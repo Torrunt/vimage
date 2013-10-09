@@ -1,0 +1,14 @@
+C:\Users\Corey\Documents\Visual Studio 2012\Projects\vimage\vimage\bin\Debug\vimage.exe.config
+C:\Users\Corey\Documents\Visual Studio 2012\Projects\vimage\vimage\bin\Debug\vimage.exe
+C:\Users\Corey\Documents\Visual Studio 2012\Projects\vimage\vimage\bin\Debug\vimage.pdb
+C:\Users\Corey\Documents\Visual Studio 2012\Projects\vimage\vimage\bin\Debug\sfmlnet-audio-2.dll
+C:\Users\Corey\Documents\Visual Studio 2012\Projects\vimage\vimage\bin\Debug\sfmlnet-graphics-2.dll
+C:\Users\Corey\Documents\Visual Studio 2012\Projects\vimage\vimage\bin\Debug\sfmlnet-window-2.dll
+C:\Users\Corey\Documents\Visual Studio 2012\Projects\vimage\vimage\obj\Debug\vimage.csprojResolveAssemblyReference.cache
+C:\Users\Corey\Documents\Visual Studio 2012\Projects\vimage\vimage\obj\Debug\vimage.exe
+C:\Users\Corey\Documents\Visual Studio 2012\Projects\vimage\vimage\obj\Debug\vimage.pdb
+C:\Users\Corey\Documents\Visual Studio 2012\Projects\vimage\vimage\bin\Debug\csfml-audio-2.dll
+C:\Users\Corey\Documents\Visual Studio 2012\Projects\vimage\vimage\bin\Debug\csfml-graphics-2.dll
+C:\Users\Corey\Documents\Visual Studio 2012\Projects\vimage\vimage\bin\Debug\csfml-window-2.dll
+C:\Users\Corey\Documents\Visual Studio 2012\Projects\vimage\vimage\bin\Debug\libsndfile-1.dll
+C:\Users\Corey\Documents\Visual Studio 2012\Projects\vimage\vimage\bin\Debug\openal32.dll
