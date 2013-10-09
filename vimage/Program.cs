@@ -7,6 +7,7 @@ using System.IO;
 using SFML.Window;
 using SFML.Graphics;
 using Tao.OpenGl;
+using Tao.DevIl;
 
 namespace vimage
 {
@@ -37,10 +38,16 @@ namespace vimage
         static void Main(string[] args)
         {
             if (args.Count() == 0)
+            {
+                //File = "G:\\Misc\\Desktop Backgrounds\\0diHF.jpg"; // For quick debugging
                 return;
+            }
+
+            Il.ilInit();
 
             // Get Image
-            File = args[0];
+            if (args.Count() != 0)
+                File = args[0];
             
             Texture = Graphics.GetTexture(File);
             Texture.Smooth = true;
@@ -97,7 +104,6 @@ namespace vimage
         {
             // Clear screen
             Gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            //window.Clear(new Color(230, 230, 230));
             // Display Image
             window.Draw(Image);
             // Update the window
