@@ -83,10 +83,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DWM.cs" />
-    <Compile Include="Graphics.cs" />
+    <Compile Include="Display\DisplayObject.cs" />
+    <Compile Include="Display\DWM.cs" />
+    <Compile Include="Display\Graphics.cs" />
+    <Compile Include="ImageViewer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Display\AnimatedImage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
