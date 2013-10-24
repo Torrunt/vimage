@@ -80,8 +80,6 @@ namespace vimage
                 }
                 else
                     Finished = true;
-
-                CurrentFrameLength = Data.FrameDurations[CurrentFrame] == 0 ? DEFAULT_FRAME_DURATION : Data.FrameDurations[CurrentFrame];
                 
                 if (CurrentFrameLength == 0)
                     CurrentTime = 0;
@@ -105,6 +103,8 @@ namespace vimage
             RemoveChild(Sprite);
             Sprite = new Sprite(Data.Frames[CurrentFrame]);
             AddChild(Sprite);
+
+            CurrentFrameLength = Data.FrameDurations[CurrentFrame] == 0 ? DEFAULT_FRAME_DURATION : Data.FrameDurations[CurrentFrame];
             
             return true;
         }
