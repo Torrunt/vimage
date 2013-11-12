@@ -24,6 +24,8 @@ namespace vimage
         public string[] FolderContents;
         public int FolderPosition = 0;
 
+        private Config Config;
+
         private bool Updated = false;
         private bool CloseNextTick = false;
 
@@ -34,11 +36,16 @@ namespace vimage
         private bool ZoomFaster = false;
         private float CurrentZoom = 1;
         private bool FlippedX = false;
-        private bool FlippedY = false;
+        private bool FitToMonitorHeight = false;
+        private bool FitToMonitorHeightForced = false;
+        private bool BackgroundsForImagesWithTransparency = false;
 
         public ImageViewer(string file)
         {
             Il.ilInit();
+
+            // Save Mouse Position -> will open image at this position
+            Vector2i mousePos = Mouse.GetPosition();
 
             // Get Image
             File = file;
@@ -63,6 +70,10 @@ namespace vimage
             Image.Origin = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             Image.Position = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             
+            // Load Config File
+            Config = new Config();
+            Config.Load(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
+
             // Create Window
             Window = new RenderWindow(new VideoMode(Image.Texture.Size.X, Image.Texture.Size.Y), "vimage", Styles.None);
             Window.SetActive();
@@ -74,17 +85,48 @@ namespace vimage
             bb.hRgnBlur = new IntPtr();
             DWM.DwmEnableBlurBehindWindow(Window.SystemHandle, ref bb);
 
+            // Resize Window
             if (Image.Texture.Size.X >= VideoMode.DesktopMode.Width)
             {
                 // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
                 Window.Position = new Vector2i(0, 0);
             }
-            else if (Image.Texture.Size.Y > VideoMode.DesktopMode.Height)
+            else
             {
-                // Fit to monitor height if it's higher than monitor height.
-                Window.Position = new Vector2i(Window.Position.X, 0);
-                Zoom(1 + (((float)VideoMode.DesktopMode.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y));
+                if (Image.Texture.Size.Y > VideoMode.DesktopMode.Height)
+                {
+                    // Fit to monitor height if it's higher than monitor height.
+                    //Window.Position = new Vector2i(Window.Position.X, 0);
+                    Zoom(1 + (((float)VideoMode.DesktopMode.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y));
+                    FitToMonitorHeightForced = true;
+                }
+
+
+                // Open At Mouse Position
+                if (Config.Setting_OpenAtMousePosition)
+                {
+                    Vector2i winPos = new Vector2i(mousePos.X - (int)(Window.Size.X / 2), mousePos.Y - (int)(Window.Size.Y / 2));
+                    if (!FitToMonitorHeightForced)
+                    {
+                        if (winPos.Y < 0)
+                            winPos.Y = 0;
+                        if (winPos.Y + Window.Size.Y > VideoMode.DesktopMode.Height)
+                            winPos.Y = (int)VideoMode.DesktopMode.Height - (int)Window.Size.Y;
+                    }
+                    else
+                        winPos.Y = 0;
+                    Window.Position = winPos;
+                }
             }
+
+            // Defaults
+                // Smoothing
+            if (Image is AnimatedImage)
+                Image.Data.Smooth = Config.Setting_SmoothingDefault;
+            else
+                Image.Texture.Smooth = Config.Setting_SmoothingDefault;
+                // Backgrounds Fore Images With Transparency
+            BackgroundsForImagesWithTransparency = Config.Setting_BackgroundForImagesWithTransparencyDefault;
 
             Redraw();
             
@@ -96,7 +138,7 @@ namespace vimage
             Window.MouseMoved += OnMouseMoved;
             Window.KeyReleased += OnKeyUp;
             Window.KeyPressed += OnKeyDown;
-
+            
             // Loop
             Stopwatch clock = new Stopwatch();
             clock.Start();
@@ -133,8 +175,13 @@ namespace vimage
         private void Redraw()
         {
             // Clear screen
-            Window.Clear(new Color(0, 0, 0, 0));
-            Gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            if (!BackgroundsForImagesWithTransparency)
+            {
+                Window.Clear(new Color(0, 0, 0, 0));
+                Gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            }
+            else
+                Window.Clear(new Color(230, 230, 230));
             // Display Image
             Window.Draw(Image);
             // Update the window
@@ -165,15 +212,25 @@ namespace vimage
                 if (CurrentZoom == 1)
                 {
                     // Fit to Monitor Height
+                    FitToMonitorHeight = true;
                     Window.Position = new Vector2i(Window.Position.X, 0);
-                    Zoom(1 + (((float)VideoMode.DesktopMode.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y));
+                    if (Image.Rotation == 90 || Image.Rotation == 270)
+                        Zoom(1 + (((float)VideoMode.DesktopMode.Height - Image.Texture.Size.X) / Image.Texture.Size.X));
+                    else
+                        Zoom(1 + (((float)VideoMode.DesktopMode.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y));
                 }
                 else
                 {
                     // Full Size
+                    FitToMonitorHeight = false;
                     Zoom(1);
                     Window.Position = new Vector2i(Window.Position.X < 0 ? 0 : Window.Position.X, Window.Position.Y < 0 ? 0 : Window.Position.Y);
                 }
+
+
+                // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
+                if (Image.Texture.Size.X * CurrentZoom >= VideoMode.DesktopMode.Width)
+                    Window.Position = new Vector2i(0, 0);
             }
         }
         private void OnMouseMoved(Object sender, MouseMoveEventArgs e)
@@ -187,6 +244,9 @@ namespace vimage
                 Zoom(CurrentZoom + (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED));
             else if (e.Delta < 0)
                 Zoom(Math.Max(CurrentZoom - (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED), ZOOM_MIN));
+
+            FitToMonitorHeightForced = false;
+            FitToMonitorHeight = false;
         }
 
         private void Zoom(float value)
@@ -216,168 +276,151 @@ namespace vimage
             Updated = true;
         }
 
-        private void RotateImage(int Rotation)
+        private void RotateImage(int Rotation, bool aroundCenter = true)
         {
             if (Rotation >= 360)
                 Rotation = 0;
             else if (Rotation < 0)
                 Rotation = 270;
 
+            Vector2f prev_center = new Vector2f(Window.Position.X + (Window.Size.X / 2), Window.Position.Y + (Window.Size.Y / 2));
+            Vector2u WindowSize;
+
             switch (Rotation)
             {
                 case 90:
                     Image.Scale = new Vector2f((float)Image.Texture.Size.Y / (float)Image.Texture.Size.X, (float)Image.Texture.Size.X / (float)Image.Texture.Size.Y);
                     Image.Position = new Vector2f((Image.Texture.Size.X / 2) + 1, (Image.Texture.Size.Y / 2));
-                    Window.Size = new Vector2u((uint)(Image.Texture.Size.Y * CurrentZoom), (uint)(Image.Texture.Size.X * CurrentZoom));
+                    WindowSize = new Vector2u((uint)(Image.Texture.Size.Y * CurrentZoom), (uint)(Image.Texture.Size.X * CurrentZoom));
                     break;
                 case 270:
                     Image.Scale = new Vector2f((float)Image.Texture.Size.Y / (float)Image.Texture.Size.X, (float)Image.Texture.Size.X / (float)Image.Texture.Size.Y);
                     Image.Position = new Vector2f((Image.Texture.Size.X / 2), (Image.Texture.Size.Y / 2));
-                    Window.Size = new Vector2u((uint)(Image.Texture.Size.Y * CurrentZoom), (uint)(Image.Texture.Size.X * CurrentZoom));
+                    WindowSize = new Vector2u((uint)(Image.Texture.Size.Y * CurrentZoom), (uint)(Image.Texture.Size.X * CurrentZoom));
                     break;
                 default:
                     Image.Scale = new Vector2f(1f, 1f);
                     Image.Position = new Vector2f((Image.Texture.Size.X / 2), (Image.Texture.Size.Y / 2) + (Rotation == 180 ? 1 : 0));
-                    Window.Size = new Vector2u((uint)(Image.Texture.Size.X * CurrentZoom), (uint)(Image.Texture.Size.Y * CurrentZoom));
+                    WindowSize = new Vector2u((uint)(Image.Texture.Size.X * CurrentZoom), (uint)(Image.Texture.Size.Y * CurrentZoom));
                     break;
             }
-            Image.Scale = new Vector2f(Math.Abs(Image.Scale.X) * (FlippedX ? -1 : 1), Math.Abs(Image.Scale.Y) * (FlippedY ? -1 : 1));
+            Image.Scale = new Vector2f(Math.Abs(Image.Scale.X) * (FlippedX ? -1 : 1), Math.Abs(Image.Scale.Y));
             Image.Rotation = Rotation;
+
+            Window.Size = WindowSize;
+            if (aroundCenter)
+                Window.Position = new Vector2i((int)prev_center.X - (int)(WindowSize.X / 2), (int)prev_center.Y - (int)(WindowSize.Y / 2));
 
             Updated = true;
         }
 
         private void OnKeyUp(Object sender, KeyEventArgs e)
         {
-            ZoomFaster = false;
-            ZoomInOnCenter = false;
+            // Close
+            if (Config.IsControl(e.Code, Config.Control_Close))
+                CloseNextTick = true;
 
-            switch (e.Code)
+            // Rotate Image
+            if (Config.IsControl(e.Code, Config.Control_RotateClockwise))
+                RotateImage((int)Image.Rotation + 90);
+            if (Config.IsControl(e.Code, Config.Control_RotateAntiClockwise))
+                RotateImage((int)Image.Rotation - 90);
+
+            // Flip Image
+            if (Config.IsControl(e.Code, Config.Control_Flip))
             {
-                // Close
-                case Keyboard.Key.Escape:
-                case Keyboard.Key.Back:
-                    CloseNextTick = true;
-                    break;
+                FlippedX = !FlippedX;
+                Image.Scale = new Vector2f(Math.Abs(Image.Scale.X) * (FlippedX ? -1 : 1), Math.Abs(Image.Scale.Y));
+                Redraw();
+            }
 
-                // Rotate Image
-                case Keyboard.Key.Up: RotateImage((int)Image.Rotation + 90); break;
-                case Keyboard.Key.Down: RotateImage((int)Image.Rotation - 90); break;
-
-                // Flip Image
-                case Keyboard.Key.F:
+            // Animated Image Controls
+            if (Config.IsControl(e.Code, Config.Control_PauseAnimation))
+            {
+                // Pause/Play
+                if (Image is AnimatedImage)
                 {
-                    FlippedX = !FlippedX;
-                    Image.Scale = new Vector2f(Math.Abs(Image.Scale.X) * (FlippedX ? -1 : 1), Math.Abs(Image.Scale.Y) * (FlippedY ? -1 : 1));
-                    Redraw();
-                    break;
-                }
-                case Keyboard.Key.G:
-                {
-                    FlippedY = !FlippedY;
-                    Image.Scale = new Vector2f(Math.Abs(Image.Scale.X) * (FlippedX ? -1 : 1), Math.Abs(Image.Scale.Y) * (FlippedY ? -1 : 1));
-                    Redraw();
-                    break;
-                }
-
-                // Animated Image Controls
-                case Keyboard.Key.Space:
-                {
-                    // Pause/Play
-                    if (Image is AnimatedImage)
-                    {
-                        if (Image.Playing)
-                            Image.Stop();
-                        else
-                            Image.Play();
-                    }
-                    break;
-                }
-
-                // Next/Prev Image in Folder
-                case Keyboard.Key.Left:
-                case Keyboard.Key.PageUp:
-                {
-                    GetFolderContents();
-                    bool success = false;
-                    do
-                    {
-                        FolderPosition = FolderPosition == 0 ? FolderContents.Count() - 1 : FolderPosition - 1;
-                        success = ChangeImage(FolderContents[FolderPosition]);
-                    }
-                    while (!success);
-                    break;
-                }
-                case Keyboard.Key.Right:
-                case Keyboard.Key.PageDown:
-                {
-                    GetFolderContents();
-                    bool success = false;
-                    do
-                    {
-                        FolderPosition = FolderPosition == FolderContents.Count() - 1 ? 0 : FolderPosition + 1;
-                        success = ChangeImage(FolderContents[FolderPosition]);
-                    }
-                    while (!success);
-                    break;
-                }
-
-                // Toggle Settings
-                case Keyboard.Key.S:
-                {
-                    if (Image is AnimatedImage)
-                        Image.Data.Smooth = !Image.Data.Smooth;
+                    if (Image.Playing)
+                        Image.Stop();
                     else
-                        Image.Texture.Smooth = !Image.Texture.Smooth;
-                    Updated = true;
-                    break;
+                        Image.Play();
                 }
             }
+
+            // Next/Prev Image in Folder
+            if (Config.IsControl(e.Code, Config.Control_PrevImage))
+            {
+                GetFolderContents();
+                bool success = false;
+                do
+                {
+                    FolderPosition = FolderPosition == 0 ? FolderContents.Count() - 1 : FolderPosition - 1;
+                    success = ChangeImage(FolderContents[FolderPosition]);
+                }
+                while (!success);
+            }
+            if (Config.IsControl(e.Code, Config.Control_NextImage))
+            {
+                GetFolderContents();
+                bool success = false;
+                do
+                {
+                    FolderPosition = FolderPosition == FolderContents.Count() - 1 ? 0 : FolderPosition + 1;
+                    success = ChangeImage(FolderContents[FolderPosition]);
+                }
+                while (!success);
+            }
+
+            // Toggle Settings
+            if (Config.IsControl(e.Code, Config.Control_ToggleSmoothing))
+            {
+                if (Image is AnimatedImage)
+                    Image.Data.Smooth = !Image.Data.Smooth;
+                else
+                    Image.Texture.Smooth = !Image.Texture.Smooth;
+                Updated = true;
+            }
+
+            if (Config.IsControl(e.Code, Config.Control_ToggleBackgroundForTransparency))
+            {
+                BackgroundsForImagesWithTransparency = !BackgroundsForImagesWithTransparency;
+                Updated = true;
+            }
+
+            ZoomFaster = false;
+            ZoomInOnCenter = false;
         }
         private void OnKeyDown(Object sender, KeyEventArgs e)
         {
-            switch (e.Code)
+            // Animated Image Controls
+            if (Config.IsControl(e.Code, Config.Control_NextFrame))
             {
-                // Animated Image Controls
-                case Keyboard.Key.Period:
+                // Next Frame
+                if (Image is AnimatedImage)
                 {
-                    // Next Frame
-                    if (Image is AnimatedImage)
-                    {
-                        if (Image.Playing)
-                            Image.Stop();
-                        Image.NextFrame();
-                        Updated = true;
-                    }
-                    break;
-                }
-                case Keyboard.Key.Comma:
-                {
-                    // Prev Frame
-                    if (Image is AnimatedImage)
-                    {
-                        if (Image.Playing)
-                            Image.Stop();
-                        Image.PrevFrame();
-                        Updated = true;
-                    }
-                    break;
-                }
-
-                // Zooming
-                case Keyboard.Key.RShift:
-                case Keyboard.Key.LShift:
-                {
-                    ZoomFaster = true;
-                    break;
-                }
-                case Keyboard.Key.RControl:
-                case Keyboard.Key.LControl:
-                {
-                    ZoomInOnCenter = true;
-                    break;
+                    if (Image.Playing)
+                        Image.Stop();
+                    Image.NextFrame();
+                    Updated = true;
                 }
             }
+            if (Config.IsControl(e.Code, Config.Control_PrevFrame))
+            {
+                // Prev Frame
+                if (Image is AnimatedImage)
+                {
+                    if (Image.Playing)
+                        Image.Stop();
+                    Image.PrevFrame();
+                    Updated = true;
+                }
+            }
+
+            // Zooming
+            if (Config.IsControl(e.Code, Config.Control_ZoomFaster))
+                ZoomFaster = true;
+            if (Config.IsControl(e.Code, Config.Control_ZoomInOnCenter))
+                ZoomInOnCenter = true;
         }
 
         private void GetFolderContents()
@@ -420,20 +463,28 @@ namespace vimage
             view.Size = new Vector2f(Image.Texture.Size.X, Image.Texture.Size.Y);
             Window.SetView(view);
 
-            RotateImage((int)prevRotation);
-            Zoom(CurrentZoom);
+            RotateImage((int)prevRotation, false);
 
             if (Image.Texture.Size.X * CurrentZoom >= VideoMode.DesktopMode.Width)
             {
                 // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
                 Window.Position = new Vector2i(0, 0);
             }
-            else if (Image.Texture.Size.Y * CurrentZoom > VideoMode.DesktopMode.Height)
+            else if (FitToMonitorHeight || Image.Texture.Size.Y >= VideoMode.DesktopMode.Height)
             {
-                // Fit to monitor height if it's higher than monitor height.
+                // Fit to monitor height if it's higher than monitor height (or FitToMonitorHeight is true).
                 Window.Position = new Vector2i(Window.Position.X, 0);
                 Zoom(1 + (((float)VideoMode.DesktopMode.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y));
+                if (!FitToMonitorHeight)
+                    FitToMonitorHeightForced = true;
             }
+            else if (FitToMonitorHeightForced)
+            {
+                Zoom(1);
+                FitToMonitorHeightForced = false;
+            }
+            else
+                Zoom(CurrentZoom);
 
             return true;
         }
