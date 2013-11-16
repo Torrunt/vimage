@@ -29,7 +29,7 @@ namespace vimage
         private bool Updated = false;
         private bool CloseNextTick = false;
 
-        private bool LeftMouseDown = false;
+        private bool Dragging = false;
         private Vector2i DragPos = new Vector2i();
         private Vector2i MousePos = new Vector2i();
         private bool ZoomInOnCenter = false;
@@ -86,14 +86,14 @@ namespace vimage
             DWM.DwmEnableBlurBehindWindow(Window.SystemHandle, ref bb);
 
             // Resize Window
-            if (Image.Texture.Size.X >= VideoMode.DesktopMode.Width)
+            if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X > Image.Texture.Size.Y && Image.Texture.Size.X * CurrentZoom >= VideoMode.DesktopMode.Width)
             {
-                // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
+                // Position Window at 0,0 if the image is wide (ie: a Desktop Wallpaper / Screenshot)
                 Window.Position = new Vector2i(0, 0);
             }
             else
             {
-                if (Image.Texture.Size.Y > VideoMode.DesktopMode.Height)
+                if (Config.Setting_LimitImagesToMonitorHeight && Image.Texture.Size.Y > VideoMode.DesktopMode.Height)
                 {
                     // Fit to monitor height if it's higher than monitor height.
                     //Window.Position = new Vector2i(Window.Position.X, 0);
@@ -160,8 +160,8 @@ namespace vimage
                 }
                 clock.Restart();
                 
-                // Drag on LeftMouseDown
-                if (LeftMouseDown)
+                // Drag Window
+                if (Dragging)
                     Window.Position = new Vector2i(Mouse.GetPosition().X - DragPos.X, Mouse.GetPosition().Y - DragPos.Y);
 
                 // Update
@@ -190,63 +190,6 @@ namespace vimage
         private void OnWindowClosed(Object sender, EventArgs e)
         {
             Window.Close();
-        }
-
-        private void OnMouseDown(Object sender, MouseButtonEventArgs e)
-        {
-            if (e.Button.Equals(Mouse.Button.Left))
-                LeftMouseDown = true;
-
-            if (LeftMouseDown)
-                DragPos = new Vector2i(e.X, e.Y);
-        }
-        private void OnMouseUp(Object sender, MouseButtonEventArgs e)
-        {
-            if (e.Button.Equals(Mouse.Button.Left))
-                LeftMouseDown = false;
-
-            if (e.Button.Equals(Mouse.Button.Right))
-                CloseNextTick = true;
-            else if (e.Button.Equals(Mouse.Button.Middle))
-            {
-                if (CurrentZoom == 1)
-                {
-                    // Fit to Monitor Height
-                    FitToMonitorHeight = true;
-                    Window.Position = new Vector2i(Window.Position.X, 0);
-                    if (Image.Rotation == 90 || Image.Rotation == 270)
-                        Zoom(1 + (((float)VideoMode.DesktopMode.Height - Image.Texture.Size.X) / Image.Texture.Size.X));
-                    else
-                        Zoom(1 + (((float)VideoMode.DesktopMode.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y));
-                }
-                else
-                {
-                    // Full Size
-                    FitToMonitorHeight = false;
-                    Zoom(1);
-                    Window.Position = new Vector2i(Window.Position.X < 0 ? 0 : Window.Position.X, Window.Position.Y < 0 ? 0 : Window.Position.Y);
-                }
-
-
-                // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
-                if (Image.Texture.Size.X * CurrentZoom >= VideoMode.DesktopMode.Width)
-                    Window.Position = new Vector2i(0, 0);
-            }
-        }
-        private void OnMouseMoved(Object sender, MouseMoveEventArgs e)
-        {
-            MousePos = new Vector2i(e.X, e.Y);
-        }
-
-        private void OnMouseWheelMoved(Object sender, MouseWheelEventArgs e)
-        {
-            if (e.Delta > 0)
-                Zoom(CurrentZoom + (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED));
-            else if (e.Delta < 0)
-                Zoom(Math.Max(CurrentZoom - (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED), ZOOM_MIN));
-
-            FitToMonitorHeightForced = false;
-            FitToMonitorHeight = false;
         }
 
         private void Zoom(float value)
@@ -314,11 +257,80 @@ namespace vimage
             Updated = true;
         }
 
+        private void ToggleFitToMonitorHeight()
+        {
+            if (CurrentZoom == 1)
+            {
+                // Fit to Monitor Height
+                FitToMonitorHeight = true;
+                Window.Position = new Vector2i(Window.Position.X, 0);
+                if (Image.Rotation == 90 || Image.Rotation == 270)
+                    Zoom(1 + (((float)VideoMode.DesktopMode.Height - Image.Texture.Size.X) / Image.Texture.Size.X));
+                else
+                    Zoom(1 + (((float)VideoMode.DesktopMode.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y));
+            }
+            else
+            {
+                // Full Size
+                FitToMonitorHeight = false;
+                Zoom(1);
+                Window.Position = new Vector2i(Window.Position.X < 0 ? 0 : Window.Position.X, Window.Position.Y < 0 ? 0 : Window.Position.Y);
+            }
+
+
+            // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
+            if (Image.Texture.Size.X * CurrentZoom >= VideoMode.DesktopMode.Width)
+                Window.Position = new Vector2i(0, 0);
+        }
+
+        // Controls
+        
+        private void OnMouseDown(Object sender, MouseButtonEventArgs e)
+        {
+            if (Config.IsControl(e.Button, Config.Control_Drag))
+                Dragging = true;
+
+            if (Dragging)
+                DragPos = new Vector2i(e.X, e.Y);
+        }
+        private void OnMouseUp(Object sender, MouseButtonEventArgs e)
+        {
+            // Dragging
+            if (Config.IsControl(e.Button, Config.Control_Drag))
+                Dragging = false;
+
+            // Close
+            if (Config.IsControl(e.Button, Config.Control_Close))
+                CloseNextTick = true;
+
+            // Fit To Monitor Height
+            if (Config.IsControl(e.Button, Config.Control_FitToMonitorHeight))
+                ToggleFitToMonitorHeight();
+        }
+        private void OnMouseMoved(Object sender, MouseMoveEventArgs e)
+        {
+            MousePos = new Vector2i(e.X, e.Y);
+        }
+        private void OnMouseWheelMoved(Object sender, MouseWheelEventArgs e)
+        {
+            if (e.Delta > 0)
+                Zoom(CurrentZoom + (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED));
+            else if (e.Delta < 0)
+                Zoom(Math.Max(CurrentZoom - (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED), ZOOM_MIN));
+
+            FitToMonitorHeightForced = false;
+            FitToMonitorHeight = false;
+        }
+
         private void OnKeyUp(Object sender, KeyEventArgs e)
         {
             // Close
             if (Config.IsControl(e.Code, Config.Control_Close))
                 CloseNextTick = true;
+
+            // Dragging
+            if (Config.IsControl(e.Code, Config.Control_Drag))
+                Dragging = false;
 
             // Rotate Image
             if (Config.IsControl(e.Code, Config.Control_RotateClockwise))
@@ -333,6 +345,10 @@ namespace vimage
                 Image.Scale = new Vector2f(Math.Abs(Image.Scale.X) * (FlippedX ? -1 : 1), Math.Abs(Image.Scale.Y));
                 Redraw();
             }
+
+            // Fit To Monitor Height
+            if (Config.IsControl(e.Code, Config.Control_FitToMonitorHeight))
+                ToggleFitToMonitorHeight();
 
             // Animated Image Controls
             if (Config.IsControl(e.Code, Config.Control_PauseAnimation))
@@ -370,6 +386,10 @@ namespace vimage
                 }
                 while (!success);
             }
+            
+            // Open config.txt
+            if (Config.IsControl(e.Code, Config.Control_OpenConfig))
+                Process.Start(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
 
             // Toggle Settings
             if (Config.IsControl(e.Code, Config.Control_ToggleSmoothing))
@@ -421,7 +441,17 @@ namespace vimage
                 ZoomFaster = true;
             if (Config.IsControl(e.Code, Config.Control_ZoomInOnCenter))
                 ZoomInOnCenter = true;
+
+            // Dragging
+            if (Config.IsControl(e.Code, Config.Control_Drag))
+            {
+                if (!Dragging)
+                    DragPos = MousePos;
+                Dragging = true;
+            }
         }
+
+
 
         private void GetFolderContents()
         {
@@ -465,12 +495,7 @@ namespace vimage
 
             RotateImage((int)prevRotation, false);
 
-            if (Image.Texture.Size.X * CurrentZoom >= VideoMode.DesktopMode.Width)
-            {
-                // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
-                Window.Position = new Vector2i(0, 0);
-            }
-            else if (FitToMonitorHeight || Image.Texture.Size.Y >= VideoMode.DesktopMode.Height)
+            if (Config.Setting_LimitImagesToMonitorHeight && (FitToMonitorHeight || Image.Texture.Size.Y >= VideoMode.DesktopMode.Height))
             {
                 // Fit to monitor height if it's higher than monitor height (or FitToMonitorHeight is true).
                 Window.Position = new Vector2i(Window.Position.X, 0);
@@ -485,6 +510,10 @@ namespace vimage
             }
             else
                 Zoom(CurrentZoom);
+
+            // Position Window at 0,0 if the image is wide (ie: a Desktop Wallpaper / Screenshot)
+            if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X > Image.Texture.Size.Y && Image.Texture.Size.X * CurrentZoom >= VideoMode.DesktopMode.Width)
+                Window.Position = new Vector2i(0, 0);
 
             return true;
         }

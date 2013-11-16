@@ -24,3 +24,4 @@ S to Toggle Smoothing
 T to Toggle a light grey background for images with transparency
 Space to pause Animated GIFs
 ,/. to go through Animated GIF frames
+O to open config.txt

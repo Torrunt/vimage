@@ -11,40 +11,52 @@ namespace vimage
 @"OpenAtMousePosition = 1
 SmoothingDefault = 1
 BackgroundForImagesWithTransparencyDefault = 0
+LimitImagesToMonitorHeight = 1
+PositionLargeWideImagesInCorner = 1 // ie: Desktop Wallpapers and Screenshots
 
-Close = ESC, BACKSPACE
+Drag = MOUSELEFT
+Close = ESC, BACKSPACE, MOUSERIGHT
 PrevImage = LEFT, PAGE UP
 NextImage = RIGHT, PAGE DOWN
 RotateClockwise = UP
 RotateAntiClockwise = DOWN
 Flip = F
+FitToMonitorHeight = MOUSEMIDDLE
 ZoomFaster = RSHIFT, LSHIFT
 ZoomInOnCenter = RCONTROL, LCONTROL
 ToggleSmoothing = S
 ToggleBackgroundForTransparency = T
 PauseAnimation = SPACE
 PrevFrame = <
-NextFrame = >";
+NextFrame = >
+OpenConfig = O";
 
-        public List<Keyboard.Key> Control_Close = new List<Keyboard.Key>();
-        public List<Keyboard.Key> Control_PrevImage = new List<Keyboard.Key>();
-        public List<Keyboard.Key> Control_NextImage = new List<Keyboard.Key>();
-        public List<Keyboard.Key> Control_RotateClockwise = new List<Keyboard.Key>();
-        public List<Keyboard.Key> Control_RotateAntiClockwise = new List<Keyboard.Key>();
-        public List<Keyboard.Key> Control_Flip = new List<Keyboard.Key>();
-        public List<Keyboard.Key> Control_ZoomFaster = new List<Keyboard.Key>();
-        public List<Keyboard.Key> Control_ZoomInOnCenter = new List<Keyboard.Key>();
-        public List<Keyboard.Key> Control_ToggleSmoothing = new List<Keyboard.Key>();
-        public List<Keyboard.Key> Control_ToggleBackgroundForTransparency = new List<Keyboard.Key>();
-        public List<Keyboard.Key> Control_PauseAnimation = new List<Keyboard.Key>();
-        public List<Keyboard.Key> Control_PrevFrame = new List<Keyboard.Key>();
-        public List<Keyboard.Key> Control_NextFrame = new List<Keyboard.Key>();
+        public List<int> Control_Drag = new List<int>();
+        public List<int> Control_Close = new List<int>();
+        public List<int> Control_PrevImage = new List<int>();
+        public List<int> Control_NextImage = new List<int>();
+        public List<int> Control_RotateClockwise = new List<int>();
+        public List<int> Control_RotateAntiClockwise = new List<int>();
+        public List<int> Control_Flip = new List<int>();
+        public List<int> Control_FitToMonitorHeight = new List<int>();
+        public List<int> Control_ZoomFaster = new List<int>();
+        public List<int> Control_ZoomInOnCenter = new List<int>();
+        public List<int> Control_ToggleSmoothing = new List<int>();
+        public List<int> Control_ToggleBackgroundForTransparency = new List<int>();
+        public List<int> Control_PauseAnimation = new List<int>();
+        public List<int> Control_PrevFrame = new List<int>();
+        public List<int> Control_NextFrame = new List<int>();
+        public List<int> Control_OpenConfig = new List<int>();
 
         public bool Setting_OpenAtMousePosition { get { return (Boolean)Settings["OPENATMOUSEPOSITION"]; } }
         public bool Setting_SmoothingDefault { get { return (Boolean)Settings["SMOOTHINGDEFAULT"]; } }
         public bool Setting_BackgroundForImagesWithTransparencyDefault { get { return (Boolean)Settings["BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT"]; } }
+        public bool Setting_LimitImagesToMonitorHeight { get { return (Boolean)Settings["LIMITIMAGESTOMONITORHEIGHT"]; } }
+        public bool Setting_PositionLargeWideImagesInCorner { get { return (Boolean)Settings["POSITIONLARGEWIDEIMAGESINCORNER"]; } }
 
         private Dictionary<string, object> Settings;
+
+        public const int MouseCodeOffset = 150;
 
         public Config()
         {
@@ -53,12 +65,17 @@ NextFrame = >";
                 { "OPENATMOUSEPOSITION", true },
                 { "SMOOTHINGDEFAULT", true },
                 { "BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT", false },
+                { "LIMITIMAGESTOMONITORHEIGHT", true },
+                { "POSITIONLARGEWIDEIMAGESINCORNER", true },
+
+                { "DRAG", Control_Drag },
                 { "CLOSE", Control_Close },
                 { "PREVIMAGE", Control_PrevImage },
                 { "NEXTIMAGE", Control_NextImage },
                 { "ROTATECLOCKWISE", Control_RotateClockwise },
                 { "ROTATEANTICLOCKWISE", Control_RotateAntiClockwise },
                 { "FLIP", Control_Flip },
+                { "FITTOMONITORHEIGHT", Control_FitToMonitorHeight },
                 { "ZOOMFASTER", Control_ZoomFaster },
                 { "ZOOMINONCENTER", Control_ZoomInOnCenter },
                 { "TOGGLESMOOTHING", Control_ToggleSmoothing },
@@ -66,6 +83,7 @@ NextFrame = >";
                 { "PAUSEANIMATION", Control_PauseAnimation },
                 { "PREVFRAME", Control_PrevFrame },
                 { "NEXTFRAME", Control_NextFrame },
+                { "OPENCONFIG", Control_OpenConfig }
             };
         }
 
@@ -108,15 +126,26 @@ NextFrame = >";
                 // split values by commas
                 string[] values = nameValue[1].Split(',');
 
-                if (Settings[name] is List<Keyboard.Key>)
+                if (Settings[name] is List<int>)
                 {
                     // Control
-                    List<Keyboard.Key> list = (List<Keyboard.Key>)Settings[name];
+                    List<int> list = (List<int>)Settings[name];
                     for (int i = 0; i < values.Length; i++)
                     {
-                        Keyboard.Key key = StringToKey(values[i].ToUpper());
-                        if (key != Keyboard.Key.Unknown)
-                            list.Add(key);
+                        if (values[i].ToUpper().StartsWith("MOUSE"))
+                        {
+                            // Mouse Button
+                            int btn = StringToMouseButton(values[i].ToUpper());
+                            if (btn != -1)
+                                list.Add(btn);
+                        }
+                        else
+                        {
+                            // Keyboard Key
+                            Keyboard.Key key = StringToKey(values[i].ToUpper());
+                            if (key != Keyboard.Key.Unknown)
+                                list.Add((int)key);
+                        }
                     }
                 }
                 else if (Settings[name] is Boolean)
@@ -128,11 +157,25 @@ NextFrame = >";
                         Settings[name] = false;
                 }
             }
+
+            reader.Close();
         }
 
-        /// <summary> Returns true if keyCode is one of Control bindings. </summary>
-        public static bool IsControl(Keyboard.Key keyCode, List<Keyboard.Key> Control)
+        /// <summary> Returns true if code is one of Control bindings. </summary>
+        public static bool IsControl(int code, List<int> Control)
         {
+            // Mouse key?
+            if (IsControl((Mouse.Button)(code-MouseCodeOffset), Control))
+                return true;
+            // Keyboard key?
+            if (IsControl((Keyboard.Key)code, Control))
+                return true;
+            return false;
+        }
+        /// <summary> Returns true if Keyboard.Key is one of Control bindings. </summary>
+        public static bool IsControl(Keyboard.Key keyCode, List<int> Control)
+        {
+            // Keyboard key?
             foreach (Keyboard.Key key in Control)
             {
                 if (keyCode == key)
@@ -140,7 +183,44 @@ NextFrame = >";
             }
             return false;
         }
+        /// <summary> Returns true if Mouse.Button is one of Control bindings. </summary>
+        public static bool IsControl(Mouse.Button code, List<int> Control)
+        {
+            // Mouse key?
+            foreach (Mouse.Button key in Control)
+            {
+                if (code == (Mouse.Button)(key - MouseCodeOffset))
+                    return true;
+            }
+            return false;
+        }
 
+        /// <summary> Converts upper-case string to SFML Mouse.Button (as an int + offset). </summary>
+        public static int StringToMouseButton(string str)
+        {
+            switch (str)
+            {
+                case "MOUSELEFT":
+                case "MOUSE1":
+                    return (int)Mouse.Button.Left + MouseCodeOffset;
+                case "MOUSERIGHT":
+                case "MOUSE2":
+                    return (int)Mouse.Button.Right + MouseCodeOffset;
+                case "MOUSEMIDDLE":
+                case "MOUSE3":
+                    return (int)Mouse.Button.Middle + MouseCodeOffset;
+                case "MOUSEX1":
+                case "MOUSEXBUTTON1":
+                case "MOUSE4":
+                    return (int)Mouse.Button.XButton1 + MouseCodeOffset;
+                case "MOUSEX2":
+                case "MOUSEXBUTTON2":
+                case "MOUSE5":
+                    return (int)Mouse.Button.XButton2 + MouseCodeOffset;
+            }
+
+            return -1;
+        }
         /// <summary> Converts upper-case string to SFML Keyboard.Key. </summary>
         public static Keyboard.Key StringToKey(string str)
         {
