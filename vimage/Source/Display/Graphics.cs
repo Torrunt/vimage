@@ -8,11 +8,10 @@ using System.Runtime.InteropServices;
 
 namespace vimage
 {
-    public class TDrawable : Transformable, Drawable
-    {
-        public void Draw(RenderTarget Target, RenderStates states) { }
-    }
-
+    /// <summary>
+    /// Graphics Manager.
+    /// Loads and stores Textures and AnimatedImageDatas.
+    /// </summary>
     class Graphics
     {
         private static List<Texture> Textures = new List<Texture>();

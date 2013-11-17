@@ -22,31 +22,37 @@ RotateClockwise = UP
 RotateAntiClockwise = DOWN
 Flip = F
 FitToMonitorHeight = MOUSEMIDDLE
+FitToMonitorHeightAlternative = RSHIFT, LSHIFT
 ZoomFaster = RSHIFT, LSHIFT
 ZoomInOnCenter = RCONTROL, LCONTROL
 ToggleSmoothing = S
 ToggleBackgroundForTransparency = T
+ToggleAlwaysOnTop = L
 PauseAnimation = SPACE
 PrevFrame = <
 NextFrame = >
-OpenConfig = O";
+OpenConfig = O
+ReloadConfig = P";
 
-        public List<int> Control_Drag = new List<int>();
-        public List<int> Control_Close = new List<int>();
-        public List<int> Control_PrevImage = new List<int>();
-        public List<int> Control_NextImage = new List<int>();
-        public List<int> Control_RotateClockwise = new List<int>();
-        public List<int> Control_RotateAntiClockwise = new List<int>();
-        public List<int> Control_Flip = new List<int>();
-        public List<int> Control_FitToMonitorHeight = new List<int>();
-        public List<int> Control_ZoomFaster = new List<int>();
-        public List<int> Control_ZoomInOnCenter = new List<int>();
-        public List<int> Control_ToggleSmoothing = new List<int>();
-        public List<int> Control_ToggleBackgroundForTransparency = new List<int>();
-        public List<int> Control_PauseAnimation = new List<int>();
-        public List<int> Control_PrevFrame = new List<int>();
-        public List<int> Control_NextFrame = new List<int>();
-        public List<int> Control_OpenConfig = new List<int>();
+        public List<int> Control_Drag;
+        public List<int> Control_Close;
+        public List<int> Control_PrevImage;
+        public List<int> Control_NextImage;
+        public List<int> Control_RotateClockwise;
+        public List<int> Control_RotateAntiClockwise;
+        public List<int> Control_Flip;
+        public List<int> Control_FitToMonitorHeight;
+        public List<int> Control_FitToMonitorHeightAlternative;
+        public List<int> Control_ZoomFaster;
+        public List<int> Control_ZoomInOnCenter;
+        public List<int> Control_ToggleSmoothing;
+        public List<int> Control_ToggleBackgroundForTransparency;
+        public List<int> Control_ToggleAlwaysOnTop;
+        public List<int> Control_PauseAnimation;
+        public List<int> Control_PrevFrame;
+        public List<int> Control_NextFrame;
+        public List<int> Control_OpenConfig;
+        public List<int> Control_ReloadConfig;
 
         public bool Setting_OpenAtMousePosition { get { return (Boolean)Settings["OPENATMOUSEPOSITION"]; } }
         public bool Setting_SmoothingDefault { get { return (Boolean)Settings["SMOOTHINGDEFAULT"]; } }
@@ -60,6 +66,30 @@ OpenConfig = O";
 
         public Config()
         {
+            Init();
+        }
+        public void Init()
+        {
+            Control_Drag = new List<int>();
+            Control_Close = new List<int>();
+            Control_PrevImage = new List<int>();
+            Control_NextImage = new List<int>();
+            Control_RotateClockwise = new List<int>();
+            Control_RotateAntiClockwise = new List<int>();
+            Control_Flip = new List<int>();
+            Control_FitToMonitorHeight = new List<int>();
+            Control_FitToMonitorHeightAlternative = new List<int>();
+            Control_ZoomFaster = new List<int>();
+            Control_ZoomInOnCenter = new List<int>();
+            Control_ToggleSmoothing = new List<int>();
+            Control_ToggleBackgroundForTransparency = new List<int>();
+            Control_ToggleAlwaysOnTop = new List<int>();
+            Control_PauseAnimation = new List<int>();
+            Control_PrevFrame = new List<int>();
+            Control_NextFrame = new List<int>();
+            Control_OpenConfig = new List<int>();
+            Control_ReloadConfig = new List<int>();
+
             Settings = new Dictionary<string, object>()
             {
                 { "OPENATMOUSEPOSITION", true },
@@ -76,14 +106,17 @@ OpenConfig = O";
                 { "ROTATEANTICLOCKWISE", Control_RotateAntiClockwise },
                 { "FLIP", Control_Flip },
                 { "FITTOMONITORHEIGHT", Control_FitToMonitorHeight },
+                { "FITTOMONITORHEIGHTALTERNATIVE", Control_FitToMonitorHeightAlternative },
                 { "ZOOMFASTER", Control_ZoomFaster },
                 { "ZOOMINONCENTER", Control_ZoomInOnCenter },
                 { "TOGGLESMOOTHING", Control_ToggleSmoothing },
                 { "TOGGLEBACKGROUNDFORTRANSPARENCY", Control_ToggleBackgroundForTransparency },
+                { "TOGGLEALWAYSONTOP", Control_ToggleAlwaysOnTop },
                 { "PAUSEANIMATION", Control_PauseAnimation },
                 { "PREVFRAME", Control_PrevFrame },
                 { "NEXTFRAME", Control_NextFrame },
-                { "OPENCONFIG", Control_OpenConfig }
+                { "OPENCONFIG", Control_OpenConfig },
+                { "RELOADCONFIG", Control_ReloadConfig }
             };
         }
 

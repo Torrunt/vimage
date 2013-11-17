@@ -1,0 +1,7 @@
+------------------------
+version 2
+------------------------
+- Press L (default) to toggle Always On Top mode.
+- Fit to monitor height now temporary sets Always On Top mode.
+- Holding SHIFT (default) while setting Fit To Monitor Height (Middle Mouse Button (default)) sets the image to the height of the working area (ie: the height of the screen minus the task bar height).
+- When an image is opened at the Mouse Position it will snap to the edges of the working area of the monitor it was opened on instead of hanging off the edges of the screen.
