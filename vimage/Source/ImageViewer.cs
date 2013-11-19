@@ -433,7 +433,8 @@ namespace vimage
 
         private void Zoom(float value)
         {
-            CurrentZoom = value;
+			if(CurrentZoom < 3)
+	            CurrentZoom = value;
 
             UnforceAlwaysOnTop();
 
@@ -458,6 +459,8 @@ namespace vimage
             }
 
             Updated = true;
+
+			System.Diagnostics.Debug.WriteLine(string.Format("Zoomlock setting is {0}", Config.Setting_ZoomLock), "vimage");
         }
 
         private void RotateImage(int Rotation, bool aroundCenter = true)
