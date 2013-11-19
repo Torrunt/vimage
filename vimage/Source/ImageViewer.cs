@@ -27,6 +27,11 @@ namespace vimage
         private bool Updated = false;
         private bool CloseNextTick = false;
 
+        /// <summary>
+        /// Instead of setting the Window Position directly when the image is going to be Updated, this is set.
+        /// This prevents the old image being shown at the new image location for a split-second before the new image is loaded.
+        /// </summary>
+        private Vector2i NextWindowPos = new Vector2i();
         private bool Dragging = false;
         private Vector2i DragPos = new Vector2i();
         private Vector2i MousePos = new Vector2i();
@@ -111,7 +116,6 @@ namespace vimage
                 if (Config.Setting_LimitImagesToMonitorHeight && Image.Texture.Size.Y > bounds.Height)
                 {
                     // Fit to monitor height if it's higher than monitor height.
-                    //Window.Position = new Vector2i(Window.Position.X, 0);
                     Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
                     FitToMonitorHeightForced = true;
                 }
@@ -154,6 +158,7 @@ namespace vimage
             BackgroundsForImagesWithTransparency = Config.Setting_BackgroundForImagesWithTransparencyDefault;
 
             Redraw();
+            NextWindowPos = Window.Position;
             
             // Interaction
             Window.Closed += OnWindowClosed;
@@ -194,6 +199,7 @@ namespace vimage
                 {
                     Updated = false;
                     Redraw();
+                    Window.Position = NextWindowPos;
                 }
 
                 if (ForceAlwaysOnTopNextTick)
@@ -295,10 +301,10 @@ namespace vimage
             }
 
 			// Reset Image
-			if(Config.IsControl(e.Code, Config.Control_ResetImage))
+			if (Config.IsControl(e.Code, Config.Control_ResetImage))
 			{
 				Zoom(1f);
-				Image.Scale = new Vector2f(Math.Abs(Image.Scale.X), Math.Abs(Image.Scale.Y));
+                FlippedX = false;
 				RotateImage(0);
 			}
 
@@ -320,7 +326,7 @@ namespace vimage
             }
 
             // Next/Prev Image in Folder
-            if (Config.IsControl(e.Code, Config.Control_PrevImage))
+            if (!Updated && Config.IsControl(e.Code, Config.Control_PrevImage))
             {
                 GetFolderContents();
                 bool success = false;
@@ -331,7 +337,7 @@ namespace vimage
                 }
                 while (!success);
             }
-            if (Config.IsControl(e.Code, Config.Control_NextImage))
+            if (!Updated && Config.IsControl(e.Code, Config.Control_NextImage))
             {
                 GetFolderContents();
                 bool success = false;
@@ -447,7 +453,7 @@ namespace vimage
                 Window.Size = newSize;
 
                 Vector2i difference = new Vector2i((int)newSize.X, (int)newSize.Y) - new Vector2i((int)Window.Size.X, (int)Window.Size.Y);
-                Window.Position = new Vector2i(Window.Position.X - (difference.X / 2), Window.Position.Y - (difference.Y / 2));
+                NextWindowPos = new Vector2i(Window.Position.X - (difference.X / 2), Window.Position.Y - (difference.Y / 2));
             }
             else
             {
@@ -495,7 +501,7 @@ namespace vimage
 
             Window.Size = WindowSize;
             if (aroundCenter)
-                Window.Position = new Vector2i((int)center.X - (int)(WindowSize.X / 2), (int)center.Y - (int)(WindowSize.Y / 2));
+                NextWindowPos = new Vector2i((int)center.X - (int)(WindowSize.X / 2), (int)center.Y - (int)(WindowSize.Y / 2));
 
             Updated = true;
         }
@@ -518,19 +524,19 @@ namespace vimage
                     Zoom(1 + (((float)bounds.Height - Image.Texture.Size.X) / Image.Texture.Size.X), true);
                 else
                     Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
-                Window.Position = new Vector2i(Window.Position.X, 0);
+                NextWindowPos = new Vector2i(NextWindowPos.X, 0);
             }
             else
             {
                 // Full Size
                 FitToMonitorHeight = false;
                 Zoom(1, true);
-                Window.Position = new Vector2i(Window.Position.X < 0 ? 0 : Window.Position.X, Window.Position.Y < 0 ? 0 : Window.Position.Y);
+                NextWindowPos = new Vector2i(NextWindowPos.X < 0 ? 0 : NextWindowPos.X, NextWindowPos.Y < 0 ? 0 : NextWindowPos.Y);
             }
 
 
             if (Image.Texture.Size.X * CurrentZoom >= VideoMode.DesktopMode.Width)
-                Window.Position = new Vector2i(0, 0); // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
+                NextWindowPos = new Vector2i(0, 0); // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
             else if (!FitToMonitorHeightAlternative)
                 ForceAlwaysOnTopNextTick = true;
         }
@@ -540,6 +546,7 @@ namespace vimage
             float prevRotation = Image.Rotation;
             
             Image.Dispose();
+            Dragging = false;
 
             if (Graphics.NumberOfFramesInImage(fileName) > 1)
             {
@@ -573,7 +580,7 @@ namespace vimage
             {
                 // Fit to monitor height if it's higher than monitor height (or FitToMonitorHeight is true).
                 Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
-                Window.Position = new Vector2i(Window.Position.X, bounds.Top);
+                NextWindowPos = new Vector2i(NextWindowPos.X, bounds.Top);
                 if (!FitToMonitorHeight)
                     FitToMonitorHeightForced = true;
             }
@@ -587,7 +594,7 @@ namespace vimage
 
             // Position Window at 0,0 if the image is wide (ie: a Desktop Wallpaper / Screenshot)
             if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X > Image.Texture.Size.Y && Image.Texture.Size.X * CurrentZoom >= VideoMode.DesktopMode.Width)
-                Window.Position = new Vector2i(0, 0);
+                NextWindowPos = new Vector2i(0, 0);
 
             // Force Always On Top Mode (so it's above the task bar) - will only happen if height >= window height
             ForceAlwaysOnTopNextTick = true;
