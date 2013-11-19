@@ -112,7 +112,7 @@ namespace vimage
                 {
                     // Fit to monitor height if it's higher than monitor height.
                     //Window.Position = new Vector2i(Window.Position.X, 0);
-                    Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y));
+                    Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
                     FitToMonitorHeightForced = true;
                 }
 
@@ -262,9 +262,9 @@ namespace vimage
         private void OnMouseWheelMoved(Object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0)
-                Zoom(CurrentZoom + (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED));
+                Zoom(CurrentZoom + (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED), ZoomInOnCenter);
             else if (e.Delta < 0)
-                Zoom(Math.Max(CurrentZoom - (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED), ZOOM_MIN));
+                Zoom(Math.Max(CurrentZoom - (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED), ZOOM_MIN), ZoomInOnCenter);
 
             FitToMonitorHeightForced = false;
             FitToMonitorHeight = false;
@@ -423,13 +423,13 @@ namespace vimage
         //      Manipulation     //
         ///////////////////////////
 
-        private void Zoom(float value)
+        void Zoom(float value, bool center = false)
         {
             CurrentZoom = value;
 
             UnforceAlwaysOnTop();
 
-            if (ZoomInOnCenter)
+            if (center)
             {
                 Vector2u newSize;
                 if (Image.Rotation == 0 || Image.Rotation == 180)
@@ -459,7 +459,7 @@ namespace vimage
             else if (Rotation < 0)
                 Rotation = 270;
 
-            Vector2f prev_center = new Vector2f(Window.Position.X + (Window.Size.X / 2), Window.Position.Y + (Window.Size.Y / 2));
+            Vector2f center = new Vector2f(Window.Position.X + (Window.Size.X / 2), Window.Position.Y + (Window.Size.Y / 2));
             Vector2u WindowSize;
 
             UnforceAlwaysOnTop();
@@ -487,7 +487,7 @@ namespace vimage
 
             Window.Size = WindowSize;
             if (aroundCenter)
-                Window.Position = new Vector2i((int)prev_center.X - (int)(WindowSize.X / 2), (int)prev_center.Y - (int)(WindowSize.Y / 2));
+                Window.Position = new Vector2i((int)center.X - (int)(WindowSize.X / 2), (int)center.Y - (int)(WindowSize.Y / 2));
 
             Updated = true;
         }
@@ -506,17 +506,17 @@ namespace vimage
             {
                 // Fit to Monitor Height
                 FitToMonitorHeight = true;
-                Window.Position = new Vector2i(Window.Position.X, 0);
                 if (Image.Rotation == 90 || Image.Rotation == 270)
-                    Zoom(1 + (((float)bounds.Height - Image.Texture.Size.X) / Image.Texture.Size.X));
+                    Zoom(1 + (((float)bounds.Height - Image.Texture.Size.X) / Image.Texture.Size.X), true);
                 else
-                    Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y));
+                    Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
+                Window.Position = new Vector2i(Window.Position.X, 0);
             }
             else
             {
                 // Full Size
                 FitToMonitorHeight = false;
-                Zoom(1);
+                Zoom(1, true);
                 Window.Position = new Vector2i(Window.Position.X < 0 ? 0 : Window.Position.X, Window.Position.Y < 0 ? 0 : Window.Position.Y);
             }
 
@@ -530,7 +530,7 @@ namespace vimage
         private bool ChangeImage(string fileName)
         {
             float prevRotation = Image.Rotation;
-
+            
             Image.Dispose();
 
             if (Graphics.NumberOfFramesInImage(fileName) > 1)
@@ -560,24 +560,22 @@ namespace vimage
 
             RotateImage((int)prevRotation, false);
 
-            UnforceAlwaysOnTop();
-
             IntRect bounds = GetCurrentBounds(Window.Position);
-            if (Config.Setting_LimitImagesToMonitorHeight && (FitToMonitorHeight || Image.Texture.Size.Y >= bounds.Height))
+            if (Config.Setting_LimitImagesToMonitorHeight && (FitToMonitorHeight || (Image.Texture.Size.Y * CurrentZoom >= bounds.Height || (FitToMonitorHeightForced && Image.Texture.Size.Y >= bounds.Height))))
             {
                 // Fit to monitor height if it's higher than monitor height (or FitToMonitorHeight is true).
+                Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
                 Window.Position = new Vector2i(Window.Position.X, bounds.Top);
-                Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y));
                 if (!FitToMonitorHeight)
                     FitToMonitorHeightForced = true;
             }
             else if (FitToMonitorHeightForced)
             {
-                Zoom(1);
+                Zoom(1, true);
                 FitToMonitorHeightForced = false;
             }
             else
-                Zoom(CurrentZoom);
+                Zoom(CurrentZoom, true);
 
             // Position Window at 0,0 if the image is wide (ie: a Desktop Wallpaper / Screenshot)
             if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X > Image.Texture.Size.Y && Image.Texture.Size.X * CurrentZoom >= VideoMode.DesktopMode.Width)
