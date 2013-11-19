@@ -32,7 +32,8 @@ PauseAnimation = SPACE
 PrevFrame = <
 NextFrame = >
 OpenConfig = O
-ReloadConfig = P";
+ReloadConfig = P
+ResetImage = R";
 
         public List<int> Control_Drag;
         public List<int> Control_Close;
@@ -53,6 +54,7 @@ ReloadConfig = P";
         public List<int> Control_NextFrame;
         public List<int> Control_OpenConfig;
         public List<int> Control_ReloadConfig;
+		public List<int> Control_ResetImage;
 
         public bool Setting_OpenAtMousePosition { get { return (Boolean)Settings["OPENATMOUSEPOSITION"]; } }
         public bool Setting_SmoothingDefault { get { return (Boolean)Settings["SMOOTHINGDEFAULT"]; } }
@@ -89,6 +91,7 @@ ReloadConfig = P";
             Control_NextFrame = new List<int>();
             Control_OpenConfig = new List<int>();
             Control_ReloadConfig = new List<int>();
+			Control_ResetImage = new List<int>();
 
             Settings = new Dictionary<string, object>()
             {
@@ -116,7 +119,8 @@ ReloadConfig = P";
                 { "PREVFRAME", Control_PrevFrame },
                 { "NEXTFRAME", Control_NextFrame },
                 { "OPENCONFIG", Control_OpenConfig },
-                { "RELOADCONFIG", Control_ReloadConfig }
+                { "RELOADCONFIG", Control_ReloadConfig },
+				{ "RESETIMAGE", Control_ResetImage }
             };
         }
 
