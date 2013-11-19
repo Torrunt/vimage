@@ -294,6 +294,14 @@ namespace vimage
                 Redraw();
             }
 
+			// Reset Image
+			if(Config.IsControl(e.Code, Config.Control_ResetImage))
+			{
+				Zoom(1f);
+				Image.Scale = new Vector2f(Math.Abs(Image.Scale.X), Math.Abs(Image.Scale.Y));
+				RotateImage(0);
+			}
+
             // Fit To Monitor Height
             if (Config.IsControl(e.Code, Config.Control_FitToMonitorHeight))
                 ToggleFitToMonitorHeight();
