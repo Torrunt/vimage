@@ -573,6 +573,7 @@ namespace vimage
             }
             Image.Origin = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             Image.Position = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
+            int OldDefaultRotation = DefaultRotation;
             DefaultRotation = GetDefaultRotationFromEXIF(fileName);
 
             View view = new View(Window.DefaultView);
@@ -580,7 +581,7 @@ namespace vimage
             view.Size = new Vector2f(Image.Texture.Size.X, Image.Texture.Size.Y);
             Window.SetView(view);
 
-            RotateImage(prevRotation == 0 ? DefaultRotation : (int)prevRotation, false);
+            RotateImage(prevRotation == OldDefaultRotation ? DefaultRotation : (int)prevRotation, false);
 
             IntRect bounds = GetCurrentBounds(Window.Position);
             if (Config.Setting_LimitImagesToMonitorHeight && (FitToMonitorHeight || (Image.Texture.Size.Y * CurrentZoom >= bounds.Height || (FitToMonitorHeightForced && Image.Texture.Size.Y >= bounds.Height))))
@@ -676,12 +677,19 @@ namespace vimage
             if (!(fileName.Contains(".jpg") || fileName.Contains(".jpeg")))
                 return 0;
             gma.Drawing.ImageInfo.Info info = new gma.Drawing.ImageInfo.Info(fileName);
-            switch (info.Orientation.ToString())
+            try
             {
-                case "RightTop": return 90;
-                case "BottomLeft": return 180;
-                case "LeftBottom": return 270;
-                default: return 0;
+                switch (info.Orientation.ToString())
+                {
+                    case "RightTop": return 90;
+                    case "BottomLeft": return 180;
+                    case "LeftBottom": return 270;
+                    default: return 0;
+                }
+            }
+            catch (Exception)
+            {
+                return 0;
             }
         }
 
