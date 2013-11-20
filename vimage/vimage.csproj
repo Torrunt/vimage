@@ -57,6 +57,9 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="gma.Drawing.ImageInfo">
+      <HintPath>.\gma.Drawing.ImageInfo.dll</HintPath>
+    </Reference>
     <Reference Include="sfmlnet-graphics-2, Version=2.1.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\sfmlnet-graphics-2.dll</HintPath>

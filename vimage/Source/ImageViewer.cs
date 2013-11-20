@@ -38,6 +38,7 @@ namespace vimage
         private bool ZoomInOnCenter = false;
         private bool ZoomFaster = false;
         private float CurrentZoom = 1;
+        private int DefaultRotation = 0;
         private bool FlippedX = false;
         private bool FitToMonitorHeight = false;
         private bool FitToMonitorHeightForced = false;
@@ -81,6 +82,7 @@ namespace vimage
             }
             Image.Origin = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             Image.Position = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
+            DefaultRotation = GetDefaultRotationFromEXIF(File);
             
             // Load Config File
             Config = new Config();
@@ -149,6 +151,7 @@ namespace vimage
             }
 
             // Defaults
+            RotateImage(DefaultRotation, false);
                 // Smoothing
             if (Image is AnimatedImage)
                 Image.Data.Smooth = Config.Setting_SmoothingDefault;
@@ -305,7 +308,7 @@ namespace vimage
 			{
 				Zoom(1f);
                 FlippedX = false;
-				RotateImage(0);
+                RotateImage(DefaultRotation);
 			}
 
             // Fit To Monitor Height
@@ -461,6 +464,7 @@ namespace vimage
                     Window.Size = new Vector2u((uint)Math.Ceiling(Image.Texture.Size.X * CurrentZoom), (uint)Math.Ceiling(Image.Texture.Size.Y * CurrentZoom));
                 else
                     Window.Size = new Vector2u((uint)Math.Ceiling(Image.Texture.Size.Y * CurrentZoom), (uint)Math.Ceiling(Image.Texture.Size.X * CurrentZoom));
+                NextWindowPos = Window.Position;
             }
 
             Updated = true;
@@ -502,6 +506,8 @@ namespace vimage
             Window.Size = WindowSize;
             if (aroundCenter)
                 NextWindowPos = new Vector2i((int)center.X - (int)(WindowSize.X / 2), (int)center.Y - (int)(WindowSize.Y / 2));
+            else
+                NextWindowPos = Window.Position;
 
             Updated = true;
         }
@@ -567,13 +573,14 @@ namespace vimage
             }
             Image.Origin = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             Image.Position = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
+            DefaultRotation = GetDefaultRotationFromEXIF(fileName);
 
             View view = new View(Window.DefaultView);
             view.Center = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             view.Size = new Vector2f(Image.Texture.Size.X, Image.Texture.Size.Y);
             Window.SetView(view);
 
-            RotateImage((int)prevRotation, false);
+            RotateImage(prevRotation == 0 ? DefaultRotation : (int)prevRotation, false);
 
             IntRect bounds = GetCurrentBounds(Window.Position);
             if (Config.Setting_LimitImagesToMonitorHeight && (FitToMonitorHeight || (Image.Texture.Size.Y * CurrentZoom >= bounds.Height || (FitToMonitorHeightForced && Image.Texture.Size.Y >= bounds.Height))))
@@ -661,6 +668,21 @@ namespace vimage
             System.Windows.Forms.Screen firstScreen = System.Windows.Forms.Screen.AllScreens.ElementAt(0);
 
             return new IntRect(firstScreen.Bounds.X, firstScreen.Bounds.Y, firstScreen.Bounds.Width, firstScreen.Bounds.Height);
+        }
+
+        /// <summary>Returns Orientation from the EXIF data of a jpg.</summary>
+        private int GetDefaultRotationFromEXIF(string fileName)
+        {
+            if (!(fileName.Contains(".jpg") || fileName.Contains(".jpeg")))
+                return 0;
+            gma.Drawing.ImageInfo.Info info = new gma.Drawing.ImageInfo.Info(fileName);
+            switch (info.Orientation.ToString())
+            {
+                case "RightTop": return 90;
+                case "BottomLeft": return 180;
+                case "LeftBottom": return 270;
+                default: return 0;
+            }
         }
 
     }
