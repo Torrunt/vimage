@@ -13,6 +13,7 @@ SmoothingDefault = 1
 BackgroundForImagesWithTransparencyDefault = 0
 LimitImagesToMonitorHeight = 1
 PositionLargeWideImagesInCorner = 1 // ie: Desktop Wallpapers and Screenshots
+ZoomLock = 3 // limit zooming to this factor
 
 Drag = MOUSELEFT
 Close = ESC, BACKSPACE, MOUSERIGHT
@@ -62,6 +63,8 @@ ResetImage = R";
         public bool Setting_LimitImagesToMonitorHeight { get { return (Boolean)Settings["LIMITIMAGESTOMONITORHEIGHT"]; } }
         public bool Setting_PositionLargeWideImagesInCorner { get { return (Boolean)Settings["POSITIONLARGEWIDEIMAGESINCORNER"]; } }
 
+		public float Setting_ZoomLock { get { return (float)Settings["ZOOMLOCK"]; } }
+
         private Dictionary<string, object> Settings;
 
         public const int MouseCodeOffset = 150;
@@ -100,6 +103,7 @@ ResetImage = R";
                 { "BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT", false },
                 { "LIMITIMAGESTOMONITORHEIGHT", true },
                 { "POSITIONLARGEWIDEIMAGESINCORNER", true },
+				{ "ZOOMLOCK", 3f },
 
                 { "DRAG", Control_Drag },
                 { "CLOSE", Control_Close },
@@ -193,6 +197,17 @@ ResetImage = R";
                     else
                         Settings[name] = false;
                 }
+				else if(Settings[name] is float)
+				{
+					// float
+					float val;
+					float.TryParse(values[0], out val);
+
+					if (val == 0.0f) // invalid value, set to default value
+						val = 3.0f;
+
+					Settings[name] = val;
+				}
             }
 
             reader.Close();
