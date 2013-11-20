@@ -89,7 +89,7 @@ namespace vimage
             Config.Load(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
 
             // Create Window
-            Window = new RenderWindow(new VideoMode(Image.Texture.Size.X, Image.Texture.Size.Y), "vimage", Styles.None);
+            Window = new RenderWindow(new VideoMode(Image.Texture.Size.X, Image.Texture.Size.Y), "vimage - " + File, Styles.None);
             Window.SetActive();
 
             // Make Window Transparent (can only tell if image being viewed has transparency)
@@ -189,7 +189,10 @@ namespace vimage
                 {
                     bool imageUpdated = Image.Update((float)clock.Elapsed.TotalMilliseconds);
                     if (!Updated && imageUpdated)
+                    {
                         Updated = true;
+                        NextWindowPos = Window.Position;
+                    }
                 }
                 clock.Restart();
                 
@@ -444,6 +447,7 @@ namespace vimage
         {
             CurrentZoom = value;
 
+            Dragging = false;
             UnforceAlwaysOnTop();
 
             if (center)
@@ -606,6 +610,8 @@ namespace vimage
 
             // Force Always On Top Mode (so it's above the task bar) - will only happen if height >= window height
             ForceAlwaysOnTopNextTick = true;
+
+            Window.SetTitle("vimage - " + fileName);
 
             return true;
         }

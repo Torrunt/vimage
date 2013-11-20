@@ -16,6 +16,7 @@ Features
 - Supports Transparency
 - Supports Animated .gifs (pauseable and the frames can be stepped through)
 - Settings and Keyboard/Mouse Bindings are completely configurable
+- Toggleable Always on Top Mode
 
 Controls
 --------
