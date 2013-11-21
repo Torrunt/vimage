@@ -24,7 +24,7 @@ Flip = F
 FitToMonitorHeight = MOUSEMIDDLE
 FitToMonitorHeightAlternative = RSHIFT, LSHIFT
 ZoomFaster = RSHIFT, LSHIFT
-ZoomInOnCenter = RCONTROL, LCONTROL
+ZoomAlt = RCONTROL, LCONTROL
 ToggleSmoothing = S
 ToggleBackgroundForTransparency = T
 ToggleAlwaysOnTop = L
@@ -45,7 +45,7 @@ ResetImage = R";
         public List<int> Control_FitToMonitorHeight;
         public List<int> Control_FitToMonitorHeightAlternative;
         public List<int> Control_ZoomFaster;
-        public List<int> Control_ZoomInOnCenter;
+        public List<int> Control_ZoomAlt;
         public List<int> Control_ToggleSmoothing;
         public List<int> Control_ToggleBackgroundForTransparency;
         public List<int> Control_ToggleAlwaysOnTop;
@@ -82,7 +82,7 @@ ResetImage = R";
             Control_FitToMonitorHeight = new List<int>();
             Control_FitToMonitorHeightAlternative = new List<int>();
             Control_ZoomFaster = new List<int>();
-            Control_ZoomInOnCenter = new List<int>();
+            Control_ZoomAlt = new List<int>();
             Control_ToggleSmoothing = new List<int>();
             Control_ToggleBackgroundForTransparency = new List<int>();
             Control_ToggleAlwaysOnTop = new List<int>();
@@ -111,7 +111,7 @@ ResetImage = R";
                 { "FITTOMONITORHEIGHT", Control_FitToMonitorHeight },
                 { "FITTOMONITORHEIGHTALTERNATIVE", Control_FitToMonitorHeightAlternative },
                 { "ZOOMFASTER", Control_ZoomFaster },
-                { "ZOOMINONCENTER", Control_ZoomInOnCenter },
+                { "ZOOMALT", Control_ZoomAlt },
                 { "TOGGLESMOOTHING", Control_ToggleSmoothing },
                 { "TOGGLEBACKGROUNDFORTRANSPARENCY", Control_ToggleBackgroundForTransparency },
                 { "TOGGLEALWAYSONTOP", Control_ToggleAlwaysOnTop },

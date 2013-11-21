@@ -36,6 +36,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -45,6 +46,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -93,6 +95,8 @@
     <Compile Include="Source\Display\DisplayObject.cs" />
     <Compile Include="Source\Display\DWM.cs" />
     <Compile Include="Source\Display\Graphics.cs" />
+    <Compile Include="Source\Display\ImageManipulation\OctreeQuantizer.cs" />
+    <Compile Include="Source\Display\ImageManipulation\Quantizer.cs" />
     <Compile Include="Source\ImageViewer.cs" />
     <Compile Include="Source\Program.cs" />
   </ItemGroup>

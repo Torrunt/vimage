@@ -20,17 +20,17 @@ namespace vimage
         private static List<AnimatedImageData> AnimatedImageDatas = new List<AnimatedImageData>();
         private static List<string> AnimatedImageDataFileNames = new List<string>();
 
-        public static Sprite GetSprite(string filename, bool smooth = false)
+        public static Sprite GetSprite(string fileName, bool smooth = false)
         {
-            Sprite sprite = new Sprite(GetTexture(filename));
+            Sprite sprite = new Sprite(GetTexture(fileName));
             sprite.Texture.Smooth = smooth;
 
             return sprite;
         }
         /// <param name="imageNum">The Active Image Number (for animated gifs).</param>
-        public static Texture GetTexture(string filename)
+        public static Texture GetTexture(string fileName)
         {
-            int index = TextureFileNames.IndexOf(filename);
+            int index = TextureFileNames.IndexOf(fileName);
 
             if (index >= 0)
             {
@@ -45,12 +45,12 @@ namespace vimage
                 Il.ilGenImages(1, out imageID);
                 Il.ilBindImage(imageID);
 
-                if (Il.ilLoadImage(filename))
+                if (Il.ilLoadImage(fileName))
                 {
                     Texture texture = GetTextureFromBoundImage();
 
                     Textures.Add(texture);
-                    TextureFileNames.Add(filename);
+                    TextureFileNames.Add(fileName);
 
                     return texture;
                 }
@@ -104,13 +104,13 @@ namespace vimage
             return texture;
         }
 
-        public static int NumberOfFramesInImage(string filename)
+        public static int NumberOfFramesInImage(string fileName)
         {
             int imageid = 0;
             Il.ilGenImages(1, out imageid);
             Il.ilBindImage(imageid);
 
-            bool success = Il.ilLoadImage(filename);
+            bool success = Il.ilLoadImage(fileName);
             if (!success)
                 return 0;
 
@@ -122,14 +122,14 @@ namespace vimage
         }
 
         /// <param name="filename">Animated Image (ie: animated gif).</param>
-        public static AnimatedImage GetAnimatedImage(string filename)
+        public static AnimatedImage GetAnimatedImage(string fileName)
         {
-            return new AnimatedImage(GetAnimatedImageData(filename));
+            return new AnimatedImage(GetAnimatedImageData(fileName));
         }
         /// <param name="filename">Animated Image (ie: animated gif).</param>
-        public static AnimatedImageData GetAnimatedImageData(string filename)
+        public static AnimatedImageData GetAnimatedImageData(string fileName)
         {
-            int index = TextureFileNames.IndexOf(filename);
+            int index = TextureFileNames.IndexOf(fileName);
 
             if (index >= 0)
             {
@@ -139,31 +139,36 @@ namespace vimage
             else
             {
                 // New AnimatedImageData
-                int imageID = 0;
-                Il.ilGenImages(1, out imageID);
-                Il.ilBindImage(imageID);
-
-                bool success = Il.ilLoadImage(filename);
-
-                if (!success)
-                    return null;
-
+                System.Drawing.Image image = System.Drawing.Image.FromFile(fileName);
                 AnimatedImageData data = new AnimatedImageData();
+                ImageManipulation.OctreeQuantizer quantizer;
 
-                int TotalAnimationFrames = Il.ilGetInteger(Il.IL_NUM_IMAGES) + 1;
-                for (int i = 0; i < TotalAnimationFrames; i++)
+                System.Drawing.Imaging.FrameDimension frameDimension = new System.Drawing.Imaging.FrameDimension(image.FrameDimensionsList[0]);
+                for (int i = 0; i < image.GetFrameCount(frameDimension); i++)
                 {
-                    Il.ilBindImage(imageID);
-                    data.Frames.Add(GetTextureFromBoundImage(i));
-                    data.FrameDurations.Add(Il.ilGetInteger(Il.IL_IMAGE_DURATION));
+                    image.SelectActiveFrame(frameDimension, i);
+                    quantizer = new ImageManipulation.OctreeQuantizer(255, 8);
+
+                    System.Drawing.Bitmap quantized = quantizer.Quantize(image);
+                    MemoryStream stream = new MemoryStream();
+                    quantized.Save(stream, System.Drawing.Imaging.ImageFormat.Gif);
+                    data.Frames.Add(new Texture(stream));
+
+                    stream.Dispose();
 
                     data.Frames[i].Smooth = true;
                 }
 
-                Il.ilDeleteImage(imageID);
+                System.Drawing.Imaging.PropertyItem frameDelay = image.GetPropertyItem(0x5100);
+                int frameDuration = (frameDelay.Value[0] + frameDelay.Value[1] * 256) * 10;
+                if (frameDuration != 0)
+                    data.FrameDuration = frameDuration;
+                else
+                    data.FrameDuration = AnimatedImage.DEFAULT_FRAME_DURATION;
+                
 
                 AnimatedImageDatas.Add(data);
-                AnimatedImageDataFileNames.Add(filename);
+                AnimatedImageDataFileNames.Add(fileName);
 
                 return data;
             }

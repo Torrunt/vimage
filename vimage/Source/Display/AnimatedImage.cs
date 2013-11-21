@@ -8,7 +8,7 @@ namespace vimage
     class AnimatedImageData
     {
         public List<Texture> Frames = new List<Texture>();
-        public List<int> FrameDurations = new List<int>();
+        public int FrameDuration = 100;
 
         private bool _Smooth = true;
         public bool Smooth 
@@ -54,7 +54,7 @@ namespace vimage
             AddChild(Sprite);
 
             CurrentTime = 0;
-            CurrentFrameLength = Data.FrameDurations[CurrentFrame] == 0 ? DEFAULT_FRAME_DURATION : Data.FrameDurations[CurrentFrame];
+            CurrentFrameLength = data.FrameDuration;
         }
 
         public bool Update(float dt)
@@ -99,7 +99,7 @@ namespace vimage
             Sprite = new Sprite(Data.Frames[CurrentFrame]);
             AddChild(Sprite);
 
-            CurrentFrameLength = Data.FrameDurations[CurrentFrame] == 0 ? DEFAULT_FRAME_DURATION : Data.FrameDurations[CurrentFrame];
+            CurrentFrameLength = Data.FrameDuration;
             
             return true;
         }

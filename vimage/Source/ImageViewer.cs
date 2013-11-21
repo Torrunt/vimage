@@ -35,7 +35,7 @@ namespace vimage
         private bool Dragging = false;
         private Vector2i DragPos = new Vector2i();
         private Vector2i MousePos = new Vector2i();
-        private bool ZoomInOnCenter = false;
+        private bool ZoomAlt = false;
         private bool ZoomFaster = false;
         private float CurrentZoom = 1;
         private int DefaultRotation = 0;
@@ -61,35 +61,14 @@ namespace vimage
             Vector2i mousePos = Mouse.GetPosition();
 
             // Get Image
-            File = file;
-
-            if (Graphics.NumberOfFramesInImage(File) > 1)
-            {
-                // Animated Image
-                Image = Graphics.GetAnimatedImage(File);
-                if (Image.Texture == null)
-                    return;
-            }
-            else
-            {
-                // Image
-                Texture texture = Graphics.GetTexture(File);
-                if (texture == null)
-                    return;
-
-                texture.Smooth = true;
-                Image = new Sprite(texture);
-            }
-            Image.Origin = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
-            Image.Position = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
-            DefaultRotation = GetDefaultRotationFromEXIF(File);
+            LoadImage(file);
             
             // Load Config File
             Config = new Config();
             Config.Load(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
 
             // Create Window
-            Window = new RenderWindow(new VideoMode(Image.Texture.Size.X, Image.Texture.Size.Y), "vimage - " + File, Styles.None);
+            Window = new RenderWindow(new VideoMode(Image.Texture.Size.X, Image.Texture.Size.Y), File + " - vimage", Styles.None);
             Window.SetActive();
 
             // Make Window Transparent (can only tell if image being viewed has transparency)
@@ -189,10 +168,7 @@ namespace vimage
                 {
                     bool imageUpdated = Image.Update((float)clock.Elapsed.TotalMilliseconds);
                     if (!Updated && imageUpdated)
-                    {
-                        Updated = true;
-                        NextWindowPos = Window.Position;
-                    }
+                        Update();
                 }
                 clock.Restart();
                 
@@ -237,6 +213,12 @@ namespace vimage
         {
             Window.Close();
         }
+        /// <summary>Sets Updated status and refreshes NextWindowPos.</summary>
+        private void Update()
+        {
+            Updated = true;
+            NextWindowPos = Window.Position; // Refresh the NextWindowPos var just in case the thing that induced the update didn't change the window position
+        }
 
         ////////////////////////
         //      Controls     //
@@ -274,9 +256,9 @@ namespace vimage
         private void OnMouseWheelMoved(Object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0)
-                Zoom(CurrentZoom + (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED), ZoomInOnCenter);
+                Zoom(CurrentZoom + (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED), !ZoomAlt);
             else if (e.Delta < 0)
-                Zoom(Math.Max(CurrentZoom - (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED), ZOOM_MIN), ZoomInOnCenter);
+                Zoom(Math.Max(CurrentZoom - (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED), ZOOM_MIN), !ZoomAlt);
 
             FitToMonitorHeightForced = false;
             FitToMonitorHeight = false;
@@ -372,13 +354,13 @@ namespace vimage
                     Image.Data.Smooth = !Image.Data.Smooth;
                 else
                     Image.Texture.Smooth = !Image.Texture.Smooth;
-                Updated = true;
+                Update();
             }
 
             if (Config.IsControl(e.Code, Config.Control_ToggleBackgroundForTransparency))
             {
                 BackgroundsForImagesWithTransparency = !BackgroundsForImagesWithTransparency;
-                Updated = true;
+                Update();
             }
 
             // Toggle Always On Top
@@ -391,7 +373,7 @@ namespace vimage
 
 
             ZoomFaster = false;
-            ZoomInOnCenter = false;
+            ZoomAlt = false;
             FitToMonitorHeightAlternative = false;
         }
         private void OnKeyDown(Object sender, KeyEventArgs e)
@@ -405,7 +387,7 @@ namespace vimage
                     if (Image.Playing)
                         Image.Stop();
                     Image.NextFrame();
-                    Updated = true;
+                    Update();
                 }
             }
             if (Config.IsControl(e.Code, Config.Control_PrevFrame))
@@ -416,15 +398,15 @@ namespace vimage
                     if (Image.Playing)
                         Image.Stop();
                     Image.PrevFrame();
-                    Updated = true;
+                    Update();
                 }
             }
 
             // Zooming
             if (Config.IsControl(e.Code, Config.Control_ZoomFaster))
                 ZoomFaster = true;
-            if (Config.IsControl(e.Code, Config.Control_ZoomInOnCenter))
-                ZoomInOnCenter = true;
+            if (Config.IsControl(e.Code, Config.Control_ZoomAlt))
+                ZoomAlt = true;
 
             // Dragging
             if (Config.IsControl(e.Code, Config.Control_Drag))
@@ -551,41 +533,46 @@ namespace vimage
                 ForceAlwaysOnTopNextTick = true;
         }
 
-        private bool ChangeImage(string fileName)
+        private void LoadImage(string fileName)
         {
-            float prevRotation = Image.Rotation;
-            
-            Image.Dispose();
-            Dragging = false;
+            File = fileName;
 
-            if (Graphics.NumberOfFramesInImage(fileName) > 1)
+            if (GetExtension(fileName).Equals("gif"))
             {
                 // Animated Image
                 Image = Graphics.GetAnimatedImage(fileName);
                 if (Image.Texture == null)
-                    return false;
+                    return;
             }
             else
             {
                 // Image
                 Texture texture = Graphics.GetTexture(fileName);
                 if (texture == null)
-                    return false;
+                    return;
 
                 texture.Smooth = true;
                 Image = new Sprite(texture);
             }
             Image.Origin = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             Image.Position = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
-            int OldDefaultRotation = DefaultRotation;
             DefaultRotation = GetDefaultRotationFromEXIF(fileName);
+        }
+        private bool ChangeImage(string fileName)
+        {
+            Image.Dispose();
+            Dragging = false;
+            float prevRotation = Image.Rotation;
+            int prevDefaultRotation = DefaultRotation;
+
+            LoadImage(fileName);
 
             View view = new View(Window.DefaultView);
             view.Center = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             view.Size = new Vector2f(Image.Texture.Size.X, Image.Texture.Size.Y);
             Window.SetView(view);
 
-            RotateImage(prevRotation == OldDefaultRotation ? DefaultRotation : (int)prevRotation, false);
+            RotateImage(prevRotation == prevDefaultRotation ? DefaultRotation : (int)prevRotation, false);
 
             IntRect bounds = GetCurrentBounds(Window.Position);
             if (Config.Setting_LimitImagesToMonitorHeight && (FitToMonitorHeight || (Image.Texture.Size.Y * CurrentZoom >= bounds.Height || (FitToMonitorHeightForced && Image.Texture.Size.Y >= bounds.Height))))
@@ -611,7 +598,7 @@ namespace vimage
             // Force Always On Top Mode (so it's above the task bar) - will only happen if height >= window height
             ForceAlwaysOnTopNextTick = true;
 
-            Window.SetTitle("vimage - " + fileName);
+            Window.SetTitle(fileName + " - vimage");
 
             return true;
         }
@@ -677,10 +664,12 @@ namespace vimage
             return new IntRect(firstScreen.Bounds.X, firstScreen.Bounds.Y, firstScreen.Bounds.Width, firstScreen.Bounds.Height);
         }
 
+        private string GetExtension(string fileName) { return fileName.Substring(fileName.LastIndexOf(".") + 1); }
+
         /// <summary>Returns Orientation from the EXIF data of a jpg.</summary>
         private int GetDefaultRotationFromEXIF(string fileName)
         {
-            if (!(fileName.Contains(".jpg") || fileName.Contains(".jpeg")))
+            if (!(GetExtension(fileName).Equals("jpg") || GetExtension(fileName).Equals("jpeg")))
                 return 0;
             gma.Drawing.ImageInfo.Info info = new gma.Drawing.ImageInfo.Info(fileName);
             try
