@@ -15,6 +15,7 @@ namespace vimage
         public readonly float ZOOM_SPEED = 0.02f;
         public readonly float ZOOM_SPEED_FAST = 0.1f;
         public readonly float ZOOM_MIN = 0.05f;
+        public uint ZOOM_MAX;
 
         public RenderWindow Window;
         public dynamic Image;
@@ -70,6 +71,8 @@ namespace vimage
             // Create Window
             Window = new RenderWindow(new VideoMode(Image.Texture.Size.X, Image.Texture.Size.Y), File + " - vimage", Styles.None);
             Window.SetActive();
+
+            ZOOM_MAX = (uint)Math.Ceiling(VideoMode.DesktopMode.Width * 2.5);
 
             // Make Window Transparent (can only tell if image being viewed has transparency)
             DWM_BLURBEHIND bb = new DWM_BLURBEHIND(false);
@@ -427,8 +430,16 @@ namespace vimage
 
         void Zoom(float value, bool center = false)
         {
-            CurrentZoom = value;
+            // Limit Zooming at either 75x or 2.5x the screen width (ZOOM_MAX)
+            if (value >= 75)
+                value = 75;
+            else if ((uint)Math.Ceiling(Image.Texture.Size.X * value) >= ZOOM_MAX)
+                value = CurrentZoom;
 
+            if (CurrentZoom == value)
+                return;
+            CurrentZoom = value;
+            
             Dragging = false;
             UnforceAlwaysOnTop();
 
