@@ -433,11 +433,9 @@ namespace vimage
         void Zoom(float value, bool center = false)
         {
             // Limit Zooming at 2.5x the screen width (ZOOM_MAX_WIDTH) if it hasn't already reached 75x (ZOOM_MAX)
-            if ((value > CurrentZoom && (uint)Math.Ceiling(Image.Texture.Size.X * value) >= ZOOM_MAX_WIDTH))
+            if (value > CurrentZoom && (uint)Math.Ceiling(Image.Texture.Size.X * value) >= ZOOM_MAX_WIDTH)
                 value = CurrentZoom;
 
-            if (CurrentZoom == value)
-                return;
             CurrentZoom = value;
             
             Dragging = false;
@@ -633,9 +631,6 @@ namespace vimage
                 str => Regex.Split(str.Replace(" ", ""), "([0-9]+)").Select(convert),
                 new EnumerableComparer<object>());
             FolderContents.AddRange(sorted);
-
-            foreach (string s in FolderContents)
-                Console.WriteLine(s);
 
             FolderPosition = FolderContents.IndexOf(File);
         }
