@@ -433,7 +433,7 @@ namespace vimage
         void Zoom(float value, bool center = false)
         {
             // Limit Zooming at 2.5x the screen width (ZOOM_MAX_WIDTH) if it hasn't already reached 75x (ZOOM_MAX)
-            if ((value > CurrentZoom && (uint)Math.Ceiling(Image.Texture.Size.X * value) >= ZOOM_MAX_WIDTH)
+            if ((value > CurrentZoom && (uint)Math.Ceiling(Image.Texture.Size.X * value) >= ZOOM_MAX_WIDTH))
                 value = CurrentZoom;
 
             if (CurrentZoom == value)
@@ -544,7 +544,7 @@ namespace vimage
                 ForceAlwaysOnTopNextTick = true;
         }
 
-        private void LoadImage(string fileName)
+        private bool LoadImage(string fileName)
         {
             File = fileName;
 
@@ -553,14 +553,14 @@ namespace vimage
                 // Animated Image
                 Image = Graphics.GetAnimatedImage(fileName);
                 if (Image.Texture == null)
-                    return;
+                    return false;
             }
             else
             {
                 // Image
                 Texture texture = Graphics.GetTexture(fileName);
                 if (texture == null)
-                    return;
+                    return false;
 
                 texture.Smooth = true;
                 Image = new Sprite(texture);
@@ -568,6 +568,8 @@ namespace vimage
             Image.Origin = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             Image.Position = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             DefaultRotation = GetDefaultRotationFromEXIF(fileName);
+
+            return true;
         }
         private bool ChangeImage(string fileName)
         {
@@ -576,7 +578,8 @@ namespace vimage
             float prevRotation = Image.Rotation;
             int prevDefaultRotation = DefaultRotation;
 
-            LoadImage(fileName);
+            if (!LoadImage(fileName))
+                return false;
 
             View view = new View(Window.DefaultView);
             view.Center = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
@@ -631,6 +634,8 @@ namespace vimage
                 new EnumerableComparer<object>());
             FolderContents.AddRange(sorted);
 
+            foreach (string s in FolderContents)
+                Console.WriteLine(s);
 
             FolderPosition = FolderContents.IndexOf(File);
         }
