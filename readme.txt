@@ -30,6 +30,7 @@ Controls
 - S to Toggle Smoothing
 - T to Toggle a light grey background for images with transparency
 - L to Toggle Always On Top mode
+- R to Reset Image
 - Space to pause Animated GIFs
 - ,/. to go through Animated GIF frames
 - O to open config.txt

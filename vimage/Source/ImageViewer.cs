@@ -7,6 +7,7 @@ using SFML.Graphics;
 using Tao.OpenGl;
 using Tao.DevIl;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace vimage
 {
@@ -15,12 +16,13 @@ namespace vimage
         public readonly float ZOOM_SPEED = 0.02f;
         public readonly float ZOOM_SPEED_FAST = 0.1f;
         public readonly float ZOOM_MIN = 0.05f;
-        public uint ZOOM_MAX;
+        public readonly float ZOOM_MAX = 75f;
+        public uint ZOOM_MAX_WIDTH;
 
         public RenderWindow Window;
         public dynamic Image;
         public string File;
-        public string[] FolderContents;
+        public List<string> FolderContents = new List<string>();
         public int FolderPosition = 0;
 
         private Config Config;
@@ -72,7 +74,7 @@ namespace vimage
             Window = new RenderWindow(new VideoMode(Image.Texture.Size.X, Image.Texture.Size.Y), File + " - vimage", Styles.None);
             Window.SetActive();
 
-            ZOOM_MAX = (uint)Math.Ceiling(VideoMode.DesktopMode.Width * 2.5);
+            ZOOM_MAX_WIDTH = (uint)Math.Ceiling(VideoMode.DesktopMode.Width * 2.5);
 
             // Make Window Transparent (can only tell if image being viewed has transparency)
             DWM_BLURBEHIND bb = new DWM_BLURBEHIND(false);
@@ -259,7 +261,7 @@ namespace vimage
         private void OnMouseWheelMoved(Object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0)
-                Zoom(CurrentZoom + (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED), !ZoomAlt);
+                Zoom(Math.Min(CurrentZoom + (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED), ZOOM_MAX), !ZoomAlt);
             else if (e.Delta < 0)
                 Zoom(Math.Max(CurrentZoom - (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED), ZOOM_MIN), !ZoomAlt);
 
@@ -430,10 +432,8 @@ namespace vimage
 
         void Zoom(float value, bool center = false)
         {
-            // Limit Zooming at either 75x or 2.5x the screen width (ZOOM_MAX)
-            if (value >= 75)
-                value = 75;
-            else if ((uint)Math.Ceiling(Image.Texture.Size.X * value) >= ZOOM_MAX)
+            // Limit Zooming at 2.5x the screen width (ZOOM_MAX_WIDTH) if it hasn't already reached 75x (ZOOM_MAX)
+            if ((value > CurrentZoom && (uint)Math.Ceiling(Image.Texture.Size.X * value) >= ZOOM_MAX_WIDTH)
                 value = CurrentZoom;
 
             if (CurrentZoom == value)
@@ -618,8 +618,21 @@ namespace vimage
             if (FolderContents != null && FolderContents.Count() > 0)
                 return;
 
-            FolderContents = Directory.GetFiles(File.Substring(0, File.LastIndexOf("\\")));
-            FolderPosition = Array.IndexOf(FolderContents, File);
+            string[] contents = Directory.GetFiles(File.Substring(0, File.LastIndexOf("\\")));
+
+            // Natural Sorting
+            Func<string, object> convert = str =>
+            {
+                try { return int.Parse(str); }
+                catch { return str; }
+            };
+            var sorted = contents.OrderBy(
+                str => Regex.Split(str.Replace(" ", ""), "([0-9]+)").Select(convert),
+                new EnumerableComparer<object>());
+            FolderContents.AddRange(sorted);
+
+
+            FolderPosition = FolderContents.IndexOf(File);
         }
 
         private void ForceAlwaysOnTop()

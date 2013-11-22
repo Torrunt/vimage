@@ -99,6 +99,7 @@
     <Compile Include="Source\Display\ImageManipulation\Quantizer.cs" />
     <Compile Include="Source\ImageViewer.cs" />
     <Compile Include="Source\Program.cs" />
+    <Compile Include="Source\Utils\EnumerableComparer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
