@@ -13,9 +13,11 @@ SmoothingDefault = 1
 BackgroundForImagesWithTransparencyDefault = 0
 LimitImagesToMonitorHeight = 1
 PositionLargeWideImagesInCorner = 1 // ie: Desktop Wallpapers and Screenshots
+ContextMenuShowMargin = 0
 
 Drag = MOUSELEFT
-Close = ESC, BACKSPACE, MOUSERIGHT
+Close = ESC, BACKSPACE
+ContextMenu = MOUSERIGHT
 PrevImage = LEFT, PAGE UP
 NextImage = RIGHT, PAGE DOWN
 RotateClockwise = UP
@@ -37,6 +39,7 @@ ResetImage = R";
 
         public List<int> Control_Drag;
         public List<int> Control_Close;
+        public List<int> Control_ContextMenu;
         public List<int> Control_PrevImage;
         public List<int> Control_NextImage;
         public List<int> Control_RotateClockwise;
@@ -61,6 +64,7 @@ ResetImage = R";
         public bool Setting_BackgroundForImagesWithTransparencyDefault { get { return (Boolean)Settings["BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT"]; } }
         public bool Setting_LimitImagesToMonitorHeight { get { return (Boolean)Settings["LIMITIMAGESTOMONITORHEIGHT"]; } }
         public bool Setting_PositionLargeWideImagesInCorner { get { return (Boolean)Settings["POSITIONLARGEWIDEIMAGESINCORNER"]; } }
+        public bool Setting_ContextMenuShowMargin { get { return (Boolean)Settings["CONTEXTMENUSHOWMARGIN"]; } }
 
         private Dictionary<string, object> Settings;
 
@@ -74,6 +78,7 @@ ResetImage = R";
         {
             Control_Drag = new List<int>();
             Control_Close = new List<int>();
+            Control_ContextMenu = new List<int>();
             Control_PrevImage = new List<int>();
             Control_NextImage = new List<int>();
             Control_RotateClockwise = new List<int>();
@@ -100,9 +105,11 @@ ResetImage = R";
                 { "BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT", false },
                 { "LIMITIMAGESTOMONITORHEIGHT", true },
                 { "POSITIONLARGEWIDEIMAGESINCORNER", true },
+                { "CONTEXTMENUSHOWMARGIN", false},
 
                 { "DRAG", Control_Drag },
                 { "CLOSE", Control_Close },
+                { "CONTEXTMENU", Control_ContextMenu },
                 { "PREVIMAGE", Control_PrevImage },
                 { "NEXTIMAGE", Control_NextImage },
                 { "ROTATECLOCKWISE", Control_RotateClockwise },

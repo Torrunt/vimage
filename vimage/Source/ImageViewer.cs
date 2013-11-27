@@ -13,6 +13,8 @@ namespace vimage
 {
     class ImageViewer
     {
+        public const string VERSION_NAME = "vimage version 4*";
+
         public readonly float ZOOM_SPEED = 0.02f;
         public readonly float ZOOM_SPEED_FAST = 0.1f;
         public readonly float ZOOM_MIN = 0.05f;
@@ -24,6 +26,10 @@ namespace vimage
         public string File;
         public List<string> FolderContents = new List<string>();
         public int FolderPosition = 0;
+        private System.Windows.Forms.ContextMenuStrip ContextMenu;
+        private int ContextMenuSetting = -1;
+        private List<string> ContextMenuItems;
+        private List<string> ContextMenuItems_Animation;
 
         private Config Config;
 
@@ -70,6 +76,42 @@ namespace vimage
             Config = new Config();
             Config.Load(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
 
+            // Create Context Menu
+            ContextMenu = new System.Windows.Forms.ContextMenuStrip();
+            ContextMenu.AutoClose = false;
+            ContextMenu.MouseCaptureChanged += ContextMenu_MouseCaptureChanged;
+            ContextMenuItems = new List<string>()
+            {
+                "Close",
+                "-",
+                "Next Image",
+                "Prev Image",
+                "-",
+                "Rotate Clockwise",
+                "Rotate Anti-Clockwise",
+                "Flip",
+                "Fit To Monitor Height",
+                "Reset Image",
+                "Smoothing",
+                "Background",
+                "Always On Top",
+                "-",
+                "Open Config.txt",
+                "Reload Config.txt",
+                "-",
+                VERSION_NAME
+            };
+            ContextMenuItems_Animation = new List<string>(ContextMenuItems);
+            ContextMenuItems_Animation.InsertRange(5, new List<string>()
+            {
+                "Next Frame",
+                "Prev Frame",
+                "Pause/Play Animation",
+                "-"
+            });
+
+            SetupContextMenu();
+
             // Create Window
             Window = new RenderWindow(new VideoMode(Image.Texture.Size.X, Image.Texture.Size.Y), File + " - vimage", Styles.None);
             Window.SetActive();
@@ -94,9 +136,9 @@ namespace vimage
                 // Get Bounds
                 IntRect bounds;
                 if (Config.Setting_OpenAtMousePosition)
-                    bounds = GetCurrentBounds(mousePos);
+                    bounds = ImageViewerUtils.GetCurrentBounds(mousePos);
                 else
-                    bounds = GetCurrentBounds(Window.Position);
+                    bounds = ImageViewerUtils.GetCurrentBounds(Window.Position);
 
                 // Force Fit To Monitor Height?
                 if (Config.Setting_LimitImagesToMonitorHeight && Image.Texture.Size.Y > bounds.Height)
@@ -191,7 +233,7 @@ namespace vimage
 
                 if (ForceAlwaysOnTopNextTick)
                 {
-                    IntRect bounds = GetCurrentBounds(Window.Position);
+                    IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position);
                     if (Window.Size.Y >= bounds.Height && Window.Size.X < bounds.Width)
                         ForceAlwaysOnTop();
                     else
@@ -225,12 +267,64 @@ namespace vimage
             NextWindowPos = Window.Position; // Refresh the NextWindowPos var just in case the thing that induced the update didn't change the window position
         }
 
+        private void SetupContextMenu()
+        {
+            if ((ContextMenuSetting == 0 && !(Image is AnimatedImage)) || (ContextMenuSetting == 1 && Image is AnimatedImage))
+                return;
+
+            ContextMenu.Items.Clear();
+            ContextMenu.ShowImageMargin = Config.Setting_ContextMenuShowMargin;
+
+            List<string> items;
+            if (Image is AnimatedImage)
+            {
+                ContextMenuSetting = 1;
+                items = ContextMenuItems_Animation;
+            }
+            else
+            {
+                ContextMenuSetting = 0;
+                items = ContextMenuItems;
+            }
+
+            int c = 0;
+            for (int i = 0; i < items.Count; i++)
+            {
+                System.Windows.Forms.ToolStripItem item = ContextMenu.Items.Add(items[i]);
+                if (items[i].Equals("-"))
+                    continue;
+
+                item.Name = items[i];
+                item.Click += ContexMenuItemClicked;
+
+                c++;
+                if (c % 2 == 0)
+                    ContextMenu.Items[i].BackColor = System.Drawing.Color.LightBlue;
+            }
+
+            ((System.Windows.Forms.ToolStripMenuItem)ContextMenu.Items[VERSION_NAME]).BackColor = System.Drawing.Color.CornflowerBlue;
+
+            RefreshContextMenu();
+        }
+        private void RefreshContextMenu()
+        {
+            ((System.Windows.Forms.ToolStripMenuItem)ContextMenu.Items["Flip"]).Checked = FlippedX;
+            ((System.Windows.Forms.ToolStripMenuItem)ContextMenu.Items["Fit To Monitor Height"]).Checked = FitToMonitorHeight;
+            ((System.Windows.Forms.ToolStripMenuItem)ContextMenu.Items["Smoothing"]).Checked = Smoothing();
+            ((System.Windows.Forms.ToolStripMenuItem)ContextMenu.Items["Background"]).Checked = BackgroundsForImagesWithTransparency;
+            ((System.Windows.Forms.ToolStripMenuItem)ContextMenu.Items["Always On Top"]).Checked = AlwaysOnTop;
+        }
+
         ////////////////////////
         //      Controls     //
         ///////////////////////
         
         private void OnMouseDown(Object sender, MouseButtonEventArgs e)
         {
+            if (ContextMenu.Visible)
+                return;
+
+            // Dragging
             if (Config.IsControl(e.Button, Config.Control_Drag))
                 Dragging = true;
 
@@ -250,6 +344,14 @@ namespace vimage
             // Fit To Monitor Height
             if (Config.IsControl(e.Button, Config.Control_FitToMonitorHeight))
                 ToggleFitToMonitorHeight();
+
+            // Open Context Menu
+            if (Config.IsControl(e.Button, Config.Control_ContextMenu))
+            {
+                RefreshContextMenu();
+                ContextMenu.Show(Window.Position.X + e.X - 1, Window.Position.Y + e.Y - 1);
+                ContextMenu.Capture = true;
+            }
         }
         private void OnMouseMoved(Object sender, MouseMoveEventArgs e)
         {
@@ -287,19 +389,11 @@ namespace vimage
 
             // Flip Image
             if (Config.IsControl(e.Code, Config.Control_Flip))
-            {
-                FlippedX = !FlippedX;
-                Image.Scale = new Vector2f(Math.Abs(Image.Scale.X) * (FlippedX ? -1 : 1), Math.Abs(Image.Scale.Y));
-                Redraw();
-            }
+                FlipImage();
 
 			// Reset Image
-			if (Config.IsControl(e.Code, Config.Control_ResetImage))
-			{
-				Zoom(1f);
-                FlippedX = false;
-                RotateImage(DefaultRotation);
-			}
+            if (Config.IsControl(e.Code, Config.Control_ResetImage))
+                ResetImage();
 
             // Fit To Monitor Height
             if (Config.IsControl(e.Code, Config.Control_FitToMonitorHeight))
@@ -307,40 +401,13 @@ namespace vimage
 
             // Animated Image Controls
             if (Config.IsControl(e.Code, Config.Control_PauseAnimation))
-            {
-                // Pause/Play
-                if (Image is AnimatedImage)
-                {
-                    if (Image.Playing)
-                        Image.Stop();
-                    else
-                        Image.Play();
-                }
-            }
+                ToggleAnimation();
 
             // Next/Prev Image in Folder
             if (!Updated && Config.IsControl(e.Code, Config.Control_PrevImage))
-            {
-                GetFolderContents();
-                bool success = false;
-                do
-                {
-                    FolderPosition = FolderPosition == 0 ? FolderContents.Count() - 1 : FolderPosition - 1;
-                    success = ChangeImage(FolderContents[FolderPosition]);
-                }
-                while (!success);
-            }
+                NextImage();
             if (!Updated && Config.IsControl(e.Code, Config.Control_NextImage))
-            {
-                GetFolderContents();
-                bool success = false;
-                do
-                {
-                    FolderPosition = FolderPosition == FolderContents.Count() - 1 ? 0 : FolderPosition + 1;
-                    success = ChangeImage(FolderContents[FolderPosition]);
-                }
-                while (!success);
-            }
+                PrevImage();
             
             // Open config.txt
             if (Config.IsControl(e.Code, Config.Control_OpenConfig))
@@ -354,27 +421,14 @@ namespace vimage
 
             // Toggle Settings
             if (Config.IsControl(e.Code, Config.Control_ToggleSmoothing))
-            {
-                if (Image is AnimatedImage)
-                    Image.Data.Smooth = !Image.Data.Smooth;
-                else
-                    Image.Texture.Smooth = !Image.Texture.Smooth;
-                Update();
-            }
+                ToggleSmoothing();
 
             if (Config.IsControl(e.Code, Config.Control_ToggleBackgroundForTransparency))
-            {
-                BackgroundsForImagesWithTransparency = !BackgroundsForImagesWithTransparency;
-                Update();
-            }
+                ToggleBackground();
 
             // Toggle Always On Top
             if (Config.IsControl(e.Code, Config.Control_ToggleAlwaysOnTop))
-            {
-                AlwaysOnTop = !AlwaysOnTop;
-                AlwaysOnTopForced = false;
-                DWM.SetAlwaysOnTop(Window.SystemHandle, AlwaysOnTop);
-            }
+                ToggleAlwaysOnTop();
 
 
             ZoomFaster = false;
@@ -385,27 +439,9 @@ namespace vimage
         {
             // Animated Image Controls
             if (Config.IsControl(e.Code, Config.Control_NextFrame))
-            {
-                // Next Frame
-                if (Image is AnimatedImage)
-                {
-                    if (Image.Playing)
-                        Image.Stop();
-                    Image.NextFrame();
-                    Update();
-                }
-            }
+                NextFrame();
             if (Config.IsControl(e.Code, Config.Control_PrevFrame))
-            {
-                // Prev Frame
-                if (Image is AnimatedImage)
-                {
-                    if (Image.Playing)
-                        Image.Stop();
-                    Image.PrevFrame();
-                    Update();
-                }
-            }
+                PrevFrame();
 
             // Zooming
             if (Config.IsControl(e.Code, Config.Control_ZoomFaster))
@@ -426,11 +462,75 @@ namespace vimage
                 FitToMonitorHeightAlternative = true;
         }
 
+        private void ContexMenuItemClicked(object sender, EventArgs e)
+        {
+            string item = ((System.Windows.Forms.ToolStripItem)sender).Text;
+            ContextMenu.Close();
+
+            switch (item)
+            {
+                case "Close": CloseNextTick = true; break;
+
+                case "Next Image": NextImage(); break;
+                case "Prev Image": PrevImage(); break;
+
+                case "Next Frame": NextFrame(); break;
+                case "Prev Frame": PrevFrame(); break;
+                case "Pause/Play Animation": ToggleAnimation(); break;
+
+                case "Rotate Clockwise": RotateImage((int)Image.Rotation + 90); break;
+                case "Rotate Anti-Clockwise": RotateImage((int)Image.Rotation - 90); break;
+                case "Flip": FlipImage(); break;
+                case "Fit To Monitor Height": ToggleFitToMonitorHeight(); break;
+                case "Reset Image": ResetImage(); break;
+                case "Smoothing": ToggleSmoothing(); break;
+                case "Background": ToggleBackground(); break;
+                case "Always On Top": ToggleAlwaysOnTop(); break;
+
+                case "Open Config.txt": Process.Start(AppDomain.CurrentDomain.BaseDirectory + "config.txt"); break;
+                case "Reload Config.txt": Config.Init(); Config.Load(AppDomain.CurrentDomain.BaseDirectory + "config.txt"); break;
+
+                case VERSION_NAME: Process.Start("http://torrunt.net/vimage"); break;
+            }
+        }
+        private void ContextMenu_MouseCaptureChanged(object sender, EventArgs e) { ContextMenu.Close(); }
+
         ///////////////////////////
         //      Manipulation     //
         ///////////////////////////
 
-        void Zoom(float value, bool center = false)
+        private void NextFrame()
+        {
+            if (Image is AnimatedImage)
+            {
+                if (Image.Playing)
+                    Image.Stop();
+                Image.NextFrame();
+                Update();
+            }
+        }
+        private void PrevFrame()
+        {
+            if (Image is AnimatedImage)
+            {
+                if (Image.Playing)
+                    Image.Stop();
+                Image.PrevFrame();
+                Update();
+            }
+        }
+        private void ToggleAnimation()
+        {
+            if (Image is AnimatedImage)
+            {
+                if (Image.Playing)
+                    Image.Stop();
+                else
+                    Image.Play();
+            }
+        }
+
+        private void Zoom(float value, bool center = false)
         {
             // Limit Zooming at 2.5x the screen width (ZOOM_MAX_WIDTH) if it hasn't already reached 75x (ZOOM_MAX)
             if (value > CurrentZoom && (uint)Math.Ceiling(Image.Texture.Size.X * value) >= ZOOM_MAX_WIDTH)
@@ -507,15 +607,22 @@ namespace vimage
             Updated = true;
         }
 
+        private void FlipImage()
+        {
+            FlippedX = !FlippedX;
+            Image.Scale = new Vector2f(Math.Abs(Image.Scale.X) * (FlippedX ? -1 : 1), Math.Abs(Image.Scale.Y));
+            Redraw();
+        }
+
         private void ToggleFitToMonitorHeight()
         {
             UnforceAlwaysOnTop();
 
             IntRect bounds;
             if (FitToMonitorHeightAlternative)
-                bounds = GetCurrentWorkingArea(Window.Position);
+                bounds = ImageViewerUtils.GetCurrentWorkingArea(Window.Position);
             else
-                bounds = GetCurrentBounds(Window.Position);
+                bounds = ImageViewerUtils.GetCurrentBounds(Window.Position);
 
             if (CurrentZoom == 1)
             {
@@ -542,11 +649,70 @@ namespace vimage
                 ForceAlwaysOnTopNextTick = true;
         }
 
+        private void ResetImage()
+        {
+            Zoom(1f);
+            FlippedX = false;
+            RotateImage(DefaultRotation);
+        }
+
+        private void ToggleSmoothing()
+        {
+            if (Image is AnimatedImage)
+                Image.Data.Smooth = !Image.Data.Smooth;
+            else
+                Image.Texture.Smooth = !Image.Texture.Smooth;
+            Update();
+        }
+        private bool Smoothing()
+        {
+            if (Image is AnimatedImage)
+                return Image.Data.Smooth;
+            else
+                return Image.Texture.Smooth;
+        }
+
+        private void ToggleBackground()
+        {
+            BackgroundsForImagesWithTransparency = !BackgroundsForImagesWithTransparency;
+            Update();
+        }
+
+        private void ToggleAlwaysOnTop()
+        {
+            AlwaysOnTop = !AlwaysOnTop;
+            AlwaysOnTopForced = false;
+            DWM.SetAlwaysOnTop(Window.SystemHandle, AlwaysOnTop);
+        }
+        private void ForceAlwaysOnTop()
+        {
+            ForceAlwaysOnTopNextTick = false;
+            AlwaysOnTop = true;
+            AlwaysOnTopForced = true;
+            DWM.SetAlwaysOnTop(Window.SystemHandle);
+        }
+        /// <summary>Turns Always On Top off if it was forced.</summary>
+        private void UnforceAlwaysOnTop()
+        {
+            ForceAlwaysOnTopNextTick = false;
+
+            if (!AlwaysOnTopForced)
+                return;
+
+            AlwaysOnTop = false;
+            AlwaysOnTopForced = false;
+            DWM.SetAlwaysOnTop(Window.SystemHandle, false);
+        }
+
+        ///////////////////////////
+        //     Image Loading     //
+        ///////////////////////////
+
         private bool LoadImage(string fileName)
         {
             File = fileName;
 
-            if (GetExtension(fileName).Equals("gif"))
+            if (ImageViewerUtils.GetExtension(fileName).Equals("gif"))
             {
                 // Animated Image
                 Image = Graphics.GetAnimatedImage(fileName);
@@ -565,7 +731,7 @@ namespace vimage
             }
             Image.Origin = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             Image.Position = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
-            DefaultRotation = GetDefaultRotationFromEXIF(fileName);
+            DefaultRotation = ImageViewerUtils.GetDefaultRotationFromEXIF(fileName);
 
             return true;
         }
@@ -586,7 +752,7 @@ namespace vimage
 
             RotateImage(prevRotation == prevDefaultRotation ? DefaultRotation : (int)prevRotation, false);
 
-            IntRect bounds = GetCurrentBounds(Window.Position);
+            IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position);
             if (Config.Setting_LimitImagesToMonitorHeight && (FitToMonitorHeight || (Image.Texture.Size.Y * CurrentZoom >= bounds.Height || (FitToMonitorHeightForced && Image.Texture.Size.Y >= bounds.Height))))
             {
                 // Fit to monitor height if it's higher than monitor height (or FitToMonitorHeight is true).
@@ -611,8 +777,31 @@ namespace vimage
             ForceAlwaysOnTopNextTick = true;
 
             Window.SetTitle(fileName + " - vimage");
+            SetupContextMenu();
 
             return true;
+        }
+        private void NextImage()
+        {
+            GetFolderContents();
+            bool success = false;
+            do
+            {
+                FolderPosition = FolderPosition == 0 ? FolderContents.Count() - 1 : FolderPosition - 1;
+                success = ChangeImage(FolderContents[FolderPosition]);
+            }
+            while (!success);
+        }
+        private void PrevImage()
+        {
+            GetFolderContents();
+            bool success = false;
+            do
+            {
+                FolderPosition = FolderPosition == FolderContents.Count() - 1 ? 0 : FolderPosition + 1;
+                success = ChangeImage(FolderContents[FolderPosition]);
+            }
+            while (!success);
         }
         private void GetFolderContents()
         {
@@ -624,7 +813,7 @@ namespace vimage
             // Natural Sorting
             Func<string, object> convert = str =>
             {
-                try { return int.Parse(str); }
+                try { return long.Parse(str); }
                 catch { return str; }
             };
             var sorted = contents.OrderBy(
@@ -633,83 +822,6 @@ namespace vimage
             FolderContents.AddRange(sorted);
 
             FolderPosition = FolderContents.IndexOf(File);
-        }
-
-        private void ForceAlwaysOnTop()
-        {
-            ForceAlwaysOnTopNextTick = false;
-            AlwaysOnTop = true;
-            AlwaysOnTopForced = true;
-            DWM.SetAlwaysOnTop(Window.SystemHandle);
-        }
-        /// <summary>Turns Always On Top off if it was forced.</summary>
-        private void UnforceAlwaysOnTop()
-        {
-            ForceAlwaysOnTopNextTick = false;
-
-            if (!AlwaysOnTopForced)
-                return;
-
-            AlwaysOnTop = false;
-            AlwaysOnTopForced = false;
-            DWM.SetAlwaysOnTop(Window.SystemHandle, false);
-        }
-
-        ////////////////////
-        //      Utils     //
-        ////////////////////
-
-        /// <summary> Returns the working area IntRect of the monitor the position is located on.</summary>
-        private IntRect GetCurrentWorkingArea(Vector2i pos)
-        {
-            foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
-            {
-                if (pos.X < screen.Bounds.X || pos.Y < screen.Bounds.Y || pos.X > screen.Bounds.X + screen.Bounds.Width || pos.Y > screen.Bounds.Y + screen.Bounds.Height)
-                    continue;
-
-                return new IntRect(screen.WorkingArea.X, screen.WorkingArea.Y, screen.WorkingArea.Width, screen.WorkingArea.Height);
-            }
-            System.Windows.Forms.Screen firstScreen = System.Windows.Forms.Screen.AllScreens.ElementAt(0);
-
-            return new IntRect(firstScreen.WorkingArea.X, firstScreen.WorkingArea.Y, firstScreen.WorkingArea.Width, firstScreen.WorkingArea.Height);
-        }
-        /// <summary> Returns the bounds IntRect of the monitor the position is located on.</summary>
-        private IntRect GetCurrentBounds(Vector2i pos)
-        {
-            foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
-            {
-                if (pos.X < screen.Bounds.X || pos.Y < screen.Bounds.Y || pos.X > screen.Bounds.X + screen.Bounds.Width || pos.Y > screen.Bounds.Y + screen.Bounds.Height)
-                    continue;
-
-                return new IntRect(screen.Bounds.X, screen.Bounds.Y, screen.Bounds.Width, screen.Bounds.Height);
-            }
-            System.Windows.Forms.Screen firstScreen = System.Windows.Forms.Screen.AllScreens.ElementAt(0);
-
-            return new IntRect(firstScreen.Bounds.X, firstScreen.Bounds.Y, firstScreen.Bounds.Width, firstScreen.Bounds.Height);
-        }
-
-        private string GetExtension(string fileName) { return fileName.Substring(fileName.LastIndexOf(".") + 1); }
-
-        /// <summary>Returns Orientation from the EXIF data of a jpg.</summary>
-        private int GetDefaultRotationFromEXIF(string fileName)
-        {
-            if (!(GetExtension(fileName).Equals("jpg") || GetExtension(fileName).Equals("jpeg")))
-                return 0;
-            gma.Drawing.ImageInfo.Info info = new gma.Drawing.ImageInfo.Info(fileName);
-            try
-            {
-                switch (info.Orientation.ToString())
-                {
-                    case "RightTop": return 90;
-                    case "BottomLeft": return 180;
-                    case "LeftBottom": return 270;
-                    default: return 0;
-                }
-            }
-            catch (Exception)
-            {
-                return 0;
-            }
         }
 
     }
