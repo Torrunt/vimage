@@ -18,8 +18,8 @@ ContextMenuShowMargin = 0
 Drag = MOUSELEFT
 Close = ESC, BACKSPACE
 ContextMenu = MOUSERIGHT
-PrevImage = LEFT, PAGE UP
-NextImage = RIGHT, PAGE DOWN
+PrevImage = LEFT, PAGE UP, MOUSE4
+NextImage = RIGHT, PAGE DOWN, MOUSE5
 RotateClockwise = UP
 RotateAntiClockwise = DOWN
 Flip = F
@@ -206,14 +206,13 @@ ResetImage = R";
         }
 
         /// <summary> Returns true if code is one of Control bindings. </summary>
-        public static bool IsControl(int code, List<int> Control)
+        public static bool IsControl(object code, List<int> Control)
         {
-            // Mouse key?
-            if (IsControl((Mouse.Button)(code-MouseCodeOffset), Control))
-                return true;
-            // Keyboard key?
-            if (IsControl((Keyboard.Key)code, Control))
-                return true;
+            if (code is Keyboard.Key)
+                return IsControl((Keyboard.Key)code, Control);
+            else if (code is Mouse.Button)
+                return IsControl((Mouse.Button)code, Control);
+
             return false;
         }
         /// <summary> Returns true if Keyboard.Key is one of Control bindings. </summary>

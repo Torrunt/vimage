@@ -5,6 +5,7 @@ using Tao.DevIl;
 using Tao.OpenGl;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace vimage
 {
@@ -129,7 +130,7 @@ namespace vimage
         /// <param name="filename">Animated Image (ie: animated gif).</param>
         public static AnimatedImageData GetAnimatedImageData(string fileName)
         {
-            int index = TextureFileNames.IndexOf(fileName);
+            int index = AnimatedImageDataFileNames.IndexOf(fileName);
 
             if (index >= 0)
             {
@@ -141,38 +142,65 @@ namespace vimage
                 // New AnimatedImageData
                 System.Drawing.Image image = System.Drawing.Image.FromFile(fileName);
                 AnimatedImageData data = new AnimatedImageData();
-                ImageManipulation.OctreeQuantizer quantizer;
 
-                System.Drawing.Imaging.FrameDimension frameDimension = new System.Drawing.Imaging.FrameDimension(image.FrameDimensionsList[0]);
-                for (int i = 0; i < image.GetFrameCount(frameDimension); i++)
-                {
-                    image.SelectActiveFrame(frameDimension, i);
-                    quantizer = new ImageManipulation.OctreeQuantizer(255, 8);
-
-                    System.Drawing.Bitmap quantized = quantizer.Quantize(image);
-                    MemoryStream stream = new MemoryStream();
-                    quantized.Save(stream, System.Drawing.Imaging.ImageFormat.Gif);
-                    data.Frames.Add(new Texture(stream));
-
-                    stream.Dispose();
-
-                    data.Frames[i].Smooth = true;
-                }
-
+                //// Get Frame Duration
                 System.Drawing.Imaging.PropertyItem frameDelay = image.GetPropertyItem(0x5100);
                 int frameDuration = (frameDelay.Value[0] + frameDelay.Value[1] * 256) * 10;
-                if (frameDuration != 0)
+                if (frameDuration > 10)
                     data.FrameDuration = frameDuration;
                 else
                     data.FrameDuration = AnimatedImage.DEFAULT_FRAME_DURATION;
                 
-
+                //// Store AnimatedImageData
                 AnimatedImageDatas.Add(data);
                 AnimatedImageDataFileNames.Add(fileName);
 
+                //// Get Frames
+                LoadingAnimatedImage loadingAnimatedImage = new LoadingAnimatedImage(image, data);
+                Thread loadFramesThread = new Thread(new ThreadStart(loadingAnimatedImage.LoadFrames));
+                loadFramesThread.IsBackground = true;
+                loadFramesThread.Start();
+
+                while (data.Frames.Count <= 0); // wait for at least one frame to be loaded
+                
                 return data;
             }
         }
 
     }
+
+    class LoadingAnimatedImage
+    {
+        private System.Drawing.Image Image;
+        private ImageManipulation.OctreeQuantizer Quantizer;
+        private AnimatedImageData Data;
+
+        public LoadingAnimatedImage(System.Drawing.Image image, AnimatedImageData data)
+        {
+            Image = image;
+            Data = data;
+        }
+
+        public void LoadFrames()
+        {
+            System.Drawing.Imaging.FrameDimension frameDimension = new System.Drawing.Imaging.FrameDimension(Image.FrameDimensionsList[0]);
+            Data.FramesCount = Image.GetFrameCount(frameDimension);
+
+            for (int i = 0; i < Image.GetFrameCount(frameDimension); i++)
+            {
+                Image.SelectActiveFrame(frameDimension, i);
+                Quantizer = new ImageManipulation.OctreeQuantizer(255, 8);
+
+                System.Drawing.Bitmap quantized = Quantizer.Quantize(Image);
+                MemoryStream stream = new MemoryStream();
+                quantized.Save(stream, System.Drawing.Imaging.ImageFormat.Gif);
+                Data.Frames.Add(new Texture(stream));
+
+                stream.Dispose();
+
+                Data.Frames[i].Smooth = true;
+            }
+        }
+    }
+
 }

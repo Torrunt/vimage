@@ -8,6 +8,7 @@ namespace vimage
     class AnimatedImageData
     {
         public List<Texture> Frames = new List<Texture>();
+        public int FramesCount = 0;
         public int FrameDuration = 100;
 
         private bool _Smooth = true;
@@ -66,6 +67,10 @@ namespace vimage
 
             while (CurrentTime > CurrentFrameLength)
             {
+                // If next frame is yet to be loaded in - don't loop or continue animation until it is
+                if (TotalFrames != Data.FramesCount && Looping && CurrentFrame == TotalFrames - 1 && CurrentFrame < Data.FramesCount - 1)
+                    continue;
+
                 if (Looping || CurrentFrame < TotalFrames - 1)
                 {
                     if (CurrentFrame == TotalFrames - 1)

@@ -318,41 +318,7 @@ namespace vimage
         ////////////////////////
         //      Controls     //
         ///////////////////////
-        
-        private void OnMouseDown(Object sender, MouseButtonEventArgs e)
-        {
-            if (ContextMenu.Visible)
-                return;
 
-            // Dragging
-            if (Config.IsControl(e.Button, Config.Control_Drag))
-                Dragging = true;
-
-            if (Dragging)
-                DragPos = new Vector2i(e.X, e.Y);
-        }
-        private void OnMouseUp(Object sender, MouseButtonEventArgs e)
-        {
-            // Dragging
-            if (Config.IsControl(e.Button, Config.Control_Drag))
-                Dragging = false;
-
-            // Close
-            if (Config.IsControl(e.Button, Config.Control_Close))
-                CloseNextTick = true;
-
-            // Fit To Monitor Height
-            if (Config.IsControl(e.Button, Config.Control_FitToMonitorHeight))
-                ToggleFitToMonitorHeight();
-
-            // Open Context Menu
-            if (Config.IsControl(e.Button, Config.Control_ContextMenu))
-            {
-                RefreshContextMenu();
-                ContextMenu.Show(Window.Position.X + e.X - 1, Window.Position.Y + e.Y - 1);
-                ContextMenu.Capture = true;
-            }
-        }
         private void OnMouseMoved(Object sender, MouseMoveEventArgs e)
         {
             MousePos = new Vector2i(e.X, e.Y);
@@ -371,94 +337,106 @@ namespace vimage
             FitToMonitorHeight = false;
         }
 
-        private void OnKeyUp(Object sender, KeyEventArgs e)
+        private void OnMouseDown(Object sender, MouseButtonEventArgs e) { ControlDown(e.Button); }
+        private void OnMouseUp(Object sender, MouseButtonEventArgs e) { ControlUp(e.Button); }
+        private void OnKeyDown(Object sender, KeyEventArgs e) { ControlDown(e.Code); }
+        private void OnKeyUp(Object sender, KeyEventArgs e) { ControlUp(e.Code); }
+
+        private void ControlUp(object code)
         {
             // Close
-            if (Config.IsControl(e.Code, Config.Control_Close))
+            if (Config.IsControl(code, Config.Control_Close))
                 CloseNextTick = true;
 
             // Dragging
-            if (Config.IsControl(e.Code, Config.Control_Drag))
+            if (Config.IsControl(code, Config.Control_Drag))
                 Dragging = false;
 
+            // Open Context Menu
+            if (Config.IsControl(code, Config.Control_ContextMenu))
+            {
+                RefreshContextMenu();
+                ContextMenu.Show(Window.Position.X + MousePos.X - 1, Window.Position.Y + MousePos.Y - 1);
+                ContextMenu.Capture = true;
+            }
+
             // Rotate Image
-            if (Config.IsControl(e.Code, Config.Control_RotateClockwise))
+            if (Config.IsControl(code, Config.Control_RotateClockwise))
                 RotateImage((int)Image.Rotation + 90);
-            if (Config.IsControl(e.Code, Config.Control_RotateAntiClockwise))
+            if (Config.IsControl(code, Config.Control_RotateAntiClockwise))
                 RotateImage((int)Image.Rotation - 90);
 
             // Flip Image
-            if (Config.IsControl(e.Code, Config.Control_Flip))
+            if (Config.IsControl(code, Config.Control_Flip))
                 FlipImage();
 
-			// Reset Image
-            if (Config.IsControl(e.Code, Config.Control_ResetImage))
+            // Reset Image
+            if (Config.IsControl(code, Config.Control_ResetImage))
                 ResetImage();
 
             // Fit To Monitor Height
-            if (Config.IsControl(e.Code, Config.Control_FitToMonitorHeight))
+            if (Config.IsControl(code, Config.Control_FitToMonitorHeight))
                 ToggleFitToMonitorHeight();
 
-            // Animated Image Controls
-            if (Config.IsControl(e.Code, Config.Control_PauseAnimation))
+            // Animated Image - Pause/Play
+            if (Config.IsControl(code, Config.Control_PauseAnimation))
                 ToggleAnimation();
 
             // Next/Prev Image in Folder
-            if (!Updated && Config.IsControl(e.Code, Config.Control_PrevImage))
+            if (!Updated && Config.IsControl(code, Config.Control_PrevImage))
                 NextImage();
-            if (!Updated && Config.IsControl(e.Code, Config.Control_NextImage))
+            if (!Updated && Config.IsControl(code, Config.Control_NextImage))
                 PrevImage();
-            
+
             // Open config.txt
-            if (Config.IsControl(e.Code, Config.Control_OpenConfig))
+            if (Config.IsControl(code, Config.Control_OpenConfig))
                 Process.Start(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
             // Reload Config
-            if (Config.IsControl(e.Code, Config.Control_ReloadConfig))
+            if (Config.IsControl(code, Config.Control_ReloadConfig))
             {
                 Config.Init();
                 Config.Load(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
             }
 
             // Toggle Settings
-            if (Config.IsControl(e.Code, Config.Control_ToggleSmoothing))
+            if (Config.IsControl(code, Config.Control_ToggleSmoothing))
                 ToggleSmoothing();
 
-            if (Config.IsControl(e.Code, Config.Control_ToggleBackgroundForTransparency))
+            if (Config.IsControl(code, Config.Control_ToggleBackgroundForTransparency))
                 ToggleBackground();
 
             // Toggle Always On Top
-            if (Config.IsControl(e.Code, Config.Control_ToggleAlwaysOnTop))
+            if (Config.IsControl(code, Config.Control_ToggleAlwaysOnTop))
                 ToggleAlwaysOnTop();
-
 
             ZoomFaster = false;
             ZoomAlt = false;
             FitToMonitorHeightAlternative = false;
         }
-        private void OnKeyDown(Object sender, KeyEventArgs e)
+        private void ControlDown(object code)
         {
-            // Animated Image Controls
-            if (Config.IsControl(e.Code, Config.Control_NextFrame))
-                NextFrame();
-            if (Config.IsControl(e.Code, Config.Control_PrevFrame))
-                PrevFrame();
-
-            // Zooming
-            if (Config.IsControl(e.Code, Config.Control_ZoomFaster))
-                ZoomFaster = true;
-            if (Config.IsControl(e.Code, Config.Control_ZoomAlt))
-                ZoomAlt = true;
-
             // Dragging
-            if (Config.IsControl(e.Code, Config.Control_Drag))
+            if (Config.IsControl(code, Config.Control_Drag))
             {
                 if (!Dragging)
                     DragPos = MousePos;
                 Dragging = true;
             }
 
+            // Animated Image Controls
+            if (Config.IsControl(code, Config.Control_NextFrame))
+                NextFrame();
+            if (Config.IsControl(code, Config.Control_PrevFrame))
+                PrevFrame();
+
+            // Zooming
+            if (Config.IsControl(code, Config.Control_ZoomFaster))
+                ZoomFaster = true;
+            if (Config.IsControl(code, Config.Control_ZoomAlt))
+                ZoomAlt = true;
+
             // Fit To Monitor Height Alternative
-            if (Config.IsControl(e.Code, Config.Control_FitToMonitorHeightAlternative))
+            if (Config.IsControl(code, Config.Control_FitToMonitorHeightAlternative))
                 FitToMonitorHeightAlternative = true;
         }
 
