@@ -2,6 +2,7 @@
 version 4 (06-12-2013)
 ------------------------
 - Added Context Menu (can be disabled simply by unbinding it).
+- Reset Image (default: R) now centers the image on the monitor it's currently on (or in the top-left it's a large/wide image).
 - Faster Animated Gif Loading - the loading of the frames are now done in seperate threads allowing for animated gifs to display much sooner.
 - Image Preloading - when using the next/prev image buttons the image after the one just loaded is preloaded ready (can be turned off).
 - Limited the amount of images and animations that can be stored in memory (to avoid the program using too much memory). Up to 20 images and 6 animated gifs stay in memory when navigating with the next/prev image buttons.

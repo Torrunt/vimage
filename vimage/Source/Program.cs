@@ -13,10 +13,10 @@ namespace vimage
             if (args.Length == 0)
             {
 #if DEBUG
-                file = @"C:\Users\Corey\Pictures\Test Images\Beaver_Transparent.png";
+                //file = @"C:\Users\Corey\Pictures\Test Images\Beaver_Transparent.png";
                 //file = @"C:\Users\Corey\Pictures\Test Images\AdventureTime_TransparentAnimation.gif";
                 //file = @"C:\Users\Corey\Pictures\Test Images\AnimatedGif.gif";
-                //file = @"G:\Misc\Desktop Backgrounds\0diHF.jpg";
+                file = @"G:\Misc\Desktop Backgrounds\0diHF.jpg";
 #else
                 return;
 #endif

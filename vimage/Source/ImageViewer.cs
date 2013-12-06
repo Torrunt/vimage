@@ -61,6 +61,9 @@ namespace vimage
         /// If the window is wider and taller than the monitor it will automatically be above the task bar anyway.
         /// </summary>
         private bool ForceAlwaysOnTopNextTick = false;
+        /// <summary>0=false, 1=next, -1=prev.</summary>
+        private int PreloadingNextImage = 0;
+        private bool PreloadNextImageStart = false;
 
         public ImageViewer(string file)
         {
@@ -229,6 +232,9 @@ namespace vimage
                     Updated = false;
                     Redraw();
                     Window.Position = NextWindowPos;
+
+                    if (PreloadNextImageStart)
+                        PreloadNextImage();
                 }
 
                 if (ForceAlwaysOnTopNextTick)
@@ -384,9 +390,9 @@ namespace vimage
 
             // Next/Prev Image in Folder
             if (!Updated && Config.IsControl(code, Config.Control_PrevImage))
-                NextImage();
-            if (!Updated && Config.IsControl(code, Config.Control_NextImage))
                 PrevImage();
+            if (!Updated && Config.IsControl(code, Config.Control_NextImage))
+                NextImage();
 
             // Open config.txt
             if (Config.IsControl(code, Config.Control_OpenConfig))
@@ -632,6 +638,13 @@ namespace vimage
             Zoom(1f);
             FlippedX = false;
             RotateImage(DefaultRotation);
+
+            // Center image or place in top-left corner if it's a large/wide image.
+            IntRect currentWorkingArea = ImageViewerUtils.GetCurrentWorkingArea(new Vector2i((int)Window.Position.X + ((int)Image.Texture.Size.X / 2), (int)Window.Position.Y + ((int)Image.Texture.Size.Y / 2)));
+            if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X > Image.Texture.Size.Y && Image.Texture.Size.X * CurrentZoom >= currentWorkingArea.Width)
+                NextWindowPos = new Vector2i(currentWorkingArea.Left, currentWorkingArea.Top);
+            else
+                NextWindowPos = new Vector2i(currentWorkingArea.Left + (currentWorkingArea.Width / 2) - ((int)Image.Texture.Size.X / 2), currentWorkingArea.Top + (currentWorkingArea.Height / 2) - ((int)Image.Texture.Size.Y / 2));
         }
 
         private void ToggleSmoothing()
@@ -713,28 +726,6 @@ namespace vimage
 
             return true;
         }
-        /// <summary>Loads an image into memory but doesn't set it as the displayed image.</summary>
-        private bool PreloadImage(string fileName)
-        {
-            if (ImageViewerUtils.GetExtension(fileName).Equals("gif"))
-            {
-                // Animated Image
-                AnimatedImage image = Graphics.GetAnimatedImage(fileName);
-                if (image.Texture == null)
-                    return false;
-            }
-            else
-            {
-                // Image
-                Texture texture = Graphics.GetTexture(fileName);
-                if (texture == null)
-                    return false;
-
-                texture.Smooth = true;
-            }
-            
-            return true;
-        }
         private bool ChangeImage(string fileName)
         {
             Image.Dispose();
@@ -781,31 +772,53 @@ namespace vimage
 
             return true;
         }
-        private void NextImage()
+
+        /// <summary>Loads an image into memory but doesn't set it as the displayed image.</summary>
+        private bool PreloadImage(string fileName)
         {
-            GetFolderContents();
+            if (ImageViewerUtils.GetExtension(fileName).Equals("gif"))
+            {
+                // Animated Image
+                AnimatedImage image = Graphics.GetAnimatedImage(fileName);
+                if (image.Texture == null)
+                    return false;
+            }
+            else
+            {
+                // Image
+                Texture texture = Graphics.GetTexture(fileName);
+                if (texture == null)
+                    return false;
+
+                texture.Smooth = true;
+            }
+
+            return true;
+        }
+        private void PreloadNextImage()
+        {
+            if (PreloadingNextImage == 0)
+                return;
+
+            PreloadNextImageStart = false;
+
             bool success = false;
+            int pos = FolderPosition;
             do
             {
-                FolderPosition = FolderPosition == 0 ? FolderContents.Count() - 1 : FolderPosition - 1;
-                success = ChangeImage(FolderContents[FolderPosition]);
+                if (PreloadingNextImage == 1)
+                    pos = pos == FolderContents.Count() - 1 ? 0 : pos + 1;
+                else if (PreloadingNextImage == -1)
+                    pos = pos == 0 ? FolderContents.Count() - 1 : pos - 1;
+                else
+                    return;
+
+                success = PreloadImage(FolderContents[pos]);
             }
             while (!success);
-
-            // Preload next image?
-            if (Config.Setting_PreloadNextImage)
-            {
-                success = false;
-                int pos = FolderPosition;
-                do
-                {
-                    pos = pos == 0 ? FolderContents.Count() - 1 : pos - 1;
-                    success = PreloadImage(FolderContents[pos]);
-                }
-                while (!success);
-            }
         }
-        private void PrevImage()
+
+        private void NextImage()
         {
             GetFolderContents();
             bool success = false;
@@ -819,14 +832,26 @@ namespace vimage
             // Preload next image?
             if (Config.Setting_PreloadNextImage)
             {
-                success = false;
-                int pos = FolderPosition;
-                do
-                {
-                    pos = pos == FolderContents.Count() - 1 ? 0 : pos + 1;
-                    success = PreloadImage(FolderContents[pos]);
-                }
-                while (!success);
+                PreloadingNextImage = 1;
+                PreloadNextImageStart = true;
+            }
+        }
+        private void PrevImage()
+        {
+            GetFolderContents();
+            bool success = false;
+            do
+            {
+                FolderPosition = FolderPosition == 0 ? FolderContents.Count() - 1 : FolderPosition - 1;
+                success = ChangeImage(FolderContents[FolderPosition]);
+            }
+            while (!success);
+
+            // Preload next image?
+            if (Config.Setting_PreloadNextImage)
+            {
+                PreloadingNextImage = -1;
+                PreloadNextImageStart = true;
             }
         }
         private void GetFolderContents()
