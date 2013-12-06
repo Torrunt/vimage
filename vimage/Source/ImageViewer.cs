@@ -713,6 +713,28 @@ namespace vimage
 
             return true;
         }
+        /// <summary>Loads an image into memory but doesn't set it as the displayed image.</summary>
+        private bool PreloadImage(string fileName)
+        {
+            if (ImageViewerUtils.GetExtension(fileName).Equals("gif"))
+            {
+                // Animated Image
+                AnimatedImage image = Graphics.GetAnimatedImage(fileName);
+                if (image.Texture == null)
+                    return false;
+            }
+            else
+            {
+                // Image
+                Texture texture = Graphics.GetTexture(fileName);
+                if (texture == null)
+                    return false;
+
+                texture.Smooth = true;
+            }
+            
+            return true;
+        }
         private bool ChangeImage(string fileName)
         {
             Image.Dispose();
@@ -769,6 +791,19 @@ namespace vimage
                 success = ChangeImage(FolderContents[FolderPosition]);
             }
             while (!success);
+
+            // Preload next image?
+            if (Config.Setting_PreloadNextImage)
+            {
+                success = false;
+                int pos = FolderPosition;
+                do
+                {
+                    pos = pos == 0 ? FolderContents.Count() - 1 : pos - 1;
+                    success = PreloadImage(FolderContents[pos]);
+                }
+                while (!success);
+            }
         }
         private void PrevImage()
         {
@@ -780,6 +815,19 @@ namespace vimage
                 success = ChangeImage(FolderContents[FolderPosition]);
             }
             while (!success);
+
+            // Preload next image?
+            if (Config.Setting_PreloadNextImage)
+            {
+                success = false;
+                int pos = FolderPosition;
+                do
+                {
+                    pos = pos == FolderContents.Count() - 1 ? 0 : pos + 1;
+                    success = PreloadImage(FolderContents[pos]);
+                }
+                while (!success);
+            }
         }
         private void GetFolderContents()
         {

@@ -21,6 +21,9 @@ namespace vimage
         private static List<AnimatedImageData> AnimatedImageDatas = new List<AnimatedImageData>();
         private static List<string> AnimatedImageDataFileNames = new List<string>();
 
+        public const uint MAX_TEXTURES = 20;
+        public const uint MAX_ANIMATIONS = 6;
+
         public static Sprite GetSprite(string fileName, bool smooth = false)
         {
             Sprite sprite = new Sprite(GetTexture(fileName));
@@ -36,7 +39,16 @@ namespace vimage
             if (index >= 0)
             {
                 // Texture Already Exists
-                return Textures[index];
+                // move it to the end of the array and return it
+                Texture texture = Textures[index];
+                string name = TextureFileNames[index];
+
+                Textures.RemoveAt(index);
+                TextureFileNames.RemoveAt(index);
+                Textures.Add(texture);
+                TextureFileNames.Add(name);
+
+                return Textures[Textures.Count - 1];
             }
             else
             {
@@ -52,6 +64,14 @@ namespace vimage
 
                     Textures.Add(texture);
                     TextureFileNames.Add(fileName);
+
+                    // Limit amount of Textures in Memory
+                    if (Textures.Count >= MAX_TEXTURES)
+                    {
+                        Textures[0].Dispose();
+                        Textures.RemoveAt(0);
+                        TextureFileNames.RemoveAt(0);
+                    }
 
                     return texture;
                 }
@@ -131,11 +151,21 @@ namespace vimage
         public static AnimatedImageData GetAnimatedImageData(string fileName)
         {
             int index = AnimatedImageDataFileNames.IndexOf(fileName);
+            Console.WriteLine(fileName);
 
             if (index >= 0)
             {
                 // AnimatedImageData Already Exists
-                return AnimatedImageDatas[index];
+                // move it to the end of the array and return it
+                AnimatedImageData data = AnimatedImageDatas[index];
+                string name = AnimatedImageDataFileNames[index];
+
+                AnimatedImageDatas.RemoveAt(index);
+                AnimatedImageDataFileNames.RemoveAt(index);
+                AnimatedImageDatas.Add(data);
+                AnimatedImageDataFileNames.Add(name);
+
+                return AnimatedImageDatas[AnimatedImageDatas.Count-1];
             }
             else
             {
@@ -154,6 +184,16 @@ namespace vimage
                 //// Store AnimatedImageData
                 AnimatedImageDatas.Add(data);
                 AnimatedImageDataFileNames.Add(fileName);
+
+                // Limit amount of Animations in Memory
+                if (AnimatedImageDatas.Count >= MAX_ANIMATIONS)
+                {
+                    for (int i = 0; i < AnimatedImageDatas[0].Frames.Count; i++)
+                        AnimatedImageDatas[0].Frames[i].Dispose();
+                    
+                    AnimatedImageDatas.RemoveAt(0);
+                    AnimatedImageDataFileNames.RemoveAt(0);
+                }
 
                 //// Get Frames
                 LoadingAnimatedImage loadingAnimatedImage = new LoadingAnimatedImage(image, data);

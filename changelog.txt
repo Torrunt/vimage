@@ -1,4 +1,15 @@
 ------------------------
+version 4 (06-12-2013)
+------------------------
+- Added Context Menu (can be disabled simply by unbinding it).
+- Faster Animated Gif Loading - the loading of the frames are now done in seperate threads allowing for animated gifs to display much sooner.
+- Image Preloading - when using the next/prev image buttons the image after the one just loaded is preloaded ready (can be turned off).
+- Limited the amount of images and animations that can be stored in memory (to avoid the program using too much memory). Up to 20 images and 6 animated gifs stay in memory when navigating with the next/prev image buttons.
+- All control bindings should now be bindable to either or both mouse buttons and keyboard keys.
+- Fixed bug where Animated Gifs reloaded themselves even though they were still in memory.
+- Fixed crash when navigating images in a folder that contained files with names with very large numbers in them.
+
+------------------------
 version 3 (22-11-2013)
 ------------------------
 - Improved Animated GIF Support - if an animated gif looked glitchy before, it should be fine now.

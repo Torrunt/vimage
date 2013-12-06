@@ -13,7 +13,8 @@ SmoothingDefault = 1
 BackgroundForImagesWithTransparencyDefault = 0
 LimitImagesToMonitorHeight = 1
 PositionLargeWideImagesInCorner = 1 // ie: Desktop Wallpapers and Screenshots
-ContextMenuShowMargin = 0
+ContextMenuShowMargin = 0 // shows checkboxes for certain menu items
+PreloadNextImage = 1 // when using the next/prev image buttons, the image after the one just loaded will be loaded as well ready
 
 Drag = MOUSELEFT
 Close = ESC, BACKSPACE
@@ -65,6 +66,7 @@ ResetImage = R";
         public bool Setting_LimitImagesToMonitorHeight { get { return (Boolean)Settings["LIMITIMAGESTOMONITORHEIGHT"]; } }
         public bool Setting_PositionLargeWideImagesInCorner { get { return (Boolean)Settings["POSITIONLARGEWIDEIMAGESINCORNER"]; } }
         public bool Setting_ContextMenuShowMargin { get { return (Boolean)Settings["CONTEXTMENUSHOWMARGIN"]; } }
+        public bool Setting_PreloadNextImage { get { return (Boolean)Settings["PRELOADNEXTIMAGE"]; } }
 
         private Dictionary<string, object> Settings;
 
@@ -106,6 +108,7 @@ ResetImage = R";
                 { "LIMITIMAGESTOMONITORHEIGHT", true },
                 { "POSITIONLARGEWIDEIMAGESINCORNER", true },
                 { "CONTEXTMENUSHOWMARGIN", false},
+                { "PRELOADNEXTIMAGE", true},
 
                 { "DRAG", Control_Drag },
                 { "CLOSE", Control_Close },
