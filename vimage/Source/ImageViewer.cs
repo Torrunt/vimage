@@ -864,7 +864,7 @@ namespace vimage
             // Natural Sorting
             Func<string, object> convert = str =>
             {
-                try { return long.Parse(str); }
+                try { return ulong.Parse(str); }
                 catch { return str; }
             };
             var sorted = contents.OrderBy(
