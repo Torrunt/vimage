@@ -128,6 +128,8 @@ namespace vimage
             bb.hRgnBlur = new IntPtr();
             DWM.DwmEnableBlurBehindWindow(Window.SystemHandle, ref bb);
 
+            bool _forceAlwaysOnTop = false;
+
             // Resize Window
             if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X > Image.Texture.Size.Y && Image.Texture.Size.X * CurrentZoom >= VideoMode.DesktopMode.Width)
             {
@@ -176,7 +178,7 @@ namespace vimage
 
                 // Force Always On Top Mode (so it's above the task bar)
                 if (FitToMonitorHeightForced || (Image.Texture.Size.Y >= bounds.Height && Image.Texture.Size.X < bounds.Width))
-                    ForceAlwaysOnTop();
+                    _forceAlwaysOnTop = true;
             }
 
             // Defaults
@@ -188,6 +190,8 @@ namespace vimage
                 Image.Texture.Smooth = Config.Setting_SmoothingDefault;
                 // Backgrounds For Images With Transparency
             BackgroundsForImagesWithTransparency = Config.Setting_BackgroundForImagesWithTransparencyDefault;
+
+            ForceAlwaysOnTopNextTick = _forceAlwaysOnTop;
 
             Redraw();
             NextWindowPos = Window.Position;
@@ -232,9 +236,6 @@ namespace vimage
                     Updated = false;
                     Redraw();
                     Window.Position = NextWindowPos;
-
-                    if (PreloadNextImageStart)
-                        PreloadNextImage();
                 }
 
                 if (ForceAlwaysOnTopNextTick)
@@ -245,6 +246,9 @@ namespace vimage
                     else
                         ForceAlwaysOnTopNextTick = false;
                 }
+
+                if (Updated && PreloadNextImageStart)
+                    PreloadNextImage();
             }
         }
         private void Redraw()
@@ -639,12 +643,31 @@ namespace vimage
             FlippedX = false;
             RotateImage(DefaultRotation);
 
+            // Force Fit To Monitor Height?
+            Vector2i imagePos = new Vector2i((int)NextWindowPos.X + ((int)Image.Texture.Size.X / 2), (int)NextWindowPos.Y + ((int)Image.Texture.Size.Y / 2));
+            IntRect currentBounds = ImageViewerUtils.GetCurrentBounds(imagePos);
+            if (Config.Setting_LimitImagesToMonitorHeight && Image.Texture.Size.Y > Image.Texture.Size.X && Image.Texture.Size.Y > currentBounds.Height)
+            {
+                // Fit to monitor height if it's higher than monitor height.
+                Zoom(1 + (((float)currentBounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
+                FitToMonitorHeightForced = true;
+            }
+
             // Center image or place in top-left corner if it's a large/wide image.
-            IntRect currentWorkingArea = ImageViewerUtils.GetCurrentWorkingArea(new Vector2i((int)Window.Position.X + ((int)Image.Texture.Size.X / 2), (int)Window.Position.Y + ((int)Image.Texture.Size.Y / 2)));
-            if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X > Image.Texture.Size.Y && Image.Texture.Size.X * CurrentZoom >= currentWorkingArea.Width)
+            IntRect currentWorkingArea;
+            if (!FitToMonitorHeightForced)
+                currentWorkingArea = ImageViewerUtils.GetCurrentWorkingArea(imagePos);
+            else
+                currentWorkingArea = currentBounds;
+
+            if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X * CurrentZoom > Image.Texture.Size.Y * CurrentZoom && Image.Texture.Size.X * CurrentZoom >= currentWorkingArea.Width)
                 NextWindowPos = new Vector2i(currentWorkingArea.Left, currentWorkingArea.Top);
             else
-                NextWindowPos = new Vector2i(currentWorkingArea.Left + (currentWorkingArea.Width / 2) - ((int)Image.Texture.Size.X / 2), currentWorkingArea.Top + (currentWorkingArea.Height / 2) - ((int)Image.Texture.Size.Y / 2));
+                NextWindowPos = new Vector2i(currentWorkingArea.Left + (currentWorkingArea.Width / 2) - ((int)(Image.Texture.Size.X * CurrentZoom) / 2), currentWorkingArea.Top + (currentWorkingArea.Height / 2) - ((int)(Image.Texture.Size.Y * CurrentZoom) / 2));
+
+            // Force Always on Top?
+            if (FitToMonitorHeightForced || (Image.Texture.Size.Y >= currentBounds.Height && Image.Texture.Size.X < currentBounds.Width))
+                ForceAlwaysOnTopNextTick = true;
         }
 
         private void ToggleSmoothing()
