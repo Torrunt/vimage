@@ -31,7 +31,6 @@ namespace vimage
 
             return sprite;
         }
-        /// <param name="imageNum">The Active Image Number (for animated gifs).</param>
         public static Texture GetTexture(string fileName)
         {
             int index = TextureFileNames.IndexOf(fileName);
@@ -72,6 +71,7 @@ namespace vimage
                         Textures.RemoveAt(0);
                         TextureFileNames.RemoveAt(0);
                     }
+                    Il.ilDeleteImage(imageID);
 
                     return texture;
                 }
@@ -91,9 +91,6 @@ namespace vimage
 
             int width = Il.ilGetInteger(Il.IL_IMAGE_WIDTH);
             int height = Il.ilGetInteger(Il.IL_IMAGE_HEIGHT);
-
-            int image = 0;
-            Gl.glGenTextures(1, out image);
 
             Texture texture = new Texture((uint)width, (uint)height);
             Texture.Bind(texture);
@@ -119,8 +116,6 @@ namespace vimage
                 Gl.glEnd();
             }
             Texture.Bind(null);
-
-            Gl.glDeleteTextures(1, ref image);
 
             return texture;
         }
@@ -151,7 +146,6 @@ namespace vimage
         public static AnimatedImageData GetAnimatedImageData(string fileName)
         {
             int index = AnimatedImageDataFileNames.IndexOf(fileName);
-            Console.WriteLine(fileName);
 
             if (index >= 0)
             {

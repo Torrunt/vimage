@@ -13,7 +13,7 @@ namespace vimage
 {
     class ImageViewer
     {
-        public const string VERSION_NAME = "vimage version 4*";
+        public const string VERSION_NAME = "vimage version 4";
 
         public readonly float ZOOM_SPEED = 0.02f;
         public readonly float ZOOM_SPEED_FAST = 0.1f;
@@ -729,6 +729,8 @@ namespace vimage
         private bool ChangeImage(string fileName)
         {
             Image.Dispose();
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+
             Dragging = false;
             float prevRotation = Image.Rotation;
             int prevDefaultRotation = DefaultRotation;
@@ -779,9 +781,7 @@ namespace vimage
             if (ImageViewerUtils.GetExtension(fileName).Equals("gif"))
             {
                 // Animated Image
-                AnimatedImage image = Graphics.GetAnimatedImage(fileName);
-                if (image.Texture == null)
-                    return false;
+                AnimatedImageData image = Graphics.GetAnimatedImageData(fileName);
             }
             else
             {
@@ -789,8 +789,6 @@ namespace vimage
                 Texture texture = Graphics.GetTexture(fileName);
                 if (texture == null)
                     return false;
-
-                texture.Smooth = true;
             }
 
             return true;
@@ -801,7 +799,7 @@ namespace vimage
                 return;
 
             PreloadNextImageStart = false;
-
+            
             bool success = false;
             int pos = FolderPosition;
             do
@@ -813,9 +811,13 @@ namespace vimage
                 else
                     return;
 
+                Gl.glActiveTexture(Gl.GL_TEXTURE1);
                 success = PreloadImage(FolderContents[pos]);
+                Gl.glActiveTexture(Gl.GL_TEXTURE0);
             }
             while (!success);
+            
+            PreloadingNextImage = 0;
         }
 
         private void NextImage()
