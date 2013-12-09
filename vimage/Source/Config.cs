@@ -36,7 +36,9 @@ PrevFrame = <
 NextFrame = >
 OpenConfig = O
 ReloadConfig = P
-ResetImage = R";
+ResetImage = R
+OpenAtLocation =
+Delete = DELETE";
 
         public List<int> Control_Drag;
         public List<int> Control_Close;
@@ -59,6 +61,8 @@ ResetImage = R";
         public List<int> Control_OpenConfig;
         public List<int> Control_ReloadConfig;
 		public List<int> Control_ResetImage;
+        public List<int> Control_OpenAtLocation;
+        public List<int> Control_Delete;
 
         public bool Setting_OpenAtMousePosition { get { return (Boolean)Settings["OPENATMOUSEPOSITION"]; } }
         public bool Setting_SmoothingDefault { get { return (Boolean)Settings["SMOOTHINGDEFAULT"]; } }
@@ -99,6 +103,8 @@ ResetImage = R";
             Control_OpenConfig = new List<int>();
             Control_ReloadConfig = new List<int>();
 			Control_ResetImage = new List<int>();
+            Control_OpenAtLocation = new List<int>();
+            Control_Delete = new List<int>();
 
             Settings = new Dictionary<string, object>()
             {
@@ -130,7 +136,9 @@ ResetImage = R";
                 { "NEXTFRAME", Control_NextFrame },
                 { "OPENCONFIG", Control_OpenConfig },
                 { "RELOADCONFIG", Control_ReloadConfig },
-				{ "RESETIMAGE", Control_ResetImage }
+				{ "RESETIMAGE", Control_ResetImage },
+                { "OPENATLOCATION", Control_OpenAtLocation },
+                { "DELETE", Control_Delete }
             };
         }
 
@@ -434,8 +442,10 @@ ResetImage = R";
                 case "HOME":
                     return Keyboard.Key.Home;
                 case "INSERT":
+                case "INS":
                     return Keyboard.Key.Insert;
                 case "DELETE":
+                case "DEL":
                     return Keyboard.Key.Delete;
                 case "ADD":
                     return Keyboard.Key.Add;

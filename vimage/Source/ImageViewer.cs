@@ -99,6 +99,9 @@ namespace vimage
                 "Background",
                 "Always On Top",
                 "-",
+                "Open file location",
+                "Delete",
+                "-",
                 "Open Config.txt",
                 "Reload Config.txt",
                 "-",
@@ -419,6 +422,14 @@ namespace vimage
             if (Config.IsControl(code, Config.Control_ToggleAlwaysOnTop))
                 ToggleAlwaysOnTop();
 
+            // Open File At Location
+            if (Config.IsControl(code, Config.Control_OpenAtLocation))
+                OpenFileAtLocation();
+
+            // Delete File
+            if (Config.IsControl(code, Config.Control_Delete))
+                DeleteFile();
+
             ZoomFaster = false;
             ZoomAlt = false;
             FitToMonitorHeightAlternative = false;
@@ -474,6 +485,9 @@ namespace vimage
                 case "Smoothing": ToggleSmoothing(); break;
                 case "Background": ToggleBackground(); break;
                 case "Always On Top": ToggleAlwaysOnTop(); break;
+
+                case "Open file location": OpenFileAtLocation(); break;
+                case "Delete": DeleteFile(); break;
 
                 case "Open Config.txt": Process.Start(AppDomain.CurrentDomain.BaseDirectory + "config.txt"); break;
                 case "Reload Config.txt": Config.Init(); Config.Load(AppDomain.CurrentDomain.BaseDirectory + "config.txt"); break;
@@ -879,6 +893,11 @@ namespace vimage
                 PreloadNextImageStart = true;
             }
         }
+
+        ///////////////////////////
+        //         Other         //
+        ///////////////////////////
+
         private void GetFolderContents()
         {
             if (FolderContents != null && FolderContents.Count() > 0)
@@ -898,6 +917,25 @@ namespace vimage
             FolderContents.AddRange(sorted);
 
             FolderPosition = FolderContents.IndexOf(File);
+        }
+
+        private void DeleteFile()
+        {
+            string fileName = File;
+            if (FolderContents.Count == 1)
+            {
+                Image.Dispose();
+                Window.Close();
+            }
+            else
+                NextImage();
+            Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(fileName, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+
+            FolderContents.Clear();
+        }
+        private void OpenFileAtLocation()
+        {
+            Process.Start("explorer.exe", "/select, " + File);
         }
 
     }
