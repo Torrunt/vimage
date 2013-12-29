@@ -116,7 +116,7 @@ namespace vimage
                 "-"
             });
 
-            SetupContextMenu();
+            SetupContextMenu(false);
 
             // Create Window
             Window = new RenderWindow(new VideoMode(Image.Texture.Size.X, Image.Texture.Size.Y), File + " - vimage", Styles.None);
@@ -254,6 +254,7 @@ namespace vimage
                     PreloadNextImage();
             }
         }
+
         private void Redraw()
         {
             // Clear screen
@@ -280,9 +281,9 @@ namespace vimage
             NextWindowPos = Window.Position; // Refresh the NextWindowPos var just in case the thing that induced the update didn't change the window position
         }
 
-        private void SetupContextMenu()
+        private void SetupContextMenu(bool force)
         {
-            if ((ContextMenuSetting == 0 && !(Image is AnimatedImage)) || (ContextMenuSetting == 1 && Image is AnimatedImage))
+            if (!force && ((ContextMenuSetting == 0 && !(Image is AnimatedImage)) || (ContextMenuSetting == 1 && Image is AnimatedImage)))
                 return;
 
             ContextMenu.Items.Clear();
@@ -301,6 +302,7 @@ namespace vimage
             }
 
             int c = 0;
+            bool contextMenuColors = Config.Setting_ContextMenuColors;
             for (int i = 0; i < items.Count; i++)
             {
                 System.Windows.Forms.ToolStripItem item = ContextMenu.Items.Add(items[i]);
@@ -311,7 +313,7 @@ namespace vimage
                 item.Click += ContexMenuItemClicked;
 
                 c++;
-                if (c % 2 == 0)
+                if (c % 2 == 0 && contextMenuColors)
                     ContextMenu.Items[i].BackColor = System.Drawing.Color.LightBlue;
             }
 
@@ -407,8 +409,7 @@ namespace vimage
             // Reload Config
             if (Config.IsControl(code, Config.Control_ReloadConfig))
             {
-                Config.Init();
-                Config.Load(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
+                ReloadConfig();
             }
 
             // Toggle Settings
@@ -490,7 +491,7 @@ namespace vimage
                 case "Delete": DeleteFile(); break;
 
                 case "Open Config.txt": Process.Start(AppDomain.CurrentDomain.BaseDirectory + "config.txt"); break;
-                case "Reload Config.txt": Config.Init(); Config.Load(AppDomain.CurrentDomain.BaseDirectory + "config.txt"); break;
+                case "Reload Config.txt": ReloadConfig(); break;
 
                 case VERSION_NAME: Process.Start("http://torrunt.net/vimage"); break;
             }
@@ -807,7 +808,7 @@ namespace vimage
             ForceAlwaysOnTopNextTick = true;
 
             Window.SetTitle(fileName + " - vimage");
-            SetupContextMenu();
+            SetupContextMenu(false);
 
             return true;
         }
@@ -936,6 +937,13 @@ namespace vimage
         private void OpenFileAtLocation()
         {
             Process.Start("explorer.exe", "/select, " + File);
+        }
+
+        private void ReloadConfig()
+        {
+            Config.Init();
+            Config.Load(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
+            SetupContextMenu(true);
         }
 
     }
