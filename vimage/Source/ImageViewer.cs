@@ -8,6 +8,7 @@ using Tao.OpenGl;
 using Tao.DevIl;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace vimage
 {
@@ -214,6 +215,9 @@ namespace vimage
             
             while (Window.IsOpen())
             {
+                // Add in some idle time to not thrash the CPU
+                Thread.Sleep(1);
+
                 if (CloseNextTick)
                     break;
 
