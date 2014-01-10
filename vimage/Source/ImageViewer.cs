@@ -14,7 +14,7 @@ namespace vimage
 {
     class ImageViewer
     {
-        public const string VERSION_NAME = "vimage version 4";
+        public const string VERSION_NAME = "vimage version 5";
 
         public readonly float ZOOM_SPEED = 0.02f;
         public readonly float ZOOM_SPEED_FAST = 0.1f;
@@ -109,7 +109,7 @@ namespace vimage
                 VERSION_NAME
             };
             ContextMenuItems_Animation = new List<string>(ContextMenuItems);
-            ContextMenuItems_Animation.InsertRange(5, new List<string>()
+            ContextMenuItems_Animation.InsertRange(2, new List<string>()
             {
                 "Next Frame",
                 "Prev Frame",

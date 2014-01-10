@@ -14,7 +14,7 @@ BackgroundForImagesWithTransparencyDefault = 0
 LimitImagesToMonitorHeight = 1
 PositionLargeWideImagesInCorner = 1 // ie: Desktop Wallpapers and Screenshots
 ContextMenuShowMargin = 0 // shows checkboxes for certain menu items
-ContextMenuColors = 1 // colorize the context menu
+ContextMenuColors = 0 // colorize the context menu
 PreloadNextImage = 1 // when using the next/prev image buttons, the image after the one just loaded will be loaded as well ready
 
 Drag = MOUSELEFT
