@@ -5,7 +5,7 @@ using System.IO;
 using SFML.Window;
 using SFML.Graphics;
 using Tao.OpenGl;
-using Tao.DevIl;
+using DevIL.Unmanaged;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -68,7 +68,7 @@ namespace vimage
 
         public ImageViewer(string file)
         {
-            Il.ilInit();
+            IL.Initialize();
 
             // Save Mouse Position -> will open image at this position
             Vector2i mousePos = Mouse.GetPosition();
@@ -186,7 +186,6 @@ namespace vimage
             }
 
             // Defaults
-            RotateImage(DefaultRotation, false);
                 // Smoothing
             if (Image is AnimatedImage)
                 Image.Data.Smooth = Config.Setting_SmoothingDefault;

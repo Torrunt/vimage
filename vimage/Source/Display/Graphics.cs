@@ -1,7 +1,7 @@
 ﻿using SFML.Graphics;
 using System.Collections.Generic;
 using System;
-using Tao.DevIl;
+using DevIL.Unmanaged;
 using Tao.OpenGl;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -52,15 +52,12 @@ namespace vimage
             else
             {
                 // New Texture
-                int imageID = 0;
-
-                Il.ilGenImages(1, out imageID);
-                Il.ilBindImage(imageID);
-
-                if (Il.ilLoadImage(fileName))
+                int imageID = IL.GenerateImage();
+                IL.BindImage(imageID);
+                if (IL.LoadImageFromStream(File.OpenRead(fileName)))
                 {
                     Texture texture = GetTextureFromBoundImage();
-
+                    
                     Textures.Add(texture);
                     TextureFileNames.Add(fileName);
 
@@ -71,39 +68,37 @@ namespace vimage
                         Textures.RemoveAt(0);
                         TextureFileNames.RemoveAt(0);
                     }
-                    Il.ilDeleteImage(imageID);
+                    IL.DeleteImage(imageID);
 
                     return texture;
                 }
-                Il.ilDeleteImage(imageID);
-
+                IL.DeleteImage(imageID);
+                
                 return null;
             }
         }
         private static Texture GetTextureFromBoundImage(int imageNum = 0)
         {
-            Il.ilActiveImage(imageNum);
-
-            bool success = Il.ilConvertImage(Il.IL_RGBA, Il.IL_UNSIGNED_BYTE);
-
+            IL.ActiveImage(imageNum);
+            
+            bool success = IL.ConvertImage(DevIL.DataFormat.RGBA, DevIL.DataType.UnsignedByte);
+            
             if (!success)
                 return null;
 
-            int width = Il.ilGetInteger(Il.IL_IMAGE_WIDTH);
-            int height = Il.ilGetInteger(Il.IL_IMAGE_HEIGHT);
-
+            int width = IL.GetImageInfo().Width;
+            int height = IL.GetImageInfo().Height;
+            
             Texture texture = new Texture((uint)width, (uint)height);
             Texture.Bind(texture);
             {
                 Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, Gl.GL_LINEAR);
                 Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, Gl.GL_LINEAR);
                 Gl.glTexImage2D(
-                    Gl.GL_TEXTURE_2D, 0,
-                    Il.ilGetInteger(Il.IL_IMAGE_BPP),
-                    Il.ilGetInteger(Il.IL_IMAGE_WIDTH),
-                    Il.ilGetInteger(Il.IL_IMAGE_HEIGHT), 0,
-                    Il.ilGetInteger(Il.IL_IMAGE_FORMAT), Gl.GL_UNSIGNED_BYTE,
-                    Il.ilGetData()
+                    Gl.GL_TEXTURE_2D, 0, IL.GetInteger(ILIntegerMode.ImageBytesPerPixel),
+                    width, height, 0,
+                    IL.GetInteger(ILIntegerMode.ImageFormat), ILDefines.IL_UNSIGNED_BYTE,
+                    IL.GetData()
                     );
 
                 Gl.glBegin(Gl.GL_QUADS);
@@ -118,23 +113,6 @@ namespace vimage
             Texture.Bind(null);
 
             return texture;
-        }
-
-        public static int NumberOfFramesInImage(string fileName)
-        {
-            int imageid = 0;
-            Il.ilGenImages(1, out imageid);
-            Il.ilBindImage(imageid);
-
-            bool success = Il.ilLoadImage(fileName);
-            if (!success)
-                return 0;
-
-            int no = Il.ilGetInteger(Il.IL_NUM_IMAGES) + 1;
-
-            Il.ilDeleteImage(imageid);
-
-            return no;
         }
 
         /// <param name="filename">Animated Image (ie: animated gif).</param>
