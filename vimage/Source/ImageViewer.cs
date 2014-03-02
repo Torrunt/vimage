@@ -9,6 +9,7 @@ using DevIL.Unmanaged;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace vimage
 {
@@ -27,7 +28,7 @@ namespace vimage
         public string File;
         public List<string> FolderContents = new List<string>();
         public int FolderPosition = 0;
-        private System.Windows.Forms.ContextMenuStrip ContextMenu;
+        private ContextMenuStrip ContextMenu;
         private int ContextMenuSetting = -1;
         private List<string> ContextMenuItems;
         private List<string> ContextMenuItems_Animation;
@@ -65,6 +66,8 @@ namespace vimage
         /// <summary>0=false, 1=next, -1=prev.</summary>
         private int PreloadingNextImage = 0;
         private bool PreloadNextImageStart = false;
+        private SortBy SortImagesBy = SortBy.Name;
+        private SortDirection SortImagesByDir = SortDirection.Ascending;
 
         public ImageViewer(string file)
         {
@@ -81,15 +84,15 @@ namespace vimage
             Config.Load(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
 
             // Create Context Menu
-            ContextMenu = new System.Windows.Forms.ContextMenuStrip();
-            ContextMenu.AutoClose = false;
-            ContextMenu.MouseCaptureChanged += ContextMenu_MouseCaptureChanged;
+            ContextMenu = new ContextMenuStrip();
+
             ContextMenuItems = new List<string>()
             {
                 "Close",
                 "-",
                 "Next Image",
                 "Prev Image",
+                "Sort by:", ":Name", ":Date modified", ":Date created", ":Size", ":-", ":Ascending", ":Descending",
                 "-",
                 "Rotate Clockwise",
                 "Rotate Anti-Clockwise",
@@ -186,6 +189,8 @@ namespace vimage
             }
 
             // Defaults
+                // Rotation (some images have a rotation set in their exif data)
+            RotateImage(DefaultRotation, false);
                 // Smoothing
             if (Image is AnimatedImage)
                 Image.Data.Smooth = Config.Setting_SmoothingDefault;
@@ -304,33 +309,59 @@ namespace vimage
                 items = ContextMenuItems;
             }
 
-            int c = 0;
-            bool contextMenuColors = Config.Setting_ContextMenuColors;
             for (int i = 0; i < items.Count; i++)
             {
-                System.Windows.Forms.ToolStripItem item = ContextMenu.Items.Add(items[i]);
-                if (items[i].Equals("-"))
+                ToolStripItem item = null;
+                string name = items[i];
+                bool itemClickable = true;
+
+                if (name.IndexOf(":") == name.Length - 1)
+                {
+                    // non-clickable item?
+                    name = name.Substring(0, name.Length - 1);
+                    itemClickable = false;
+                }
+
+                if (items[i].IndexOf(":") == 0)
+                {
+                    // sub item
+                    ToolStripDropDownItem dropDownItem = ContextMenu.Items[ContextMenu.Items.Count - 1] as ToolStripDropDownItem;
+                    name = items[i].Substring(1);
+                    item = dropDownItem.DropDownItems.Add(name);
+                }
+                else
+                {
+                    // item
+                    item = ContextMenu.Items.Add(name);
+                }
+                if (name.Equals("-"))
                     continue;
 
-                item.Name = items[i];
-                item.Click += ContexMenuItemClicked;
+                if (itemClickable)
+                    item.Click += ContexMenuItemClicked;
 
-                c++;
-                if (c % 2 == 0 && contextMenuColors)
-                    ContextMenu.Items[i].BackColor = System.Drawing.Color.LightBlue;
+                item.Name = name;
             }
 
-            ((System.Windows.Forms.ToolStripMenuItem)ContextMenu.Items[VERSION_NAME]).BackColor = System.Drawing.Color.CornflowerBlue;
+            ((ToolStripMenuItem)ContextMenu.Items[VERSION_NAME]).BackColor = System.Drawing.Color.CornflowerBlue;
 
             RefreshContextMenu();
         }
         private void RefreshContextMenu()
         {
-            ((System.Windows.Forms.ToolStripMenuItem)ContextMenu.Items["Flip"]).Checked = FlippedX;
-            ((System.Windows.Forms.ToolStripMenuItem)ContextMenu.Items["Fit To Monitor Height"]).Checked = FitToMonitorHeight;
-            ((System.Windows.Forms.ToolStripMenuItem)ContextMenu.Items["Smoothing"]).Checked = Smoothing();
-            ((System.Windows.Forms.ToolStripMenuItem)ContextMenu.Items["Background"]).Checked = BackgroundsForImagesWithTransparency;
-            ((System.Windows.Forms.ToolStripMenuItem)ContextMenu.Items["Always On Top"]).Checked = AlwaysOnTop;
+            ((ToolStripMenuItem)ContextMenu.Items["Flip"]).Checked = FlippedX;
+            ((ToolStripMenuItem)ContextMenu.Items["Fit To Monitor Height"]).Checked = FitToMonitorHeight;
+            ((ToolStripMenuItem)ContextMenu.Items["Smoothing"]).Checked = Smoothing();
+            ((ToolStripMenuItem)ContextMenu.Items["Background"]).Checked = BackgroundsForImagesWithTransparency;
+            ((ToolStripMenuItem)ContextMenu.Items["Always On Top"]).Checked = AlwaysOnTop;
+
+            ((ToolStripMenuItem)((ToolStripDropDownItem)ContextMenu.Items["Sort By"]).DropDownItems["Name"]).Checked = SortImagesBy == SortBy.Name;
+            ((ToolStripMenuItem)((ToolStripDropDownItem)ContextMenu.Items["Sort By"]).DropDownItems["Date modified"]).Checked = SortImagesBy == SortBy.DateModified;
+            ((ToolStripMenuItem)((ToolStripDropDownItem)ContextMenu.Items["Sort By"]).DropDownItems["Date created"]).Checked = SortImagesBy == SortBy.DateCreated;
+            ((ToolStripMenuItem)((ToolStripDropDownItem)ContextMenu.Items["Sort By"]).DropDownItems["Size"]).Checked = SortImagesBy == SortBy.Size;
+
+            ((ToolStripMenuItem)((ToolStripDropDownItem)ContextMenu.Items["Sort By"]).DropDownItems["Ascending"]).Checked = SortImagesByDir == SortDirection.Ascending;
+            ((ToolStripMenuItem)((ToolStripDropDownItem)ContextMenu.Items["Sort By"]).DropDownItems["Descending"]).Checked = SortImagesByDir == SortDirection.Descending;
         }
 
         ////////////////////////
@@ -357,8 +388,8 @@ namespace vimage
 
         private void OnMouseDown(Object sender, MouseButtonEventArgs e) { ControlDown(e.Button); }
         private void OnMouseUp(Object sender, MouseButtonEventArgs e) { ControlUp(e.Button); }
-        private void OnKeyDown(Object sender, KeyEventArgs e) { ControlDown(e.Code); }
-        private void OnKeyUp(Object sender, KeyEventArgs e) { ControlUp(e.Code); }
+        private void OnKeyDown(Object sender, SFML.Window.KeyEventArgs e) { ControlDown(e.Code); }
+        private void OnKeyUp(Object sender, SFML.Window.KeyEventArgs e) { ControlUp(e.Code); }
 
         private void ControlUp(object code)
         {
@@ -434,6 +465,14 @@ namespace vimage
             if (Config.IsControl(code, Config.Control_Delete))
                 DeleteFile();
 
+            if (Config.IsControl(code, Config.Control_OpenDuplicateImage))
+            {
+                Process p = new Process();
+                p.StartInfo.FileName = Application.ExecutablePath;
+                p.StartInfo.Arguments = "\"" + File + "\"";
+                p.Start();
+            }
+
             ZoomFaster = false;
             ZoomAlt = false;
             FitToMonitorHeightAlternative = false;
@@ -465,17 +504,27 @@ namespace vimage
                 FitToMonitorHeightAlternative = true;
         }
 
+
         private void ContexMenuItemClicked(object sender, EventArgs e)
         {
-            string item = ((System.Windows.Forms.ToolStripItem)sender).Text;
-            ContextMenu.Close();
+            ToolStripItem item = sender as ToolStripItem;
 
-            switch (item)
+            if (!(item as ToolStripDropDownItem).HasDropDownItems)
+                ContextMenu.Close();
+
+            switch (item.Name)
             {
                 case "Close": CloseNextTick = true; break;
 
                 case "Next Image": NextImage(); break;
                 case "Prev Image": PrevImage(); break;
+
+                case "Name": ChangeSortBy(SortBy.Name); break;
+                case "Date modified": ChangeSortBy(SortBy.DateModified); break;
+                case "Date created": ChangeSortBy(SortBy.DateCreated); break;
+                case "Size": ChangeSortBy(SortBy.Size); break;
+                case "Ascending": ChangeSortByDirection(SortDirection.Ascending); break;
+                case "Descending": ChangeSortByDirection(SortDirection.Descending); break;
 
                 case "Next Frame": NextFrame(); break;
                 case "Prev Frame": PrevFrame(); break;
@@ -499,7 +548,6 @@ namespace vimage
                 case VERSION_NAME: Process.Start("http://torrunt.net/vimage"); break;
             }
         }
-        private void ContextMenu_MouseCaptureChanged(object sender, EventArgs e) { ContextMenu.Close(); }
 
         ///////////////////////////
         //      Manipulation     //
@@ -779,7 +827,7 @@ namespace vimage
             if (!LoadImage(fileName))
                 return false;
 
-            View view = new View(Window.DefaultView);
+            SFML.Graphics.View view = new SFML.Graphics.View(Window.DefaultView);
             view.Center = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             view.Size = new Vector2f(Image.Texture.Size.X, Image.Texture.Size.Y);
             Window.SetView(view);
@@ -898,6 +946,30 @@ namespace vimage
             }
         }
 
+        private void ChangeSortBy(SortBy by)
+        {
+            if (by == SortImagesBy)
+                return;
+            SortImagesBy = by;
+
+            if (SortImagesBy == SortBy.Name)
+                SortImagesByDir = SortDirection.Ascending;
+            else
+                SortImagesByDir = SortDirection.Descending;
+
+            FolderContents.Clear();
+            GetFolderContents();
+        }
+        private void ChangeSortByDirection(SortDirection dir)
+        {
+            if (dir == SortImagesByDir)
+                return;
+            SortImagesByDir = dir;
+
+            FolderContents.Clear();
+            GetFolderContents();
+        }
+
         ///////////////////////////
         //         Other         //
         ///////////////////////////
@@ -909,16 +981,58 @@ namespace vimage
 
             string[] contents = Directory.GetFiles(File.Substring(0, File.LastIndexOf("\\")));
 
-            // Natural Sorting
-            Func<string, object> convert = str =>
+            switch (SortImagesBy)
             {
-                try { return ulong.Parse(str); }
-                catch { return str; }
-            };
-            var sorted = contents.OrderBy(
-                str => Regex.Split(str.Replace(" ", ""), "([0-9]+)").Select(convert),
-                new EnumerableComparer<object>());
-            FolderContents.AddRange(sorted);
+                case SortBy.Name:
+                {
+                    // Natural Sorting
+                    Func<string, object> convert = str =>
+                    {
+                        try { return ulong.Parse(str); }
+                        catch { return str; }
+                    };
+                    IOrderedEnumerable<string> sorted = null;
+                    if (SortImagesByDir == SortDirection.Ascending)
+                    {
+                        sorted = contents.OrderBy(
+                            str => Regex.Split(str.Replace(" ", ""), "([0-9]+)").Select(convert),
+                            new EnumerableComparer<object>());
+                    }
+                    else
+                    {
+                        sorted = contents.OrderByDescending(
+                            str => Regex.Split(str.Replace(" ", ""), "([0-9]+)").Select(convert),
+                            new EnumerableComparer<object>());
+                    }
+
+                    FolderContents.AddRange(sorted);
+                    break;
+                }
+                case SortBy.DateModified:
+                {
+                    if (SortImagesByDir == SortDirection.Ascending)
+                        FolderContents.AddRange(contents.OrderBy(d => new FileInfo(d).LastWriteTime));
+                    else
+                        FolderContents.AddRange(contents.OrderByDescending(d => new FileInfo(d).LastWriteTime));
+                    break;
+                }
+                case SortBy.DateCreated:
+                {
+                    if (SortImagesByDir == SortDirection.Ascending)
+                        FolderContents.AddRange(contents.OrderBy(d => new FileInfo(d).CreationTime));
+                    else
+                        FolderContents.AddRange(contents.OrderByDescending(d => new FileInfo(d).CreationTime));
+                    break;
+                }
+                case SortBy.Size:
+                {
+                    if (SortImagesByDir == SortDirection.Ascending)
+                        FolderContents.AddRange(contents.OrderBy(d => new FileInfo(d).Length));
+                    else
+                        FolderContents.AddRange(contents.OrderByDescending(d => new FileInfo(d).Length));
+                    break;
+                }
+            }
 
             FolderPosition = FolderContents.IndexOf(File);
         }
@@ -950,4 +1064,7 @@ namespace vimage
         }
 
     }
+
+    enum SortBy { Name, DateModified, DateCreated, Size }
+    enum SortDirection { Ascending, Descending }
 }

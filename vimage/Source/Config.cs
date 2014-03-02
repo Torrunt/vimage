@@ -14,9 +14,9 @@ BackgroundForImagesWithTransparencyDefault = 0
 LimitImagesToMonitorHeight = 1
 PositionLargeWideImagesInCorner = 1 // ie: Desktop Wallpapers and Screenshots
 ContextMenuShowMargin = 0 // shows checkboxes for certain menu items
-ContextMenuColors = 0 // colorize the context menu
 PreloadNextImage = 1 // when using the next/prev image buttons, the image after the one just loaded will be loaded as well ready
 
+// Bindings
 Drag = MOUSELEFT
 Close = ESC, BACKSPACE
 ContextMenu = MOUSERIGHT
@@ -39,7 +39,8 @@ OpenConfig = O
 ReloadConfig = P
 ResetImage = R
 OpenAtLocation =
-Delete = DELETE";
+Delete = DELETE,
+OpenDuplicateImage = C";
 
         public List<int> Control_Drag;
         public List<int> Control_Close;
@@ -64,6 +65,7 @@ Delete = DELETE";
 		public List<int> Control_ResetImage;
         public List<int> Control_OpenAtLocation;
         public List<int> Control_Delete;
+        public List<int> Control_OpenDuplicateImage;
 
         public bool Setting_OpenAtMousePosition { get { return (Boolean)Settings["OPENATMOUSEPOSITION"]; } }
         public bool Setting_SmoothingDefault { get { return (Boolean)Settings["SMOOTHINGDEFAULT"]; } }
@@ -71,7 +73,6 @@ Delete = DELETE";
         public bool Setting_LimitImagesToMonitorHeight { get { return (Boolean)Settings["LIMITIMAGESTOMONITORHEIGHT"]; } }
         public bool Setting_PositionLargeWideImagesInCorner { get { return (Boolean)Settings["POSITIONLARGEWIDEIMAGESINCORNER"]; } }
         public bool Setting_ContextMenuShowMargin { get { return (Boolean)Settings["CONTEXTMENUSHOWMARGIN"]; } }
-        public bool Setting_ContextMenuColors { get { return (Boolean)Settings["CONTEXTMENUCOLORS"]; } }
         public bool Setting_PreloadNextImage { get { return (Boolean)Settings["PRELOADNEXTIMAGE"]; } }
 
         private Dictionary<string, object> Settings;
@@ -107,6 +108,7 @@ Delete = DELETE";
 			Control_ResetImage = new List<int>();
             Control_OpenAtLocation = new List<int>();
             Control_Delete = new List<int>();
+            Control_OpenDuplicateImage = new List<int>();
 
             Settings = new Dictionary<string, object>()
             {
@@ -116,7 +118,6 @@ Delete = DELETE";
                 { "LIMITIMAGESTOMONITORHEIGHT", true },
                 { "POSITIONLARGEWIDEIMAGESINCORNER", true },
                 { "CONTEXTMENUSHOWMARGIN", false},
-                { "CONTEXTMENUCOLORS", true},
                 { "PRELOADNEXTIMAGE", true},
 
                 { "DRAG", Control_Drag },
@@ -141,7 +142,8 @@ Delete = DELETE";
                 { "RELOADCONFIG", Control_ReloadConfig },
 				{ "RESETIMAGE", Control_ResetImage },
                 { "OPENATLOCATION", Control_OpenAtLocation },
-                { "DELETE", Control_Delete }
+                { "DELETE", Control_Delete },
+                { "OPENDUPLICATEIMAGE", Control_OpenDuplicateImage }
             };
         }
 
