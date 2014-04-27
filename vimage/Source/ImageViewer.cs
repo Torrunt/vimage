@@ -991,21 +991,19 @@ namespace vimage
                         try { return ulong.Parse(str); }
                         catch { return str; }
                     };
-                    IOrderedEnumerable<string> sorted = null;
                     if (SortImagesByDir == SortDirection.Ascending)
                     {
-                        sorted = contents.OrderBy(
+                        FolderContents.AddRange(contents.OrderBy(
                             str => Regex.Split(str.Replace(" ", ""), "([0-9]+)").Select(convert),
-                            new EnumerableComparer<object>());
+                            new EnumerableComparer<object>()));
                     }
                     else
                     {
-                        sorted = contents.OrderByDescending(
+                        FolderContents.AddRange(contents.OrderByDescending(
                             str => Regex.Split(str.Replace(" ", ""), "([0-9]+)").Select(convert),
-                            new EnumerableComparer<object>());
+                            new EnumerableComparer<object>()));
                     }
 
-                    FolderContents.AddRange(sorted);
                     break;
                 }
                 case SortBy.DateModified:

@@ -146,8 +146,13 @@ namespace vimage
                 AnimatedImageData data = new AnimatedImageData();
 
                 //// Get Frame Duration
-                System.Drawing.Imaging.PropertyItem frameDelay = image.GetPropertyItem(0x5100);
-                int frameDuration = (frameDelay.Value[0] + frameDelay.Value[1] * 256) * 10;
+                int frameDuration = 0;
+                try
+                {
+                    System.Drawing.Imaging.PropertyItem frameDelay = image.GetPropertyItem(0x5100);
+                    frameDuration = (frameDelay.Value[0] + frameDelay.Value[1] * 256) * 10;
+                }
+                catch { }
                 if (frameDuration > 10)
                     data.FrameDuration = frameDuration;
                 else
