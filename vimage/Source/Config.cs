@@ -8,7 +8,8 @@ namespace vimage
     class Config
     {
         public const string DEFAULT_CONFIG =
-@"OpenAtMousePosition = 1
+@"// General Settings
+OpenAtMousePosition = 1
 SmoothingDefault = 1
 BackgroundForImagesWithTransparencyDefault = 0
 LimitImagesToMonitorHeight = 1
@@ -19,7 +20,7 @@ PreloadNextImage = 1 // when using the next/prev image buttons, the image after 
 // Bindings
 Drag = MOUSELEFT
 Close = ESC, BACKSPACE
-ContextMenu = MOUSERIGHT
+OpenContextMenu = MOUSERIGHT
 PrevImage = LEFT, PAGE UP, MOUSE4
 NextImage = RIGHT, PAGE DOWN, MOUSE5
 RotateClockwise = UP
@@ -40,11 +41,54 @@ ReloadConfig = P
 ResetImage = R
 OpenAtLocation =
 Delete = DELETE,
-OpenDuplicateImage = C";
+OpenDuplicateImage = C
+
+// Context Menu
+ContextMenu =
+{
+	Close : CLOSE
+	-
+	Next Image : NEXT IMAGE
+	Prev Image : PREV IMAGE
+	Sort by
+	{
+		Name : SORT NAME
+		Date modified : SORT DATE MODIFIED
+		Date created : SORT DATE CREATED
+		Size : SORT SIZE
+		-
+		Ascending : SORT ASCENDING
+		Descending : SORT DESCENDING
+	}
+	-
+	Rotate Clockwise : ROTATE CLOCKWISE
+	Rotate Anti-Clockwise : ROTATE ANTICLOCKWISE
+	Flip : FLIP
+	Fit to monitor height : FIT TO HEIGHT
+	Reset Image : RESET IMAGE
+	Smoothing : TOGGLE SMOOTHING
+	Background : TOGGLE BACKGROUND
+	Always on top : ALWAYS ON TOP
+	-
+	Open file location : OPEN FILE LOCATION
+	Delete : DELETE
+	-
+	Open Config.txt : OPEN SETTINGS
+	Reload Config.txt : RELOAD SETTINGS
+	: VERSION NAME
+}
+ContextMenu_Animation =
+{
+	Next Frame : NEXT FRAME
+	Prev Frame : PREV FRAME
+	Pause/Play Animation : TOGGLE ANIMATION
+	-
+}
+ContextMenu_Animation_InsertAtIndex = 2";
 
         public List<int> Control_Drag;
         public List<int> Control_Close;
-        public List<int> Control_ContextMenu;
+        public List<int> Control_OpenContextMenu;
         public List<int> Control_PrevImage;
         public List<int> Control_NextImage;
         public List<int> Control_RotateClockwise;
@@ -75,6 +119,10 @@ OpenDuplicateImage = C";
         public bool Setting_ContextMenuShowMargin { get { return (Boolean)Settings["CONTEXTMENUSHOWMARGIN"]; } }
         public bool Setting_PreloadNextImage { get { return (Boolean)Settings["PRELOADNEXTIMAGE"]; } }
 
+        public List<object> ContextMenu;
+        public List<object> ContextMenu_Animation;
+        public int ContextMenu_Animation_InsertAtIndex { get { return (int)Settings["CONTEXTMENU_ANIMATION_INSERTATINDEX"]; } }
+
         private Dictionary<string, object> Settings;
 
         public const int MouseCodeOffset = 150;
@@ -87,7 +135,7 @@ OpenDuplicateImage = C";
         {
             Control_Drag = new List<int>();
             Control_Close = new List<int>();
-            Control_ContextMenu = new List<int>();
+            Control_OpenContextMenu = new List<int>();
             Control_PrevImage = new List<int>();
             Control_NextImage = new List<int>();
             Control_RotateClockwise = new List<int>();
@@ -110,6 +158,9 @@ OpenDuplicateImage = C";
             Control_Delete = new List<int>();
             Control_OpenDuplicateImage = new List<int>();
 
+            ContextMenu = new List<object>();
+            ContextMenu_Animation = new List<object>();
+
             Settings = new Dictionary<string, object>()
             {
                 { "OPENATMOUSEPOSITION", true },
@@ -122,7 +173,7 @@ OpenDuplicateImage = C";
 
                 { "DRAG", Control_Drag },
                 { "CLOSE", Control_Close },
-                { "CONTEXTMENU", Control_ContextMenu },
+                { "OPENCONTEXTMENU", Control_OpenContextMenu },
                 { "PREVIMAGE", Control_PrevImage },
                 { "NEXTIMAGE", Control_NextImage },
                 { "ROTATECLOCKWISE", Control_RotateClockwise },
@@ -143,11 +194,15 @@ OpenDuplicateImage = C";
 				{ "RESETIMAGE", Control_ResetImage },
                 { "OPENATLOCATION", Control_OpenAtLocation },
                 { "DELETE", Control_Delete },
-                { "OPENDUPLICATEIMAGE", Control_OpenDuplicateImage }
+                { "OPENDUPLICATEIMAGE", Control_OpenDuplicateImage },
+
+                { "CONTEXTMENU", ContextMenu },
+                { "CONTEXTMENU_ANIMATION", ContextMenu_Animation },
+                { "CONTEXTMENU_ANIMATION_INSERTATINDEX", 2 }
             };
         }
 
-        /// <summary> Parses and loads a config.txt file. If it doesn't exist, a default one will be made. </summary>
+        /// <summary> Loads and parses a config.txt file. If it doesn't exist, a default one will be made. </summary>
         public void Load(string configFile)
         {
             if (!File.Exists(configFile))
@@ -161,12 +216,16 @@ OpenDuplicateImage = C";
             }
 
             StreamReader reader = File.OpenText(configFile);
-            string line;
+            string line = reader.ReadLine();
 
-            while ((line = reader.ReadLine()) != null)
+            while (line != null)
             {
-                if (line.Equals(""))
+                // if line is empty of has no '=' symbol, go to next
+                if (line.Equals("") || line.IndexOf('=') == -1)
+                {
+                    line = reader.ReadLine();
                     continue;
+                }
 
                 // trim spaces
                 line = line.Replace(" ", "");
@@ -181,11 +240,137 @@ OpenDuplicateImage = C";
                 // invalid name?
                 string name = nameValue[0].ToUpper();
                 if (!Settings.ContainsKey(name))
+                {
+                    line = reader.ReadLine();
                     continue;
+                }
+
+                // nothing after '='?, check next line
+                if (nameValue[1].Equals(""))
+                {
+                    line = reader.ReadLine().Replace(" ", "").Replace("\t", "");
+
+                    // line is empty or is part of another setting, skip
+                    if (line.Equals("") || line.IndexOf('=') != -1)
+                        continue;
+
+                    // line doesn't have open brace, skip
+                    if (!line.Equals("{"))
+                        continue;
+                    
+                    // read section
+                    line = reader.ReadLine();
+                    string trimedLine = line.Replace(" ", "").Replace("\t", "");
+                    string[] splitValues;
+
+                    while (line != null)
+                    {
+                        // sub section?
+                        if (!trimedLine.Equals("-") && trimedLine.IndexOf(':') == -1)
+                        {
+                            string sectionName = line.Replace("\t", "");
+
+                            do
+                            {
+                                // read line, break if end brace
+                                line = reader.ReadLine();
+                                trimedLine = line.Replace(" ", "").Replace("\t", "");
+                                if (trimedLine.Equals("}"))
+                                {
+                                    line = reader.ReadLine();
+                                    trimedLine = line.Replace(" ", "").Replace("\t", "");
+                                    break;
+                                }
+
+                                // line is empty, next
+                                if (trimedLine.Equals(""))
+                                    continue;
+
+                                // line doesn't have open brace, skip
+                                if (!trimedLine.Equals("{"))
+                                    continue;
+
+                                // read section
+                                line = reader.ReadLine();
+                                trimedLine = line.Replace(" ", "").Replace("\t", "");
+
+                                List<object> subContextMenu = new List<object>();
+                                (Settings[name] as List<object>).Add(sectionName);
+                                (Settings[name] as List<object>).Add(subContextMenu);
+
+                                while (line != null)
+                                {
+                                    // lines is empty, next
+                                    if (trimedLine.Equals(""))
+                                    {
+                                        line = reader.ReadLine();
+                                        trimedLine = line.Replace(" ", "").Replace("\t", "");
+                                        continue;
+                                    }
+
+                                    // split by :
+                                    if (trimedLine.Equals("-"))
+                                        splitValues = new[] { "-", "-" }; // line break
+                                    else
+                                        splitValues = line.Split(':');
+
+                                    // trim tabs from name, spaces from map name
+                                    splitValues[0] = splitValues[0].Replace("\t", "");
+                                    splitValues[1] = splitValues[1].Replace(" ", "");
+
+                                    // Assign Values
+                                    subContextMenu.Add(new { name = splitValues[0], func = splitValues[1] });
+
+                                    // next line, break if end brace
+                                    line = reader.ReadLine();
+                                    trimedLine = line.Replace(" ", "").Replace("\t", "");
+                                    if (trimedLine.Equals("}"))
+                                    {
+                                        line = reader.ReadLine();
+                                        trimedLine = line.Replace(" ", "").Replace("\t", "");
+                                        break;
+                                    }
+                                }
+
+                                break;
+
+                            }
+                            while (line != null);
+
+                            continue;
+                        }
+
+                        // split by :
+                        if (trimedLine.Equals("-"))
+                            splitValues = new []{ "-", "-" }; // line break
+                        else
+                            splitValues = line.Split(':');
+
+                        // trim tabs from name, spaces from map name
+                        splitValues[0] = splitValues[0].Replace("\t", "");
+                        splitValues[1] = splitValues[1].Replace(" ", "");
+
+                        // Assign Values
+                        (Settings[name] as List<object>).Add(new { name = splitValues[0], func = splitValues[1] });
+
+                        // next line, break if end brace
+                        line = reader.ReadLine();
+                        trimedLine = line.Replace(" ", "").Replace("\t", "");
+                        if (trimedLine.Equals("}"))
+                        {
+                            line = reader.ReadLine().Replace(" ", "").Replace("\t", "");
+                            break;
+                        }
+                    }
+
+                    continue;
+                }
+
 
                 // split values by commas
                 string[] values = nameValue[1].Split(',');
 
+                // Assign Values
                 if (Settings[name] is List<int>)
                 {
                     // Control
@@ -216,6 +401,9 @@ OpenDuplicateImage = C";
                     else
                         Settings[name] = false;
                 }
+
+                // next line
+                line = reader.ReadLine();
             }
 
             reader.Close();

@@ -28,15 +28,12 @@ namespace vimage
         public string File;
         public List<string> FolderContents = new List<string>();
         public int FolderPosition = 0;
-        private ContextMenuStrip ContextMenu;
-        private int ContextMenuSetting = -1;
-        private List<string> ContextMenuItems;
-        private List<string> ContextMenuItems_Animation;
+        private ContextMenu ContextMenu;
 
-        private Config Config;
+        public Config Config;
 
         private bool Updated = false;
-        private bool CloseNextTick = false;
+        public bool CloseNextTick = false;
 
         /// <summary>
         /// Instead of setting the Window Position directly when the image is going to be Updated, this is set.
@@ -50,13 +47,13 @@ namespace vimage
         private bool ZoomFaster = false;
         private float CurrentZoom = 1;
         private int DefaultRotation = 0;
-        private bool FlippedX = false;
-        private bool FitToMonitorHeight = false;
+        public bool FlippedX = false;
+        public bool FitToMonitorHeight = false;
         private bool FitToMonitorHeightForced = false;
         /// <summary>If true will resize to bounds height instead of working area height</summary>
         private bool FitToMonitorHeightAlternative = false;
-        private bool BackgroundsForImagesWithTransparency = false;
-        private bool AlwaysOnTop = false;
+        public bool BackgroundsForImagesWithTransparency = false;
+        public bool AlwaysOnTop = false;
         private bool AlwaysOnTopForced = false;
         /// <summary>
         /// If true will turn AlwaysOnTop mode on next update if the window height >= monitor height and window width < monitor width.
@@ -66,8 +63,8 @@ namespace vimage
         /// <summary>0=false, 1=next, -1=prev.</summary>
         private int PreloadingNextImage = 0;
         private bool PreloadNextImageStart = false;
-        private SortBy SortImagesBy = SortBy.Name;
-        private SortDirection SortImagesByDir = SortDirection.Ascending;
+        public SortBy SortImagesBy = SortBy.Name;
+        public SortDirection SortImagesByDir = SortDirection.Ascending;
 
         public ImageViewer(string file)
         {
@@ -82,45 +79,11 @@ namespace vimage
             // Load Config File
             Config = new Config();
             Config.Load(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
-
+            
             // Create Context Menu
-            ContextMenu = new ContextMenuStrip();
-
-            ContextMenuItems = new List<string>()
-            {
-                "Close",
-                "-",
-                "Next Image",
-                "Prev Image",
-                "Sort by:", ":Name", ":Date modified", ":Date created", ":Size", ":-", ":Ascending", ":Descending",
-                "-",
-                "Rotate Clockwise",
-                "Rotate Anti-Clockwise",
-                "Flip",
-                "Fit To Monitor Height",
-                "Reset Image",
-                "Smoothing",
-                "Background",
-                "Always On Top",
-                "-",
-                "Open file location",
-                "Delete",
-                "-",
-                "Open Config.txt",
-                "Reload Config.txt",
-                "-",
-                VERSION_NAME
-            };
-            ContextMenuItems_Animation = new List<string>(ContextMenuItems);
-            ContextMenuItems_Animation.InsertRange(2, new List<string>()
-            {
-                "Next Frame",
-                "Prev Frame",
-                "Pause/Play Animation",
-                "-"
-            });
-
-            SetupContextMenu(false);
+            ContextMenu = new ContextMenu(this);
+            ContextMenu.LoadItems(Config.ContextMenu, Config.ContextMenu_Animation, Config.ContextMenu_Animation_InsertAtIndex);
+            ContextMenu.Setup(false);
 
             // Create Window
             Window = new RenderWindow(new VideoMode(Image.Texture.Size.X, Image.Texture.Size.Y), File + " - vimage", Styles.None);
@@ -289,81 +252,6 @@ namespace vimage
             NextWindowPos = Window.Position; // Refresh the NextWindowPos var just in case the thing that induced the update didn't change the window position
         }
 
-        private void SetupContextMenu(bool force)
-        {
-            if (!force && ((ContextMenuSetting == 0 && !(Image is AnimatedImage)) || (ContextMenuSetting == 1 && Image is AnimatedImage)))
-                return;
-
-            ContextMenu.Items.Clear();
-            ContextMenu.ShowImageMargin = Config.Setting_ContextMenuShowMargin;
-
-            List<string> items;
-            if (Image is AnimatedImage)
-            {
-                ContextMenuSetting = 1;
-                items = ContextMenuItems_Animation;
-            }
-            else
-            {
-                ContextMenuSetting = 0;
-                items = ContextMenuItems;
-            }
-
-            for (int i = 0; i < items.Count; i++)
-            {
-                ToolStripItem item = null;
-                string name = items[i];
-                bool itemClickable = true;
-
-                if (name.IndexOf(":") == name.Length - 1)
-                {
-                    // non-clickable item?
-                    name = name.Substring(0, name.Length - 1);
-                    itemClickable = false;
-                }
-
-                if (items[i].IndexOf(":") == 0)
-                {
-                    // sub item
-                    ToolStripDropDownItem dropDownItem = ContextMenu.Items[ContextMenu.Items.Count - 1] as ToolStripDropDownItem;
-                    name = items[i].Substring(1);
-                    item = dropDownItem.DropDownItems.Add(name);
-                }
-                else
-                {
-                    // item
-                    item = ContextMenu.Items.Add(name);
-                }
-                if (name.Equals("-"))
-                    continue;
-
-                if (itemClickable)
-                    item.Click += ContexMenuItemClicked;
-
-                item.Name = name;
-            }
-
-            ((ToolStripMenuItem)ContextMenu.Items[VERSION_NAME]).BackColor = System.Drawing.Color.CornflowerBlue;
-
-            RefreshContextMenu();
-        }
-        private void RefreshContextMenu()
-        {
-            ((ToolStripMenuItem)ContextMenu.Items["Flip"]).Checked = FlippedX;
-            ((ToolStripMenuItem)ContextMenu.Items["Fit To Monitor Height"]).Checked = FitToMonitorHeight;
-            ((ToolStripMenuItem)ContextMenu.Items["Smoothing"]).Checked = Smoothing();
-            ((ToolStripMenuItem)ContextMenu.Items["Background"]).Checked = BackgroundsForImagesWithTransparency;
-            ((ToolStripMenuItem)ContextMenu.Items["Always On Top"]).Checked = AlwaysOnTop;
-
-            ((ToolStripMenuItem)((ToolStripDropDownItem)ContextMenu.Items["Sort By"]).DropDownItems["Name"]).Checked = SortImagesBy == SortBy.Name;
-            ((ToolStripMenuItem)((ToolStripDropDownItem)ContextMenu.Items["Sort By"]).DropDownItems["Date modified"]).Checked = SortImagesBy == SortBy.DateModified;
-            ((ToolStripMenuItem)((ToolStripDropDownItem)ContextMenu.Items["Sort By"]).DropDownItems["Date created"]).Checked = SortImagesBy == SortBy.DateCreated;
-            ((ToolStripMenuItem)((ToolStripDropDownItem)ContextMenu.Items["Sort By"]).DropDownItems["Size"]).Checked = SortImagesBy == SortBy.Size;
-
-            ((ToolStripMenuItem)((ToolStripDropDownItem)ContextMenu.Items["Sort By"]).DropDownItems["Ascending"]).Checked = SortImagesByDir == SortDirection.Ascending;
-            ((ToolStripMenuItem)((ToolStripDropDownItem)ContextMenu.Items["Sort By"]).DropDownItems["Descending"]).Checked = SortImagesByDir == SortDirection.Descending;
-        }
-
         ////////////////////////
         //      Controls     //
         ///////////////////////
@@ -402,9 +290,9 @@ namespace vimage
                 Dragging = false;
 
             // Open Context Menu
-            if (Config.IsControl(code, Config.Control_ContextMenu))
+            if (Config.IsControl(code, Config.Control_OpenContextMenu))
             {
-                RefreshContextMenu();
+                ContextMenu.RefreshItems();
                 ContextMenu.Show(Window.Position.X + MousePos.X - 1, Window.Position.Y + MousePos.Y - 1);
                 ContextMenu.Capture = true;
             }
@@ -503,57 +391,13 @@ namespace vimage
             if (Config.IsControl(code, Config.Control_FitToMonitorHeightAlternative))
                 FitToMonitorHeightAlternative = true;
         }
-
-
-        private void ContexMenuItemClicked(object sender, EventArgs e)
-        {
-            ToolStripItem item = sender as ToolStripItem;
-
-            if (!(item as ToolStripDropDownItem).HasDropDownItems)
-                ContextMenu.Close();
-
-            switch (item.Name)
-            {
-                case "Close": CloseNextTick = true; break;
-
-                case "Next Image": NextImage(); break;
-                case "Prev Image": PrevImage(); break;
-
-                case "Name": ChangeSortBy(SortBy.Name); break;
-                case "Date modified": ChangeSortBy(SortBy.DateModified); break;
-                case "Date created": ChangeSortBy(SortBy.DateCreated); break;
-                case "Size": ChangeSortBy(SortBy.Size); break;
-                case "Ascending": ChangeSortByDirection(SortDirection.Ascending); break;
-                case "Descending": ChangeSortByDirection(SortDirection.Descending); break;
-
-                case "Next Frame": NextFrame(); break;
-                case "Prev Frame": PrevFrame(); break;
-                case "Pause/Play Animation": ToggleAnimation(); break;
-
-                case "Rotate Clockwise": RotateImage((int)Image.Rotation + 90); break;
-                case "Rotate Anti-Clockwise": RotateImage((int)Image.Rotation - 90); break;
-                case "Flip": FlipImage(); break;
-                case "Fit To Monitor Height": ToggleFitToMonitorHeight(); break;
-                case "Reset Image": ResetImage(); break;
-                case "Smoothing": ToggleSmoothing(); break;
-                case "Background": ToggleBackground(); break;
-                case "Always On Top": ToggleAlwaysOnTop(); break;
-
-                case "Open file location": OpenFileAtLocation(); break;
-                case "Delete": DeleteFile(); break;
-
-                case "Open Config.txt": Process.Start(AppDomain.CurrentDomain.BaseDirectory + "config.txt"); break;
-                case "Reload Config.txt": ReloadConfig(); break;
-
-                case VERSION_NAME: Process.Start("http://torrunt.net/vimage"); break;
-            }
-        }
+     
 
         ///////////////////////////
         //      Manipulation     //
         ///////////////////////////
 
-        private void NextFrame()
+        public void NextFrame()
         {
             if (Image is AnimatedImage)
             {
@@ -563,7 +407,7 @@ namespace vimage
                 Update();
             }
         }
-        private void PrevFrame()
+        public void PrevFrame()
         {
             if (Image is AnimatedImage)
             {
@@ -573,7 +417,7 @@ namespace vimage
                 Update();
             }
         }
-        private void ToggleAnimation()
+        public void ToggleAnimation()
         {
             if (Image is AnimatedImage)
             {
@@ -619,7 +463,7 @@ namespace vimage
             Updated = true;
         }
 
-        private void RotateImage(int Rotation, bool aroundCenter = true)
+        public void RotateImage(int Rotation, bool aroundCenter = true)
         {
             if (Rotation >= 360)
                 Rotation = 0;
@@ -661,14 +505,14 @@ namespace vimage
             Updated = true;
         }
 
-        private void FlipImage()
+        public void FlipImage()
         {
             FlippedX = !FlippedX;
             Image.Scale = new Vector2f(Math.Abs(Image.Scale.X) * (FlippedX ? -1 : 1), Math.Abs(Image.Scale.Y));
             Redraw();
         }
 
-        private void ToggleFitToMonitorHeight()
+        public void ToggleFitToMonitorHeight()
         {
             UnforceAlwaysOnTop();
 
@@ -703,7 +547,7 @@ namespace vimage
                 ForceAlwaysOnTopNextTick = true;
         }
 
-        private void ResetImage()
+        public void ResetImage()
         {
             Zoom(1f);
             FlippedX = false;
@@ -736,7 +580,7 @@ namespace vimage
                 ForceAlwaysOnTopNextTick = true;
         }
 
-        private void ToggleSmoothing()
+        public void ToggleSmoothing()
         {
             if (Image is AnimatedImage)
                 Image.Data.Smooth = !Image.Data.Smooth;
@@ -744,7 +588,7 @@ namespace vimage
                 Image.Texture.Smooth = !Image.Texture.Smooth;
             Update();
         }
-        private bool Smoothing()
+        public bool Smoothing()
         {
             if (Image is AnimatedImage)
                 return Image.Data.Smooth;
@@ -752,19 +596,19 @@ namespace vimage
                 return Image.Texture.Smooth;
         }
 
-        private void ToggleBackground()
+        public void ToggleBackground()
         {
             BackgroundsForImagesWithTransparency = !BackgroundsForImagesWithTransparency;
             Update();
         }
 
-        private void ToggleAlwaysOnTop()
+        public void ToggleAlwaysOnTop()
         {
             AlwaysOnTop = !AlwaysOnTop;
             AlwaysOnTopForced = false;
             DWM.SetAlwaysOnTop(Window.SystemHandle, AlwaysOnTop);
         }
-        private void ForceAlwaysOnTop()
+        public void ForceAlwaysOnTop()
         {
             ForceAlwaysOnTopNextTick = false;
             AlwaysOnTop = true;
@@ -772,7 +616,7 @@ namespace vimage
             DWM.SetAlwaysOnTop(Window.SystemHandle);
         }
         /// <summary>Turns Always On Top off if it was forced.</summary>
-        private void UnforceAlwaysOnTop()
+        public void UnforceAlwaysOnTop()
         {
             ForceAlwaysOnTopNextTick = false;
 
@@ -859,7 +703,7 @@ namespace vimage
             ForceAlwaysOnTopNextTick = true;
 
             Window.SetTitle(fileName + " - vimage");
-            SetupContextMenu(false);
+            ContextMenu.Setup(false);
 
             return true;
         }
@@ -909,7 +753,7 @@ namespace vimage
             PreloadingNextImage = 0;
         }
 
-        private void NextImage()
+        public void NextImage()
         {
             GetFolderContents();
             bool success = false;
@@ -927,7 +771,7 @@ namespace vimage
                 PreloadNextImageStart = true;
             }
         }
-        private void PrevImage()
+        public void PrevImage()
         {
             GetFolderContents();
             bool success = false;
@@ -946,7 +790,7 @@ namespace vimage
             }
         }
 
-        private void ChangeSortBy(SortBy by)
+        public void ChangeSortBy(SortBy by)
         {
             if (by == SortImagesBy)
                 return;
@@ -960,7 +804,7 @@ namespace vimage
             FolderContents.Clear();
             GetFolderContents();
         }
-        private void ChangeSortByDirection(SortDirection dir)
+        public void ChangeSortByDirection(SortDirection dir)
         {
             if (dir == SortImagesByDir)
                 return;
@@ -1035,7 +879,7 @@ namespace vimage
             FolderPosition = FolderContents.IndexOf(File);
         }
 
-        private void DeleteFile()
+        public void DeleteFile()
         {
             string fileName = File;
             if (FolderContents.Count == 1)
@@ -1049,16 +893,17 @@ namespace vimage
 
             FolderContents.Clear();
         }
-        private void OpenFileAtLocation()
+        public void OpenFileAtLocation()
         {
             Process.Start("explorer.exe", "/select, " + File);
         }
 
-        private void ReloadConfig()
+        public void ReloadConfig()
         {
             Config.Init();
             Config.Load(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
-            SetupContextMenu(true);
+            ContextMenu.LoadItems(Config.ContextMenu, Config.ContextMenu_Animation, Config.ContextMenu_Animation_InsertAtIndex);
+            ContextMenu.Setup(true);
         }
 
     }
