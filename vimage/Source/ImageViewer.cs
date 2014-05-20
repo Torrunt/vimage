@@ -832,8 +832,13 @@ namespace vimage
                     // Natural Sorting
                     Func<string, object> convert = str =>
                     {
-                        try { return ulong.Parse(str); }
-                        catch { return str; }
+                        ulong number;
+                        bool success = ulong.TryParse(str.Substring(0, Math.Min(str.Length, 19)), out number);
+                        // max ulong is 18446744073709551615 (20 chars)
+                        if (success)
+                            return number;
+                        else
+                            return str;
                     };
                     if (SortImagesByDir == SortDirection.Ascending)
                     {
