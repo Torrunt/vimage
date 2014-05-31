@@ -17,6 +17,12 @@ namespace vimage
     {
         public const string VERSION_NAME = "vimage version 5";
 
+        public readonly string[] EXTENSIONS =
+        {
+            "bmp", "cut", "dds", "doom", "exr", "hdr", "gif", "ico", "jp2", "jpg", "jpeg", "lbm", "mdl", "mng",
+            "pal", "pbm", "pcd", "pcx", "pgm", "pic", "png", "ppm", "psd", "psp", "raw", "sgi", "tga", "tif"
+        };
+
         public readonly float ZOOM_SPEED = 0.02f;
         public readonly float ZOOM_SPEED_FAST = 0.1f;
         public readonly float ZOOM_MIN = 0.05f;
@@ -69,6 +75,10 @@ namespace vimage
         public ImageViewer(string file)
         {
             IL.Initialize();
+
+            // Extension supported?
+            if (!ImageViewerUtils.IsValidExtension(file, EXTENSIONS))
+                return;
 
             // Save Mouse Position -> will open image at this position
             Vector2i mousePos = Mouse.GetPosition();
@@ -330,9 +340,7 @@ namespace vimage
                 Process.Start(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
             // Reload Config
             if (Config.IsControl(code, Config.Control_ReloadConfig))
-            {
                 ReloadConfig();
-            }
 
             // Toggle Settings
             if (Config.IsControl(code, Config.Control_ToggleSmoothing))
@@ -636,22 +644,29 @@ namespace vimage
         {
             File = fileName;
 
-            if (ImageViewerUtils.GetExtension(fileName).Equals("gif"))
+            string extension = ImageViewerUtils.GetExtension(fileName);
+            bool isGif = extension.Equals("gif");
+            bool success = false;
+
+            // Image
+            if (!isGif)
             {
-                // Animated Image
+                Texture texture = Graphics.GetTexture(fileName);
+                if (texture != null)
+                {
+                    success = true;
+                    texture.Smooth = true;
+                    Image = new Sprite(texture);
+                }
+                else if (!extension.Equals("ico"))
+                    return false;
+            }
+            // Animated GIF or image that failed to load normally (ie some .icos)
+            if (isGif || !success)
+            {
                 Image = Graphics.GetAnimatedImage(fileName);
                 if (Image.Texture == null)
                     return false;
-            }
-            else
-            {
-                // Image
-                Texture texture = Graphics.GetTexture(fileName);
-                if (texture == null)
-                    return false;
-
-                texture.Smooth = true;
-                Image = new Sprite(texture);
             }
             Image.Origin = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             Image.Position = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
@@ -670,7 +685,7 @@ namespace vimage
 
             if (!LoadImage(fileName))
                 return false;
-
+            
             SFML.Graphics.View view = new SFML.Graphics.View(Window.DefaultView);
             view.Center = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             view.Size = new Vector2f(Image.Texture.Size.X, Image.Texture.Size.Y);
@@ -756,6 +771,9 @@ namespace vimage
         public void NextImage()
         {
             GetFolderContents();
+            if (FolderContents.Count() <= 1)
+                return;
+
             bool success = false;
             do
             {
@@ -774,6 +792,9 @@ namespace vimage
         public void PrevImage()
         {
             GetFolderContents();
+            if (FolderContents.Count() <= 1)
+                return;
+
             bool success = false;
             do
             {
@@ -824,6 +845,7 @@ namespace vimage
                 return;
 
             string[] contents = Directory.GetFiles(File.Substring(0, File.LastIndexOf("\\")));
+            contents = Array.FindAll(contents, delegate(string s) { return ImageViewerUtils.IsValidExtension(s, EXTENSIONS); });
 
             switch (SortImagesBy)
             {
@@ -887,16 +909,21 @@ namespace vimage
         public void DeleteFile()
         {
             string fileName = File;
+
+            GetFolderContents();
             if (FolderContents.Count == 1)
             {
                 Image.Dispose();
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
                 Window.Close();
             }
             else
+            {
                 NextImage();
-            Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(fileName, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                FolderContents.Clear();
+            }
 
-            FolderContents.Clear();
+            Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(fileName, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
         }
         public void OpenFileAtLocation()
         {

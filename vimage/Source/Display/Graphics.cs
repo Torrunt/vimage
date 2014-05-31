@@ -52,12 +52,19 @@ namespace vimage
             else
             {
                 // New Texture
+                Texture texture = null;
                 int imageID = IL.GenerateImage();
                 IL.BindImage(imageID);
-                if (IL.LoadImageFromStream(File.OpenRead(fileName)))
+
+                bool loaded = false;
+                using (FileStream fileStream = File.OpenRead(fileName))
+                    loaded = IL.LoadImageFromStream(fileStream);
+
+                if (loaded)
                 {
-                    Texture texture = GetTextureFromBoundImage();
-                    
+                    texture = GetTextureFromBoundImage();
+                    IL.DeleteImage(imageID);
+
                     Textures.Add(texture);
                     TextureFileNames.Add(fileName);
 
@@ -68,13 +75,10 @@ namespace vimage
                         Textures.RemoveAt(0);
                         TextureFileNames.RemoveAt(0);
                     }
-                    IL.DeleteImage(imageID);
-
-                    return texture;
                 }
                 IL.DeleteImage(imageID);
-                
-                return null;
+
+                return texture;
             }
         }
         private static Texture GetTextureFromBoundImage(int imageNum = 0)

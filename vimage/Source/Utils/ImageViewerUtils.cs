@@ -60,5 +60,12 @@ namespace vimage
                 return 0;
             }
         }
+
+        public static bool IsValidExtension(string fileName, string[] extensions)
+        {
+            string extension = ImageViewerUtils.GetExtension(fileName);
+            return Array.Exists(extensions, delegate(string s) { return s == extension; });
+        }
+
     }
 }
