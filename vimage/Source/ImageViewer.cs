@@ -52,6 +52,7 @@ namespace vimage
         private bool ZoomAlt = false;
         private bool ZoomFaster = false;
         private float CurrentZoom = 1;
+        private bool AutomaticallyZoomed = false;
         private int DefaultRotation = 0;
         public bool FlippedX = false;
         public bool FitToMonitorHeight = false;
@@ -132,6 +133,12 @@ namespace vimage
                     Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
                     FitToMonitorHeightForced = true;
                 }
+                else if (Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_MinImageSize)
+                {
+                    // Reisze images smaller than min size to min size
+                    AutomaticallyZoomed = true;
+                    Zoom(Config.Setting_MinImageSize / Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y), true);
+                }
 
 
                 // Open At Mouse Position?
@@ -166,9 +173,9 @@ namespace vimage
             RotateImage(DefaultRotation, false);
                 // Smoothing
             if (Image is AnimatedImage)
-                Image.Data.Smooth = Config.Setting_SmoothingDefault;
+                Image.Data.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
             else
-                Image.Texture.Smooth = Config.Setting_SmoothingDefault;
+                Image.Texture.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
                 // Backgrounds For Images With Transparency
             BackgroundsForImagesWithTransparency = Config.Setting_BackgroundForImagesWithTransparencyDefault;
 
@@ -280,6 +287,7 @@ namespace vimage
             else if (e.Delta < 0)
                 Zoom(Math.Max(CurrentZoom - (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED), ZOOM_MIN), !ZoomAlt);
 
+            AutomaticallyZoomed = false;
             FitToMonitorHeightForced = false;
             FitToMonitorHeight = false;
         }
@@ -553,11 +561,14 @@ namespace vimage
                 NextWindowPos = new Vector2i(0, 0); // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
             else if (!FitToMonitorHeightAlternative)
                 ForceAlwaysOnTopNextTick = true;
+
+            AutomaticallyZoomed = false;
         }
 
         public void ResetImage()
         {
             Zoom(1f);
+            AutomaticallyZoomed = false;
             FlippedX = false;
             RotateImage(DefaultRotation);
 
@@ -683,6 +694,13 @@ namespace vimage
             float prevRotation = Image.Rotation;
             int prevDefaultRotation = DefaultRotation;
 
+            if (AutomaticallyZoomed)
+            {
+                // don't keep current zoom value if it wasn't set by user
+                AutomaticallyZoomed = false;
+                CurrentZoom = 1;
+            }
+
             if (!LoadImage(fileName))
                 return false;
             
@@ -691,7 +709,13 @@ namespace vimage
             view.Size = new Vector2f(Image.Texture.Size.X, Image.Texture.Size.Y);
             Window.SetView(view);
 
+            // Rotation
             RotateImage(prevRotation == prevDefaultRotation ? DefaultRotation : (int)prevRotation, false);
+            // Smoothing
+            if (Image is AnimatedImage)
+                Image.Data.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
+            else
+                Image.Texture.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
 
             IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position);
             if (Config.Setting_LimitImagesToMonitorHeight && (FitToMonitorHeight || (Image.Texture.Size.Y * CurrentZoom >= bounds.Height || (FitToMonitorHeightForced && Image.Texture.Size.Y >= bounds.Height))))
@@ -706,6 +730,12 @@ namespace vimage
             {
                 Zoom(1, true);
                 FitToMonitorHeightForced = false;
+            }
+            else if (Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) * CurrentZoom < Config.Setting_MinImageSize)
+            {
+                // Reisze images smaller than min size to min size
+                AutomaticallyZoomed = true;
+                Zoom(Config.Setting_MinImageSize / Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y), true);
             }
             else
                 Zoom(CurrentZoom, true);

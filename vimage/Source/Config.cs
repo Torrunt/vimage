@@ -15,7 +15,9 @@ BackgroundForImagesWithTransparencyDefault = 0
 LimitImagesToMonitorHeight = 1
 PositionLargeWideImagesInCorner = 1 // ie: Desktop Wallpapers and Screenshots
 ContextMenuShowMargin = 0 // shows checkboxes for certain menu items
-PreloadNextImage = 1 // when using the next/prev image buttons, the image after the one just loaded will be loaded as well ready
+PreloadNextImage = 1 // when using the next/prev image buttons, the image after the one just loaded will be loaded as well
+MinImageSize = 64 // if an image is smaller than this (in width or height) it will scaled up to it automatically
+SmoothingMinImageSize = 65 // images smaller than this it will not have smoothing turned on (if 0, all images with use smoothing)
 
 // Bindings
 Drag = MOUSELEFT
@@ -118,6 +120,8 @@ ContextMenu_Animation_InsertAtIndex = 2";
         public bool Setting_PositionLargeWideImagesInCorner { get { return (Boolean)Settings["POSITIONLARGEWIDEIMAGESINCORNER"]; } }
         public bool Setting_ContextMenuShowMargin { get { return (Boolean)Settings["CONTEXTMENUSHOWMARGIN"]; } }
         public bool Setting_PreloadNextImage { get { return (Boolean)Settings["PRELOADNEXTIMAGE"]; } }
+        public int Setting_MinImageSize { get { return (int)Settings["MINIMAGESIZE"]; } }
+        public int Setting_SmoothingMinImageSize { get { return (int)Settings["SMOOTHINGMINIMAGESIZE"]; } }
 
         public List<object> ContextMenu;
         public List<object> ContextMenu_Animation;
@@ -170,6 +174,8 @@ ContextMenu_Animation_InsertAtIndex = 2";
                 { "POSITIONLARGEWIDEIMAGESINCORNER", true },
                 { "CONTEXTMENUSHOWMARGIN", false},
                 { "PRELOADNEXTIMAGE", true},
+                { "MINIMAGESIZE", 64},
+                { "SMOOTHINGMINIMAGESIZE", 64},
 
                 { "DRAG", Control_Drag },
                 { "CLOSE", Control_Close },
@@ -392,6 +398,13 @@ ContextMenu_Animation_InsertAtIndex = 2";
                                 list.Add((int)key);
                         }
                     }
+                }
+                else if (Settings[name] is int)
+                {
+                    // Integer
+                    int i;
+                    if (int.TryParse(values[0], out i))
+                        Settings[name] = i;
                 }
                 else if (Settings[name] is Boolean)
                 {
