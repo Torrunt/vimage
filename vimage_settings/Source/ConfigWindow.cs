@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows.Forms;
 using vimage;
 
@@ -21,7 +15,7 @@ namespace vimage_settings
 
             // Load Config File
             vimageConfig = new Config();
-            vimageConfig.Load(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
+            vimageConfig.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
 
             // Set Values
             checkBox_OpenAtMousePosition.Checked = vimageConfig.Setting_OpenAtMousePosition;
