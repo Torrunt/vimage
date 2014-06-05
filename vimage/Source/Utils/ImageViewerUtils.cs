@@ -37,7 +37,7 @@ namespace vimage
         }
 
 
-        public static string GetExtension(string fileName) { return fileName.Substring(fileName.LastIndexOf(".") + 1); }
+        public static string GetExtension(string fileName) { return fileName.Substring(fileName.LastIndexOf(".") + 1).ToLower(); }
 
         /// <summary>Returns Orientation from the EXIF data of a jpg.</summary>
         public static int GetDefaultRotationFromEXIF(string fileName)

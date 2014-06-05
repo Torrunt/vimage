@@ -17,7 +17,7 @@ PositionLargeWideImagesInCorner = 1 // ie: Desktop Wallpapers and Screenshots
 ContextMenuShowMargin = 0 // shows checkboxes for certain menu items
 PreloadNextImage = 1 // when using the next/prev image buttons, the image after the one just loaded will be loaded as well
 MinImageSize = 64 // if an image is smaller than this (in width or height) it will scaled up to it automatically
-SmoothingMinImageSize = 65 // images smaller than this it will not have smoothing turned on (if 0, all images with use smoothing)
+SmoothingMinImageSize = 65 // images smaller than this will not have smoothing turned on (if 0, all images with use smoothing)
 
 // Bindings
 Drag = MOUSELEFT
