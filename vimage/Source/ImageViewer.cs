@@ -89,7 +89,7 @@ namespace vimage
             
             // Load Config File
             Config = new Config();
-            Config.Load(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
+            Config.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
             
             // Create Context Menu
             ContextMenu = new ContextMenu(this);
@@ -963,7 +963,7 @@ namespace vimage
         public void ReloadConfig()
         {
             Config.Init();
-            Config.Load(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
+            Config.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
             ContextMenu.LoadItems(Config.ContextMenu, Config.ContextMenu_Animation, Config.ContextMenu_Animation_InsertAtIndex);
             ContextMenu.Setup(true);
         }

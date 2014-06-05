@@ -27,12 +27,12 @@ namespace vimage_settings
             numericUpDown_MinImageSize.Value = vimageConfig.Setting_MinImageSize;
             numericUpDown_SmoothingMinImageSize.Value = vimageConfig.Setting_SmoothingMinImageSize;
 
-            checkBox_ContextMenuShowMargin.Checked = vimageConfig.Setting_ContextMenuShowMargin;
+            checkBox_ContextMenuShowMargin.Checked = vimageConfig.ContextMenuShowMargin;
         }
 
         private void button_Save_Click(object sender, EventArgs e)
         {
-
+            vimageConfig.Save(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
         }
     }
 }

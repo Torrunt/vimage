@@ -126,7 +126,7 @@ namespace vimage
                 return;
 
             Items.Clear();
-            ShowImageMargin = ImageViewer.Config.Setting_ContextMenuShowMargin;
+            ShowImageMargin = ImageViewer.Config.ContextMenuShowMargin;
 
             List<string> items;
             if (ImageViewer.Image is AnimatedImage)
