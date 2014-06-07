@@ -39,6 +39,7 @@ namespace vimage
         public bool Setting_LimitImagesToMonitorHeight { get { return (Boolean)Settings["LIMITIMAGESTOMONITORHEIGHT"]; } }
         public bool Setting_PositionLargeWideImagesInCorner { get { return (Boolean)Settings["POSITIONLARGEWIDEIMAGESINCORNER"]; } }
         public bool Setting_PreloadNextImage { get { return (Boolean)Settings["PRELOADNEXTIMAGE"]; } }
+        public bool Setting_OpenSettingsEXE { get { return (Boolean)Settings["OPENSETTINGSEXE"]; } }
         public int Setting_MinImageSize { get { return (int)Settings["MINIMAGESIZE"]; } }
         public int Setting_SmoothingMinImageSize { get { return (int)Settings["SMOOTHINGMINIMAGESIZE"]; } }
 
@@ -90,6 +91,7 @@ namespace vimage
                 { "LIMITIMAGESTOMONITORHEIGHT", true },
                 { "POSITIONLARGEWIDEIMAGESINCORNER", true },
                 { "PRELOADNEXTIMAGE", true },
+                { "OPENSETTINGSEXE", true },
                 { "MINIMAGESIZE", 64 },
                 { "SMOOTHINGMINIMAGESIZE", 65 },
 
@@ -371,6 +373,7 @@ namespace vimage
                 "ie: Desktop Wallpapers and Screenshots");
             WriteSetting(writer, "PreloadNextImage", Setting_PreloadNextImage, 
                 "when using the next/prev image buttons, the image after the one just loaded will be loaded as well");
+            WriteSetting(writer, "OpenSettingsEXE", Setting_OpenSettingsEXE, "if false, will open config.txt instead");
             WriteSetting(writer, "MinImageSize", Setting_MinImageSize, 
                 "if an image is smaller than this (in width or height) it will scaled up to it automatically");
             WriteSetting(writer, "SmoothingMinImageSize", Setting_SmoothingMinImageSize, 
@@ -437,8 +440,8 @@ namespace vimage
 	Open file location : OPEN FILE LOCATION
 	Delete : DELETE
 	-
-	Open Config.txt : OPEN SETTINGS
-	Reload Config.txt : RELOAD SETTINGS
+	Open Settings : OPEN SETTINGS
+	Reload Settings : RELOAD SETTINGS
 	: VERSION NAME
 }
 ContextMenu_Animation =

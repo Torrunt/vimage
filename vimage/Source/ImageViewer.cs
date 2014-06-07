@@ -345,7 +345,7 @@ namespace vimage
 
             // Open config.txt
             if (Config.IsControl(code, Config.Control_OpenConfig))
-                Process.Start(AppDomain.CurrentDomain.BaseDirectory + "config.txt");
+                OpenConfig();
             // Reload Config
             if (Config.IsControl(code, Config.Control_ReloadConfig))
                 ReloadConfig();
@@ -960,6 +960,20 @@ namespace vimage
             Process.Start("explorer.exe", "/select, " + File);
         }
 
+        public void OpenConfig()
+        {
+            if (Config.Setting_OpenSettingsEXE)
+            {
+                string vimage_settings = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vimage_settings.exe");
+                if (System.IO.File.Exists(vimage_settings))
+                {
+                    Process.Start(vimage_settings);
+                    return;
+                }
+            }
+
+            Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
+        }
         public void ReloadConfig()
         {
             Config.Init();

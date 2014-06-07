@@ -255,7 +255,7 @@ namespace vimage
                 case OPEN_FILE_LOCATION: ImageViewer.OpenFileAtLocation(); break;
                 case DELETE: ImageViewer.DeleteFile(); break;
 
-                case OPEN_SETTINGS: Process.Start(AppDomain.CurrentDomain.BaseDirectory + "config.txt"); break;
+                case OPEN_SETTINGS: ImageViewer.OpenConfig(); break;
                 case RELOAD_SETTINGS: ImageViewer.ReloadConfig(); break;
 
                 case VERSION_NAME: Process.Start("http://torrunt.net/vimage"); break;
