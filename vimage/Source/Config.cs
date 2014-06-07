@@ -33,20 +33,107 @@ namespace vimage
         public List<int> Control_Delete = new List<int>();
         public List<int> Control_OpenDuplicateImage = new List<int>();
 
-        public bool Setting_OpenAtMousePosition { get { return (Boolean)Settings["OPENATMOUSEPOSITION"]; } }
-        public bool Setting_SmoothingDefault { get { return (Boolean)Settings["SMOOTHINGDEFAULT"]; } }
-        public bool Setting_BackgroundForImagesWithTransparencyDefault { get { return (Boolean)Settings["BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT"]; } }
-        public bool Setting_LimitImagesToMonitorHeight { get { return (Boolean)Settings["LIMITIMAGESTOMONITORHEIGHT"]; } }
-        public bool Setting_PositionLargeWideImagesInCorner { get { return (Boolean)Settings["POSITIONLARGEWIDEIMAGESINCORNER"]; } }
-        public bool Setting_PreloadNextImage { get { return (Boolean)Settings["PRELOADNEXTIMAGE"]; } }
-        public bool Setting_OpenSettingsEXE { get { return (Boolean)Settings["OPENSETTINGSEXE"]; } }
-        public int Setting_MinImageSize { get { return (int)Settings["MINIMAGESIZE"]; } }
-        public int Setting_SmoothingMinImageSize { get { return (int)Settings["SMOOTHINGMINIMAGESIZE"]; } }
+        public bool Setting_OpenAtMousePosition
+        {
+            get { return (Boolean)Settings["OPENATMOUSEPOSITION"]; }
+            set { Settings["OPENATMOUSEPOSITION"] = value; }
+        }
+        public bool Setting_SmoothingDefault
+        {
+            get { return (Boolean)Settings["SMOOTHINGDEFAULT"]; }
+            set { Settings["SMOOTHINGDEFAULT"] = value; }
+        }
+        public bool Setting_BackgroundForImagesWithTransparencyDefault
+        {
+            get { return (Boolean)Settings["BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT"]; }
+            set { Settings["BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT"] = value; }
+        }
+        public bool Setting_LimitImagesToMonitorHeight
+        {
+            get { return (Boolean)Settings["LIMITIMAGESTOMONITORHEIGHT"]; }
+            set { Settings["LIMITIMAGESTOMONITORHEIGHT"] = value; }
+        }
+        public bool Setting_PositionLargeWideImagesInCorner
+        {
+            get { return (Boolean)Settings["POSITIONLARGEWIDEIMAGESINCORNER"]; }
+            set { Settings["POSITIONLARGEWIDEIMAGESINCORNER"] = value; }
+        }
+        public bool Setting_PreloadNextImage
+        {
+            get { return (Boolean)Settings["PRELOADNEXTIMAGE"]; }
+            set { Settings["PRELOADNEXTIMAGE"] = value; }
+        }
+        public bool Setting_OpenSettingsEXE
+        {
+            get { return (Boolean)Settings["OPENSETTINGSEXE"]; }
+            set { Settings["OPENSETTINGSEXE"] = value; }
+        }
+        public int Setting_MinImageSize
+        {
+            get { return (int)Settings["MINIMAGESIZE"]; }
+            set { Settings["MINIMAGESIZE"] = value; }
+        }
+        public int Setting_SmoothingMinImageSize
+        {
+            get { return (int)Settings["SMOOTHINGMINIMAGESIZE"]; }
+            set { Settings["SMOOTHINGMINIMAGESIZE"] = value; }
+        }
 
         public List<object> ContextMenu = new List<object>();
         public List<object> ContextMenu_Animation = new List<object>();
-        public int ContextMenu_Animation_InsertAtIndex { get { return (int)Settings["CONTEXTMENU_ANIMATION_INSERTATINDEX"]; } }
-        public bool ContextMenuShowMargin { get { return (Boolean)Settings["CONTEXTMENU_SHOWMARGIN"]; } }
+        public int ContextMenu_Animation_InsertAtIndex
+        {
+            get { return (int)Settings["CONTEXTMENU_ANIMATION_INSERTATINDEX"]; }
+            set { Settings["CONTEXTMENU_ANIMATION_INSERTATINDEX"] = value; }
+        }
+        public bool ContextMenuShowMargin
+        {
+            get { return (Boolean)Settings["CONTEXTMENU_SHOWMARGIN"]; }
+            set { Settings["CONTEXTMENU_SHOWMARGIN"] = value; }
+        }
+        public string ContextMenuSetup =
+@"ContextMenu =
+{
+	Close : CLOSE
+	-
+	Next Image : NEXT IMAGE
+	Prev Image : PREV IMAGE
+	Sort by
+	{
+		Name : SORT NAME
+		Date modified : SORT DATE MODIFIED
+		Date created : SORT DATE CREATED
+		Size : SORT SIZE
+		-
+		Ascending : SORT ASCENDING
+		Descending : SORT DESCENDING
+	}
+	-
+	Rotate Clockwise : ROTATE CLOCKWISE
+	Rotate Anti-Clockwise : ROTATE ANTICLOCKWISE
+	Flip : FLIP
+	Fit to monitor height : FIT TO HEIGHT
+	Reset Image : RESET IMAGE
+	Smoothing : TOGGLE SMOOTHING
+	Background : TOGGLE BACKGROUND
+	Always on top : ALWAYS ON TOP
+	-
+	Open file location : OPEN FILE LOCATION
+	Delete : DELETE
+	-
+	Open Settings : OPEN SETTINGS
+	Reload Settings : RELOAD SETTINGS
+	: VERSION NAME
+}
+ContextMenu_Animation =
+{
+	Next Frame : NEXT FRAME
+	Prev Frame : PREV FRAME
+	Pause/Play Animation : TOGGLE ANIMATION
+	-
+}";
+        public string ContextMenuSetupDefault;
+
 
         private Dictionary<string, object> Settings;
 
@@ -58,6 +145,8 @@ namespace vimage
         }
         public void Init()
         {
+            ContextMenuSetupDefault = ContextMenuSetup;
+
             SetControls(Control_Drag, "MOUSELEFT");
             SetControls(Control_Close, "ESC", "BACKSPACE");
             SetControls(Control_OpenContextMenu, "MOUSERIGHT");
@@ -132,17 +221,12 @@ namespace vimage
         {
             // If config file doesn't exist, make one
             if (!File.Exists(configFile))
-            {
                 Save(configFile);
-            }
-            else
+            // Clear default controls before the are loaded back in
+            foreach (var list in Settings)
             {
-                // If config did exist, clear all controls
-                foreach (var list in Settings)
-                {
-                    if (list.Value is List<int>)
-                        ((List<int>)list.Value).Clear();
-                }
+                if (list.Value is List<int>)
+                    ((List<int>)list.Value).Clear();
             }
 
             
@@ -410,47 +494,7 @@ namespace vimage
             writer.Write(Environment.NewLine);
             writer.Write("// Context Menu" + Environment.NewLine);
 
-            writer.Write(
-@"ContextMenu =
-{
-	Close : CLOSE
-	-
-	Next Image : NEXT IMAGE
-	Prev Image : PREV IMAGE
-	Sort by
-	{
-		Name : SORT NAME
-		Date modified : SORT DATE MODIFIED
-		Date created : SORT DATE CREATED
-		Size : SORT SIZE
-		-
-		Ascending : SORT ASCENDING
-		Descending : SORT DESCENDING
-	}
-	-
-	Rotate Clockwise : ROTATE CLOCKWISE
-	Rotate Anti-Clockwise : ROTATE ANTICLOCKWISE
-	Flip : FLIP
-	Fit to monitor height : FIT TO HEIGHT
-	Reset Image : RESET IMAGE
-	Smoothing : TOGGLE SMOOTHING
-	Background : TOGGLE BACKGROUND
-	Always on top : ALWAYS ON TOP
-	-
-	Open file location : OPEN FILE LOCATION
-	Delete : DELETE
-	-
-	Open Settings : OPEN SETTINGS
-	Reload Settings : RELOAD SETTINGS
-	: VERSION NAME
-}
-ContextMenu_Animation =
-{
-	Next Frame : NEXT FRAME
-	Prev Frame : PREV FRAME
-	Pause/Play Animation : TOGGLE ANIMATION
-	-
-}");
+            writer.Write(ContextMenuSetup);
             writer.Write(Environment.NewLine);
             WriteSetting(writer, "ContextMenu_Animation_InsertAtIndex", ContextMenu_Animation_InsertAtIndex);
             WriteSetting(writer, "ContextMenu_ShowMargin", ContextMenuShowMargin, "shows checkboxes for certain menu items");
@@ -683,10 +727,13 @@ ContextMenu_Animation =
                 case "ESC":
                     return Keyboard.Key.Escape;
                 case "LCONTROL":
+                case "CONTROL":
                     return Keyboard.Key.LControl;
                 case "LSHIFT":
+                case "SHIFT":
                     return Keyboard.Key.LShift;
                 case "LALT":
+                case "ALT":
                     return Keyboard.Key.LAlt;
                 case "LSYSTEM":
                     return Keyboard.Key.LSystem;
@@ -701,10 +748,12 @@ ContextMenu_Animation =
                 case "MENU":
                     return Keyboard.Key.Menu;
                 case "LBRACKET":
-                case "(":
+                case "[":
+                case "{":
                     return Keyboard.Key.LBracket;
                 case "RBRACKET":
-                case ")":
+                case "]":
+                case "}":
                     return Keyboard.Key.RBracket;
                 case "SEMICOLON":
                 case ";":
@@ -724,6 +773,7 @@ ContextMenu_Animation =
                 case "SLASH":
                 case "?":
                 case "/":
+                case "QUESTION":
                     return Keyboard.Key.Slash;
                 case "BACKSLASH":
                 case "|":
@@ -734,10 +784,12 @@ ContextMenu_Animation =
                 case "`":
                     return Keyboard.Key.Tilde;
                 case "EQUAL":
+                case "PLUS":
                 case "+":
                 case "=":
                     return Keyboard.Key.Equal;
                 case "DASH":
+                case "MINUS":
                 case "_":
                 case "-":
                     return Keyboard.Key.Dash;
@@ -751,8 +803,11 @@ ContextMenu_Animation =
                 case "TAB":
                     return Keyboard.Key.Tab;
                 case "PAGEUP":
+                case "PGUP":
                     return Keyboard.Key.PageUp;
                 case "PAGEDOWN":
+                case "PGDOWN":
+                case "NEXT":
                     return Keyboard.Key.PageDown;
                 case "END":
                     return Keyboard.Key.End;
@@ -763,6 +818,7 @@ ContextMenu_Animation =
                     return Keyboard.Key.Insert;
                 case "DELETE":
                 case "DEL":
+                case "DECIMAL":
                     return Keyboard.Key.Delete;
                 case "ADD":
                     return Keyboard.Key.Add;
@@ -933,9 +989,9 @@ ContextMenu_Animation =
                 case Keyboard.Key.Menu:
 	                return "MENU";
                 case Keyboard.Key.LBracket:
-	                return "(";
+	                return "[";
                 case Keyboard.Key.RBracket:
-	                return ")";
+	                return "]";
                 case Keyboard.Key.SemiColon:
 	                return ";";
                 case Keyboard.Key.Comma:
@@ -959,13 +1015,13 @@ ContextMenu_Animation =
                 case Keyboard.Key.Return:
 	                return "RETURN";
                 case Keyboard.Key.Back:
-	                return "BACKSPACE";
+	                return "BACK";
                 case Keyboard.Key.Tab:
 	                return "TAB";
                 case Keyboard.Key.PageUp:
-	                return "PAGE UP";
+	                return "PGUP";
                 case Keyboard.Key.PageDown:
-	                return "PAGE DOWN";
+	                return "PGDOWN";
                 case Keyboard.Key.End:
 	                return "END";
                 case Keyboard.Key.Home:
