@@ -596,6 +596,22 @@ ContextMenu_Animation =
             }
         }
 
+        public List<int> UpdateControl(string name, int bind)
+        {
+            name = name.ToUpper();
+            if (!Settings.ContainsKey(name))
+                return null;
+
+            List<int> Control = (List<int>)Settings[name];
+
+            if (bind == -1)
+                Control.Clear();
+            else if (Control.IndexOf(bind) == -1)
+                Control.Add(bind);
+
+            return Control;
+        }
+
         /// <summary> Converts upper-case string to SFML Mouse.Button (as an int + offset). </summary>
         public static int StringToMouseButton(string str)
         {

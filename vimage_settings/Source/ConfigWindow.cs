@@ -3,7 +3,6 @@ using System.IO;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Collections.Generic;
-using System.Reflection;
 using vimage;
 
 namespace vimage_settings
@@ -101,46 +100,6 @@ namespace vimage_settings
             textBox_ContextMenu.Text = vimageConfig.ContextMenuSetup;
         }
 
-        private List<int> UpdateControl(string name, int bind)
-        {
-            List<int> Control;
-            switch (name)
-            {
-                case "Drag": Control = vimageConfig.Control_Drag; break;
-                case "Close": Control = vimageConfig.Control_Close; break;
-                case "OpenContextMenu": Control = vimageConfig.Control_OpenContextMenu; break;
-                case "PrevImage": Control = vimageConfig.Control_PrevImage; break;
-                case "NextImage": Control = vimageConfig.Control_NextImage; break;
-                case "RotateClockwise": Control = vimageConfig.Control_RotateClockwise; break;
-                case "RotateAntiClockwise": Control = vimageConfig.Control_RotateAntiClockwise; break;
-                case "Flip": Control = vimageConfig.Control_Flip; break;
-                case "FitToMonitorHeight": Control = vimageConfig.Control_FitToMonitorHeight; break;
-                case "FitToMonitorHeightAlternative": Control = vimageConfig.Control_FitToMonitorHeightAlternative; break;
-                case "ZoomFaster": Control = vimageConfig.Control_ZoomFaster; break;
-                case "ZoomAlt": Control = vimageConfig.Control_ZoomAlt; break;
-                case "ToggleSmoothing": Control = vimageConfig.Control_ToggleSmoothing; break;
-                case "ToggleBackgroundForTransparency": Control = vimageConfig.Control_ToggleBackgroundForTransparency; break;
-                case "ToggleAlwaysOnTop": Control = vimageConfig.Control_ToggleAlwaysOnTop; break;
-                case "PauseAnimation": Control = vimageConfig.Control_PauseAnimation; break;
-                case "PrevFrame<": Control = vimageConfig.Control_NextFrame; break;
-                case "NextFrame>": Control = vimageConfig.Control_PrevFrame; break;
-                case "OpenConfig": Control = vimageConfig.Control_OpenConfig; break;
-                case "ReloadConfig": Control = vimageConfig.Control_ReloadConfig; break;
-                case "ResetImage": Control = vimageConfig.Control_ResetImage; break;
-                case "OpenAtLocation": Control = vimageConfig.Control_OpenAtLocation; break;
-                case "Delete": Control = vimageConfig.Control_Delete; break;
-                case "OpenDuplicateImage": Control = vimageConfig.Control_OpenDuplicateImage; break;
-                default: return null;
-            }
-
-            if (bind == -1)
-                Control.Clear();
-            else if (Control.IndexOf(bind) == -1)
-                Control.Add(bind);
-
-            return Control;
-        }
-
         private void control_OnKeyDown(object sender, KeyEventArgs e)
         {
             // Record Key Press
@@ -165,7 +124,7 @@ namespace vimage_settings
             key = key.Replace("KEY", ""); // eg: CONTROLKEY to CONTROL
 
             // Update Control and Text Box
-            List<int> Control = UpdateControl(name, (int)Config.StringToKey(key));
+            List<int> Control = vimageConfig.UpdateControl(name, (int)Config.StringToKey(key));
             if (Control != null)
                 ((TextBox)sender).Text = Config.ControlsToString(Control);
         }
@@ -182,7 +141,7 @@ namespace vimage_settings
             string button = e.Button.ToString().ToUpper();
 
             // Update Control and Text Box
-            List<int> Control = UpdateControl(name, Config.StringToMouseButton("MOUSE" + button));
+            List<int> Control = vimageConfig.UpdateControl(name, Config.StringToMouseButton("MOUSE" + button));
             if (Control != null)
                 ((TextBox)sender).Text = Config.ControlsToString(Control);
         }
@@ -193,7 +152,7 @@ namespace vimage_settings
             string name = ((Button)sender).Name.Replace("button_Clear_", "");
 
             ((TextBox)Controls.Find("textBox_" + name, true)[0]).Clear();
-            UpdateControl(name, -1);
+            vimageConfig.UpdateControl(name, -1);
         }
 
         private void control_OnLoseFocus(object sender, EventArgs e)
