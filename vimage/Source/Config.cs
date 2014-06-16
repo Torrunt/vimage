@@ -461,7 +461,7 @@ ContextMenu_Animation =
             WriteSetting(writer, "MinImageSize", Setting_MinImageSize, 
                 "if an image is smaller than this (in width or height) it will scaled up to it automatically");
             WriteSetting(writer, "SmoothingMinImageSize", Setting_SmoothingMinImageSize, 
-                "images smaller than this it will not have smoothing turned on (if 0, all images with use smoothing)");
+                "images smaller than this will not have smoothing turned on (if 0, all images with use smoothing)");
 
             writer.Write(Environment.NewLine);
             writer.Write("// Bindings" + Environment.NewLine);

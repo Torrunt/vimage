@@ -125,6 +125,7 @@
             this.checkBox_ContextMenuShowMargin = new System.Windows.Forms.CheckBox();
             this.button_Save = new System.Windows.Forms.Button();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.TabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_SmoothingMinImageSize)).BeginInit();
@@ -176,6 +177,7 @@
             this.checkBox_OpenSettingsEXE.Size = new System.Drawing.Size(324, 17);
             this.checkBox_OpenSettingsEXE.TabIndex = 10;
             this.checkBox_OpenSettingsEXE.Text = "Use vimage_settings.exe (otherwise will open config.txt directly)";
+            this.toolTip1.SetToolTip(this.checkBox_OpenSettingsEXE, "what will open when the \'Open Config\' button is clicked or the shortcut is used.");
             this.checkBox_OpenSettingsEXE.UseVisualStyleBackColor = true;
             // 
             // label2
@@ -183,9 +185,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(6, 190);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(169, 13);
+            this.label2.Size = new System.Drawing.Size(164, 13);
             this.label2.TabIndex = 9;
-            this.label2.Text = "Don\'t Smooth Images Smaller than";
+            this.label2.Text = "Don\'t smooth images smaller than";
             // 
             // numericUpDown_SmoothingMinImageSize
             // 
@@ -199,9 +201,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(6, 167);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(261, 13);
+            this.label1.Size = new System.Drawing.Size(258, 13);
             this.label1.TabIndex = 7;
-            this.label1.Text = "Min Image Size (if image is smaller, it will be scaled up)";
+            this.label1.Text = "Min image size (if image is smaller, it will be scaled up)";
             // 
             // numericUpDown_MinImageSize
             // 
@@ -215,9 +217,11 @@
             this.checkBox_PreloadNextImage.AutoSize = true;
             this.checkBox_PreloadNextImage.Location = new System.Drawing.Point(9, 122);
             this.checkBox_PreloadNextImage.Name = "checkBox_PreloadNextImage";
-            this.checkBox_PreloadNextImage.Size = new System.Drawing.Size(119, 17);
+            this.checkBox_PreloadNextImage.Size = new System.Drawing.Size(116, 17);
             this.checkBox_PreloadNextImage.TabIndex = 5;
-            this.checkBox_PreloadNextImage.Text = "Preload Next Image";
+            this.checkBox_PreloadNextImage.Text = "Preload next image";
+            this.toolTip1.SetToolTip(this.checkBox_PreloadNextImage, "when using the next/prev image buttons, the image after the one just loaded will " +
+        "be loaded as well.");
             this.checkBox_PreloadNextImage.UseVisualStyleBackColor = true;
             // 
             // checkBox_PositionLargeWideImagesInCorner
@@ -225,9 +229,11 @@
             this.checkBox_PositionLargeWideImagesInCorner.AutoSize = true;
             this.checkBox_PositionLargeWideImagesInCorner.Location = new System.Drawing.Point(9, 99);
             this.checkBox_PositionLargeWideImagesInCorner.Name = "checkBox_PositionLargeWideImagesInCorner";
-            this.checkBox_PositionLargeWideImagesInCorner.Size = new System.Drawing.Size(345, 17);
+            this.checkBox_PositionLargeWideImagesInCorner.Size = new System.Drawing.Size(331, 17);
             this.checkBox_PositionLargeWideImagesInCorner.TabIndex = 4;
-            this.checkBox_PositionLargeWideImagesInCorner.Text = "Position Large/Wide Images in Corner (ie: Wallpapers/Screenshots)";
+            this.checkBox_PositionLargeWideImagesInCorner.Text = "Position large/wide images in corner (ie: wallpapers/screenshots)";
+            this.toolTip1.SetToolTip(this.checkBox_PositionLargeWideImagesInCorner, "images that are wider than the current monitor width will be placed in the top le" +
+        "ft corner.");
             this.checkBox_PositionLargeWideImagesInCorner.UseVisualStyleBackColor = true;
             // 
             // checkBox_LimitImagesToMonitorHeight
@@ -235,9 +241,9 @@
             this.checkBox_LimitImagesToMonitorHeight.AutoSize = true;
             this.checkBox_LimitImagesToMonitorHeight.Location = new System.Drawing.Point(9, 76);
             this.checkBox_LimitImagesToMonitorHeight.Name = "checkBox_LimitImagesToMonitorHeight";
-            this.checkBox_LimitImagesToMonitorHeight.Size = new System.Drawing.Size(168, 17);
+            this.checkBox_LimitImagesToMonitorHeight.Size = new System.Drawing.Size(164, 17);
             this.checkBox_LimitImagesToMonitorHeight.TabIndex = 3;
-            this.checkBox_LimitImagesToMonitorHeight.Text = "Limit Images to Monitor Height";
+            this.checkBox_LimitImagesToMonitorHeight.Text = "Limit images to monitor height";
             this.checkBox_LimitImagesToMonitorHeight.UseVisualStyleBackColor = true;
             // 
             // checkBox_BackgroundForImagesWithTransparencyDefault
@@ -245,9 +251,10 @@
             this.checkBox_BackgroundForImagesWithTransparencyDefault.AutoSize = true;
             this.checkBox_BackgroundForImagesWithTransparencyDefault.Location = new System.Drawing.Point(9, 53);
             this.checkBox_BackgroundForImagesWithTransparencyDefault.Name = "checkBox_BackgroundForImagesWithTransparencyDefault";
-            this.checkBox_BackgroundForImagesWithTransparencyDefault.Size = new System.Drawing.Size(276, 17);
+            this.checkBox_BackgroundForImagesWithTransparencyDefault.Size = new System.Drawing.Size(270, 17);
             this.checkBox_BackgroundForImagesWithTransparencyDefault.TabIndex = 2;
-            this.checkBox_BackgroundForImagesWithTransparencyDefault.Text = "Show Background behind Images with Transparency";
+            this.checkBox_BackgroundForImagesWithTransparencyDefault.Text = "Show background behind images with transparency";
+            this.toolTip1.SetToolTip(this.checkBox_BackgroundForImagesWithTransparencyDefault, "images with partial transparency will have a grey background behind them.");
             this.checkBox_BackgroundForImagesWithTransparencyDefault.UseVisualStyleBackColor = true;
             // 
             // checkBox_SmoothingDefault
@@ -255,9 +262,9 @@
             this.checkBox_SmoothingDefault.AutoSize = true;
             this.checkBox_SmoothingDefault.Location = new System.Drawing.Point(9, 30);
             this.checkBox_SmoothingDefault.Name = "checkBox_SmoothingDefault";
-            this.checkBox_SmoothingDefault.Size = new System.Drawing.Size(150, 17);
+            this.checkBox_SmoothingDefault.Size = new System.Drawing.Size(147, 17);
             this.checkBox_SmoothingDefault.TabIndex = 1;
-            this.checkBox_SmoothingDefault.Text = "Smooth Images by Default";
+            this.checkBox_SmoothingDefault.Text = "Smooth images by default";
             this.checkBox_SmoothingDefault.UseVisualStyleBackColor = true;
             // 
             // checkBox_OpenAtMousePosition
@@ -265,9 +272,11 @@
             this.checkBox_OpenAtMousePosition.AutoSize = true;
             this.checkBox_OpenAtMousePosition.Location = new System.Drawing.Point(9, 7);
             this.checkBox_OpenAtMousePosition.Name = "checkBox_OpenAtMousePosition";
-            this.checkBox_OpenAtMousePosition.Size = new System.Drawing.Size(176, 17);
+            this.checkBox_OpenAtMousePosition.Size = new System.Drawing.Size(173, 17);
             this.checkBox_OpenAtMousePosition.TabIndex = 0;
-            this.checkBox_OpenAtMousePosition.Text = "Open Images at Mouse Position";
+            this.checkBox_OpenAtMousePosition.Text = "Open images at mouse position";
+            this.toolTip1.SetToolTip(this.checkBox_OpenAtMousePosition, "when an image is opened it will be centered at the current mouse position (common" +
+        "ly where the image file is).");
             this.checkBox_OpenAtMousePosition.UseVisualStyleBackColor = true;
             // 
             // tabPage2
@@ -1171,6 +1180,7 @@
             this.button_ContextMenuDefault.Name = "button_ContextMenuDefault";
             this.button_ContextMenuDefault.Size = new System.Drawing.Size(75, 23);
             this.button_ContextMenuDefault.TabIndex = 11;
+            this.button_ContextMenuDefault.TabStop = false;
             this.button_ContextMenuDefault.Text = "Default";
             this.button_ContextMenuDefault.UseVisualStyleBackColor = true;
             this.button_ContextMenuDefault.Click += new System.EventHandler(this.button_ContextMenuDefault_Click);
@@ -1183,15 +1193,16 @@
             this.textBox_ContextMenu.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox_ContextMenu.Size = new System.Drawing.Size(382, 233);
             this.textBox_ContextMenu.TabIndex = 10;
+            this.textBox_ContextMenu.TabStop = false;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(222, 8);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(123, 13);
+            this.label3.Size = new System.Drawing.Size(121, 13);
             this.label3.TabIndex = 9;
-            this.label3.Text = "Insert Animation at Index";
+            this.label3.Text = "Insert animation at index";
             // 
             // numericUpDown_ContextMenu_Animation_InsertAtIndex
             // 
@@ -1199,15 +1210,18 @@
             this.numericUpDown_ContextMenu_Animation_InsertAtIndex.Name = "numericUpDown_ContextMenu_Animation_InsertAtIndex";
             this.numericUpDown_ContextMenu_Animation_InsertAtIndex.Size = new System.Drawing.Size(40, 20);
             this.numericUpDown_ContextMenu_Animation_InsertAtIndex.TabIndex = 8;
+            this.numericUpDown_ContextMenu_Animation_InsertAtIndex.TabStop = false;
             // 
             // checkBox_ContextMenuShowMargin
             // 
             this.checkBox_ContextMenuShowMargin.AutoSize = true;
             this.checkBox_ContextMenuShowMargin.Location = new System.Drawing.Point(9, 7);
             this.checkBox_ContextMenuShowMargin.Name = "checkBox_ContextMenuShowMargin";
-            this.checkBox_ContextMenuShowMargin.Size = new System.Drawing.Size(152, 17);
+            this.checkBox_ContextMenuShowMargin.Size = new System.Drawing.Size(150, 17);
             this.checkBox_ContextMenuShowMargin.TabIndex = 1;
-            this.checkBox_ContextMenuShowMargin.Text = "Show Margin/Checkboxes";
+            this.checkBox_ContextMenuShowMargin.TabStop = false;
+            this.checkBox_ContextMenuShowMargin.Text = "Show margin/checkboxes";
+            this.toolTip1.SetToolTip(this.checkBox_ContextMenuShowMargin, "context menu will have a margin or the left and some items will have checkboxes.");
             this.checkBox_ContextMenuShowMargin.UseVisualStyleBackColor = true;
             // 
             // button_Save
@@ -1232,6 +1246,10 @@
             this.linkLabel1.TabStop = true;
             this.linkLabel1.Text = "torrunt.net/vimage";
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            // 
+            // toolTip1
+            // 
+            this.toolTip1.ShowAlways = true;
             // 
             // ConfigWindow
             // 
@@ -1359,6 +1377,7 @@
         private System.Windows.Forms.Button button_ContextMenuDefault;
         private System.Windows.Forms.TextBox textBox_ContextMenu;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip_Empty;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }
 
