@@ -31,11 +31,11 @@ namespace vimage_settings
             checkBox_OpenAtMousePosition.Checked = vimageConfig.Setting_OpenAtMousePosition;
             checkBox_SmoothingDefault.Checked = vimageConfig.Setting_SmoothingDefault;
             checkBox_BackgroundForImagesWithTransparencyDefault.Checked = vimageConfig.Setting_BackgroundForImagesWithTransparencyDefault;
-            checkBox_LimitImagesToMonitorHeight.Checked = vimageConfig.Setting_LimitImagesToMonitorHeight;
             checkBox_PositionLargeWideImagesInCorner.Checked = vimageConfig.Setting_PositionLargeWideImagesInCorner;
             checkBox_PreloadNextImage.Checked = vimageConfig.Setting_PreloadNextImage;
             checkBox_OpenSettingsEXE.Checked = vimageConfig.Setting_OpenSettingsEXE;
             checkBox_ListenForConfigChanges.Checked = vimageConfig.Setting_ListenForConfigChanges;
+            comboBox_LimitImagesToMonitor.SelectedIndex = vimageConfig.Setting_LimitImagesToMonitor;
             numericUpDown_MinImageSize.Value = vimageConfig.Setting_MinImageSize;
             numericUpDown_SmoothingMinImageSize.Value = vimageConfig.Setting_SmoothingMinImageSize;
             numericUpDown_ZoomSpeed.Value = vimageConfig.Setting_ZoomSpeed;
@@ -155,11 +155,11 @@ namespace vimage_settings
             vimageConfig.Setting_OpenAtMousePosition = checkBox_OpenAtMousePosition.Checked;
             vimageConfig.Setting_SmoothingDefault = checkBox_SmoothingDefault.Checked;
             vimageConfig.Setting_BackgroundForImagesWithTransparencyDefault = checkBox_BackgroundForImagesWithTransparencyDefault.Checked;
-            vimageConfig.Setting_LimitImagesToMonitorHeight = checkBox_LimitImagesToMonitorHeight.Checked;
             vimageConfig.Setting_PositionLargeWideImagesInCorner = checkBox_PositionLargeWideImagesInCorner.Checked;
             vimageConfig.Setting_PreloadNextImage = checkBox_PreloadNextImage.Checked;
             vimageConfig.Setting_OpenSettingsEXE = checkBox_OpenSettingsEXE.Checked;
             vimageConfig.Setting_ListenForConfigChanges = checkBox_ListenForConfigChanges.Checked;
+            vimageConfig.Setting_LimitImagesToMonitor = comboBox_LimitImagesToMonitor.SelectedIndex;
             vimageConfig.Setting_MinImageSize = (int)numericUpDown_MinImageSize.Value;
             vimageConfig.Setting_SmoothingMinImageSize = (int)numericUpDown_SmoothingMinImageSize.Value;
             vimageConfig.Setting_ZoomSpeed = (int)numericUpDown_ZoomSpeed.Value;

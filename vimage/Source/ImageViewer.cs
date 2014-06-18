@@ -123,11 +123,19 @@ namespace vimage
             IntRect bounds = ImageViewerUtils.GetCurrentBounds(mousePos);
 
             // Resize Window
-            if (Config.Setting_LimitImagesToMonitorHeight && Image.Texture.Size.Y > bounds.Height)
+            if (Config.Setting_LimitImagesToMonitor != Config.NONE)
             {
-                // Fit to monitor height if it's higher than monitor height.
-                Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
-                FitToMonitorHeightForced = true;
+                // Fit to monitor height/width
+                if (Config.Setting_LimitImagesToMonitor == Config.HEIGHT && Image.Texture.Size.Y > bounds.Height)
+                {
+                    Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
+                    FitToMonitorHeightForced = true;
+                }
+                else if (Config.Setting_LimitImagesToMonitor == Config.WIDTH && Image.Texture.Size.X > bounds.Width)
+                {
+                    Zoom(1 + (((float)bounds.Width - Image.Texture.Size.X) / Image.Texture.Size.X), true);
+                    AutomaticallyZoomed = true;
+                }
             }
             else if (Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_MinImageSize)
             {
@@ -592,11 +600,19 @@ namespace vimage
             // Force Fit To Monitor Height?
             Vector2i imagePos = new Vector2i((int)NextWindowPos.X + ((int)Image.Texture.Size.X / 2), (int)NextWindowPos.Y + ((int)Image.Texture.Size.Y / 2));
             IntRect currentBounds = ImageViewerUtils.GetCurrentBounds(imagePos);
-            if (Config.Setting_LimitImagesToMonitorHeight && Image.Texture.Size.Y > Image.Texture.Size.X && Image.Texture.Size.Y > currentBounds.Height)
+            if (Config.Setting_LimitImagesToMonitor != Config.NONE)
             {
-                // Fit to monitor height if it's higher than monitor height.
-                Zoom(1 + (((float)currentBounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
-                FitToMonitorHeightForced = true;
+                // Fit to monitor height/width
+                if (Config.Setting_LimitImagesToMonitor == Config.HEIGHT && Image.Texture.Size.Y > currentBounds.Height)
+                {
+                    Zoom(1 + (((float)currentBounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
+                    FitToMonitorHeightForced = true;
+                }
+                else if (Config.Setting_LimitImagesToMonitor == Config.WIDTH && Image.Texture.Size.X > currentBounds.Width)
+                {
+                    Zoom(1 + (((float)currentBounds.Width - Image.Texture.Size.X) / Image.Texture.Size.X), true);
+                    AutomaticallyZoomed = true;
+                }
             }
 
             // Center image or place in top-left corner if it's a large/wide image.
@@ -711,6 +727,9 @@ namespace vimage
             float prevRotation = Image.Rotation;
             int prevDefaultRotation = DefaultRotation;
 
+            IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position +
+                new Vector2i((int)(Image.Texture.Size.X * CurrentZoom) / 2, (int)(Image.Texture.Size.Y * CurrentZoom) / 2));
+
             if (AutomaticallyZoomed)
             {
                 // don't keep current zoom value if it wasn't set by user
@@ -733,29 +752,55 @@ namespace vimage
                 Image.Data.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
             else
                 Image.Texture.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
+            
+            bool wasFitToMonitorDimension = false;
+            if (Config.Setting_LimitImagesToMonitor != Config.NONE)
+            {
+                // Fit to monitor height/width
+                if (Config.Setting_LimitImagesToMonitor == Config.HEIGHT && (FitToMonitorHeight || Image.Texture.Size.Y >= bounds.Height))
+                {
+                    Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
 
-            IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position + new Vector2i(4, 4));
-            if (Config.Setting_LimitImagesToMonitorHeight && (FitToMonitorHeight || (Image.Texture.Size.Y * CurrentZoom >= bounds.Height || (FitToMonitorHeightForced && Image.Texture.Size.Y >= bounds.Height))))
-            {
-                // Fit to monitor height if it's higher than monitor height (or FitToMonitorHeight is true).
-                Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
-                NextWindowPos = new Vector2i(NextWindowPos.X, bounds.Top);
-                if (!FitToMonitorHeight)
-                    FitToMonitorHeightForced = true;
+                    bounds = ImageViewerUtils.GetCurrentBounds(NextWindowPos +
+                        new Vector2i((int)(Image.Texture.Size.X * CurrentZoom) / 2, (int)(Image.Texture.Size.Y * CurrentZoom) / 2));
+                    NextWindowPos = new Vector2i(NextWindowPos.X, bounds.Top);
+
+                    if (!FitToMonitorHeight)
+                        FitToMonitorHeightForced = true;
+
+                    wasFitToMonitorDimension = true;
+                }
+                else if (Config.Setting_LimitImagesToMonitor == Config.WIDTH && Image.Texture.Size.X > bounds.Width)
+                {
+                    Zoom(1 + (((float)bounds.Width - Image.Texture.Size.X) / Image.Texture.Size.X), true);
+
+                    bounds = ImageViewerUtils.GetCurrentBounds(NextWindowPos +
+                        new Vector2i((int)(Image.Texture.Size.X * CurrentZoom) / 2, (int)(Image.Texture.Size.Y * CurrentZoom) / 2));
+                    NextWindowPos = new Vector2i(bounds.Left, NextWindowPos.Y);
+
+                    AutomaticallyZoomed = true;
+                    wasFitToMonitorDimension = true;
+                }
             }
-            else if (FitToMonitorHeightForced)
+            if (!wasFitToMonitorDimension)
             {
-                Zoom(1, true);
-                FitToMonitorHeightForced = false;
+                if (FitToMonitorHeightForced)
+                {
+                    Zoom(1, true);
+                    FitToMonitorHeightForced = false;
+                }
+                else if (Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) * CurrentZoom < Config.Setting_MinImageSize)
+                {
+                    // Reisze images smaller than min size to min size
+                    AutomaticallyZoomed = true;
+                    Zoom(Config.Setting_MinImageSize / Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y), true);
+                }
+                else
+                    Zoom(CurrentZoom, true);
             }
-            else if (Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) * CurrentZoom < Config.Setting_MinImageSize)
-            {
-                // Reisze images smaller than min size to min size
-                AutomaticallyZoomed = true;
-                Zoom(Config.Setting_MinImageSize / Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y), true);
-            }
-            else
-                Zoom(CurrentZoom, true);
+
+            bounds = ImageViewerUtils.GetCurrentBounds(NextWindowPos +
+                new Vector2i((int)(Image.Texture.Size.X * CurrentZoom) / 2, (int)(Image.Texture.Size.Y * CurrentZoom) / 2));
 
             // Position Window at top-left if the image is wide (ie: a Desktop Wallpaper / Screenshot)
             // Otherwise, if image is hanging off monitor just center it.

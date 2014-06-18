@@ -24,16 +24,24 @@ namespace vimage
         /// <summary> Returns the bounds IntRect of the monitor the position is located on.</summary>
         public static IntRect GetCurrentBounds(Vector2i pos)
         {
+            System.Windows.Forms.Screen backupScreen = System.Windows.Forms.Screen.AllScreens.ElementAt(0);
+
             foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
             {
                 if (pos.X < screen.Bounds.X || pos.Y < screen.Bounds.Y || pos.X > screen.Bounds.X + screen.Bounds.Width || pos.Y > screen.Bounds.Y + screen.Bounds.Height)
+                {
+                    if ((pos.X > screen.Bounds.X && screen.Bounds.X > backupScreen.Bounds.X) ||
+                        (pos.X < screen.Bounds.X && screen.Bounds.X < backupScreen.Bounds.X) ||
+                        (pos.Y > screen.Bounds.Y && screen.Bounds.Y > backupScreen.Bounds.Y) ||
+                        (pos.Y < screen.Bounds.Y && screen.Bounds.Y < backupScreen.Bounds.Y))
+                        backupScreen = screen;
                     continue;
+                }
 
                 return new IntRect(screen.Bounds.X, screen.Bounds.Y, screen.Bounds.Width, screen.Bounds.Height);
             }
-            System.Windows.Forms.Screen firstScreen = System.Windows.Forms.Screen.AllScreens.ElementAt(0);
 
-            return new IntRect(firstScreen.Bounds.X, firstScreen.Bounds.Y, firstScreen.Bounds.Width, firstScreen.Bounds.Height);
+            return new IntRect(backupScreen.Bounds.X, backupScreen.Bounds.Y, backupScreen.Bounds.Width, backupScreen.Bounds.Height);
         }
 
 

@@ -48,11 +48,15 @@ namespace vimage
             get { return (Boolean)Settings["BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT"]; }
             set { Settings["BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT"] = value; }
         }
-        public bool Setting_LimitImagesToMonitorHeight
+        public int Setting_LimitImagesToMonitor
         {
-            get { return (Boolean)Settings["LIMITIMAGESTOMONITORHEIGHT"]; }
-            set { Settings["LIMITIMAGESTOMONITORHEIGHT"] = value; }
+            get { return (int)Settings["LIMITIMAGESTOMONITOR"]; }
+            set { Settings["LIMITIMAGESTOMONITOR"] = value; }
         }
+        public const int NONE   = 0;
+        public const int HEIGHT = 1;
+        public const int WIDTH  = 2;
+
         public bool Setting_PositionLargeWideImagesInCorner
         {
             get { return (Boolean)Settings["POSITIONLARGEWIDEIMAGESINCORNER"]; }
@@ -188,7 +192,7 @@ namespace vimage
                 { "OPENATMOUSEPOSITION", true },
                 { "SMOOTHINGDEFAULT", true },
                 { "BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT", false },
-                { "LIMITIMAGESTOMONITORHEIGHT", true },
+                { "LIMITIMAGESTOMONITOR", HEIGHT },
                 { "POSITIONLARGEWIDEIMAGESINCORNER", true },
                 { "PRELOADNEXTIMAGE", true },
                 { "OPENSETTINGSEXE", true },
@@ -428,7 +432,7 @@ namespace vimage
             WriteSetting(writer, "OpenAtMousePosition", Setting_OpenAtMousePosition);
             WriteSetting(writer, "SmoothingDefault", Setting_SmoothingDefault);
             WriteSetting(writer, "BackgroundForImagesWithTransparencyDefault", Setting_BackgroundForImagesWithTransparencyDefault);
-            WriteSetting(writer, "LimitImagesToMonitorHeight", Setting_LimitImagesToMonitorHeight);
+            WriteSetting(writer, "LimitImagesToMonitor", Setting_LimitImagesToMonitor, "0=NONE, 1=HEIGHT, 2=WIDTH");
             WriteSetting(writer, "PositionLargeWideImagesInCorner", Setting_PositionLargeWideImagesInCorner, 
                 "ie: Desktop Wallpapers and Screenshots");
             WriteSetting(writer, "PreloadNextImage", Setting_PreloadNextImage, 
@@ -491,6 +495,11 @@ namespace vimage
         private void WriteSetting(StreamWriter writer, string name, int value, string comment = "")
         {
             writer.Write(name + " = " + value.ToString());
+            WriteComment(writer, comment);
+        }
+        private void WriteSetting(StreamWriter writer, string name, string value, string comment = "")
+        {
+            writer.Write(name + " = " + value);
             WriteComment(writer, comment);
         }
         private void WriteComment(StreamWriter writer, string comment = "")

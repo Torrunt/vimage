@@ -32,6 +32,14 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigWindow));
             this.TabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.numericUpDown_ZoomSpeedFast = new System.Windows.Forms.NumericUpDown();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.numericUpDown_ZoomSpeed = new System.Windows.Forms.NumericUpDown();
             this.checkBox_ListenForConfigChanges = new System.Windows.Forms.CheckBox();
             this.checkBox_OpenSettingsEXE = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -40,7 +48,6 @@
             this.numericUpDown_MinImageSize = new System.Windows.Forms.NumericUpDown();
             this.checkBox_PreloadNextImage = new System.Windows.Forms.CheckBox();
             this.checkBox_PositionLargeWideImagesInCorner = new System.Windows.Forms.CheckBox();
-            this.checkBox_LimitImagesToMonitorHeight = new System.Windows.Forms.CheckBox();
             this.checkBox_BackgroundForImagesWithTransparencyDefault = new System.Windows.Forms.CheckBox();
             this.checkBox_SmoothingDefault = new System.Windows.Forms.CheckBox();
             this.checkBox_OpenAtMousePosition = new System.Windows.Forms.CheckBox();
@@ -75,16 +82,12 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.label9 = new System.Windows.Forms.Label();
-            this.numericUpDown_ZoomSpeed = new System.Windows.Forms.NumericUpDown();
-            this.label10 = new System.Windows.Forms.Label();
-            this.label11 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.numericUpDown_ZoomSpeedFast = new System.Windows.Forms.NumericUpDown();
-            this.label13 = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
+            this.comboBox_LimitImagesToMonitor = new System.Windows.Forms.ComboBox();
             this.TabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ZoomSpeedFast)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ZoomSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_SmoothingMinImageSize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_MinImageSize)).BeginInit();
             this.tabPage3.SuspendLayout();
@@ -96,8 +99,6 @@
             this.tabPage4.SuspendLayout();
             this.panel1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ZoomSpeed)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ZoomSpeedFast)).BeginInit();
             this.SuspendLayout();
             // 
             // TabControl
@@ -118,6 +119,9 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.AutoScroll = true;
+            this.tabPage1.Controls.Add(this.comboBox_LimitImagesToMonitor);
+            this.tabPage1.Controls.Add(this.label15);
             this.tabPage1.Controls.Add(this.label13);
             this.tabPage1.Controls.Add(this.label14);
             this.tabPage1.Controls.Add(this.label11);
@@ -134,7 +138,6 @@
             this.tabPage1.Controls.Add(this.numericUpDown_MinImageSize);
             this.tabPage1.Controls.Add(this.checkBox_PreloadNextImage);
             this.tabPage1.Controls.Add(this.checkBox_PositionLargeWideImagesInCorner);
-            this.tabPage1.Controls.Add(this.checkBox_LimitImagesToMonitorHeight);
             this.tabPage1.Controls.Add(this.checkBox_BackgroundForImagesWithTransparencyDefault);
             this.tabPage1.Controls.Add(this.checkBox_SmoothingDefault);
             this.tabPage1.Controls.Add(this.checkBox_OpenAtMousePosition);
@@ -146,10 +149,78 @@
             this.tabPage1.Text = "General";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(382, 212);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(18, 13);
+            this.label13.TabIndex = 19;
+            this.label13.Text = "px";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(382, 190);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(18, 13);
+            this.label14.TabIndex = 18;
+            this.label14.Text = "px";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(372, 256);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(15, 13);
+            this.label11.TabIndex = 17;
+            this.label11.Text = "%";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(6, 256);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(91, 13);
+            this.label12.TabIndex = 16;
+            this.label12.Text = "Zoom Speed Fast";
+            // 
+            // numericUpDown_ZoomSpeedFast
+            // 
+            this.numericUpDown_ZoomSpeedFast.Location = new System.Drawing.Point(330, 254);
+            this.numericUpDown_ZoomSpeedFast.Name = "numericUpDown_ZoomSpeedFast";
+            this.numericUpDown_ZoomSpeedFast.Size = new System.Drawing.Size(40, 20);
+            this.numericUpDown_ZoomSpeedFast.TabIndex = 15;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(372, 234);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(15, 13);
+            this.label10.TabIndex = 14;
+            this.label10.Text = "%";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(6, 234);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(68, 13);
+            this.label9.TabIndex = 13;
+            this.label9.Text = "Zoom Speed";
+            // 
+            // numericUpDown_ZoomSpeed
+            // 
+            this.numericUpDown_ZoomSpeed.Location = new System.Drawing.Point(330, 232);
+            this.numericUpDown_ZoomSpeed.Name = "numericUpDown_ZoomSpeed";
+            this.numericUpDown_ZoomSpeed.Size = new System.Drawing.Size(40, 20);
+            this.numericUpDown_ZoomSpeed.TabIndex = 12;
+            // 
             // checkBox_ListenForConfigChanges
             // 
             this.checkBox_ListenForConfigChanges.AutoSize = true;
-            this.checkBox_ListenForConfigChanges.Location = new System.Drawing.Point(9, 168);
+            this.checkBox_ListenForConfigChanges.Location = new System.Drawing.Point(9, 145);
             this.checkBox_ListenForConfigChanges.Name = "checkBox_ListenForConfigChanges";
             this.checkBox_ListenForConfigChanges.Size = new System.Drawing.Size(147, 17);
             this.checkBox_ListenForConfigChanges.TabIndex = 11;
@@ -160,7 +231,7 @@
             // checkBox_OpenSettingsEXE
             // 
             this.checkBox_OpenSettingsEXE.AutoSize = true;
-            this.checkBox_OpenSettingsEXE.Location = new System.Drawing.Point(9, 145);
+            this.checkBox_OpenSettingsEXE.Location = new System.Drawing.Point(9, 122);
             this.checkBox_OpenSettingsEXE.Name = "checkBox_OpenSettingsEXE";
             this.checkBox_OpenSettingsEXE.Size = new System.Drawing.Size(324, 17);
             this.checkBox_OpenSettingsEXE.TabIndex = 10;
@@ -213,7 +284,7 @@
             // checkBox_PreloadNextImage
             // 
             this.checkBox_PreloadNextImage.AutoSize = true;
-            this.checkBox_PreloadNextImage.Location = new System.Drawing.Point(9, 122);
+            this.checkBox_PreloadNextImage.Location = new System.Drawing.Point(9, 99);
             this.checkBox_PreloadNextImage.Name = "checkBox_PreloadNextImage";
             this.checkBox_PreloadNextImage.Size = new System.Drawing.Size(116, 17);
             this.checkBox_PreloadNextImage.TabIndex = 5;
@@ -225,7 +296,7 @@
             // checkBox_PositionLargeWideImagesInCorner
             // 
             this.checkBox_PositionLargeWideImagesInCorner.AutoSize = true;
-            this.checkBox_PositionLargeWideImagesInCorner.Location = new System.Drawing.Point(9, 99);
+            this.checkBox_PositionLargeWideImagesInCorner.Location = new System.Drawing.Point(9, 76);
             this.checkBox_PositionLargeWideImagesInCorner.Name = "checkBox_PositionLargeWideImagesInCorner";
             this.checkBox_PositionLargeWideImagesInCorner.Size = new System.Drawing.Size(331, 17);
             this.checkBox_PositionLargeWideImagesInCorner.TabIndex = 4;
@@ -233,16 +304,6 @@
             this.toolTip1.SetToolTip(this.checkBox_PositionLargeWideImagesInCorner, "Images that are wider than the current monitor width will be placed in the top le" +
         "ft corner.");
             this.checkBox_PositionLargeWideImagesInCorner.UseVisualStyleBackColor = true;
-            // 
-            // checkBox_LimitImagesToMonitorHeight
-            // 
-            this.checkBox_LimitImagesToMonitorHeight.AutoSize = true;
-            this.checkBox_LimitImagesToMonitorHeight.Location = new System.Drawing.Point(9, 76);
-            this.checkBox_LimitImagesToMonitorHeight.Name = "checkBox_LimitImagesToMonitorHeight";
-            this.checkBox_LimitImagesToMonitorHeight.Size = new System.Drawing.Size(164, 17);
-            this.checkBox_LimitImagesToMonitorHeight.TabIndex = 3;
-            this.checkBox_LimitImagesToMonitorHeight.Text = "Limit images to monitor height";
-            this.checkBox_LimitImagesToMonitorHeight.UseVisualStyleBackColor = true;
             // 
             // checkBox_BackgroundForImagesWithTransparencyDefault
             // 
@@ -619,73 +680,27 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(434, 361);
             this.tableLayoutPanel1.TabIndex = 13;
             // 
-            // label9
+            // label15
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(6, 234);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(68, 13);
-            this.label9.TabIndex = 13;
-            this.label9.Text = "Zoom Speed";
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(6, 169);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(113, 13);
+            this.label15.TabIndex = 20;
+            this.label15.Text = "Limit images to monitor";
             // 
-            // numericUpDown_ZoomSpeed
+            // comboBox_LimitImagesToMonitor
             // 
-            this.numericUpDown_ZoomSpeed.Location = new System.Drawing.Point(330, 232);
-            this.numericUpDown_ZoomSpeed.Name = "numericUpDown_ZoomSpeed";
-            this.numericUpDown_ZoomSpeed.Size = new System.Drawing.Size(40, 20);
-            this.numericUpDown_ZoomSpeed.TabIndex = 12;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(372, 234);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(15, 13);
-            this.label10.TabIndex = 14;
-            this.label10.Text = "%";
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(372, 256);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(15, 13);
-            this.label11.TabIndex = 17;
-            this.label11.Text = "%";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(6, 256);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(91, 13);
-            this.label12.TabIndex = 16;
-            this.label12.Text = "Zoom Speed Fast";
-            // 
-            // numericUpDown_ZoomSpeedFast
-            // 
-            this.numericUpDown_ZoomSpeedFast.Location = new System.Drawing.Point(330, 254);
-            this.numericUpDown_ZoomSpeedFast.Name = "numericUpDown_ZoomSpeedFast";
-            this.numericUpDown_ZoomSpeedFast.Size = new System.Drawing.Size(40, 20);
-            this.numericUpDown_ZoomSpeedFast.TabIndex = 15;
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(382, 212);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(18, 13);
-            this.label13.TabIndex = 19;
-            this.label13.Text = "px";
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(382, 190);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(18, 13);
-            this.label14.TabIndex = 18;
-            this.label14.Text = "px";
+            this.comboBox_LimitImagesToMonitor.FormattingEnabled = true;
+            this.comboBox_LimitImagesToMonitor.Items.AddRange(new object[] {
+            "NONE",
+            "HEIGHT",
+            "WIDTH"});
+            this.comboBox_LimitImagesToMonitor.Location = new System.Drawing.Point(330, 166);
+            this.comboBox_LimitImagesToMonitor.Name = "comboBox_LimitImagesToMonitor";
+            this.comboBox_LimitImagesToMonitor.Size = new System.Drawing.Size(72, 21);
+            this.comboBox_LimitImagesToMonitor.TabIndex = 21;
+            this.comboBox_LimitImagesToMonitor.Text = "HEIGHT";
             // 
             // ConfigWindow
             // 
@@ -701,6 +716,8 @@
             this.TabControl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ZoomSpeedFast)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ZoomSpeed)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_SmoothingMinImageSize)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_MinImageSize)).EndInit();
             this.tabPage3.ResumeLayout(false);
@@ -715,8 +732,6 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ZoomSpeed)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ZoomSpeedFast)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -731,7 +746,6 @@
         private System.Windows.Forms.CheckBox checkBox_SmoothingDefault;
         private System.Windows.Forms.CheckBox checkBox_BackgroundForImagesWithTransparencyDefault;
         private System.Windows.Forms.CheckBox checkBox_PositionLargeWideImagesInCorner;
-        private System.Windows.Forms.CheckBox checkBox_LimitImagesToMonitorHeight;
         private System.Windows.Forms.CheckBox checkBox_PreloadNextImage;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown numericUpDown_SmoothingMinImageSize;
@@ -776,6 +790,8 @@
         private System.Windows.Forms.NumericUpDown numericUpDown_ZoomSpeed;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.ComboBox comboBox_LimitImagesToMonitor;
+        private System.Windows.Forms.Label label15;
     }
 }
 
