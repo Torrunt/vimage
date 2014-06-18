@@ -102,6 +102,7 @@
     <Compile Include="Source\Display\ImageManipulation\OctreeQuantizer.cs" />
     <Compile Include="Source\Display\ImageManipulation\Quantizer.cs" />
     <Compile Include="Source\ImageViewer.cs" />
+    <Compile Include="Source\MenuFuncs.cs" />
     <Compile Include="Source\Program.cs" />
     <Compile Include="Source\Utils\EnumerableComparer.cs" />
     <Compile Include="Source\Utils\ImageViewerUtils.cs" />

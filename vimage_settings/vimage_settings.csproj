@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="sfmlnet-window-2">
       <HintPath>..\vimage\sfmlnet-window-2.dll</HintPath>
@@ -52,11 +55,26 @@
     <Compile Include="..\vimage\Source\Config.cs">
       <Link>Source\Config.cs</Link>
     </Compile>
+    <Compile Include="..\vimage\Source\MenuFuncs.cs">
+      <Link>Source\MenuFuncs.cs</Link>
+    </Compile>
     <Compile Include="Source\ConfigWindow.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Source\ConfigWindow.Designer.cs">
       <DependentUpon>ConfigWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Source\ContextMenuItem.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Source\ContextMenuItem.Designer.cs">
+      <DependentUpon>ContextMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Source\ControlItem.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Source\ControlItem.Designer.cs">
+      <DependentUpon>ControlItem.cs</DependentUpon>
     </Compile>
     <Compile Include="Source\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -71,7 +89,14 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="Source\ContextMenuItem.resx">
+      <DependentUpon>ContextMenuItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Source\ControlItem.resx">
+      <DependentUpon>ControlItem.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -84,6 +109,27 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bullet_arrow_down.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bullet_arrow_up.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bullet_arrow_right.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bullet_arrow_left.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cross.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

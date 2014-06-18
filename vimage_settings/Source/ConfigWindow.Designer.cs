@@ -44,95 +44,49 @@
             this.checkBox_SmoothingDefault = new System.Windows.Forms.CheckBox();
             this.checkBox_OpenAtMousePosition = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.button_Clear_OpenDuplicateImage = new System.Windows.Forms.Button();
-            this.label20 = new System.Windows.Forms.Label();
-            this.textBox_OpenDuplicateImage = new System.Windows.Forms.TextBox();
-            this.contextMenuStrip_Empty = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.button_Clear_Delete = new System.Windows.Forms.Button();
-            this.label21 = new System.Windows.Forms.Label();
-            this.textBox_Delete = new System.Windows.Forms.TextBox();
-            this.button_Clear_OpenAtLocation = new System.Windows.Forms.Button();
-            this.label22 = new System.Windows.Forms.Label();
-            this.textBox_OpenAtLocation = new System.Windows.Forms.TextBox();
-            this.button_Clear_ResetImage = new System.Windows.Forms.Button();
-            this.label23 = new System.Windows.Forms.Label();
-            this.textBox_ResetImage = new System.Windows.Forms.TextBox();
-            this.button_Clear_ReloadConfig = new System.Windows.Forms.Button();
-            this.label24 = new System.Windows.Forms.Label();
-            this.textBox_ReloadConfig = new System.Windows.Forms.TextBox();
-            this.button_Clear_OpenConfig = new System.Windows.Forms.Button();
-            this.label25 = new System.Windows.Forms.Label();
-            this.textBox_OpenConfig = new System.Windows.Forms.TextBox();
-            this.button_Clear_NextFrame = new System.Windows.Forms.Button();
-            this.label26 = new System.Windows.Forms.Label();
-            this.textBox_NextFrame = new System.Windows.Forms.TextBox();
-            this.button_Clear_PrevFrame = new System.Windows.Forms.Button();
-            this.label27 = new System.Windows.Forms.Label();
-            this.textBox_PrevFrame = new System.Windows.Forms.TextBox();
-            this.button_Clear_PauseAnimation = new System.Windows.Forms.Button();
-            this.label12 = new System.Windows.Forms.Label();
-            this.textBox_PauseAnimation = new System.Windows.Forms.TextBox();
-            this.button_Clear_ToggleAlwaysOnTop = new System.Windows.Forms.Button();
-            this.label13 = new System.Windows.Forms.Label();
-            this.textBox_ToggleAlwaysOnTop = new System.Windows.Forms.TextBox();
-            this.button_Clear_ToggleBackgroundForTransparency = new System.Windows.Forms.Button();
-            this.label14 = new System.Windows.Forms.Label();
-            this.textBox_ToggleBackgroundForTransparency = new System.Windows.Forms.TextBox();
-            this.button_Clear_ToggleSmoothing = new System.Windows.Forms.Button();
-            this.label15 = new System.Windows.Forms.Label();
-            this.textBox_ToggleSmoothing = new System.Windows.Forms.TextBox();
-            this.button_Clear_ZoomAlt = new System.Windows.Forms.Button();
-            this.label16 = new System.Windows.Forms.Label();
-            this.textBox_ZoomAlt = new System.Windows.Forms.TextBox();
-            this.button_Clear_ZoomFaster = new System.Windows.Forms.Button();
-            this.label17 = new System.Windows.Forms.Label();
-            this.textBox_ZoomFaster = new System.Windows.Forms.TextBox();
-            this.button_Clear_FitToMonitorHeightAlternative = new System.Windows.Forms.Button();
-            this.label18 = new System.Windows.Forms.Label();
-            this.textBox_FitToMonitorHeightAlternative = new System.Windows.Forms.TextBox();
-            this.button_Clear_FitToMonitorHeight = new System.Windows.Forms.Button();
-            this.label19 = new System.Windows.Forms.Label();
-            this.textBox_FitToMonitorHeight = new System.Windows.Forms.TextBox();
-            this.button_Clear_Flip = new System.Windows.Forms.Button();
-            this.label8 = new System.Windows.Forms.Label();
-            this.textBox_Flip = new System.Windows.Forms.TextBox();
-            this.button_Clear_RotateAntiClockwise = new System.Windows.Forms.Button();
-            this.label9 = new System.Windows.Forms.Label();
-            this.textBox_RotateAntiClockwise = new System.Windows.Forms.TextBox();
-            this.button_Clear_RotateClockwise = new System.Windows.Forms.Button();
-            this.label10 = new System.Windows.Forms.Label();
-            this.textBox_RotateClockwise = new System.Windows.Forms.TextBox();
-            this.button_Clear_NextImage = new System.Windows.Forms.Button();
-            this.label11 = new System.Windows.Forms.Label();
-            this.textBox_NextImage = new System.Windows.Forms.TextBox();
-            this.button_Clear_PrevImage = new System.Windows.Forms.Button();
-            this.label6 = new System.Windows.Forms.Label();
-            this.textBox_PrevImage = new System.Windows.Forms.TextBox();
-            this.button_Clear_OpenContextMenu = new System.Windows.Forms.Button();
-            this.label7 = new System.Windows.Forms.Label();
-            this.textBox_OpenContextMenu = new System.Windows.Forms.TextBox();
-            this.button_Clear_Close = new System.Windows.Forms.Button();
-            this.label4 = new System.Windows.Forms.Label();
-            this.textBox_Close = new System.Windows.Forms.TextBox();
-            this.button_Clear_Drag = new System.Windows.Forms.Button();
-            this.label5 = new System.Windows.Forms.Label();
-            this.textBox_Drag = new System.Windows.Forms.TextBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.button_ContextMenuDefault = new System.Windows.Forms.Button();
-            this.textBox_ContextMenu = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.numericUpDown_ContextMenu_Animation_InsertAtIndex = new System.Windows.Forms.NumericUpDown();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.panel3 = new System.Windows.Forms.Panel();
             this.checkBox_ContextMenuShowMargin = new System.Windows.Forms.CheckBox();
+            this.numericUpDown_ContextMenu_Animation_InsertAtIndex = new System.Windows.Forms.NumericUpDown();
+            this.label3 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.button_ContextMenuAddNew = new System.Windows.Forms.Button();
+            this.button_ContextMenuDefault = new System.Windows.Forms.Button();
+            this.tabControl_ContextMenus = new System.Windows.Forms.TabControl();
+            this.tabPage_ContextMenuGeneral = new System.Windows.Forms.TabPage();
+            this.tabPage_ContextMenuAnimation = new System.Windows.Forms.TabPage();
+            this.contextMenuStrip_Empty = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.button_Save = new System.Windows.Forms.Button();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.linkLabel2 = new System.Windows.Forms.LinkLabel();
+            this.label7 = new System.Windows.Forms.Label();
+            this.linkLabel3 = new System.Windows.Forms.LinkLabel();
+            this.linkLabel4 = new System.Windows.Forms.LinkLabel();
+            this.label8 = new System.Windows.Forms.Label();
+            this.linkLabel5 = new System.Windows.Forms.LinkLabel();
+            this.linkLabel6 = new System.Windows.Forms.LinkLabel();
+            this.label_version = new System.Windows.Forms.Label();
             this.TabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_SmoothingMinImageSize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_MinImageSize)).BeginInit();
-            this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
+            this.tableLayoutPanel2.SuspendLayout();
+            this.panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ContextMenu_Animation_InsertAtIndex)).BeginInit();
+            this.panel2.SuspendLayout();
+            this.tabControl_ContextMenus.SuspendLayout();
+            this.panel1.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
+            this.tabPage4.SuspendLayout();
             this.SuspendLayout();
             // 
             // TabControl
@@ -140,13 +94,16 @@
             this.TabControl.Controls.Add(this.tabPage1);
             this.TabControl.Controls.Add(this.tabPage2);
             this.TabControl.Controls.Add(this.tabPage3);
-            this.TabControl.Location = new System.Drawing.Point(8, 9);
+            this.TabControl.Controls.Add(this.tabPage4);
+            this.TabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TabControl.Location = new System.Drawing.Point(0, 0);
             this.TabControl.Margin = new System.Windows.Forms.Padding(0);
             this.TabControl.Name = "TabControl";
             this.TabControl.SelectedIndex = 0;
-            this.TabControl.Size = new System.Drawing.Size(409, 322);
+            this.TabControl.Size = new System.Drawing.Size(434, 331);
             this.TabControl.TabIndex = 0;
             this.TabControl.TabStop = false;
+            this.TabControl.SelectedIndexChanged += new System.EventHandler(this.TabControl_SelectedIndexChanged);
             // 
             // tabPage1
             // 
@@ -164,7 +121,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(401, 296);
+            this.tabPage1.Size = new System.Drawing.Size(426, 305);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "General";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -177,7 +134,7 @@
             this.checkBox_OpenSettingsEXE.Size = new System.Drawing.Size(324, 17);
             this.checkBox_OpenSettingsEXE.TabIndex = 10;
             this.checkBox_OpenSettingsEXE.Text = "Use vimage_settings.exe (otherwise will open config.txt directly)";
-            this.toolTip1.SetToolTip(this.checkBox_OpenSettingsEXE, "what will open when the \'Open Config\' button is clicked or the shortcut is used.");
+            this.toolTip1.SetToolTip(this.checkBox_OpenSettingsEXE, "What will open when the \'Open Config\' button is clicked or the shortcut is used.");
             this.checkBox_OpenSettingsEXE.UseVisualStyleBackColor = true;
             // 
             // label2
@@ -220,7 +177,7 @@
             this.checkBox_PreloadNextImage.Size = new System.Drawing.Size(116, 17);
             this.checkBox_PreloadNextImage.TabIndex = 5;
             this.checkBox_PreloadNextImage.Text = "Preload next image";
-            this.toolTip1.SetToolTip(this.checkBox_PreloadNextImage, "when using the next/prev image buttons, the image after the one just loaded will " +
+            this.toolTip1.SetToolTip(this.checkBox_PreloadNextImage, "When using the next/prev image buttons, the image after the one just loaded will " +
         "be loaded as well.");
             this.checkBox_PreloadNextImage.UseVisualStyleBackColor = true;
             // 
@@ -232,7 +189,7 @@
             this.checkBox_PositionLargeWideImagesInCorner.Size = new System.Drawing.Size(331, 17);
             this.checkBox_PositionLargeWideImagesInCorner.TabIndex = 4;
             this.checkBox_PositionLargeWideImagesInCorner.Text = "Position large/wide images in corner (ie: wallpapers/screenshots)";
-            this.toolTip1.SetToolTip(this.checkBox_PositionLargeWideImagesInCorner, "images that are wider than the current monitor width will be placed in the top le" +
+            this.toolTip1.SetToolTip(this.checkBox_PositionLargeWideImagesInCorner, "Images that are wider than the current monitor width will be placed in the top le" +
         "ft corner.");
             this.checkBox_PositionLargeWideImagesInCorner.UseVisualStyleBackColor = true;
             // 
@@ -254,7 +211,7 @@
             this.checkBox_BackgroundForImagesWithTransparencyDefault.Size = new System.Drawing.Size(270, 17);
             this.checkBox_BackgroundForImagesWithTransparencyDefault.TabIndex = 2;
             this.checkBox_BackgroundForImagesWithTransparencyDefault.Text = "Show background behind images with transparency";
-            this.toolTip1.SetToolTip(this.checkBox_BackgroundForImagesWithTransparencyDefault, "images with partial transparency will have a grey background behind them.");
+            this.toolTip1.SetToolTip(this.checkBox_BackgroundForImagesWithTransparencyDefault, "Images with partial transparency will have a grey background behind them.");
             this.checkBox_BackgroundForImagesWithTransparencyDefault.UseVisualStyleBackColor = true;
             // 
             // checkBox_SmoothingDefault
@@ -275,908 +232,118 @@
             this.checkBox_OpenAtMousePosition.Size = new System.Drawing.Size(173, 17);
             this.checkBox_OpenAtMousePosition.TabIndex = 0;
             this.checkBox_OpenAtMousePosition.Text = "Open images at mouse position";
-            this.toolTip1.SetToolTip(this.checkBox_OpenAtMousePosition, "when an image is opened it will be centered at the current mouse position (common" +
+            this.toolTip1.SetToolTip(this.checkBox_OpenAtMousePosition, "When an image is opened it will be centered at the current mouse position (common" +
         "ly where the image file is).");
             this.checkBox_OpenAtMousePosition.UseVisualStyleBackColor = true;
             // 
             // tabPage2
             // 
             this.tabPage2.AutoScroll = true;
-            this.tabPage2.Controls.Add(this.button_Clear_OpenDuplicateImage);
-            this.tabPage2.Controls.Add(this.label20);
-            this.tabPage2.Controls.Add(this.textBox_OpenDuplicateImage);
-            this.tabPage2.Controls.Add(this.button_Clear_Delete);
-            this.tabPage2.Controls.Add(this.label21);
-            this.tabPage2.Controls.Add(this.textBox_Delete);
-            this.tabPage2.Controls.Add(this.button_Clear_OpenAtLocation);
-            this.tabPage2.Controls.Add(this.label22);
-            this.tabPage2.Controls.Add(this.textBox_OpenAtLocation);
-            this.tabPage2.Controls.Add(this.button_Clear_ResetImage);
-            this.tabPage2.Controls.Add(this.label23);
-            this.tabPage2.Controls.Add(this.textBox_ResetImage);
-            this.tabPage2.Controls.Add(this.button_Clear_ReloadConfig);
-            this.tabPage2.Controls.Add(this.label24);
-            this.tabPage2.Controls.Add(this.textBox_ReloadConfig);
-            this.tabPage2.Controls.Add(this.button_Clear_OpenConfig);
-            this.tabPage2.Controls.Add(this.label25);
-            this.tabPage2.Controls.Add(this.textBox_OpenConfig);
-            this.tabPage2.Controls.Add(this.button_Clear_NextFrame);
-            this.tabPage2.Controls.Add(this.label26);
-            this.tabPage2.Controls.Add(this.textBox_NextFrame);
-            this.tabPage2.Controls.Add(this.button_Clear_PrevFrame);
-            this.tabPage2.Controls.Add(this.label27);
-            this.tabPage2.Controls.Add(this.textBox_PrevFrame);
-            this.tabPage2.Controls.Add(this.button_Clear_PauseAnimation);
-            this.tabPage2.Controls.Add(this.label12);
-            this.tabPage2.Controls.Add(this.textBox_PauseAnimation);
-            this.tabPage2.Controls.Add(this.button_Clear_ToggleAlwaysOnTop);
-            this.tabPage2.Controls.Add(this.label13);
-            this.tabPage2.Controls.Add(this.textBox_ToggleAlwaysOnTop);
-            this.tabPage2.Controls.Add(this.button_Clear_ToggleBackgroundForTransparency);
-            this.tabPage2.Controls.Add(this.label14);
-            this.tabPage2.Controls.Add(this.textBox_ToggleBackgroundForTransparency);
-            this.tabPage2.Controls.Add(this.button_Clear_ToggleSmoothing);
-            this.tabPage2.Controls.Add(this.label15);
-            this.tabPage2.Controls.Add(this.textBox_ToggleSmoothing);
-            this.tabPage2.Controls.Add(this.button_Clear_ZoomAlt);
-            this.tabPage2.Controls.Add(this.label16);
-            this.tabPage2.Controls.Add(this.textBox_ZoomAlt);
-            this.tabPage2.Controls.Add(this.button_Clear_ZoomFaster);
-            this.tabPage2.Controls.Add(this.label17);
-            this.tabPage2.Controls.Add(this.textBox_ZoomFaster);
-            this.tabPage2.Controls.Add(this.button_Clear_FitToMonitorHeightAlternative);
-            this.tabPage2.Controls.Add(this.label18);
-            this.tabPage2.Controls.Add(this.textBox_FitToMonitorHeightAlternative);
-            this.tabPage2.Controls.Add(this.button_Clear_FitToMonitorHeight);
-            this.tabPage2.Controls.Add(this.label19);
-            this.tabPage2.Controls.Add(this.textBox_FitToMonitorHeight);
-            this.tabPage2.Controls.Add(this.button_Clear_Flip);
-            this.tabPage2.Controls.Add(this.label8);
-            this.tabPage2.Controls.Add(this.textBox_Flip);
-            this.tabPage2.Controls.Add(this.button_Clear_RotateAntiClockwise);
-            this.tabPage2.Controls.Add(this.label9);
-            this.tabPage2.Controls.Add(this.textBox_RotateAntiClockwise);
-            this.tabPage2.Controls.Add(this.button_Clear_RotateClockwise);
-            this.tabPage2.Controls.Add(this.label10);
-            this.tabPage2.Controls.Add(this.textBox_RotateClockwise);
-            this.tabPage2.Controls.Add(this.button_Clear_NextImage);
-            this.tabPage2.Controls.Add(this.label11);
-            this.tabPage2.Controls.Add(this.textBox_NextImage);
-            this.tabPage2.Controls.Add(this.button_Clear_PrevImage);
-            this.tabPage2.Controls.Add(this.label6);
-            this.tabPage2.Controls.Add(this.textBox_PrevImage);
-            this.tabPage2.Controls.Add(this.button_Clear_OpenContextMenu);
-            this.tabPage2.Controls.Add(this.label7);
-            this.tabPage2.Controls.Add(this.textBox_OpenContextMenu);
-            this.tabPage2.Controls.Add(this.button_Clear_Close);
-            this.tabPage2.Controls.Add(this.label4);
-            this.tabPage2.Controls.Add(this.textBox_Close);
-            this.tabPage2.Controls.Add(this.button_Clear_Drag);
-            this.tabPage2.Controls.Add(this.label5);
-            this.tabPage2.Controls.Add(this.textBox_Drag);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(401, 296);
+            this.tabPage2.Size = new System.Drawing.Size(426, 305);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Control Bindings";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // button_Clear_OpenDuplicateImage
-            // 
-            this.button_Clear_OpenDuplicateImage.Location = new System.Drawing.Point(330, 560);
-            this.button_Clear_OpenDuplicateImage.Name = "button_Clear_OpenDuplicateImage";
-            this.button_Clear_OpenDuplicateImage.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_OpenDuplicateImage.TabIndex = 73;
-            this.button_Clear_OpenDuplicateImage.TabStop = false;
-            this.button_Clear_OpenDuplicateImage.Text = "Clear";
-            this.button_Clear_OpenDuplicateImage.UseVisualStyleBackColor = true;
-            this.button_Clear_OpenDuplicateImage.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label20
-            // 
-            this.label20.Location = new System.Drawing.Point(6, 565);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(152, 13);
-            this.label20.TabIndex = 72;
-            this.label20.Text = "Open Duplicate Image";
-            this.label20.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_OpenDuplicateImage
-            // 
-            this.textBox_OpenDuplicateImage.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_OpenDuplicateImage.Location = new System.Drawing.Point(164, 561);
-            this.textBox_OpenDuplicateImage.Name = "textBox_OpenDuplicateImage";
-            this.textBox_OpenDuplicateImage.ReadOnly = true;
-            this.textBox_OpenDuplicateImage.Size = new System.Drawing.Size(160, 20);
-            this.textBox_OpenDuplicateImage.TabIndex = 71;
-            this.textBox_OpenDuplicateImage.TabStop = false;
-            this.textBox_OpenDuplicateImage.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_OpenDuplicateImage.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_OpenDuplicateImage.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // contextMenuStrip_Empty
-            // 
-            this.contextMenuStrip_Empty.Name = "contextMenuStrip1";
-            this.contextMenuStrip_Empty.Size = new System.Drawing.Size(61, 4);
-            // 
-            // button_Clear_Delete
-            // 
-            this.button_Clear_Delete.Location = new System.Drawing.Point(330, 536);
-            this.button_Clear_Delete.Name = "button_Clear_Delete";
-            this.button_Clear_Delete.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_Delete.TabIndex = 70;
-            this.button_Clear_Delete.TabStop = false;
-            this.button_Clear_Delete.Text = "Clear";
-            this.button_Clear_Delete.UseVisualStyleBackColor = true;
-            this.button_Clear_Delete.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label21
-            // 
-            this.label21.Location = new System.Drawing.Point(6, 541);
-            this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(152, 13);
-            this.label21.TabIndex = 69;
-            this.label21.Text = "Delete";
-            this.label21.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_Delete
-            // 
-            this.textBox_Delete.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_Delete.Location = new System.Drawing.Point(164, 537);
-            this.textBox_Delete.Name = "textBox_Delete";
-            this.textBox_Delete.ReadOnly = true;
-            this.textBox_Delete.Size = new System.Drawing.Size(160, 20);
-            this.textBox_Delete.TabIndex = 68;
-            this.textBox_Delete.TabStop = false;
-            this.textBox_Delete.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_Delete.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_Delete.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_OpenAtLocation
-            // 
-            this.button_Clear_OpenAtLocation.Location = new System.Drawing.Point(330, 512);
-            this.button_Clear_OpenAtLocation.Name = "button_Clear_OpenAtLocation";
-            this.button_Clear_OpenAtLocation.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_OpenAtLocation.TabIndex = 67;
-            this.button_Clear_OpenAtLocation.TabStop = false;
-            this.button_Clear_OpenAtLocation.Text = "Clear";
-            this.button_Clear_OpenAtLocation.UseVisualStyleBackColor = true;
-            this.button_Clear_OpenAtLocation.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label22
-            // 
-            this.label22.Location = new System.Drawing.Point(6, 517);
-            this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(152, 13);
-            this.label22.TabIndex = 66;
-            this.label22.Text = "Open At Location";
-            this.label22.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_OpenAtLocation
-            // 
-            this.textBox_OpenAtLocation.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_OpenAtLocation.Location = new System.Drawing.Point(164, 513);
-            this.textBox_OpenAtLocation.Name = "textBox_OpenAtLocation";
-            this.textBox_OpenAtLocation.ReadOnly = true;
-            this.textBox_OpenAtLocation.Size = new System.Drawing.Size(160, 20);
-            this.textBox_OpenAtLocation.TabIndex = 65;
-            this.textBox_OpenAtLocation.TabStop = false;
-            this.textBox_OpenAtLocation.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_OpenAtLocation.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_OpenAtLocation.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_ResetImage
-            // 
-            this.button_Clear_ResetImage.Location = new System.Drawing.Point(330, 488);
-            this.button_Clear_ResetImage.Name = "button_Clear_ResetImage";
-            this.button_Clear_ResetImage.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_ResetImage.TabIndex = 64;
-            this.button_Clear_ResetImage.TabStop = false;
-            this.button_Clear_ResetImage.Text = "Clear";
-            this.button_Clear_ResetImage.UseVisualStyleBackColor = true;
-            this.button_Clear_ResetImage.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label23
-            // 
-            this.label23.Location = new System.Drawing.Point(6, 493);
-            this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(152, 13);
-            this.label23.TabIndex = 63;
-            this.label23.Text = "Reset Image";
-            this.label23.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_ResetImage
-            // 
-            this.textBox_ResetImage.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_ResetImage.Location = new System.Drawing.Point(164, 489);
-            this.textBox_ResetImage.Name = "textBox_ResetImage";
-            this.textBox_ResetImage.ReadOnly = true;
-            this.textBox_ResetImage.Size = new System.Drawing.Size(160, 20);
-            this.textBox_ResetImage.TabIndex = 62;
-            this.textBox_ResetImage.TabStop = false;
-            this.textBox_ResetImage.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_ResetImage.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_ResetImage.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_ReloadConfig
-            // 
-            this.button_Clear_ReloadConfig.Location = new System.Drawing.Point(330, 463);
-            this.button_Clear_ReloadConfig.Name = "button_Clear_ReloadConfig";
-            this.button_Clear_ReloadConfig.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_ReloadConfig.TabIndex = 61;
-            this.button_Clear_ReloadConfig.TabStop = false;
-            this.button_Clear_ReloadConfig.Text = "Clear";
-            this.button_Clear_ReloadConfig.UseVisualStyleBackColor = true;
-            this.button_Clear_ReloadConfig.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label24
-            // 
-            this.label24.Location = new System.Drawing.Point(6, 468);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(152, 13);
-            this.label24.TabIndex = 60;
-            this.label24.Text = "Reload Config";
-            this.label24.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_ReloadConfig
-            // 
-            this.textBox_ReloadConfig.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_ReloadConfig.Location = new System.Drawing.Point(164, 464);
-            this.textBox_ReloadConfig.Name = "textBox_ReloadConfig";
-            this.textBox_ReloadConfig.ReadOnly = true;
-            this.textBox_ReloadConfig.Size = new System.Drawing.Size(160, 20);
-            this.textBox_ReloadConfig.TabIndex = 59;
-            this.textBox_ReloadConfig.TabStop = false;
-            this.textBox_ReloadConfig.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_ReloadConfig.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_ReloadConfig.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_OpenConfig
-            // 
-            this.button_Clear_OpenConfig.Location = new System.Drawing.Point(330, 439);
-            this.button_Clear_OpenConfig.Name = "button_Clear_OpenConfig";
-            this.button_Clear_OpenConfig.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_OpenConfig.TabIndex = 58;
-            this.button_Clear_OpenConfig.TabStop = false;
-            this.button_Clear_OpenConfig.Text = "Clear";
-            this.button_Clear_OpenConfig.UseVisualStyleBackColor = true;
-            this.button_Clear_OpenConfig.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label25
-            // 
-            this.label25.Location = new System.Drawing.Point(6, 444);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(152, 13);
-            this.label25.TabIndex = 57;
-            this.label25.Text = "Open Config";
-            this.label25.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_OpenConfig
-            // 
-            this.textBox_OpenConfig.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_OpenConfig.Location = new System.Drawing.Point(164, 440);
-            this.textBox_OpenConfig.Name = "textBox_OpenConfig";
-            this.textBox_OpenConfig.ReadOnly = true;
-            this.textBox_OpenConfig.Size = new System.Drawing.Size(160, 20);
-            this.textBox_OpenConfig.TabIndex = 56;
-            this.textBox_OpenConfig.TabStop = false;
-            this.textBox_OpenConfig.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_OpenConfig.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_OpenConfig.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_NextFrame
-            // 
-            this.button_Clear_NextFrame.Location = new System.Drawing.Point(330, 415);
-            this.button_Clear_NextFrame.Name = "button_Clear_NextFrame";
-            this.button_Clear_NextFrame.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_NextFrame.TabIndex = 55;
-            this.button_Clear_NextFrame.TabStop = false;
-            this.button_Clear_NextFrame.Text = "Clear";
-            this.button_Clear_NextFrame.UseVisualStyleBackColor = true;
-            this.button_Clear_NextFrame.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label26
-            // 
-            this.label26.Location = new System.Drawing.Point(6, 420);
-            this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(152, 13);
-            this.label26.TabIndex = 54;
-            this.label26.Text = "Next Frame";
-            this.label26.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_NextFrame
-            // 
-            this.textBox_NextFrame.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_NextFrame.Location = new System.Drawing.Point(164, 416);
-            this.textBox_NextFrame.Name = "textBox_NextFrame";
-            this.textBox_NextFrame.ReadOnly = true;
-            this.textBox_NextFrame.Size = new System.Drawing.Size(160, 20);
-            this.textBox_NextFrame.TabIndex = 53;
-            this.textBox_NextFrame.TabStop = false;
-            this.textBox_NextFrame.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_NextFrame.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_NextFrame.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_PrevFrame
-            // 
-            this.button_Clear_PrevFrame.Location = new System.Drawing.Point(330, 391);
-            this.button_Clear_PrevFrame.Name = "button_Clear_PrevFrame";
-            this.button_Clear_PrevFrame.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_PrevFrame.TabIndex = 52;
-            this.button_Clear_PrevFrame.TabStop = false;
-            this.button_Clear_PrevFrame.Text = "Clear";
-            this.button_Clear_PrevFrame.UseVisualStyleBackColor = true;
-            this.button_Clear_PrevFrame.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label27
-            // 
-            this.label27.Location = new System.Drawing.Point(6, 396);
-            this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(152, 13);
-            this.label27.TabIndex = 51;
-            this.label27.Text = "Prev Frame";
-            this.label27.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_PrevFrame
-            // 
-            this.textBox_PrevFrame.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_PrevFrame.Location = new System.Drawing.Point(164, 392);
-            this.textBox_PrevFrame.Name = "textBox_PrevFrame";
-            this.textBox_PrevFrame.ReadOnly = true;
-            this.textBox_PrevFrame.Size = new System.Drawing.Size(160, 20);
-            this.textBox_PrevFrame.TabIndex = 50;
-            this.textBox_PrevFrame.TabStop = false;
-            this.textBox_PrevFrame.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_PrevFrame.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_PrevFrame.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_PauseAnimation
-            // 
-            this.button_Clear_PauseAnimation.Location = new System.Drawing.Point(330, 366);
-            this.button_Clear_PauseAnimation.Name = "button_Clear_PauseAnimation";
-            this.button_Clear_PauseAnimation.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_PauseAnimation.TabIndex = 49;
-            this.button_Clear_PauseAnimation.TabStop = false;
-            this.button_Clear_PauseAnimation.Text = "Clear";
-            this.button_Clear_PauseAnimation.UseVisualStyleBackColor = true;
-            this.button_Clear_PauseAnimation.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label12
-            // 
-            this.label12.Location = new System.Drawing.Point(6, 371);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(152, 13);
-            this.label12.TabIndex = 48;
-            this.label12.Text = "Pause Animation";
-            this.label12.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_PauseAnimation
-            // 
-            this.textBox_PauseAnimation.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_PauseAnimation.Location = new System.Drawing.Point(164, 367);
-            this.textBox_PauseAnimation.Name = "textBox_PauseAnimation";
-            this.textBox_PauseAnimation.ReadOnly = true;
-            this.textBox_PauseAnimation.Size = new System.Drawing.Size(160, 20);
-            this.textBox_PauseAnimation.TabIndex = 47;
-            this.textBox_PauseAnimation.TabStop = false;
-            this.textBox_PauseAnimation.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_PauseAnimation.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_PauseAnimation.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_ToggleAlwaysOnTop
-            // 
-            this.button_Clear_ToggleAlwaysOnTop.Location = new System.Drawing.Point(330, 342);
-            this.button_Clear_ToggleAlwaysOnTop.Name = "button_Clear_ToggleAlwaysOnTop";
-            this.button_Clear_ToggleAlwaysOnTop.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_ToggleAlwaysOnTop.TabIndex = 46;
-            this.button_Clear_ToggleAlwaysOnTop.TabStop = false;
-            this.button_Clear_ToggleAlwaysOnTop.Text = "Clear";
-            this.button_Clear_ToggleAlwaysOnTop.UseVisualStyleBackColor = true;
-            this.button_Clear_ToggleAlwaysOnTop.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label13
-            // 
-            this.label13.Location = new System.Drawing.Point(6, 347);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(152, 13);
-            this.label13.TabIndex = 45;
-            this.label13.Text = "Toggle Always On Top";
-            this.label13.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_ToggleAlwaysOnTop
-            // 
-            this.textBox_ToggleAlwaysOnTop.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_ToggleAlwaysOnTop.Location = new System.Drawing.Point(164, 343);
-            this.textBox_ToggleAlwaysOnTop.Name = "textBox_ToggleAlwaysOnTop";
-            this.textBox_ToggleAlwaysOnTop.ReadOnly = true;
-            this.textBox_ToggleAlwaysOnTop.Size = new System.Drawing.Size(160, 20);
-            this.textBox_ToggleAlwaysOnTop.TabIndex = 44;
-            this.textBox_ToggleAlwaysOnTop.TabStop = false;
-            this.textBox_ToggleAlwaysOnTop.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_ToggleAlwaysOnTop.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_ToggleAlwaysOnTop.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_ToggleBackgroundForTransparency
-            // 
-            this.button_Clear_ToggleBackgroundForTransparency.Location = new System.Drawing.Point(330, 318);
-            this.button_Clear_ToggleBackgroundForTransparency.Name = "button_Clear_ToggleBackgroundForTransparency";
-            this.button_Clear_ToggleBackgroundForTransparency.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_ToggleBackgroundForTransparency.TabIndex = 43;
-            this.button_Clear_ToggleBackgroundForTransparency.TabStop = false;
-            this.button_Clear_ToggleBackgroundForTransparency.Text = "Clear";
-            this.button_Clear_ToggleBackgroundForTransparency.UseVisualStyleBackColor = true;
-            this.button_Clear_ToggleBackgroundForTransparency.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label14
-            // 
-            this.label14.Location = new System.Drawing.Point(6, 323);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(152, 13);
-            this.label14.TabIndex = 42;
-            this.label14.Text = "Toggle Back for Transparency";
-            this.label14.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_ToggleBackgroundForTransparency
-            // 
-            this.textBox_ToggleBackgroundForTransparency.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_ToggleBackgroundForTransparency.Location = new System.Drawing.Point(164, 319);
-            this.textBox_ToggleBackgroundForTransparency.Name = "textBox_ToggleBackgroundForTransparency";
-            this.textBox_ToggleBackgroundForTransparency.ReadOnly = true;
-            this.textBox_ToggleBackgroundForTransparency.Size = new System.Drawing.Size(160, 20);
-            this.textBox_ToggleBackgroundForTransparency.TabIndex = 41;
-            this.textBox_ToggleBackgroundForTransparency.TabStop = false;
-            this.textBox_ToggleBackgroundForTransparency.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_ToggleBackgroundForTransparency.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_ToggleBackgroundForTransparency.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_ToggleSmoothing
-            // 
-            this.button_Clear_ToggleSmoothing.Location = new System.Drawing.Point(330, 294);
-            this.button_Clear_ToggleSmoothing.Name = "button_Clear_ToggleSmoothing";
-            this.button_Clear_ToggleSmoothing.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_ToggleSmoothing.TabIndex = 40;
-            this.button_Clear_ToggleSmoothing.TabStop = false;
-            this.button_Clear_ToggleSmoothing.Text = "Clear";
-            this.button_Clear_ToggleSmoothing.UseVisualStyleBackColor = true;
-            this.button_Clear_ToggleSmoothing.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label15
-            // 
-            this.label15.Location = new System.Drawing.Point(6, 299);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(152, 13);
-            this.label15.TabIndex = 39;
-            this.label15.Text = "Toggle Smoothing";
-            this.label15.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_ToggleSmoothing
-            // 
-            this.textBox_ToggleSmoothing.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_ToggleSmoothing.Location = new System.Drawing.Point(164, 295);
-            this.textBox_ToggleSmoothing.Name = "textBox_ToggleSmoothing";
-            this.textBox_ToggleSmoothing.ReadOnly = true;
-            this.textBox_ToggleSmoothing.Size = new System.Drawing.Size(160, 20);
-            this.textBox_ToggleSmoothing.TabIndex = 38;
-            this.textBox_ToggleSmoothing.TabStop = false;
-            this.textBox_ToggleSmoothing.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_ToggleSmoothing.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_ToggleSmoothing.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_ZoomAlt
-            // 
-            this.button_Clear_ZoomAlt.Location = new System.Drawing.Point(330, 268);
-            this.button_Clear_ZoomAlt.Name = "button_Clear_ZoomAlt";
-            this.button_Clear_ZoomAlt.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_ZoomAlt.TabIndex = 37;
-            this.button_Clear_ZoomAlt.TabStop = false;
-            this.button_Clear_ZoomAlt.Text = "Clear";
-            this.button_Clear_ZoomAlt.UseVisualStyleBackColor = true;
-            this.button_Clear_ZoomAlt.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label16
-            // 
-            this.label16.Location = new System.Drawing.Point(6, 274);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(152, 13);
-            this.label16.TabIndex = 36;
-            this.label16.Text = "Zoom Alt";
-            this.label16.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_ZoomAlt
-            // 
-            this.textBox_ZoomAlt.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_ZoomAlt.Location = new System.Drawing.Point(164, 270);
-            this.textBox_ZoomAlt.Name = "textBox_ZoomAlt";
-            this.textBox_ZoomAlt.ReadOnly = true;
-            this.textBox_ZoomAlt.Size = new System.Drawing.Size(160, 20);
-            this.textBox_ZoomAlt.TabIndex = 35;
-            this.textBox_ZoomAlt.TabStop = false;
-            this.textBox_ZoomAlt.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_ZoomAlt.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_ZoomAlt.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_ZoomFaster
-            // 
-            this.button_Clear_ZoomFaster.Location = new System.Drawing.Point(330, 244);
-            this.button_Clear_ZoomFaster.Name = "button_Clear_ZoomFaster";
-            this.button_Clear_ZoomFaster.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_ZoomFaster.TabIndex = 34;
-            this.button_Clear_ZoomFaster.TabStop = false;
-            this.button_Clear_ZoomFaster.Text = "Clear";
-            this.button_Clear_ZoomFaster.UseVisualStyleBackColor = true;
-            this.button_Clear_ZoomFaster.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label17
-            // 
-            this.label17.Location = new System.Drawing.Point(6, 250);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(152, 13);
-            this.label17.TabIndex = 33;
-            this.label17.Text = "Zoom Faster";
-            this.label17.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_ZoomFaster
-            // 
-            this.textBox_ZoomFaster.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_ZoomFaster.Location = new System.Drawing.Point(164, 246);
-            this.textBox_ZoomFaster.Name = "textBox_ZoomFaster";
-            this.textBox_ZoomFaster.ReadOnly = true;
-            this.textBox_ZoomFaster.Size = new System.Drawing.Size(160, 20);
-            this.textBox_ZoomFaster.TabIndex = 32;
-            this.textBox_ZoomFaster.TabStop = false;
-            this.textBox_ZoomFaster.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_ZoomFaster.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_ZoomFaster.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_FitToMonitorHeightAlternative
-            // 
-            this.button_Clear_FitToMonitorHeightAlternative.Location = new System.Drawing.Point(330, 220);
-            this.button_Clear_FitToMonitorHeightAlternative.Name = "button_Clear_FitToMonitorHeightAlternative";
-            this.button_Clear_FitToMonitorHeightAlternative.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_FitToMonitorHeightAlternative.TabIndex = 31;
-            this.button_Clear_FitToMonitorHeightAlternative.TabStop = false;
-            this.button_Clear_FitToMonitorHeightAlternative.Text = "Clear";
-            this.button_Clear_FitToMonitorHeightAlternative.UseVisualStyleBackColor = true;
-            this.button_Clear_FitToMonitorHeightAlternative.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label18
-            // 
-            this.label18.Location = new System.Drawing.Point(6, 226);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(152, 13);
-            this.label18.TabIndex = 30;
-            this.label18.Text = "Fit To Monitor Height Alt";
-            this.label18.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_FitToMonitorHeightAlternative
-            // 
-            this.textBox_FitToMonitorHeightAlternative.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_FitToMonitorHeightAlternative.Location = new System.Drawing.Point(164, 222);
-            this.textBox_FitToMonitorHeightAlternative.Name = "textBox_FitToMonitorHeightAlternative";
-            this.textBox_FitToMonitorHeightAlternative.ReadOnly = true;
-            this.textBox_FitToMonitorHeightAlternative.Size = new System.Drawing.Size(160, 20);
-            this.textBox_FitToMonitorHeightAlternative.TabIndex = 29;
-            this.textBox_FitToMonitorHeightAlternative.TabStop = false;
-            this.textBox_FitToMonitorHeightAlternative.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_FitToMonitorHeightAlternative.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_FitToMonitorHeightAlternative.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_FitToMonitorHeight
-            // 
-            this.button_Clear_FitToMonitorHeight.Location = new System.Drawing.Point(330, 196);
-            this.button_Clear_FitToMonitorHeight.Name = "button_Clear_FitToMonitorHeight";
-            this.button_Clear_FitToMonitorHeight.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_FitToMonitorHeight.TabIndex = 28;
-            this.button_Clear_FitToMonitorHeight.TabStop = false;
-            this.button_Clear_FitToMonitorHeight.Text = "Clear";
-            this.button_Clear_FitToMonitorHeight.UseVisualStyleBackColor = true;
-            this.button_Clear_FitToMonitorHeight.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label19
-            // 
-            this.label19.Location = new System.Drawing.Point(6, 202);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(152, 13);
-            this.label19.TabIndex = 27;
-            this.label19.Text = "Fit To Monitor Height";
-            this.label19.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_FitToMonitorHeight
-            // 
-            this.textBox_FitToMonitorHeight.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_FitToMonitorHeight.Location = new System.Drawing.Point(164, 198);
-            this.textBox_FitToMonitorHeight.Name = "textBox_FitToMonitorHeight";
-            this.textBox_FitToMonitorHeight.ReadOnly = true;
-            this.textBox_FitToMonitorHeight.Size = new System.Drawing.Size(160, 20);
-            this.textBox_FitToMonitorHeight.TabIndex = 26;
-            this.textBox_FitToMonitorHeight.TabStop = false;
-            this.textBox_FitToMonitorHeight.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_FitToMonitorHeight.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_FitToMonitorHeight.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_Flip
-            // 
-            this.button_Clear_Flip.Location = new System.Drawing.Point(330, 170);
-            this.button_Clear_Flip.Name = "button_Clear_Flip";
-            this.button_Clear_Flip.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_Flip.TabIndex = 25;
-            this.button_Clear_Flip.TabStop = false;
-            this.button_Clear_Flip.Text = "Clear";
-            this.button_Clear_Flip.UseVisualStyleBackColor = true;
-            this.button_Clear_Flip.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label8
-            // 
-            this.label8.Location = new System.Drawing.Point(6, 176);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(152, 13);
-            this.label8.TabIndex = 24;
-            this.label8.Text = "Flip";
-            this.label8.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_Flip
-            // 
-            this.textBox_Flip.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_Flip.Location = new System.Drawing.Point(164, 172);
-            this.textBox_Flip.Name = "textBox_Flip";
-            this.textBox_Flip.ReadOnly = true;
-            this.textBox_Flip.Size = new System.Drawing.Size(160, 20);
-            this.textBox_Flip.TabIndex = 23;
-            this.textBox_Flip.TabStop = false;
-            this.textBox_Flip.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_Flip.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_Flip.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_RotateAntiClockwise
-            // 
-            this.button_Clear_RotateAntiClockwise.Location = new System.Drawing.Point(330, 146);
-            this.button_Clear_RotateAntiClockwise.Name = "button_Clear_RotateAntiClockwise";
-            this.button_Clear_RotateAntiClockwise.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_RotateAntiClockwise.TabIndex = 22;
-            this.button_Clear_RotateAntiClockwise.TabStop = false;
-            this.button_Clear_RotateAntiClockwise.Text = "Clear";
-            this.button_Clear_RotateAntiClockwise.UseVisualStyleBackColor = true;
-            this.button_Clear_RotateAntiClockwise.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label9
-            // 
-            this.label9.Location = new System.Drawing.Point(6, 152);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(152, 13);
-            this.label9.TabIndex = 21;
-            this.label9.Text = "Rotate Anti-Clockwise";
-            this.label9.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_RotateAntiClockwise
-            // 
-            this.textBox_RotateAntiClockwise.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_RotateAntiClockwise.Location = new System.Drawing.Point(164, 148);
-            this.textBox_RotateAntiClockwise.Name = "textBox_RotateAntiClockwise";
-            this.textBox_RotateAntiClockwise.ReadOnly = true;
-            this.textBox_RotateAntiClockwise.Size = new System.Drawing.Size(160, 20);
-            this.textBox_RotateAntiClockwise.TabIndex = 20;
-            this.textBox_RotateAntiClockwise.TabStop = false;
-            this.textBox_RotateAntiClockwise.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_RotateAntiClockwise.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_RotateAntiClockwise.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_RotateClockwise
-            // 
-            this.button_Clear_RotateClockwise.Location = new System.Drawing.Point(330, 122);
-            this.button_Clear_RotateClockwise.Name = "button_Clear_RotateClockwise";
-            this.button_Clear_RotateClockwise.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_RotateClockwise.TabIndex = 19;
-            this.button_Clear_RotateClockwise.TabStop = false;
-            this.button_Clear_RotateClockwise.Text = "Clear";
-            this.button_Clear_RotateClockwise.UseVisualStyleBackColor = true;
-            this.button_Clear_RotateClockwise.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label10
-            // 
-            this.label10.Location = new System.Drawing.Point(6, 128);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(152, 13);
-            this.label10.TabIndex = 18;
-            this.label10.Text = "Rotate Clockwise";
-            this.label10.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_RotateClockwise
-            // 
-            this.textBox_RotateClockwise.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_RotateClockwise.Location = new System.Drawing.Point(164, 124);
-            this.textBox_RotateClockwise.Name = "textBox_RotateClockwise";
-            this.textBox_RotateClockwise.ReadOnly = true;
-            this.textBox_RotateClockwise.Size = new System.Drawing.Size(160, 20);
-            this.textBox_RotateClockwise.TabIndex = 17;
-            this.textBox_RotateClockwise.TabStop = false;
-            this.textBox_RotateClockwise.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_RotateClockwise.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_RotateClockwise.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_NextImage
-            // 
-            this.button_Clear_NextImage.Location = new System.Drawing.Point(330, 98);
-            this.button_Clear_NextImage.Name = "button_Clear_NextImage";
-            this.button_Clear_NextImage.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_NextImage.TabIndex = 16;
-            this.button_Clear_NextImage.TabStop = false;
-            this.button_Clear_NextImage.Text = "Clear";
-            this.button_Clear_NextImage.UseVisualStyleBackColor = true;
-            this.button_Clear_NextImage.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label11
-            // 
-            this.label11.Location = new System.Drawing.Point(6, 104);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(152, 13);
-            this.label11.TabIndex = 15;
-            this.label11.Text = "Next Image";
-            this.label11.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_NextImage
-            // 
-            this.textBox_NextImage.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_NextImage.Location = new System.Drawing.Point(164, 100);
-            this.textBox_NextImage.Name = "textBox_NextImage";
-            this.textBox_NextImage.ReadOnly = true;
-            this.textBox_NextImage.Size = new System.Drawing.Size(160, 20);
-            this.textBox_NextImage.TabIndex = 14;
-            this.textBox_NextImage.TabStop = false;
-            this.textBox_NextImage.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_NextImage.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_NextImage.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_PrevImage
-            // 
-            this.button_Clear_PrevImage.Location = new System.Drawing.Point(330, 73);
-            this.button_Clear_PrevImage.Name = "button_Clear_PrevImage";
-            this.button_Clear_PrevImage.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_PrevImage.TabIndex = 13;
-            this.button_Clear_PrevImage.TabStop = false;
-            this.button_Clear_PrevImage.Text = "Clear";
-            this.button_Clear_PrevImage.UseVisualStyleBackColor = true;
-            this.button_Clear_PrevImage.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label6
-            // 
-            this.label6.Location = new System.Drawing.Point(6, 79);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(152, 13);
-            this.label6.TabIndex = 12;
-            this.label6.Text = "Prev Image";
-            this.label6.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_PrevImage
-            // 
-            this.textBox_PrevImage.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_PrevImage.Location = new System.Drawing.Point(164, 75);
-            this.textBox_PrevImage.Name = "textBox_PrevImage";
-            this.textBox_PrevImage.ReadOnly = true;
-            this.textBox_PrevImage.Size = new System.Drawing.Size(160, 20);
-            this.textBox_PrevImage.TabIndex = 11;
-            this.textBox_PrevImage.TabStop = false;
-            this.textBox_PrevImage.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_PrevImage.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_PrevImage.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_OpenContextMenu
-            // 
-            this.button_Clear_OpenContextMenu.Location = new System.Drawing.Point(330, 49);
-            this.button_Clear_OpenContextMenu.Name = "button_Clear_OpenContextMenu";
-            this.button_Clear_OpenContextMenu.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_OpenContextMenu.TabIndex = 10;
-            this.button_Clear_OpenContextMenu.TabStop = false;
-            this.button_Clear_OpenContextMenu.Text = "Clear";
-            this.button_Clear_OpenContextMenu.UseVisualStyleBackColor = true;
-            this.button_Clear_OpenContextMenu.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label7
-            // 
-            this.label7.Location = new System.Drawing.Point(6, 55);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(152, 13);
-            this.label7.TabIndex = 9;
-            this.label7.Text = "Open Context Menu";
-            this.label7.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_OpenContextMenu
-            // 
-            this.textBox_OpenContextMenu.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_OpenContextMenu.Location = new System.Drawing.Point(164, 51);
-            this.textBox_OpenContextMenu.Name = "textBox_OpenContextMenu";
-            this.textBox_OpenContextMenu.ReadOnly = true;
-            this.textBox_OpenContextMenu.Size = new System.Drawing.Size(160, 20);
-            this.textBox_OpenContextMenu.TabIndex = 8;
-            this.textBox_OpenContextMenu.TabStop = false;
-            this.textBox_OpenContextMenu.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_OpenContextMenu.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_OpenContextMenu.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_Close
-            // 
-            this.button_Clear_Close.Location = new System.Drawing.Point(330, 25);
-            this.button_Clear_Close.Name = "button_Clear_Close";
-            this.button_Clear_Close.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_Close.TabIndex = 7;
-            this.button_Clear_Close.TabStop = false;
-            this.button_Clear_Close.Text = "Clear";
-            this.button_Clear_Close.UseVisualStyleBackColor = true;
-            this.button_Clear_Close.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label4
-            // 
-            this.label4.Location = new System.Drawing.Point(6, 31);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(152, 13);
-            this.label4.TabIndex = 6;
-            this.label4.Text = "Close";
-            this.label4.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_Close
-            // 
-            this.textBox_Close.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_Close.Location = new System.Drawing.Point(164, 27);
-            this.textBox_Close.Name = "textBox_Close";
-            this.textBox_Close.ReadOnly = true;
-            this.textBox_Close.Size = new System.Drawing.Size(160, 20);
-            this.textBox_Close.TabIndex = 5;
-            this.textBox_Close.TabStop = false;
-            this.textBox_Close.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_Close.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_Close.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
-            // button_Clear_Drag
-            // 
-            this.button_Clear_Drag.Location = new System.Drawing.Point(330, 1);
-            this.button_Clear_Drag.Name = "button_Clear_Drag";
-            this.button_Clear_Drag.Size = new System.Drawing.Size(48, 23);
-            this.button_Clear_Drag.TabIndex = 4;
-            this.button_Clear_Drag.TabStop = false;
-            this.button_Clear_Drag.Text = "Clear";
-            this.button_Clear_Drag.UseVisualStyleBackColor = true;
-            this.button_Clear_Drag.Click += new System.EventHandler(this.control_Clear);
-            // 
-            // label5
-            // 
-            this.label5.Location = new System.Drawing.Point(6, 7);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(152, 13);
-            this.label5.TabIndex = 3;
-            this.label5.Text = "Drag";
-            this.label5.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // textBox_Drag
-            // 
-            this.textBox_Drag.ContextMenuStrip = this.contextMenuStrip_Empty;
-            this.textBox_Drag.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.textBox_Drag.Location = new System.Drawing.Point(164, 3);
-            this.textBox_Drag.Name = "textBox_Drag";
-            this.textBox_Drag.ReadOnly = true;
-            this.textBox_Drag.Size = new System.Drawing.Size(160, 20);
-            this.textBox_Drag.TabIndex = 2;
-            this.textBox_Drag.TabStop = false;
-            this.textBox_Drag.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
-            this.textBox_Drag.Leave += new System.EventHandler(this.control_OnLoseFocus);
-            this.textBox_Drag.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
-            // 
             // tabPage3
             // 
-            this.tabPage3.Controls.Add(this.button_ContextMenuDefault);
-            this.tabPage3.Controls.Add(this.textBox_ContextMenu);
-            this.tabPage3.Controls.Add(this.label3);
-            this.tabPage3.Controls.Add(this.numericUpDown_ContextMenu_Animation_InsertAtIndex);
-            this.tabPage3.Controls.Add(this.checkBox_ContextMenuShowMargin);
+            this.tabPage3.Controls.Add(this.tableLayoutPanel2);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(401, 296);
+            this.tabPage3.Size = new System.Drawing.Size(426, 305);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Context Menu";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
+            // tableLayoutPanel2
+            // 
+            this.tableLayoutPanel2.ColumnCount = 1;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel2.Controls.Add(this.panel3, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.panel2, 0, 2);
+            this.tableLayoutPanel2.Controls.Add(this.tabControl_ContextMenus, 0, 1);
+            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 3;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(426, 305);
+            this.tableLayoutPanel2.TabIndex = 17;
+            // 
+            // panel3
+            // 
+            this.panel3.Controls.Add(this.checkBox_ContextMenuShowMargin);
+            this.panel3.Controls.Add(this.numericUpDown_ContextMenu_Animation_InsertAtIndex);
+            this.panel3.Controls.Add(this.label3);
+            this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel3.Location = new System.Drawing.Point(3, 3);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(420, 24);
+            this.panel3.TabIndex = 18;
+            // 
+            // checkBox_ContextMenuShowMargin
+            // 
+            this.checkBox_ContextMenuShowMargin.AutoSize = true;
+            this.checkBox_ContextMenuShowMargin.Location = new System.Drawing.Point(6, 4);
+            this.checkBox_ContextMenuShowMargin.Name = "checkBox_ContextMenuShowMargin";
+            this.checkBox_ContextMenuShowMargin.Size = new System.Drawing.Size(150, 17);
+            this.checkBox_ContextMenuShowMargin.TabIndex = 1;
+            this.checkBox_ContextMenuShowMargin.TabStop = false;
+            this.checkBox_ContextMenuShowMargin.Text = "Show margin/checkboxes";
+            this.toolTip1.SetToolTip(this.checkBox_ContextMenuShowMargin, "Context menu will have a margin or the left and some items will have checkboxes.");
+            this.checkBox_ContextMenuShowMargin.UseVisualStyleBackColor = true;
+            // 
+            // numericUpDown_ContextMenu_Animation_InsertAtIndex
+            // 
+            this.numericUpDown_ContextMenu_Animation_InsertAtIndex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.numericUpDown_ContextMenu_Animation_InsertAtIndex.Location = new System.Drawing.Point(379, 2);
+            this.numericUpDown_ContextMenu_Animation_InsertAtIndex.Name = "numericUpDown_ContextMenu_Animation_InsertAtIndex";
+            this.numericUpDown_ContextMenu_Animation_InsertAtIndex.Size = new System.Drawing.Size(40, 20);
+            this.numericUpDown_ContextMenu_Animation_InsertAtIndex.TabIndex = 8;
+            this.numericUpDown_ContextMenu_Animation_InsertAtIndex.TabStop = false;
+            // 
+            // label3
+            // 
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(223, 5);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(150, 13);
+            this.label3.TabIndex = 9;
+            this.label3.Text = "Insert animation menu at index";
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.button_ContextMenuAddNew);
+            this.panel2.Controls.Add(this.button_ContextMenuDefault);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(3, 278);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(420, 24);
+            this.panel2.TabIndex = 16;
+            // 
+            // button_ContextMenuAddNew
+            // 
+            this.button_ContextMenuAddNew.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button_ContextMenuAddNew.BackgroundImage = global::vimage_settings.Properties.Resources.add;
+            this.button_ContextMenuAddNew.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.button_ContextMenuAddNew.Location = new System.Drawing.Point(-1, -1);
+            this.button_ContextMenuAddNew.Name = "button_ContextMenuAddNew";
+            this.button_ContextMenuAddNew.Size = new System.Drawing.Size(23, 23);
+            this.button_ContextMenuAddNew.TabIndex = 13;
+            this.button_ContextMenuAddNew.TabStop = false;
+            this.toolTip1.SetToolTip(this.button_ContextMenuAddNew, "Add item below currently selected");
+            this.button_ContextMenuAddNew.UseVisualStyleBackColor = true;
+            this.button_ContextMenuAddNew.Click += new System.EventHandler(this.button_ContextMenuAddNew_Click);
+            // 
             // button_ContextMenuDefault
             // 
-            this.button_ContextMenuDefault.Location = new System.Drawing.Point(316, 270);
+            this.button_ContextMenuDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_ContextMenuDefault.Location = new System.Drawing.Point(346, -1);
             this.button_ContextMenuDefault.Name = "button_ContextMenuDefault";
             this.button_ContextMenuDefault.Size = new System.Drawing.Size(75, 23);
             this.button_ContextMenuDefault.TabIndex = 11;
@@ -1185,49 +352,49 @@
             this.button_ContextMenuDefault.UseVisualStyleBackColor = true;
             this.button_ContextMenuDefault.Click += new System.EventHandler(this.button_ContextMenuDefault_Click);
             // 
-            // textBox_ContextMenu
+            // tabControl_ContextMenus
             // 
-            this.textBox_ContextMenu.Location = new System.Drawing.Point(9, 31);
-            this.textBox_ContextMenu.Multiline = true;
-            this.textBox_ContextMenu.Name = "textBox_ContextMenu";
-            this.textBox_ContextMenu.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox_ContextMenu.Size = new System.Drawing.Size(382, 233);
-            this.textBox_ContextMenu.TabIndex = 10;
-            this.textBox_ContextMenu.TabStop = false;
+            this.tabControl_ContextMenus.Controls.Add(this.tabPage_ContextMenuGeneral);
+            this.tabControl_ContextMenus.Controls.Add(this.tabPage_ContextMenuAnimation);
+            this.tabControl_ContextMenus.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl_ContextMenus.Location = new System.Drawing.Point(3, 33);
+            this.tabControl_ContextMenus.Name = "tabControl_ContextMenus";
+            this.tabControl_ContextMenus.SelectedIndex = 0;
+            this.tabControl_ContextMenus.Size = new System.Drawing.Size(420, 239);
+            this.tabControl_ContextMenus.TabIndex = 19;
+            this.tabControl_ContextMenus.SelectedIndexChanged += new System.EventHandler(this.tabControl_ContextMenus_SelectedIndexChanged);
             // 
-            // label3
+            // tabPage_ContextMenuGeneral
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(222, 8);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(121, 13);
-            this.label3.TabIndex = 9;
-            this.label3.Text = "Insert animation at index";
+            this.tabPage_ContextMenuGeneral.AutoScroll = true;
+            this.tabPage_ContextMenuGeneral.BackColor = System.Drawing.Color.Gainsboro;
+            this.tabPage_ContextMenuGeneral.Location = new System.Drawing.Point(4, 22);
+            this.tabPage_ContextMenuGeneral.Name = "tabPage_ContextMenuGeneral";
+            this.tabPage_ContextMenuGeneral.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage_ContextMenuGeneral.Size = new System.Drawing.Size(412, 213);
+            this.tabPage_ContextMenuGeneral.TabIndex = 0;
+            this.tabPage_ContextMenuGeneral.Text = "General";
             // 
-            // numericUpDown_ContextMenu_Animation_InsertAtIndex
+            // tabPage_ContextMenuAnimation
             // 
-            this.numericUpDown_ContextMenu_Animation_InsertAtIndex.Location = new System.Drawing.Point(351, 5);
-            this.numericUpDown_ContextMenu_Animation_InsertAtIndex.Name = "numericUpDown_ContextMenu_Animation_InsertAtIndex";
-            this.numericUpDown_ContextMenu_Animation_InsertAtIndex.Size = new System.Drawing.Size(40, 20);
-            this.numericUpDown_ContextMenu_Animation_InsertAtIndex.TabIndex = 8;
-            this.numericUpDown_ContextMenu_Animation_InsertAtIndex.TabStop = false;
+            this.tabPage_ContextMenuAnimation.AutoScroll = true;
+            this.tabPage_ContextMenuAnimation.BackColor = System.Drawing.Color.Gainsboro;
+            this.tabPage_ContextMenuAnimation.Location = new System.Drawing.Point(4, 22);
+            this.tabPage_ContextMenuAnimation.Name = "tabPage_ContextMenuAnimation";
+            this.tabPage_ContextMenuAnimation.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage_ContextMenuAnimation.Size = new System.Drawing.Size(412, 213);
+            this.tabPage_ContextMenuAnimation.TabIndex = 1;
+            this.tabPage_ContextMenuAnimation.Text = "Animation";
             // 
-            // checkBox_ContextMenuShowMargin
+            // contextMenuStrip_Empty
             // 
-            this.checkBox_ContextMenuShowMargin.AutoSize = true;
-            this.checkBox_ContextMenuShowMargin.Location = new System.Drawing.Point(9, 7);
-            this.checkBox_ContextMenuShowMargin.Name = "checkBox_ContextMenuShowMargin";
-            this.checkBox_ContextMenuShowMargin.Size = new System.Drawing.Size(150, 17);
-            this.checkBox_ContextMenuShowMargin.TabIndex = 1;
-            this.checkBox_ContextMenuShowMargin.TabStop = false;
-            this.checkBox_ContextMenuShowMargin.Text = "Show margin/checkboxes";
-            this.toolTip1.SetToolTip(this.checkBox_ContextMenuShowMargin, "context menu will have a margin or the left and some items will have checkboxes.");
-            this.checkBox_ContextMenuShowMargin.UseVisualStyleBackColor = true;
+            this.contextMenuStrip_Empty.Name = "contextMenuStrip1";
+            this.contextMenuStrip_Empty.Size = new System.Drawing.Size(61, 4);
             // 
             // button_Save
             // 
             this.button_Save.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_Save.Location = new System.Drawing.Point(342, 334);
+            this.button_Save.Location = new System.Drawing.Point(354, 1);
             this.button_Save.Name = "button_Save";
             this.button_Save.Size = new System.Drawing.Size(75, 23);
             this.button_Save.TabIndex = 10;
@@ -1238,8 +405,9 @@
             // 
             // linkLabel1
             // 
+            this.linkLabel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(9, 339);
+            this.linkLabel1.Location = new System.Drawing.Point(3, 6);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(94, 13);
             this.linkLabel1.TabIndex = 11;
@@ -1251,18 +419,174 @@
             // 
             this.toolTip1.ShowAlways = true;
             // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.linkLabel1);
+            this.panel1.Controls.Add(this.button_Save);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(3, 334);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(428, 24);
+            this.panel1.TabIndex = 12;
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.TabControl, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 1);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 2;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(434, 361);
+            this.tableLayoutPanel1.TabIndex = 13;
+            // 
+            // tabPage4
+            // 
+            this.tabPage4.AutoScroll = true;
+            this.tabPage4.Controls.Add(this.label_version);
+            this.tabPage4.Controls.Add(this.linkLabel6);
+            this.tabPage4.Controls.Add(this.linkLabel5);
+            this.tabPage4.Controls.Add(this.linkLabel4);
+            this.tabPage4.Controls.Add(this.label8);
+            this.tabPage4.Controls.Add(this.linkLabel3);
+            this.tabPage4.Controls.Add(this.label7);
+            this.tabPage4.Controls.Add(this.linkLabel2);
+            this.tabPage4.Controls.Add(this.label6);
+            this.tabPage4.Controls.Add(this.label5);
+            this.tabPage4.Controls.Add(this.label4);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Size = new System.Drawing.Size(426, 305);
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "About";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(10, 43);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(188, 13);
+            this.label4.TabIndex = 0;
+            this.label4.Text = "A simplistic image viewer for Windows.";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(8, 9);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(87, 25);
+            this.label5.TabIndex = 1;
+            this.label5.Text = "vimage";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(10, 122);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(211, 13);
+            this.label6.TabIndex = 14;
+            this.label6.Text = "Created by Corey Zeke Womack (Torrunt) -\r\n";
+            // 
+            // linkLabel2
+            // 
+            this.linkLabel2.AutoSize = true;
+            this.linkLabel2.Location = new System.Drawing.Point(220, 122);
+            this.linkLabel2.Name = "linkLabel2";
+            this.linkLabel2.Size = new System.Drawing.Size(80, 13);
+            this.linkLabel2.TabIndex = 12;
+            this.linkLabel2.TabStop = true;
+            this.linkLabel2.Text = "me@torrunt.net";
+            this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel2_LinkClicked);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(10, 145);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(132, 13);
+            this.label7.TabIndex = 16;
+            this.label7.Text = "Image Loading via DevIL -";
+            // 
+            // linkLabel3
+            // 
+            this.linkLabel3.AutoSize = true;
+            this.linkLabel3.Location = new System.Drawing.Point(142, 145);
+            this.linkLabel3.Name = "linkLabel3";
+            this.linkLabel3.Size = new System.Drawing.Size(112, 13);
+            this.linkLabel3.TabIndex = 15;
+            this.linkLabel3.TabStop = true;
+            this.linkLabel3.Text = "openil.sourceforge.net";
+            this.linkLabel3.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel3_LinkClicked);
+            // 
+            // linkLabel4
+            // 
+            this.linkLabel4.AutoSize = true;
+            this.linkLabel4.Location = new System.Drawing.Point(48, 168);
+            this.linkLabel4.Name = "linkLabel4";
+            this.linkLabel4.Size = new System.Drawing.Size(150, 13);
+            this.linkLabel4.TabIndex = 17;
+            this.linkLabel4.TabStop = true;
+            this.linkLabel4.Text = "famfamfam.com/lab/icons/silk";
+            this.linkLabel4.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel4_LinkClicked);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(10, 168);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(39, 13);
+            this.label8.TabIndex = 18;
+            this.label8.Text = "Icons -";
+            // 
+            // linkLabel5
+            // 
+            this.linkLabel5.AutoSize = true;
+            this.linkLabel5.Location = new System.Drawing.Point(10, 71);
+            this.linkLabel5.Name = "linkLabel5";
+            this.linkLabel5.Size = new System.Drawing.Size(94, 13);
+            this.linkLabel5.TabIndex = 12;
+            this.linkLabel5.TabStop = true;
+            this.linkLabel5.Text = "torrunt.net/vimage";
+            this.linkLabel5.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            // 
+            // linkLabel6
+            // 
+            this.linkLabel6.AutoSize = true;
+            this.linkLabel6.Location = new System.Drawing.Point(10, 87);
+            this.linkLabel6.Name = "linkLabel6";
+            this.linkLabel6.Size = new System.Drawing.Size(137, 13);
+            this.linkLabel6.TabIndex = 19;
+            this.linkLabel6.TabStop = true;
+            this.linkLabel6.Text = "github.com/Torrunt/vimage";
+            this.linkLabel6.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel6_LinkClicked);
+            // 
+            // label_version
+            // 
+            this.label_version.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label_version.AutoSize = true;
+            this.label_version.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label_version.Location = new System.Drawing.Point(346, 13);
+            this.label_version.Name = "label_version";
+            this.label_version.Size = new System.Drawing.Size(72, 20);
+            this.label_version.TabIndex = 20;
+            this.label_version.Text = "version #";
+            // 
             // ConfigWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(424, 361);
-            this.Controls.Add(this.linkLabel1);
-            this.Controls.Add(this.button_Save);
-            this.Controls.Add(this.TabControl);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.ClientSize = new System.Drawing.Size(434, 361);
+            this.Controls.Add(this.tableLayoutPanel1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(400, 280);
+            this.MinimumSize = new System.Drawing.Size(450, 322);
             this.Name = "ConfigWindow";
             this.Text = "vimage settings";
             this.TabControl.ResumeLayout(false);
@@ -1270,13 +594,19 @@
             this.tabPage1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_SmoothingMinImageSize)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_MinImageSize)).EndInit();
-            this.tabPage2.ResumeLayout(false);
-            this.tabPage2.PerformLayout();
             this.tabPage3.ResumeLayout(false);
-            this.tabPage3.PerformLayout();
+            this.tableLayoutPanel2.ResumeLayout(false);
+            this.panel3.ResumeLayout(false);
+            this.panel3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ContextMenu_Animation_InsertAtIndex)).EndInit();
+            this.panel2.ResumeLayout(false);
+            this.tabControl_ContextMenus.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tabPage4.ResumeLayout(false);
+            this.tabPage4.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -1292,7 +622,6 @@
         private System.Windows.Forms.CheckBox checkBox_PositionLargeWideImagesInCorner;
         private System.Windows.Forms.CheckBox checkBox_LimitImagesToMonitorHeight;
         private System.Windows.Forms.CheckBox checkBox_PreloadNextImage;
-        private System.Windows.Forms.CheckBox checkBox_ContextMenuShowMargin;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown numericUpDown_SmoothingMinImageSize;
         private System.Windows.Forms.Label label1;
@@ -1301,83 +630,32 @@
         private System.Windows.Forms.CheckBox checkBox_OpenSettingsEXE;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown numericUpDown_ContextMenu_Animation_InsertAtIndex;
-        private System.Windows.Forms.Button button_Clear_Flip;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.TextBox textBox_Flip;
-        private System.Windows.Forms.Button button_Clear_RotateAntiClockwise;
-        private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.TextBox textBox_RotateAntiClockwise;
-        private System.Windows.Forms.Button button_Clear_RotateClockwise;
-        private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.TextBox textBox_RotateClockwise;
-        private System.Windows.Forms.Button button_Clear_NextImage;
-        private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.TextBox textBox_NextImage;
-        private System.Windows.Forms.Button button_Clear_PrevImage;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox textBox_PrevImage;
-        private System.Windows.Forms.Button button_Clear_OpenContextMenu;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.TextBox textBox_OpenContextMenu;
-        private System.Windows.Forms.Button button_Clear_Close;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox textBox_Close;
-        private System.Windows.Forms.Button button_Clear_Drag;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox textBox_Drag;
-        private System.Windows.Forms.Button button_Clear_PauseAnimation;
-        private System.Windows.Forms.Label label12;
-        private System.Windows.Forms.TextBox textBox_PauseAnimation;
-        private System.Windows.Forms.Button button_Clear_ToggleAlwaysOnTop;
-        private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.TextBox textBox_ToggleAlwaysOnTop;
-        private System.Windows.Forms.Button button_Clear_ToggleBackgroundForTransparency;
-        private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.TextBox textBox_ToggleBackgroundForTransparency;
-        private System.Windows.Forms.Button button_Clear_ToggleSmoothing;
-        private System.Windows.Forms.Label label15;
-        private System.Windows.Forms.TextBox textBox_ToggleSmoothing;
-        private System.Windows.Forms.Button button_Clear_ZoomAlt;
-        private System.Windows.Forms.Label label16;
-        private System.Windows.Forms.TextBox textBox_ZoomAlt;
-        private System.Windows.Forms.Button button_Clear_ZoomFaster;
-        private System.Windows.Forms.Label label17;
-        private System.Windows.Forms.TextBox textBox_ZoomFaster;
-        private System.Windows.Forms.Button button_Clear_FitToMonitorHeightAlternative;
-        private System.Windows.Forms.Label label18;
-        private System.Windows.Forms.TextBox textBox_FitToMonitorHeightAlternative;
-        private System.Windows.Forms.Button button_Clear_FitToMonitorHeight;
-        private System.Windows.Forms.Label label19;
-        private System.Windows.Forms.TextBox textBox_FitToMonitorHeight;
-        private System.Windows.Forms.Button button_Clear_OpenDuplicateImage;
-        private System.Windows.Forms.Label label20;
-        private System.Windows.Forms.TextBox textBox_OpenDuplicateImage;
-        private System.Windows.Forms.Button button_Clear_Delete;
-        private System.Windows.Forms.Label label21;
-        private System.Windows.Forms.TextBox textBox_Delete;
-        private System.Windows.Forms.Button button_Clear_OpenAtLocation;
-        private System.Windows.Forms.Label label22;
-        private System.Windows.Forms.TextBox textBox_OpenAtLocation;
-        private System.Windows.Forms.Button button_Clear_ResetImage;
-        private System.Windows.Forms.Label label23;
-        private System.Windows.Forms.TextBox textBox_ResetImage;
-        private System.Windows.Forms.Button button_Clear_ReloadConfig;
-        private System.Windows.Forms.Label label24;
-        private System.Windows.Forms.TextBox textBox_ReloadConfig;
-        private System.Windows.Forms.Button button_Clear_OpenConfig;
-        private System.Windows.Forms.Label label25;
-        private System.Windows.Forms.TextBox textBox_OpenConfig;
-        private System.Windows.Forms.Button button_Clear_NextFrame;
-        private System.Windows.Forms.Label label26;
-        private System.Windows.Forms.TextBox textBox_NextFrame;
-        private System.Windows.Forms.Button button_Clear_PrevFrame;
-        private System.Windows.Forms.Label label27;
-        private System.Windows.Forms.TextBox textBox_PrevFrame;
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.Button button_ContextMenuDefault;
-        private System.Windows.Forms.TextBox textBox_ContextMenu;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip_Empty;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Button button_ContextMenuAddNew;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.CheckBox checkBox_ContextMenuShowMargin;
+        private System.Windows.Forms.TabControl tabControl_ContextMenus;
+        private System.Windows.Forms.TabPage tabPage_ContextMenuGeneral;
+        private System.Windows.Forms.TabPage tabPage_ContextMenuAnimation;
+        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.LinkLabel linkLabel2;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.LinkLabel linkLabel3;
+        private System.Windows.Forms.LinkLabel linkLabel4;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.LinkLabel linkLabel5;
+        private System.Windows.Forms.LinkLabel linkLabel6;
+        private System.Windows.Forms.Label label_version;
     }
 }
 

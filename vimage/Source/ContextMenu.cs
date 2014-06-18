@@ -14,35 +14,6 @@ namespace vimage
 
         private Dictionary<string, string> FuncByName;
 
-        public const string CLOSE = "CLOSE";
-        public const string NEXT_IMAGE = "NEXTIMAGE";
-        public const string PREV_IMAGE = "PREVIMAGE";
-        public const string ROTATE_CLOCKWISE = "ROTATECLOCKWISE";
-        public const string ROTATE_ANTICLOCKWISE = "ROTATEANTICLOCKWISE";
-        public const string FLIP = "FLIP";
-        public const string FIT_TO_HEIGHT = "FITTOHEIGHT";
-        public const string RESET_IMAGE = "RESETIMAGE";
-        public const string TOGGLE_SMOOTHING = "TOGGLESMOOTHING";
-        public const string TOGGLE_BACKGROUND = "TOGGLEBACKGROUND";
-        public const string ALWAYS_ON_TOP = "ALWAYSONTOP";
-        public const string OPEN_FILE_LOCATION = "OPENFILELOCATION";
-        public const string DELETE = "DELETE";
-        public const string OPEN_SETTINGS = "OPENSETTINGS";
-        public const string RELOAD_SETTINGS = "RELOADSETTINGS";
-        public const string VERSION_NAME = "VERSIONNAME";
-
-        public const string SORT_NAME = "SORTNAME";
-        public const string SORT_DATE_MODIFIED = "SORTDATEMODIFIED";
-        public const string SORT_DATE_CREATED = "SORTDATECREATED";
-        public const string SORT_SIZE = "SORTSIZE";
-        public const string SORT_ASCENDING = "SORTASCENDING";
-        public const string SORT_DESCENDING = "SORTDESCENDING";
-
-        public const string NEXT_FRAME = "NEXTFRAME";
-        public const string PREV_FRAME = "PREVFRAME";
-        public const string TOGGLE_ANIMATION = "TOGGLEANIMATION";
-
-
         public ContextMenu(ImageViewer ImageViewer)
             : base()
         {
@@ -53,71 +24,51 @@ namespace vimage
         {
             FuncByName = new Dictionary<string, string>();
 
+            // General
             Items_General = new List<string>();
-            for (int i = 0; i < General.Count; i++)
+            LoadItemsInto(Items_General, General);
+
+            // Animation
+            Items_Animation = new List<string>(Items_General);
+            List<string> list = new List<string>();
+
+            // inserting into submenu?
+            int depth = 0;
+            if (Items_Animation[AnimationInsertAtIndex].IndexOf(":") == 0)
+                depth = Items_Animation[AnimationInsertAtIndex].Split(':').Length - 1;
+
+            LoadItemsInto(list, Animation, depth);
+            Items_Animation.InsertRange(AnimationInsertAtIndex, list);
+        }
+        private void LoadItemsInto(List<string> list, List<object> items, int depth = 0)
+        {
+            for (int i = 0; i < items.Count; i++)
             {
-                if (General[i] is string)
+                if (items[i] is string)
                 {
                     // Submenu
-                    Items_General.Add(General[i] + ":");
-                    FuncByName.Add(General[i] as string, General[i] as string);
-                }
-                else if (General[i] is List<object>)
-                {
-                    // Submenu Item
-                    for (int s = 0; s < (General[i] as List<object>).Count; s++)
-                    {
-                        Items_General.Add(":" + ((General[i] as List<object>)[s] as dynamic).name);
-                        if (!(((General[i] as List<object>)[s] as dynamic).name as string).Equals("-"))
-                            FuncByName.Add(((General[i] as List<object>)[s] as dynamic).name, ((General[i] as List<object>)[s] as dynamic).func);
-                    }
+                    list.Add(VariableAmountOfStrings(depth, ":") + items[i] + ":");
+                    FuncByName.Add(items[i] as string, items[i] as string);
+
+                    i++;
+                    LoadItemsInto(list, (items[i] as List<object>), depth + 1);
                 }
                 else
                 {
                     // Item
-                    if (((General[i] as dynamic).func as string).Equals(VERSION_NAME))
+                    if (((items[i] as dynamic).func as string).Equals(MenuFuncs.VERSION_NAME))
                     {
-                        Items_General.Add(ImageViewer.VERSION_NAME);
-                        FuncByName.Add(ImageViewer.VERSION_NAME, (General[i] as dynamic).func);
+                        list.Add(ImageViewer.VERSION_NAME);
+                        FuncByName.Add(ImageViewer.VERSION_NAME, (items[i] as dynamic).func);
                     }
                     else
                     {
-                        Items_General.Add((General[i] as dynamic).name);
-                        if (!((General[i] as dynamic).name as string).Equals("-"))
-                            FuncByName.Add((General[i] as dynamic).name, (General[i] as dynamic).func);
+                        list.Add(VariableAmountOfStrings(depth, ":") + (items[i] as dynamic).name);
+                        if (!((items[i] as dynamic).name as string).Equals("-"))
+                            FuncByName.Add((items[i] as dynamic).name, (items[i] as dynamic).func);
                     }
                 }
             }
-
-            Items_Animation = new List<string>(Items_General);
-            List<string> items = new List<string>();
-            for (int i = 0; i < Animation.Count; i++)
-            {
-                if (Animation[i] is string)
-                {
-                    // Submenu
-                    items.Add(Animation[i] + ":");
-                    FuncByName.Add(Animation[i] as string, Animation[i] as string);
-                }
-                else if (Animation[i] is List<object>)
-                {
-                    // Submenu Item
-                    for (int s = 0; s < (Animation[i] as List<object>).Count; s++)
-                    {
-                        items.Add(":" + ((Animation[i] as List<object>)[s] as dynamic).name);
-                        if (!(((Animation[i] as List<object>)[s] as dynamic).name as string).Equals("-"))
-                            FuncByName.Add(((Animation[i] as List<object>)[s] as dynamic).name, ((Animation[i] as List<object>)[s] as dynamic).func);
-                    }
-                }
-                else
-                {
-                    // Item
-                    items.Add((Animation[i] as dynamic).name);
-                    if (!((Animation[i] as dynamic).name as string).Equals("-"))
-                        FuncByName.Add((Animation[i] as dynamic).name, (Animation[i] as dynamic).func);
-                }
-            }
-            Items_Animation.InsertRange(AnimationInsertAtIndex, items);
         }
 
         public void Setup(bool force)
@@ -146,18 +97,25 @@ namespace vimage
                 string name = items[i];
                 bool itemClickable = true;
 
-                if (name.IndexOf(":") == name.Length - 1)
+                if (name.LastIndexOf(":") == name.Length - 1)
                 {
                     // non-clickable item?
                     name = name.Substring(0, name.Length - 1);
                     itemClickable = false;
                 }
 
-                if (items[i].IndexOf(":") == 0)
+                if (name.IndexOf(":") == 0)
                 {
                     // sub item
                     ToolStripDropDownItem dropDownItem = Items[Items.Count - 1] as ToolStripDropDownItem;
-                    name = items[i].Substring(1);
+                    name = name.Substring(1);
+                    while (name.IndexOf(":") == 0)
+                    {
+                        if (dropDownItem.DropDownItems.Count > 0)
+                            dropDownItem = dropDownItem.DropDownItems[dropDownItem.DropDownItems.Count - 1] as ToolStripDropDownItem;
+                        name = name.Substring(1);
+                    }
+
                     item = dropDownItem.DropDownItems.Add(name);
                 }
                 else
@@ -183,38 +141,38 @@ namespace vimage
         {
             ToolStripMenuItem item;
 
-            item = GetItemByFunc(FLIP);
+            item = GetItemByFunc(MenuFuncs.FLIP);
             if (item != null) item.Checked = ImageViewer.FlippedX;
 
-            item = GetItemByFunc(FIT_TO_HEIGHT);
+            item = GetItemByFunc(MenuFuncs.FIT_TO_HEIGHT);
             if (item != null) item.Checked = ImageViewer.FitToMonitorHeight;
 
-            item = GetItemByFunc(TOGGLE_SMOOTHING);
+            item = GetItemByFunc(MenuFuncs.TOGGLE_SMOOTHING);
             if (item != null) item.Checked = ImageViewer.Smoothing();
 
-            item = GetItemByFunc(TOGGLE_BACKGROUND);
+            item = GetItemByFunc(MenuFuncs.TOGGLE_BACKGROUND);
             if (item != null) item.Checked = ImageViewer.BackgroundsForImagesWithTransparency;
 
-            item = GetItemByFunc(ALWAYS_ON_TOP);
+            item = GetItemByFunc(MenuFuncs.ALWAYS_ON_TOP);
             if (item != null) item.Checked = ImageViewer.AlwaysOnTop;
 
 
-            item = GetItemByFunc(SORT_NAME);
+            item = GetItemByFunc(MenuFuncs.SORT_NAME);
             if (item != null) item.Checked = ImageViewer.SortImagesBy == SortBy.Name;
 
-            item = GetItemByFunc(SORT_DATE_MODIFIED);
+            item = GetItemByFunc(MenuFuncs.SORT_DATE_MODIFIED);
             if (item != null) item.Checked = ImageViewer.SortImagesBy == SortBy.DateModified;
 
-            item = GetItemByFunc(SORT_DATE_CREATED);
+            item = GetItemByFunc(MenuFuncs.SORT_DATE_CREATED);
             if (item != null) item.Checked = ImageViewer.SortImagesBy == SortBy.DateCreated;
 
-            item = GetItemByFunc(SORT_SIZE);
+            item = GetItemByFunc(MenuFuncs.SORT_SIZE);
             if (item != null) item.Checked = ImageViewer.SortImagesBy == SortBy.Size;
 
-            item = GetItemByFunc(SORT_ASCENDING);
+            item = GetItemByFunc(MenuFuncs.SORT_ASCENDING);
             if (item != null) item.Checked = ImageViewer.SortImagesByDir == SortDirection.Ascending;
 
-            item = GetItemByFunc(SORT_DESCENDING);
+            item = GetItemByFunc(MenuFuncs.SORT_DESCENDING);
             if (item != null) item.Checked = ImageViewer.SortImagesByDir == SortDirection.Descending;
         }
 
@@ -227,95 +185,83 @@ namespace vimage
 
             switch (FuncByName[item.Name])
             {
-                case CLOSE: ImageViewer.CloseNextTick = true; break;
+                case MenuFuncs.CLOSE: ImageViewer.CloseNextTick = true; break;
 
-                case NEXT_IMAGE: ImageViewer.NextImage(); break;
-                case PREV_IMAGE: ImageViewer.PrevImage(); break;
+                case MenuFuncs.NEXT_IMAGE: ImageViewer.NextImage(); break;
+                case MenuFuncs.PREV_IMAGE: ImageViewer.PrevImage(); break;
 
-                case SORT_NAME: ImageViewer.ChangeSortBy(SortBy.Name); break;
-                case SORT_DATE_MODIFIED: ImageViewer.ChangeSortBy(SortBy.DateModified); break;
-                case SORT_DATE_CREATED: ImageViewer.ChangeSortBy(SortBy.DateCreated); break;
-                case SORT_SIZE: ImageViewer.ChangeSortBy(SortBy.Size); break;
-                case SORT_ASCENDING: ImageViewer.ChangeSortByDirection(SortDirection.Ascending); break;
-                case SORT_DESCENDING: ImageViewer.ChangeSortByDirection(SortDirection.Descending); break;
+                case MenuFuncs.SORT_NAME: ImageViewer.ChangeSortBy(SortBy.Name); break;
+                case MenuFuncs.SORT_DATE_MODIFIED: ImageViewer.ChangeSortBy(SortBy.DateModified); break;
+                case MenuFuncs.SORT_DATE_CREATED: ImageViewer.ChangeSortBy(SortBy.DateCreated); break;
+                case MenuFuncs.SORT_SIZE: ImageViewer.ChangeSortBy(SortBy.Size); break;
+                case MenuFuncs.SORT_ASCENDING: ImageViewer.ChangeSortByDirection(SortDirection.Ascending); break;
+                case MenuFuncs.SORT_DESCENDING: ImageViewer.ChangeSortByDirection(SortDirection.Descending); break;
 
-                case NEXT_FRAME: ImageViewer.NextFrame(); break;
-                case PREV_FRAME: ImageViewer.PrevFrame(); break;
-                case TOGGLE_ANIMATION: ImageViewer.ToggleAnimation(); break;
+                case MenuFuncs.NEXT_FRAME: ImageViewer.NextFrame(); break;
+                case MenuFuncs.PREV_FRAME: ImageViewer.PrevFrame(); break;
+                case MenuFuncs.TOGGLE_ANIMATION: ImageViewer.ToggleAnimation(); break;
 
-                case ROTATE_CLOCKWISE: ImageViewer.RotateImage((int)ImageViewer.Image.Rotation + 90); break;
-                case ROTATE_ANTICLOCKWISE: ImageViewer.RotateImage((int)ImageViewer.Image.Rotation - 90); break;
-                case FLIP: ImageViewer.FlipImage(); break;
-                case FIT_TO_HEIGHT: ImageViewer.ToggleFitToMonitorHeight(); break;
-                case RESET_IMAGE: ImageViewer.ResetImage(); break;
-                case TOGGLE_SMOOTHING: ImageViewer.ToggleSmoothing(); break;
-                case TOGGLE_BACKGROUND: ImageViewer.ToggleBackground(); break;
-                case ALWAYS_ON_TOP: ImageViewer.ToggleAlwaysOnTop(); break;
+                case MenuFuncs.ROTATE_CLOCKWISE: ImageViewer.RotateImage((int)ImageViewer.Image.Rotation + 90); break;
+                case MenuFuncs.ROTATE_ANTICLOCKWISE: ImageViewer.RotateImage((int)ImageViewer.Image.Rotation - 90); break;
+                case MenuFuncs.FLIP: ImageViewer.FlipImage(); break;
+                case MenuFuncs.FIT_TO_HEIGHT: ImageViewer.ToggleFitToMonitorHeight(); break;
+                case MenuFuncs.RESET_IMAGE: ImageViewer.ResetImage(); break;
+                case MenuFuncs.TOGGLE_SMOOTHING: ImageViewer.ToggleSmoothing(); break;
+                case MenuFuncs.TOGGLE_BACKGROUND: ImageViewer.ToggleBackground(); break;
+                case MenuFuncs.ALWAYS_ON_TOP: ImageViewer.ToggleAlwaysOnTop(); break;
 
-                case OPEN_FILE_LOCATION: ImageViewer.OpenFileAtLocation(); break;
-                case DELETE: ImageViewer.DeleteFile(); break;
+                case MenuFuncs.OPEN_FILE_LOCATION: ImageViewer.OpenFileAtLocation(); break;
+                case MenuFuncs.DELETE: ImageViewer.DeleteFile(); break;
 
-                case OPEN_SETTINGS: ImageViewer.OpenConfig(); break;
-                case RELOAD_SETTINGS: ImageViewer.ReloadConfig(); break;
+                case MenuFuncs.OPEN_SETTINGS: ImageViewer.OpenConfig(); break;
+                case MenuFuncs.RELOAD_SETTINGS: ImageViewer.ReloadConfig(); break;
 
-                case VERSION_NAME: Process.Start("http://torrunt.net/vimage"); break;
+                case MenuFuncs.VERSION_NAME: Process.Start("http://torrunt.net/vimage"); break;
             }
         }
 
         /// <summary>returns the ToolStripMenuItem based on the name of the function.</summary>
         public ToolStripMenuItem GetItemByFunc(string func)
         {
-            ToolStripDropDownItem lastSubMenu = null;
+            ToolStripMenuItem item = null;
+            item = GetItemByFuncFrom(func, ImageViewer.Config.ContextMenu, Items);
+            if (item == null)
+                item = GetItemByFuncFrom(func, ImageViewer.Config.ContextMenu_Animation, Items);
 
-            // ContextMenu
-            for (int i = 0; i < Items.Count; i++)
+            return item;
+        }
+        private ToolStripMenuItem GetItemByFuncFrom(string func, List<object> list, ToolStripItemCollection collection)
+        {
+            for (int i = 0; i < collection.Count; i++)
             {
-                for (int c = 0; c < ImageViewer.Config.ContextMenu.Count; c++)
+                for (int c = 0; c < list.Count; c++)
                 {
-                    if (ImageViewer.Config.ContextMenu[c] is string)
+                    if (list[c] is string)
                     {
                         // Submenu
-                        lastSubMenu = Items[(ImageViewer.Config.ContextMenu[c] as string)] as ToolStripDropDownItem;
+                        ToolStripDropDownItem submenu = (collection[(list[c] as string)] as ToolStripDropDownItem);
+                        c++;
+                        ToolStripMenuItem item = GetItemByFuncFrom(func, (list[c] as List<object>), submenu.DropDownItems);
+                        if (item != null)
+                            return item;
                     }
-                    else if (ImageViewer.Config.ContextMenu[c] is List<object>)
-                    {
-                        // Submenu items
-                        for (int s = 0; s < (ImageViewer.Config.ContextMenu[c] as List<object>).Count; s++)
-                        {
-                            if (((ImageViewer.Config.ContextMenu[c] as List<object>)[s] as dynamic).func == func)
-                                return lastSubMenu.DropDownItems[((ImageViewer.Config.ContextMenu[c] as List<object>)[s] as dynamic).name] as ToolStripMenuItem;
-                        }
-                    }
-                    else if ((ImageViewer.Config.ContextMenu[c] as dynamic).func == func)
-                        return Items[(ImageViewer.Config.ContextMenu[c] as dynamic).name] as ToolStripMenuItem;
-                }
-            }
-
-            // ContextMenu_Animations
-            for (int i = 0; i < Items.Count; i++)
-            {
-                for (int c = 0; c < ImageViewer.Config.ContextMenu_Animation.Count; c++)
-                {
-                    if (ImageViewer.Config.ContextMenu_Animation[c] is string)
-                    {
-                        // Submenu
-                        lastSubMenu = Items[(ImageViewer.Config.ContextMenu_Animation[c] as dynamic).name] as ToolStripDropDownItem;
-                    }
-                    else if (ImageViewer.Config.ContextMenu_Animation[c] is List<object>)
-                    {
-                        // Submenu items
-                        for (int s = 0; s < (ImageViewer.Config.ContextMenu_Animation[c] as List<object>).Count; s++)
-                        {
-                            if (((ImageViewer.Config.ContextMenu_Animation[c] as List<object>)[s] as dynamic).func == func)
-                                return lastSubMenu.DropDownItems[((ImageViewer.Config.ContextMenu_Animation[c] as List<object>)[s] as dynamic).name] as ToolStripMenuItem;
-                        }
-                    }
-                    else if ((ImageViewer.Config.ContextMenu_Animation[c] as dynamic).func == func)
-                        return Items[(ImageViewer.Config.ContextMenu_Animation[c] as dynamic).name] as ToolStripMenuItem;
+                    else if ((list[c] as dynamic).func == func)
+                        return collection[(list[c] as dynamic).name] as ToolStripMenuItem;
                 }
             }
 
             return null;
+        }
+
+        private static string VariableAmountOfStrings(int amount, string s)
+        {
+            if (amount == 0)
+                return "";
+
+            string str = "";
+            for (int i = 0; i < amount; i++)
+                str += s;
+            return str;
         }
 
     }

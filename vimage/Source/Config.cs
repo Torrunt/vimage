@@ -81,6 +81,9 @@ namespace vimage
 
         public List<object> ContextMenu = new List<object>();
         public List<object> ContextMenu_Animation = new List<object>();
+        public List<object> ContextMenu_Default = new List<object>();
+        public List<object> ContextMenu_Animation_Default = new List<object>();
+
         public int ContextMenu_Animation_InsertAtIndex
         {
             get { return (int)Settings["CONTEXTMENU_ANIMATION_INSERTATINDEX"]; }
@@ -91,49 +94,6 @@ namespace vimage
             get { return (Boolean)Settings["CONTEXTMENU_SHOWMARGIN"]; }
             set { Settings["CONTEXTMENU_SHOWMARGIN"] = value; }
         }
-        public string ContextMenuSetup =
-@"ContextMenu =
-{
-	Close : CLOSE
-	-
-	Next Image : NEXT IMAGE
-	Prev Image : PREV IMAGE
-	Sort by
-	{
-		Name : SORT NAME
-		Date modified : SORT DATE MODIFIED
-		Date created : SORT DATE CREATED
-		Size : SORT SIZE
-		-
-		Ascending : SORT ASCENDING
-		Descending : SORT DESCENDING
-	}
-	-
-	Rotate Clockwise : ROTATE CLOCKWISE
-	Rotate Anti-Clockwise : ROTATE ANTICLOCKWISE
-	Flip : FLIP
-	Fit to monitor height : FIT TO HEIGHT
-	Reset Image : RESET IMAGE
-	Smoothing : TOGGLE SMOOTHING
-	Background : TOGGLE BACKGROUND
-	Always on top : ALWAYS ON TOP
-	-
-	Open file location : OPEN FILE LOCATION
-	Delete : DELETE
-	-
-	Open Settings : OPEN SETTINGS
-	Reload Settings : RELOAD SETTINGS
-	: VERSION NAME
-}
-ContextMenu_Animation =
-{
-	Next Frame : NEXT FRAME
-	Prev Frame : PREV FRAME
-	Pause/Play Animation : TOGGLE ANIMATION
-	-
-}";
-        public string ContextMenuSetupDefault;
-
 
         private Dictionary<string, object> Settings;
 
@@ -145,8 +105,6 @@ ContextMenu_Animation =
         }
         public void Init()
         {
-            ContextMenuSetupDefault = ContextMenuSetup;
-
             SetControls(Control_Drag, "MOUSELEFT");
             SetControls(Control_Close, "ESC", "BACKSPACE");
             SetControls(Control_OpenContextMenu, "MOUSERIGHT");
@@ -171,6 +129,45 @@ ContextMenu_Animation =
             SetControls(Control_OpenAtLocation, "");
             SetControls(Control_Delete, "DELETE");
             SetControls(Control_OpenDuplicateImage, "C");
+
+            ContextMenu.Add(new { name = "Close", func = MenuFuncs.CLOSE });
+            ContextMenu.Add(new { name = "-", func = "-" });
+            ContextMenu.Add(new { name = "Next Image", func = MenuFuncs.NEXT_IMAGE });
+            ContextMenu.Add(new { name = "Prev Image", func = MenuFuncs.PREV_IMAGE });
+            ContextMenu.Add("Sort by");
+            List<object> SubMenu_SortBy = new List<object>();
+            SubMenu_SortBy.Add(new { name = "Name", func = MenuFuncs.SORT_NAME });
+            SubMenu_SortBy.Add(new { name = "Date modified", func = MenuFuncs.SORT_DATE_MODIFIED });
+            SubMenu_SortBy.Add(new { name = "Date created", func = MenuFuncs.SORT_DATE_CREATED });
+            SubMenu_SortBy.Add(new { name = "Size", func = MenuFuncs.SORT_SIZE });
+            SubMenu_SortBy.Add(new { name = "-", func = "-" });
+            SubMenu_SortBy.Add(new { name = "Ascending", func = MenuFuncs.SORT_ASCENDING });
+            SubMenu_SortBy.Add(new { name = "Descending", func = MenuFuncs.SORT_DESCENDING });
+            ContextMenu.Add(SubMenu_SortBy);
+            ContextMenu.Add(new { name = "-", func = "-" });
+            ContextMenu.Add(new { name = "Rotate Clockwise", func = MenuFuncs.ROTATE_CLOCKWISE });
+            ContextMenu.Add(new { name = "Rotate Anti-Clockwise", func = MenuFuncs.ROTATE_ANTICLOCKWISE });
+            ContextMenu.Add(new { name = "Flip", func = MenuFuncs.FLIP });
+            ContextMenu.Add(new { name = "Fit to monitor height", func = MenuFuncs.FIT_TO_HEIGHT });
+            ContextMenu.Add(new { name = "Reset Image", func = MenuFuncs.RESET_IMAGE });
+            ContextMenu.Add(new { name = "Smoothing", func = MenuFuncs.TOGGLE_SMOOTHING });
+            ContextMenu.Add(new { name = "Background", func = MenuFuncs.TOGGLE_BACKGROUND });
+            ContextMenu.Add(new { name = "Always on top", func = MenuFuncs.ALWAYS_ON_TOP });
+            ContextMenu.Add(new { name = "-", func = "-" });
+            ContextMenu.Add(new { name = "Open file location", func = MenuFuncs.OPEN_FILE_LOCATION });
+            ContextMenu.Add(new { name = "Delete", func = MenuFuncs.DELETE });
+            ContextMenu.Add(new { name = "-", func = "-" });
+            ContextMenu.Add(new { name = "Open Settings", func = MenuFuncs.OPEN_SETTINGS });
+            ContextMenu.Add(new { name = "Reload Settings", func = MenuFuncs.RELOAD_SETTINGS });
+            ContextMenu.Add(new { name = "", func = MenuFuncs.VERSION_NAME });
+
+            ContextMenu_Animation.Add(new { name = "Next Frame", func = MenuFuncs.NEXT_FRAME });
+            ContextMenu_Animation.Add(new { name = "Prev Frame", func = MenuFuncs.PREV_FRAME });
+            ContextMenu_Animation.Add(new { name = "Pause/Play Animation", func = MenuFuncs.TOGGLE_ANIMATION });
+            ContextMenu_Animation.Add(new { name = "-", func = "-" });
+
+            ContextMenu_Default = new List<object>(ContextMenu);
+            ContextMenu_Animation_Default = new List<object>(ContextMenu_Animation);
 
             Settings = new Dictionary<string, object>()
             {
@@ -222,12 +219,14 @@ ContextMenu_Animation =
             // If config file doesn't exist, make one
             if (!File.Exists(configFile))
                 Save(configFile);
-            // Clear default controls before the are loaded back in
+            // Clear default controls and context menu before they are loaded back in
             foreach (var list in Settings)
             {
                 if (list.Value is List<int>)
                     ((List<int>)list.Value).Clear();
             }
+            ContextMenu.Clear();
+            ContextMenu_Animation.Clear();
 
             
             StreamReader reader = File.OpenText(configFile);
@@ -268,116 +267,12 @@ ContextMenu_Animation =
                     // line is empty or is part of another setting, skip
                     if (line.Equals("") || line.IndexOf('=') != -1)
                         continue;
-
                     // line doesn't have open brace, skip
                     if (!line.Equals("{"))
                         continue;
 
                     // read section
-                    line = reader.ReadLine();
-                    string trimedLine = line.Replace(" ", "").Replace("\t", "");
-                    string[] splitValues;
-
-                    while (line != null)
-                    {
-                        // sub section?
-                        if (!trimedLine.Equals("-") && trimedLine.IndexOf(':') == -1)
-                        {
-                            string sectionName = line.Replace("\t", "");
-
-                            do
-                            {
-                                // read line, break if end brace
-                                line = reader.ReadLine();
-                                trimedLine = line.Replace(" ", "").Replace("\t", "");
-                                if (trimedLine.Equals("}"))
-                                {
-                                    line = reader.ReadLine();
-                                    trimedLine = line.Replace(" ", "").Replace("\t", "");
-                                    break;
-                                }
-
-                                // line is empty, next
-                                if (trimedLine.Equals(""))
-                                    continue;
-
-                                // line doesn't have open brace, skip
-                                if (!trimedLine.Equals("{"))
-                                    continue;
-
-                                // read section
-                                line = reader.ReadLine();
-                                trimedLine = line.Replace(" ", "").Replace("\t", "");
-
-                                List<object> subContextMenu = new List<object>();
-                                (Settings[name] as List<object>).Add(sectionName);
-                                (Settings[name] as List<object>).Add(subContextMenu);
-
-                                while (line != null)
-                                {
-                                    // lines is empty, next
-                                    if (trimedLine.Equals(""))
-                                    {
-                                        line = reader.ReadLine();
-                                        trimedLine = line.Replace(" ", "").Replace("\t", "");
-                                        continue;
-                                    }
-
-                                    // split by :
-                                    if (trimedLine.Equals("-"))
-                                        splitValues = new[] { "-", "-" }; // line break
-                                    else
-                                        splitValues = line.Split(':');
-
-                                    // trim tabs from name, spaces from map name
-                                    splitValues[0] = splitValues[0].Replace("\t", "");
-                                    splitValues[1] = splitValues[1].Replace(" ", "");
-
-                                    // Assign Values
-                                    subContextMenu.Add(new { name = splitValues[0], func = splitValues[1] });
-
-                                    // next line, break if end brace
-                                    line = reader.ReadLine();
-                                    trimedLine = line.Replace(" ", "").Replace("\t", "");
-                                    if (trimedLine.Equals("}"))
-                                    {
-                                        line = reader.ReadLine();
-                                        trimedLine = line.Replace(" ", "").Replace("\t", "");
-                                        break;
-                                    }
-                                }
-
-                                break;
-
-                            }
-                            while (line != null);
-
-                            continue;
-                        }
-
-                        // split by :
-                        if (trimedLine.Equals("-"))
-                            splitValues = new[] { "-", "-" }; // line break
-                        else
-                            splitValues = line.Split(':');
-
-                        // trim tabs from name, spaces from map name
-                        splitValues[0] = splitValues[0].Replace("\t", "");
-                        splitValues[1] = splitValues[1].Replace(" ", "");
-
-                        // Assign Values
-                        (Settings[name] as List<object>).Add(new { name = splitValues[0], func = splitValues[1] });
-
-                        // next line, break if end brace
-                        line = reader.ReadLine();
-                        trimedLine = line.Replace(" ", "").Replace("\t", "");
-                        if (trimedLine.Equals("}"))
-                        {
-                            line = reader.ReadLine().Replace(" ", "").Replace("\t", "");
-                            break;
-                        }
-                    }
-
+                    line = ReadSection(reader, Settings[name] as List<object>);
                     continue;
                 }
 
@@ -423,6 +318,10 @@ ContextMenu_Animation =
                     else
                         Settings[name] = false;
                 }
+                else if (Settings[name] is String)
+                {
+                    Settings[name] = values[0];
+                }
 
                 // next line
                 line = reader.ReadLine();
@@ -430,6 +329,66 @@ ContextMenu_Animation =
 
             reader.Close();
         }
+        private string ReadSection(StreamReader reader, List<object> setting)
+        {
+            string line = reader.ReadLine();
+            string trimedLine = line.Replace(" ", "").Replace("\t", "");
+            string[] splitValues;
+
+            while (line != null)
+            {
+                if (!trimedLine.Equals("-") && trimedLine.IndexOf(':') == -1)
+                {
+                    // Subsection
+                    string subSectionName = line.Replace("\t", "");
+
+                    line = reader.ReadLine().Replace(" ", "").Replace("\t", "");
+
+                    // line is empty or is part of another setting, skip
+                    if (line.Equals("") || line.IndexOf('=') != -1)
+                        continue;
+                    // line doesn't have open brace, skip
+                    if (!line.Equals("{"))
+                        continue;
+
+                    setting.Add(subSectionName);
+                    List<object> subSetting = new List<object>();
+                    setting.Add(subSetting);
+
+                    line = ReadSection(reader, subSetting);
+                    trimedLine = line;
+                }
+                else
+                {
+                    // Item
+                    if (trimedLine.Equals("-"))
+                        splitValues = new[] { "-", "-" }; // line break
+                    else
+                        splitValues = line.Split(':');
+
+                    // trim tabs from name, spaces from map name
+                    splitValues[0] = splitValues[0].Replace("\t", "");
+                    splitValues[1] = splitValues[1].Replace(" ", "");
+
+                    // assign Values
+                    setting.Add(new { name = splitValues[0].Trim(), func = splitValues[1].Trim() });
+
+                    // next line
+                    line = reader.ReadLine();
+                    trimedLine = line.Replace(" ", "").Replace("\t", "");
+                }
+
+                // break if end brace
+                if (trimedLine.Equals("}"))
+                {
+                    line = reader.ReadLine().Replace(" ", "").Replace("\t", "");
+                    break;
+                }
+            }
+
+            return line;
+        }
+
 
         /// <summary> Saves settings to config txt file. </summary>
         public void Save(string configFile)
@@ -494,8 +453,9 @@ ContextMenu_Animation =
             writer.Write(Environment.NewLine);
             writer.Write("// Context Menu" + Environment.NewLine);
 
-            writer.Write(ContextMenuSetup);
-            writer.Write(Environment.NewLine);
+            WriteContextMenuSetup(writer, "ContextMenu", ContextMenu);
+            WriteContextMenuSetup(writer, "ContextMenu_Animation", ContextMenu_Animation);
+
             WriteSetting(writer, "ContextMenu_Animation_InsertAtIndex", ContextMenu_Animation_InsertAtIndex);
             WriteSetting(writer, "ContextMenu_ShowMargin", ContextMenuShowMargin, "shows checkboxes for certain menu items");
 
@@ -521,6 +481,40 @@ ContextMenu_Animation =
         private void WriteControl(StreamWriter writer, string name, List<int> controls)
         {
             writer.Write(name + " = " + ControlsToString(controls) + Environment.NewLine);
+        }
+        private void WriteContextMenuSetup(StreamWriter writer, string name, List<object> contextMenu)
+        {
+            writer.Write(name + " =" + Environment.NewLine + "{" + Environment.NewLine);
+            WriteContextMenuItems(writer, contextMenu, 1);
+            writer.Write("}" + Environment.NewLine);
+        }
+        private void WriteContextMenuItems(StreamWriter writer, List<object> items, int depth = 1)
+        {
+            for (int i = 0; i < items.Count; i++)
+            {
+                writer.Write(VariableAmountOfStrings(depth, "\t"));
+
+                if (items[i] is string)
+                {
+                    // Submenu
+                    writer.Write((items[i] as string) + Environment.NewLine + VariableAmountOfStrings(depth, "\t") + "{" + Environment.NewLine);
+                    i++;
+                    WriteContextMenuItems(writer, items[i] as List<object>, depth + 1);
+                    writer.Write(VariableAmountOfStrings(depth, "\t") + "}" + Environment.NewLine);
+                }
+                else
+                {
+                    // Item
+                    string itemName = (items[i] as dynamic).name as string;
+                    string itemFunc = MenuFuncs.WithSpaces((items[i] as dynamic).func as string);
+                    if (itemFunc.Equals("-"))
+                        writer.Write("-" + Environment.NewLine);
+                    else if (itemName.Equals(""))
+                        writer.Write(": " + itemFunc + Environment.NewLine);
+                    else
+                        writer.Write(itemName + " : " + itemFunc + Environment.NewLine);
+                }
+            }
         }
 
 
@@ -1119,5 +1113,16 @@ ContextMenu_Animation =
             return "";
         }
 
+
+        private static string VariableAmountOfStrings(int amount, string s)
+        {
+            if (amount == 0)
+                return "";
+
+            string str = "";
+            for (int i = 0; i < amount; i++)
+                str += s;
+            return str;
+        }
     }
 }

@@ -11,7 +11,11 @@ namespace vimage_settings
     {
         private Config vimageConfig;
 
-        private TextBox TextBoxWithMouseFocus = null;
+        public List<ControlItem> ControlItems = new List<ControlItem>();
+        public List<ContextMenuItem> ContextMenuItems = new List<ContextMenuItem>();
+        public List<ContextMenuItem> ContextMenuItems_Animation = new List<ContextMenuItem>();
+
+        public ContextMenuItem ContextMenuItemFocused;
 
         public ConfigWindow()
         {
@@ -23,7 +27,7 @@ namespace vimage_settings
             vimageConfig = new Config();
             vimageConfig.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
 
-            // Set Values
+            // Set Settings
             checkBox_OpenAtMousePosition.Checked = vimageConfig.Setting_OpenAtMousePosition;
             checkBox_SmoothingDefault.Checked = vimageConfig.Setting_SmoothingDefault;
             checkBox_BackgroundForImagesWithTransparencyDefault.Checked = vimageConfig.Setting_BackgroundForImagesWithTransparencyDefault;
@@ -34,36 +38,113 @@ namespace vimage_settings
             numericUpDown_MinImageSize.Value = vimageConfig.Setting_MinImageSize;
             numericUpDown_SmoothingMinImageSize.Value = vimageConfig.Setting_SmoothingMinImageSize;
 
-            textBox_Drag.Text = Config.ControlsToString(vimageConfig.Control_Drag);
-            textBox_Close.Text = Config.ControlsToString(vimageConfig.Control_Close);
-            textBox_OpenContextMenu.Text = Config.ControlsToString(vimageConfig.Control_OpenContextMenu);
-            textBox_PrevImage.Text = Config.ControlsToString(vimageConfig.Control_PrevImage);
-            textBox_NextImage.Text = Config.ControlsToString(vimageConfig.Control_NextImage);
-            textBox_RotateClockwise.Text = Config.ControlsToString(vimageConfig.Control_RotateClockwise);
-            textBox_RotateAntiClockwise.Text = Config.ControlsToString(vimageConfig.Control_RotateAntiClockwise);
-            textBox_Flip.Text = Config.ControlsToString(vimageConfig.Control_Flip);
-            textBox_FitToMonitorHeight.Text = Config.ControlsToString(vimageConfig.Control_FitToMonitorHeight);
-            textBox_FitToMonitorHeightAlternative.Text = Config.ControlsToString(vimageConfig.Control_FitToMonitorHeightAlternative);
-            textBox_ZoomFaster.Text = Config.ControlsToString(vimageConfig.Control_ZoomFaster);
-            textBox_ZoomAlt.Text = Config.ControlsToString(vimageConfig.Control_ZoomAlt);
-            textBox_ToggleSmoothing.Text = Config.ControlsToString(vimageConfig.Control_ToggleSmoothing);
-            textBox_ToggleBackgroundForTransparency.Text = Config.ControlsToString(vimageConfig.Control_ToggleBackgroundForTransparency);
-            textBox_ToggleAlwaysOnTop.Text = Config.ControlsToString(vimageConfig.Control_ToggleAlwaysOnTop);
-            textBox_PauseAnimation.Text = Config.ControlsToString(vimageConfig.Control_PauseAnimation);
-            textBox_PrevFrame.Text = Config.ControlsToString(vimageConfig.Control_PrevFrame);
-            textBox_NextFrame.Text = Config.ControlsToString(vimageConfig.Control_NextFrame);
-            textBox_OpenConfig.Text = Config.ControlsToString(vimageConfig.Control_OpenConfig);
-            textBox_ReloadConfig.Text = Config.ControlsToString(vimageConfig.Control_ReloadConfig);
-            textBox_ResetImage.Text = Config.ControlsToString(vimageConfig.Control_ResetImage);
-            textBox_OpenAtLocation.Text = Config.ControlsToString(vimageConfig.Control_OpenAtLocation);
-            textBox_Delete.Text = Config.ControlsToString(vimageConfig.Control_Delete);
-            textBox_OpenDuplicateImage.Text = Config.ControlsToString(vimageConfig.Control_OpenDuplicateImage);
+            // Setup Control Bindings
+            AddControlItem("Open Duplicate Image", vimageConfig.Control_OpenDuplicateImage);
+            AddControlItem("Delete", vimageConfig.Control_Delete);
+            AddControlItem("Open At Location", vimageConfig.Control_OpenAtLocation);
+            AddControlItem("Reset Image", vimageConfig.Control_ResetImage);
+            AddControlItem("Reload Config", vimageConfig.Control_ReloadConfig);
+            AddControlItem("Open Config", vimageConfig.Control_OpenConfig);
+            AddControlItem("NextF rame", vimageConfig.Control_NextFrame);
+            AddControlItem("Prev Frame", vimageConfig.Control_PrevFrame);
+            AddControlItem("Pause Animation", vimageConfig.Control_PauseAnimation);
+            AddControlItem("Toggle Always On Top", vimageConfig.Control_ToggleAlwaysOnTop);
+            AddControlItem("Toggle Background For Transparency", vimageConfig.Control_ToggleBackgroundForTransparency);
+            AddControlItem("Toggle Smoothing", vimageConfig.Control_ToggleSmoothing);
+            AddControlItem("Zoom Alt", vimageConfig.Control_ZoomAlt);
+            AddControlItem("Zoom Faster", vimageConfig.Control_ZoomFaster);
+            AddControlItem("Fit To Monitor Height Alternative", vimageConfig.Control_FitToMonitorHeightAlternative);
+            AddControlItem("Fit To Monitor Height", vimageConfig.Control_FitToMonitorHeight);
+            AddControlItem("Flip", vimageConfig.Control_Flip);
+            AddControlItem("Rotate Anti-Clockwise", vimageConfig.Control_RotateAntiClockwise);
+            AddControlItem("Rotate Clockwise", vimageConfig.Control_RotateClockwise);
+            AddControlItem("Next Image", vimageConfig.Control_NextImage);
+            AddControlItem("Prev Image", vimageConfig.Control_PrevImage);
+            AddControlItem("Open Context Menu", vimageConfig.Control_OpenContextMenu);
+            AddControlItem("Close", vimageConfig.Control_Close);
+            AddControlItem("Drag", vimageConfig.Control_Drag);
 
+            // Setup Context Menu Editor
             checkBox_ContextMenuShowMargin.Checked = vimageConfig.ContextMenuShowMargin;
             numericUpDown_ContextMenu_Animation_InsertAtIndex.Value = vimageConfig.ContextMenu_Animation_InsertAtIndex;
-            textBox_ContextMenu.Text = vimageConfig.ContextMenuSetup;
-            // todo : Context Menu Customisation - drag and drop system?
+
+            AddContextMenuItems(vimageConfig.ContextMenu);
+            tabControl_ContextMenus.SelectedIndex = 1;
+            AddContextMenuItems(vimageConfig.ContextMenu_Animation);
+            tabControl_ContextMenus.SelectedIndex = 0;
+
+            if (ContextMenuItems.Count > 0)
+                ContextMenuItems[0].GiveItemFocus();
         }
+
+        private void AddControlItem(string name, List<int> control)
+        {
+            ControlItem item = new ControlItem(name, control);
+            tabPage2.Controls.Add(item);
+            ControlItems.Add(item);
+        }
+
+        private void AddContextMenuItems(List<object> contextItems, int depth = 0)
+        {
+            for (int i = 0; i < contextItems.Count; i++)
+            {
+                if (contextItems[i] is List<object>)
+                    AddContextMenuItems(contextItems[i] as List<object>, depth + 1); // submenu items
+                else if (contextItems[i] is string)
+                    AddContextMenuItem(contextItems[i] as string, "", depth, true); // submenu
+                else
+                    AddContextMenuItem((contextItems[i] as dynamic).name, (contextItems[i] as dynamic).func, depth); // item
+            }
+        }
+        private ContextMenuItem AddContextMenuItem(string name = "", string func = "", int subitem = 0, bool submenu = false, int position = -1)
+        {
+            List<ContextMenuItem> CurrentList = GetContextMenuList();
+
+            ContextMenuItem item = new ContextMenuItem(name, func);
+            item.Location = new System.Drawing.Point(0, (item.Height - 2) * CurrentList.Count);
+
+            GetCurrentContextMenuPanel().Controls.Add(item);
+
+            if (position == -1)
+            {
+                // add to bottom
+                CurrentList.Add(item);
+            }
+            else
+            {
+                // add at position
+                CurrentList.Insert(position, item);
+                RefreshContextMenuItems();
+            }
+
+            item.AddConfigWindowReference(this);
+            item.SetSubitem(subitem);
+            item.SetSubmenu(submenu);
+
+            return item;
+        }
+        public void RefreshContextMenuItems(int scrollValue = -1)
+        {
+            List<ContextMenuItem> CurrentList = GetContextMenuList();
+
+            // scroll back to top temporarily
+            if (scrollValue == -1)
+                scrollValue = GetCurrentContextMenuPanel().VerticalScroll.Value;
+            GetCurrentContextMenuPanel().VerticalScroll.Value = 0;
+
+            // refresh positions of each item
+            for (int i = 0; i < CurrentList.Count; i++)
+                CurrentList[i].Location = new System.Drawing.Point(0, (CurrentList[i].Height - 2) * i);
+            
+            // scroll back
+            GetCurrentContextMenuPanel().VerticalScroll.Value = Math.Min(scrollValue, GetCurrentContextMenuPanel().VerticalScroll.Maximum);
+            GetCurrentContextMenuPanel().PerformLayout();
+        }
+        
+        public List<ContextMenuItem> GetContextMenuList() { return tabControl_ContextMenus.SelectedIndex == 1 ? ContextMenuItems_Animation : ContextMenuItems; }
+        public TabPage GetCurrentContextMenuPanel() { return tabControl_ContextMenus.SelectedTab; }
+        public int GetContextMenuPanelScrollValue() { return (int)GetCurrentContextMenuPanel().VerticalScroll.Value; }
+
 
         private void button_Save_Click(object sender, EventArgs e)
         {
@@ -81,83 +162,153 @@ namespace vimage_settings
             vimageConfig.ContextMenuShowMargin = checkBox_ContextMenuShowMargin.Checked;
             vimageConfig.ContextMenu_Animation_InsertAtIndex = (int)numericUpDown_ContextMenu_Animation_InsertAtIndex.Value;
 
-            vimageConfig.ContextMenuSetup = textBox_ContextMenu.Text;
+            // Update Context Menu
+            vimageConfig.ContextMenu.Clear();
+            SaveContextMenu(vimageConfig.ContextMenu, ContextMenuItems);
+            vimageConfig.ContextMenu_Animation.Clear();
+            SaveContextMenu(vimageConfig.ContextMenu_Animation, ContextMenuItems_Animation);
 
             // Save Config File
             vimageConfig.Save(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
         }
-
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void SaveContextMenu(List<object> contextMenu, List<ContextMenuItem> contextMenuItems)
         {
-            Process.Start("http://torrunt.net/vimage");
+            int currentSubLevel = 0;
+            List<object> currentMenu = contextMenu;
+            for (int i = 0; i < contextMenuItems.Count; i++)
+            {
+                if (contextMenuItems[i].Submenu)
+                {
+                    // Submenu
+                    currentMenu.Add(contextMenuItems[i].GetName());
+                }
+                else if (contextMenuItems[i].Subitem != 0)
+                {
+                    // Subitem
+                    if (contextMenuItems[i].Subitem != currentSubLevel)
+                    {
+                        // First subitem
+                        currentSubLevel = contextMenuItems[i].Subitem;
+                        currentMenu.Add(new List<object>());
+                        currentMenu = currentMenu[currentMenu.Count - 1] as List<object>;
+                    }
+
+                    currentMenu.Add(new { name = contextMenuItems[i].GetName(), func = contextMenuItems[i].GetFunc() });
+                }
+                else
+                {
+                    // Item
+                    if (currentSubLevel != 0)
+                    {
+                        currentSubLevel = 0;
+                        currentMenu = contextMenu;
+                    }
+
+                    currentMenu.Add(new { name = contextMenuItems[i].GetName(), func = contextMenuItems[i].GetFunc() });
+                }
+            }
         }
 
         private void button_ContextMenuDefault_Click(object sender, EventArgs e)
         {
             // Reset Context Menu Setup to Default
-            vimageConfig.ContextMenuSetup = vimageConfig.ContextMenuSetupDefault;
+            vimageConfig.ContextMenu = new List<object>(vimageConfig.ContextMenu_Default);
+            vimageConfig.ContextMenu_Animation = new List<object>(vimageConfig.ContextMenu_Animation_Default);
 
-            textBox_ContextMenu.Text = vimageConfig.ContextMenuSetup;
+            // Clear items
+            if (ContextMenuItems.Count != 0)
+                ContextMenuItems[0].Parent.Controls.Clear();
+            if (ContextMenuItems_Animation.Count != 0)
+                ContextMenuItems_Animation[0].Parent.Controls.Clear();
+            ContextMenuItems.Clear();
+            ContextMenuItems_Animation.Clear();
+
+            // Scroll back to top
+            for (int i = 0; i < tabControl_ContextMenus.TabCount; i++)
+                tabControl_ContextMenus.TabPages[i].VerticalScroll.Value = 0;
+
+            int currentTab = tabControl_ContextMenus.SelectedIndex;
+
+            // Add items
+            tabControl_ContextMenus.SelectedIndex = 0;
+            AddContextMenuItems(vimageConfig.ContextMenu);
+            tabControl_ContextMenus.SelectedIndex = 1;
+            AddContextMenuItems(vimageConfig.ContextMenu_Animation);
+
+            tabControl_ContextMenus.SelectedIndex = currentTab;
+
+            if (ContextMenuItems.Count > 0)
+                ContextMenuItems[0].GiveItemFocus();
         }
 
-        private void control_OnKeyDown(object sender, KeyEventArgs e)
+        private void button_ContextMenuAddNew_Click(object sender, EventArgs e)
         {
-            // Record Key Press
-            string name = ((TextBox)sender).Name.Replace("textBox_", "");
-            string key = e.KeyCode.ToString().ToUpper();
+            ContextMenuItem item;
+            List<ContextMenuItem> CurrentList = GetContextMenuList();
 
-            if (key.Equals("SCROLL") || key.Equals("NUMLOCK") || key.Equals("CAPITAL") ||
-                key.Equals("LWIN") || key.Equals("RWIN"))
-                return;
-
-            // fix up some weird names KeyEventArgs gives
-            switch (key)
+            int focusedIndex = ContextMenuItemFocused == null ? -1 : CurrentList.IndexOf(ContextMenuItemFocused);
+            if (focusedIndex == -1 || focusedIndex == CurrentList.Count - 1)
             {
-                case "OEMOPENBRACKETS": key = "["; break;
-                case "OEM6": key = "]"; break;
-                case "OEM5": key = "\\"; break;
-                case "OEM1": key = ";"; break;
-                case "OEM7": key = "'"; break;
+                // scroll back to top temporarily
+                GetCurrentContextMenuPanel().VerticalScroll.Visible = false;
+                GetCurrentContextMenuPanel().VerticalScroll.Value = 0;
+
+                // add item to bottom
+                item = AddContextMenuItem("-", "-");
+
+                // scroll to bottom
+                GetCurrentContextMenuPanel().VerticalScroll.Visible = true;
+                GetCurrentContextMenuPanel().VerticalScroll.Value = GetCurrentContextMenuPanel().VerticalScroll.Maximum;
+                GetCurrentContextMenuPanel().PerformLayout();
             }
+            else
+                item = AddContextMenuItem("-", "-", ContextMenuItemFocused.Subitem, false, focusedIndex + 1);
 
-            key = key.Replace("OEM", ""); // eg: OEMTILDE to TILDE
-            key = key.Replace("KEY", ""); // eg: CONTROLKEY to CONTROL
-
-            // Update Control and Text Box
-            List<int> Control = vimageConfig.UpdateControl(name, (int)Config.StringToKey(key));
-            if (Control != null)
-                ((TextBox)sender).Text = Config.ControlsToString(Control);
+            item.GiveItemFocus();
         }
-        private void control_OnMouseUp(object sender, MouseEventArgs e)
+        private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (TextBoxWithMouseFocus != (TextBox)sender)
-            {
-                TextBoxWithMouseFocus = (TextBox)sender;
-                return;
-            }
-
-            // Record Mouse Button Press
-            string name = ((TextBox)sender).Name.Replace("textBox_", "");
-            string button = e.Button.ToString().ToUpper();
-
-            // Update Control and Text Box
-            List<int> Control = vimageConfig.UpdateControl(name, Config.StringToMouseButton("MOUSE" + button));
-            if (Control != null)
-                ((TextBox)sender).Text = Config.ControlsToString(Control);
+            // focus on tab change to allow for scrolling with mouse wheel
+            TabControl.SelectedTab.Focus();
+            if (TabControl.SelectedTab == tabPage3)
+                tabControl_ContextMenus.SelectedTab.Focus();
         }
 
-        private void control_Clear(object sender, EventArgs e)
+        private void tabControl_ContextMenus_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Clear Control
-            string name = ((Button)sender).Name.Replace("button_Clear_", "");
+            // focus on tab change to allow for scrolling with mouse wheel
+            tabControl_ContextMenus.SelectedTab.Focus();
 
-            ((TextBox)Controls.Find("textBox_" + name, true)[0]).Clear();
-            vimageConfig.UpdateControl(name, -1);
+            List<ContextMenuItem> CurrentList = GetContextMenuList();
+            if (CurrentList.Count > 0)
+                CurrentList[0].GiveItemFocus();
+            else if (ContextMenuItemFocused != null)
+                ContextMenuItemFocused.RemoveItemFocus();
         }
 
-        private void control_OnLoseFocus(object sender, EventArgs e)
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            TextBoxWithMouseFocus = null;
+            Process.Start("http://torrunt.net/vimage");
+        }
+        private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("mailto:me@torrunt.net");
+        }
+
+        private void linkLabel3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("http://openil.sourceforge.net");
+        }
+
+        private void linkLabel4_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("http://www.famfamfam.com/lab/icons/silk/");
+        }
+
+        private void linkLabel6_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("http://github.com/Torrunt/vimage");
         }
 
     }
