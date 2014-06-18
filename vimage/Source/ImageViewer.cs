@@ -121,62 +121,65 @@ namespace vimage
 
             bool _forceAlwaysOnTop = false;
 
+            // Get Bounds
+            IntRect bounds = ImageViewerUtils.GetCurrentBounds(mousePos);
+
             // Resize Window
-            if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X > Image.Texture.Size.Y && Image.Texture.Size.X * CurrentZoom >= VideoMode.DesktopMode.Width)
+            if (Config.Setting_LimitImagesToMonitorHeight && Image.Texture.Size.Y > bounds.Height)
             {
-                // Position Window at 0,0 if the image is wide (ie: a Desktop Wallpaper / Screenshot)
-                Window.Position = new Vector2i(0, 0);
+                // Fit to monitor height if it's higher than monitor height.
+                Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
+                FitToMonitorHeightForced = true;
+            }
+            else if (Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_MinImageSize)
+            {
+                // Reisze images smaller than min size to min size
+                AutomaticallyZoomed = true;
+                Zoom(Config.Setting_MinImageSize / Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y), true);
+            }
+                // Use Texture Size * Zoom instead of Window.Size since it wouldn't have updated yet
+            Vector2i winSize = new Vector2i((int)(Image.Texture.Size.X * CurrentZoom), (int)(Image.Texture.Size.Y * CurrentZoom));
+
+            // Position Window
+            Vector2i winPos;
+
+            if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X > Image.Texture.Size.Y && Image.Texture.Size.X * CurrentZoom >= bounds.Width)
+            {
+                // Position Window in top-left if the image is wide (ie: a Desktop Wallpaper / Screenshot)
+                winPos = new Vector2i(bounds.Left, bounds.Top);
+            }
+            else if (Config.Setting_OpenAtMousePosition)
+            {
+                // At Mouse Position
+                winPos = new Vector2i(mousePos.X - (int)(winSize.X / 2), mousePos.Y - (int)(winSize.Y / 2));
+
+                if (!FitToMonitorHeightForced)
+                {
+                    if (winPos.Y < bounds.Top)
+                        winPos.Y = 0;
+                    else if (winPos.Y + winSize.Y > bounds.Height)
+                        winPos.Y = bounds.Height - (int)winSize.Y;
+                }
+                else
+                    winPos.Y = bounds.Top;
+
+                if (winPos.X < bounds.Left)
+                    winPos.X = bounds.Left;
+                else if (winPos.X + winSize.X > bounds.Left + bounds.Width)
+                    winPos.X = bounds.Left + bounds.Width - (int)winSize.X;
             }
             else
             {
-                // Get Bounds
-                IntRect bounds;
-                if (Config.Setting_OpenAtMousePosition)
-                    bounds = ImageViewerUtils.GetCurrentBounds(mousePos);
-                else
-                    bounds = ImageViewerUtils.GetCurrentBounds(Window.Position);
-
-                // Force Fit To Monitor Height?
-                if (Config.Setting_LimitImagesToMonitorHeight && Image.Texture.Size.Y > bounds.Height)
-                {
-                    // Fit to monitor height if it's higher than monitor height.
-                    Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
-                    FitToMonitorHeightForced = true;
-                }
-                else if (Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_MinImageSize)
-                {
-                    // Reisze images smaller than min size to min size
-                    AutomaticallyZoomed = true;
-                    Zoom(Config.Setting_MinImageSize / Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y), true);
-                }
-
-
-                // Open At Mouse Position?
-                if (Config.Setting_OpenAtMousePosition)
-                {
-                    Vector2i winPos = new Vector2i(mousePos.X - (int)(Window.Size.X / 2), mousePos.Y - (int)(Window.Size.Y / 2));
-                    if (!FitToMonitorHeightForced)
-                    {
-                        if (winPos.Y < bounds.Top)
-                            winPos.Y = 0;
-                        else if (winPos.Y + Window.Size.Y > bounds.Height)
-                            winPos.Y = bounds.Height - (int)Window.Size.Y;
-                    }
-                    else
-                        winPos.Y = bounds.Top;
-
-                    if (winPos.X < bounds.Left)
-                        winPos.X = bounds.Left;
-                    else if (winPos.X + Window.Size.X > bounds.Left + bounds.Width)
-                        winPos.X = bounds.Left + bounds.Width - (int)Window.Size.X;
-
-                    Window.Position = winPos;
-                }
-
-                // Force Always On Top Mode (so it's above the task bar)
-                if (FitToMonitorHeightForced || (Image.Texture.Size.Y >= bounds.Height && Image.Texture.Size.X < bounds.Width))
-                    _forceAlwaysOnTop = true;
+                // At Monitor Center
+                IntRect monitorBounds = ImageViewerUtils.GetCurrentBounds(mousePos);
+                winPos = new Vector2i(monitorBounds.Left + (int)((monitorBounds.Width - winSize.X) / 2), monitorBounds.Top + (int)((monitorBounds.Height - winSize.Y) / 2));
             }
+
+            Window.Position = winPos;
+
+            // Force Always On Top Mode (so it's above the task bar)
+            if (FitToMonitorHeightForced || (Image.Texture.Size.Y >= bounds.Height && Image.Texture.Size.X < bounds.Width))
+                _forceAlwaysOnTop = true;
 
             // Defaults
                 // Rotation (some images have a rotation set in their exif data)
@@ -247,7 +250,7 @@ namespace vimage
 
                 if (ForceAlwaysOnTopNextTick)
                 {
-                    IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position);
+                    bounds = ImageViewerUtils.GetCurrentBounds(Window.Position);
                     if (Window.Size.Y >= bounds.Height && Window.Size.X < bounds.Width)
                         ForceAlwaysOnTop();
                     else
@@ -550,9 +553,9 @@ namespace vimage
 
             IntRect bounds;
             if (FitToMonitorHeightAlternative)
-                bounds = ImageViewerUtils.GetCurrentWorkingArea(Window.Position);
+                bounds = ImageViewerUtils.GetCurrentWorkingArea(Mouse.GetPosition());
             else
-                bounds = ImageViewerUtils.GetCurrentBounds(Window.Position);
+                bounds = ImageViewerUtils.GetCurrentBounds(Mouse.GetPosition());
 
             if (CurrentZoom == 1)
             {
@@ -562,7 +565,7 @@ namespace vimage
                     Zoom(1 + (((float)bounds.Height - Image.Texture.Size.X) / Image.Texture.Size.X), true);
                 else
                     Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
-                NextWindowPos = new Vector2i(NextWindowPos.X, 0);
+                NextWindowPos = new Vector2i(NextWindowPos.X, bounds.Top);
             }
             else
             {
@@ -573,8 +576,8 @@ namespace vimage
             }
 
 
-            if (Image.Texture.Size.X * CurrentZoom >= VideoMode.DesktopMode.Width)
-                NextWindowPos = new Vector2i(0, 0); // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
+            if (Image.Texture.Size.X * CurrentZoom >= bounds.Width)
+                NextWindowPos = new Vector2i(bounds.Left, bounds.Top); // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
             else if (!FitToMonitorHeightAlternative)
                 ForceAlwaysOnTopNextTick = true;
 
@@ -733,7 +736,7 @@ namespace vimage
             else
                 Image.Texture.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
 
-            IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position);
+            IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position + new Vector2i(4, 4));
             if (Config.Setting_LimitImagesToMonitorHeight && (FitToMonitorHeight || (Image.Texture.Size.Y * CurrentZoom >= bounds.Height || (FitToMonitorHeightForced && Image.Texture.Size.Y >= bounds.Height))))
             {
                 // Fit to monitor height if it's higher than monitor height (or FitToMonitorHeight is true).
@@ -756,9 +759,12 @@ namespace vimage
             else
                 Zoom(CurrentZoom, true);
 
-            // Position Window at 0,0 if the image is wide (ie: a Desktop Wallpaper / Screenshot)
-            if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X > Image.Texture.Size.Y && Image.Texture.Size.X * CurrentZoom >= VideoMode.DesktopMode.Width)
-                NextWindowPos = new Vector2i(0, 0);
+            // Position Window at top-left if the image is wide (ie: a Desktop Wallpaper / Screenshot)
+            // Otherwise, if image is hanging off monitor just center it.
+            if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X > Image.Texture.Size.Y && Image.Texture.Size.X * CurrentZoom >= bounds.Width)
+                NextWindowPos = new Vector2i(bounds.Left, bounds.Top);
+            else if (NextWindowPos.X + (Image.Texture.Size.X * CurrentZoom) >= bounds.Left + bounds.Width || NextWindowPos.Y + (Image.Texture.Size.Y * CurrentZoom) >= bounds.Top + bounds.Top)
+                NextWindowPos = new Vector2i(bounds.Left + (int)((bounds.Width - (Image.Texture.Size.X * CurrentZoom)) / 2), bounds.Top + (int)((bounds.Height - (Image.Texture.Size.Y * CurrentZoom)) / 2));
 
             // Force Always On Top Mode (so it's above the task bar) - will only happen if height >= window height
             ForceAlwaysOnTopNextTick = true;
