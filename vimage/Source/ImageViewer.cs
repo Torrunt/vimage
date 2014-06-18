@@ -23,8 +23,6 @@ namespace vimage
             "pal", "pbm", "pcd", "pcx", "pgm", "pic", "png", "ppm", "psd", "psp", "raw", "sgi", "tga", "tif"
         };
 
-        public readonly float ZOOM_SPEED = 0.02f;
-        public readonly float ZOOM_SPEED_FAST = 0.1f;
         public readonly float ZOOM_MIN = 0.05f;
         public readonly float ZOOM_MAX = 75f;
         public uint ZOOM_MAX_WIDTH;
@@ -302,9 +300,9 @@ namespace vimage
         private void OnMouseWheelMoved(Object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0)
-                Zoom(Math.Min(CurrentZoom + (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED), ZOOM_MAX), !ZoomAlt);
+                Zoom(Math.Min(CurrentZoom + (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MAX), !ZoomAlt);
             else if (e.Delta < 0)
-                Zoom(Math.Max(CurrentZoom - (ZoomFaster ? ZOOM_SPEED_FAST : ZOOM_SPEED), ZOOM_MIN), !ZoomAlt);
+                Zoom(Math.Max(CurrentZoom - (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MIN), !ZoomAlt);
 
             AutomaticallyZoomed = false;
             FitToMonitorHeightForced = false;
@@ -763,7 +761,7 @@ namespace vimage
             // Otherwise, if image is hanging off monitor just center it.
             if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X > Image.Texture.Size.Y && Image.Texture.Size.X * CurrentZoom >= bounds.Width)
                 NextWindowPos = new Vector2i(bounds.Left, bounds.Top);
-            else if (NextWindowPos.X + (Image.Texture.Size.X * CurrentZoom) >= bounds.Left + bounds.Width || NextWindowPos.Y + (Image.Texture.Size.Y * CurrentZoom) >= bounds.Top + bounds.Top)
+            else if (NextWindowPos.X + (Image.Texture.Size.X * CurrentZoom) >= bounds.Left + bounds.Width || NextWindowPos.Y + (Image.Texture.Size.Y * CurrentZoom) >= bounds.Top + bounds.Height)
                 NextWindowPos = new Vector2i(bounds.Left + (int)((bounds.Width - (Image.Texture.Size.X * CurrentZoom)) / 2), bounds.Top + (int)((bounds.Height - (Image.Texture.Size.Y * CurrentZoom)) / 2));
 
             // Force Always On Top Mode (so it's above the task bar) - will only happen if height >= window height

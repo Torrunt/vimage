@@ -38,6 +38,8 @@ namespace vimage_settings
             checkBox_ListenForConfigChanges.Checked = vimageConfig.Setting_ListenForConfigChanges;
             numericUpDown_MinImageSize.Value = vimageConfig.Setting_MinImageSize;
             numericUpDown_SmoothingMinImageSize.Value = vimageConfig.Setting_SmoothingMinImageSize;
+            numericUpDown_ZoomSpeed.Value = vimageConfig.Setting_ZoomSpeed;
+            numericUpDown_ZoomSpeedFast.Value = vimageConfig.Setting_ZoomSpeedFast;
 
             // Setup Control Bindings
             AddControlItem("Open Duplicate Image", vimageConfig.Control_OpenDuplicateImage);
@@ -160,6 +162,8 @@ namespace vimage_settings
             vimageConfig.Setting_ListenForConfigChanges = checkBox_ListenForConfigChanges.Checked;
             vimageConfig.Setting_MinImageSize = (int)numericUpDown_MinImageSize.Value;
             vimageConfig.Setting_SmoothingMinImageSize = (int)numericUpDown_SmoothingMinImageSize.Value;
+            vimageConfig.Setting_ZoomSpeed = (int)numericUpDown_ZoomSpeed.Value;
+            vimageConfig.Setting_ZoomSpeedFast = (int)numericUpDown_ZoomSpeedFast.Value;
 
             vimageConfig.ContextMenuShowMargin = checkBox_ContextMenuShowMargin.Checked;
             vimageConfig.ContextMenu_Animation_InsertAtIndex = (int)numericUpDown_ContextMenu_Animation_InsertAtIndex.Value;

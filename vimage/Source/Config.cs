@@ -83,6 +83,16 @@ namespace vimage
             get { return (int)Settings["SMOOTHINGMINIMAGESIZE"]; }
             set { Settings["SMOOTHINGMINIMAGESIZE"] = value; }
         }
+        public int Setting_ZoomSpeed
+        {
+            get { return (int)Settings["ZOOMSPEED"]; }
+            set { Settings["ZOOMSPEED"] = value; }
+        }
+        public int Setting_ZoomSpeedFast
+        {
+            get { return (int)Settings["ZOOMSPEEDFAST"]; }
+            set { Settings["ZOOMSPEEDFAST"] = value; }
+        }
 
         public List<object> ContextMenu = new List<object>();
         public List<object> ContextMenu_Animation = new List<object>();
@@ -185,6 +195,8 @@ namespace vimage
                 { "LISTENFORCONFIGCHANGES", true },
                 { "MINIMAGESIZE", 64 },
                 { "SMOOTHINGMINIMAGESIZE", 65 },
+                { "ZOOMSPEED", 2 },
+                { "ZOOMSPEEDFAST", 10 },
 
                 { "DRAG", Control_Drag },
                 { "CLOSE", Control_Close },
@@ -428,6 +440,8 @@ namespace vimage
                 "if an image is smaller than this (in width or height) it will scaled up to it automatically");
             WriteSetting(writer, "SmoothingMinImageSize", Setting_SmoothingMinImageSize, 
                 "images smaller than this will not have smoothing turned on (if 0, all images with use smoothing)");
+            WriteSetting(writer, "ZoomSpeed", Setting_ZoomSpeed);
+            WriteSetting(writer, "ZoomSpeedFast", Setting_ZoomSpeedFast);
 
             writer.Write(Environment.NewLine);
             writer.Write("// Bindings" + Environment.NewLine);
@@ -497,6 +511,9 @@ namespace vimage
         }
         private void WriteContextMenuItems(StreamWriter writer, List<object> items, int depth = 1)
         {
+            if (items == null)
+                return;
+
             for (int i = 0; i < items.Count; i++)
             {
                 writer.Write(VariableAmountOfStrings(depth, "\t"));
