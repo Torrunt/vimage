@@ -35,6 +35,7 @@ namespace vimage_settings
             checkBox_PositionLargeWideImagesInCorner.Checked = vimageConfig.Setting_PositionLargeWideImagesInCorner;
             checkBox_PreloadNextImage.Checked = vimageConfig.Setting_PreloadNextImage;
             checkBox_OpenSettingsEXE.Checked = vimageConfig.Setting_OpenSettingsEXE;
+            checkBox_ListenForConfigChanges.Checked = vimageConfig.Setting_ListenForConfigChanges;
             numericUpDown_MinImageSize.Value = vimageConfig.Setting_MinImageSize;
             numericUpDown_SmoothingMinImageSize.Value = vimageConfig.Setting_SmoothingMinImageSize;
 
@@ -156,6 +157,7 @@ namespace vimage_settings
             vimageConfig.Setting_PositionLargeWideImagesInCorner = checkBox_PositionLargeWideImagesInCorner.Checked;
             vimageConfig.Setting_PreloadNextImage = checkBox_PreloadNextImage.Checked;
             vimageConfig.Setting_OpenSettingsEXE = checkBox_OpenSettingsEXE.Checked;
+            vimageConfig.Setting_ListenForConfigChanges = checkBox_ListenForConfigChanges.Checked;
             vimageConfig.Setting_MinImageSize = (int)numericUpDown_MinImageSize.Value;
             vimageConfig.Setting_SmoothingMinImageSize = (int)numericUpDown_SmoothingMinImageSize.Value;
 

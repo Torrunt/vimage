@@ -56,24 +56,25 @@
             this.tabControl_ContextMenus = new System.Windows.Forms.TabControl();
             this.tabPage_ContextMenuGeneral = new System.Windows.Forms.TabPage();
             this.tabPage_ContextMenuAnimation = new System.Windows.Forms.TabPage();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.label_version = new System.Windows.Forms.Label();
+            this.linkLabel6 = new System.Windows.Forms.LinkLabel();
+            this.linkLabel5 = new System.Windows.Forms.LinkLabel();
+            this.linkLabel4 = new System.Windows.Forms.LinkLabel();
+            this.label8 = new System.Windows.Forms.Label();
+            this.linkLabel3 = new System.Windows.Forms.LinkLabel();
+            this.label7 = new System.Windows.Forms.Label();
+            this.linkLabel2 = new System.Windows.Forms.LinkLabel();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.contextMenuStrip_Empty = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.button_Save = new System.Windows.Forms.Button();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.linkLabel2 = new System.Windows.Forms.LinkLabel();
-            this.label7 = new System.Windows.Forms.Label();
-            this.linkLabel3 = new System.Windows.Forms.LinkLabel();
-            this.linkLabel4 = new System.Windows.Forms.LinkLabel();
-            this.label8 = new System.Windows.Forms.Label();
-            this.linkLabel5 = new System.Windows.Forms.LinkLabel();
-            this.linkLabel6 = new System.Windows.Forms.LinkLabel();
-            this.label_version = new System.Windows.Forms.Label();
+            this.checkBox_ListenForConfigChanges = new System.Windows.Forms.CheckBox();
             this.TabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_SmoothingMinImageSize)).BeginInit();
@@ -84,9 +85,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ContextMenu_Animation_InsertAtIndex)).BeginInit();
             this.panel2.SuspendLayout();
             this.tabControl_ContextMenus.SuspendLayout();
+            this.tabPage4.SuspendLayout();
             this.panel1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
-            this.tabPage4.SuspendLayout();
             this.SuspendLayout();
             // 
             // TabControl
@@ -107,6 +108,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.checkBox_ListenForConfigChanges);
             this.tabPage1.Controls.Add(this.checkBox_OpenSettingsEXE);
             this.tabPage1.Controls.Add(this.label2);
             this.tabPage1.Controls.Add(this.numericUpDown_SmoothingMinImageSize);
@@ -140,7 +142,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 190);
+            this.label2.Location = new System.Drawing.Point(6, 213);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(164, 13);
             this.label2.TabIndex = 9;
@@ -148,7 +150,7 @@
             // 
             // numericUpDown_SmoothingMinImageSize
             // 
-            this.numericUpDown_SmoothingMinImageSize.Location = new System.Drawing.Point(330, 188);
+            this.numericUpDown_SmoothingMinImageSize.Location = new System.Drawing.Point(330, 211);
             this.numericUpDown_SmoothingMinImageSize.Name = "numericUpDown_SmoothingMinImageSize";
             this.numericUpDown_SmoothingMinImageSize.Size = new System.Drawing.Size(60, 20);
             this.numericUpDown_SmoothingMinImageSize.TabIndex = 8;
@@ -156,7 +158,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 167);
+            this.label1.Location = new System.Drawing.Point(6, 190);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(258, 13);
             this.label1.TabIndex = 7;
@@ -164,7 +166,7 @@
             // 
             // numericUpDown_MinImageSize
             // 
-            this.numericUpDown_MinImageSize.Location = new System.Drawing.Point(330, 165);
+            this.numericUpDown_MinImageSize.Location = new System.Drawing.Point(330, 188);
             this.numericUpDown_MinImageSize.Name = "numericUpDown_MinImageSize";
             this.numericUpDown_MinImageSize.Size = new System.Drawing.Size(60, 20);
             this.numericUpDown_MinImageSize.TabIndex = 6;
@@ -386,6 +388,139 @@
             this.tabPage_ContextMenuAnimation.TabIndex = 1;
             this.tabPage_ContextMenuAnimation.Text = "Animation";
             // 
+            // tabPage4
+            // 
+            this.tabPage4.AutoScroll = true;
+            this.tabPage4.Controls.Add(this.label_version);
+            this.tabPage4.Controls.Add(this.linkLabel6);
+            this.tabPage4.Controls.Add(this.linkLabel5);
+            this.tabPage4.Controls.Add(this.linkLabel4);
+            this.tabPage4.Controls.Add(this.label8);
+            this.tabPage4.Controls.Add(this.linkLabel3);
+            this.tabPage4.Controls.Add(this.label7);
+            this.tabPage4.Controls.Add(this.linkLabel2);
+            this.tabPage4.Controls.Add(this.label6);
+            this.tabPage4.Controls.Add(this.label5);
+            this.tabPage4.Controls.Add(this.label4);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Size = new System.Drawing.Size(426, 305);
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "About";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // label_version
+            // 
+            this.label_version.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label_version.AutoSize = true;
+            this.label_version.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label_version.Location = new System.Drawing.Point(346, 13);
+            this.label_version.Name = "label_version";
+            this.label_version.Size = new System.Drawing.Size(72, 20);
+            this.label_version.TabIndex = 20;
+            this.label_version.Text = "version #";
+            // 
+            // linkLabel6
+            // 
+            this.linkLabel6.AutoSize = true;
+            this.linkLabel6.Location = new System.Drawing.Point(10, 87);
+            this.linkLabel6.Name = "linkLabel6";
+            this.linkLabel6.Size = new System.Drawing.Size(137, 13);
+            this.linkLabel6.TabIndex = 19;
+            this.linkLabel6.TabStop = true;
+            this.linkLabel6.Text = "github.com/Torrunt/vimage";
+            this.linkLabel6.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel6_LinkClicked);
+            // 
+            // linkLabel5
+            // 
+            this.linkLabel5.AutoSize = true;
+            this.linkLabel5.Location = new System.Drawing.Point(10, 71);
+            this.linkLabel5.Name = "linkLabel5";
+            this.linkLabel5.Size = new System.Drawing.Size(94, 13);
+            this.linkLabel5.TabIndex = 12;
+            this.linkLabel5.TabStop = true;
+            this.linkLabel5.Text = "torrunt.net/vimage";
+            this.linkLabel5.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            // 
+            // linkLabel4
+            // 
+            this.linkLabel4.AutoSize = true;
+            this.linkLabel4.Location = new System.Drawing.Point(48, 168);
+            this.linkLabel4.Name = "linkLabel4";
+            this.linkLabel4.Size = new System.Drawing.Size(150, 13);
+            this.linkLabel4.TabIndex = 17;
+            this.linkLabel4.TabStop = true;
+            this.linkLabel4.Text = "famfamfam.com/lab/icons/silk";
+            this.linkLabel4.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel4_LinkClicked);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(10, 168);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(39, 13);
+            this.label8.TabIndex = 18;
+            this.label8.Text = "Icons -";
+            // 
+            // linkLabel3
+            // 
+            this.linkLabel3.AutoSize = true;
+            this.linkLabel3.Location = new System.Drawing.Point(142, 145);
+            this.linkLabel3.Name = "linkLabel3";
+            this.linkLabel3.Size = new System.Drawing.Size(112, 13);
+            this.linkLabel3.TabIndex = 15;
+            this.linkLabel3.TabStop = true;
+            this.linkLabel3.Text = "openil.sourceforge.net";
+            this.linkLabel3.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel3_LinkClicked);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(10, 145);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(132, 13);
+            this.label7.TabIndex = 16;
+            this.label7.Text = "Image Loading via DevIL -";
+            // 
+            // linkLabel2
+            // 
+            this.linkLabel2.AutoSize = true;
+            this.linkLabel2.Location = new System.Drawing.Point(220, 122);
+            this.linkLabel2.Name = "linkLabel2";
+            this.linkLabel2.Size = new System.Drawing.Size(80, 13);
+            this.linkLabel2.TabIndex = 12;
+            this.linkLabel2.TabStop = true;
+            this.linkLabel2.Text = "me@torrunt.net";
+            this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel2_LinkClicked);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(10, 122);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(211, 13);
+            this.label6.TabIndex = 14;
+            this.label6.Text = "Created by Corey Zeke Womack (Torrunt) -\r\n";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(8, 9);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(87, 25);
+            this.label5.TabIndex = 1;
+            this.label5.Text = "vimage";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(10, 43);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(188, 13);
+            this.label4.TabIndex = 0;
+            this.label4.Text = "A simplistic image viewer for Windows.";
+            // 
             // contextMenuStrip_Empty
             // 
             this.contextMenuStrip_Empty.Name = "contextMenuStrip1";
@@ -445,138 +580,16 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(434, 361);
             this.tableLayoutPanel1.TabIndex = 13;
             // 
-            // tabPage4
+            // checkBox_ListenForConfigChanges
             // 
-            this.tabPage4.AutoScroll = true;
-            this.tabPage4.Controls.Add(this.label_version);
-            this.tabPage4.Controls.Add(this.linkLabel6);
-            this.tabPage4.Controls.Add(this.linkLabel5);
-            this.tabPage4.Controls.Add(this.linkLabel4);
-            this.tabPage4.Controls.Add(this.label8);
-            this.tabPage4.Controls.Add(this.linkLabel3);
-            this.tabPage4.Controls.Add(this.label7);
-            this.tabPage4.Controls.Add(this.linkLabel2);
-            this.tabPage4.Controls.Add(this.label6);
-            this.tabPage4.Controls.Add(this.label5);
-            this.tabPage4.Controls.Add(this.label4);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size(426, 305);
-            this.tabPage4.TabIndex = 3;
-            this.tabPage4.Text = "About";
-            this.tabPage4.UseVisualStyleBackColor = true;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(10, 43);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(188, 13);
-            this.label4.TabIndex = 0;
-            this.label4.Text = "A simplistic image viewer for Windows.";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(8, 9);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(87, 25);
-            this.label5.TabIndex = 1;
-            this.label5.Text = "vimage";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(10, 122);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(211, 13);
-            this.label6.TabIndex = 14;
-            this.label6.Text = "Created by Corey Zeke Womack (Torrunt) -\r\n";
-            // 
-            // linkLabel2
-            // 
-            this.linkLabel2.AutoSize = true;
-            this.linkLabel2.Location = new System.Drawing.Point(220, 122);
-            this.linkLabel2.Name = "linkLabel2";
-            this.linkLabel2.Size = new System.Drawing.Size(80, 13);
-            this.linkLabel2.TabIndex = 12;
-            this.linkLabel2.TabStop = true;
-            this.linkLabel2.Text = "me@torrunt.net";
-            this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel2_LinkClicked);
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(10, 145);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(132, 13);
-            this.label7.TabIndex = 16;
-            this.label7.Text = "Image Loading via DevIL -";
-            // 
-            // linkLabel3
-            // 
-            this.linkLabel3.AutoSize = true;
-            this.linkLabel3.Location = new System.Drawing.Point(142, 145);
-            this.linkLabel3.Name = "linkLabel3";
-            this.linkLabel3.Size = new System.Drawing.Size(112, 13);
-            this.linkLabel3.TabIndex = 15;
-            this.linkLabel3.TabStop = true;
-            this.linkLabel3.Text = "openil.sourceforge.net";
-            this.linkLabel3.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel3_LinkClicked);
-            // 
-            // linkLabel4
-            // 
-            this.linkLabel4.AutoSize = true;
-            this.linkLabel4.Location = new System.Drawing.Point(48, 168);
-            this.linkLabel4.Name = "linkLabel4";
-            this.linkLabel4.Size = new System.Drawing.Size(150, 13);
-            this.linkLabel4.TabIndex = 17;
-            this.linkLabel4.TabStop = true;
-            this.linkLabel4.Text = "famfamfam.com/lab/icons/silk";
-            this.linkLabel4.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel4_LinkClicked);
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(10, 168);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(39, 13);
-            this.label8.TabIndex = 18;
-            this.label8.Text = "Icons -";
-            // 
-            // linkLabel5
-            // 
-            this.linkLabel5.AutoSize = true;
-            this.linkLabel5.Location = new System.Drawing.Point(10, 71);
-            this.linkLabel5.Name = "linkLabel5";
-            this.linkLabel5.Size = new System.Drawing.Size(94, 13);
-            this.linkLabel5.TabIndex = 12;
-            this.linkLabel5.TabStop = true;
-            this.linkLabel5.Text = "torrunt.net/vimage";
-            this.linkLabel5.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
-            // 
-            // linkLabel6
-            // 
-            this.linkLabel6.AutoSize = true;
-            this.linkLabel6.Location = new System.Drawing.Point(10, 87);
-            this.linkLabel6.Name = "linkLabel6";
-            this.linkLabel6.Size = new System.Drawing.Size(137, 13);
-            this.linkLabel6.TabIndex = 19;
-            this.linkLabel6.TabStop = true;
-            this.linkLabel6.Text = "github.com/Torrunt/vimage";
-            this.linkLabel6.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel6_LinkClicked);
-            // 
-            // label_version
-            // 
-            this.label_version.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label_version.AutoSize = true;
-            this.label_version.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_version.Location = new System.Drawing.Point(346, 13);
-            this.label_version.Name = "label_version";
-            this.label_version.Size = new System.Drawing.Size(72, 20);
-            this.label_version.TabIndex = 20;
-            this.label_version.Text = "version #";
+            this.checkBox_ListenForConfigChanges.AutoSize = true;
+            this.checkBox_ListenForConfigChanges.Location = new System.Drawing.Point(9, 168);
+            this.checkBox_ListenForConfigChanges.Name = "checkBox_ListenForConfigChanges";
+            this.checkBox_ListenForConfigChanges.Size = new System.Drawing.Size(147, 17);
+            this.checkBox_ListenForConfigChanges.TabIndex = 11;
+            this.checkBox_ListenForConfigChanges.Text = "Listen for setting changes";
+            this.toolTip1.SetToolTip(this.checkBox_ListenForConfigChanges, "If ticked, vimage will reload settings automatically when they are changed.");
+            this.checkBox_ListenForConfigChanges.UseVisualStyleBackColor = true;
             // 
             // ConfigWindow
             // 
@@ -601,11 +614,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ContextMenu_Animation_InsertAtIndex)).EndInit();
             this.panel2.ResumeLayout(false);
             this.tabControl_ContextMenus.ResumeLayout(false);
+            this.tabPage4.ResumeLayout(false);
+            this.tabPage4.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
-            this.tabPage4.ResumeLayout(false);
-            this.tabPage4.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -656,6 +669,7 @@
         private System.Windows.Forms.LinkLabel linkLabel5;
         private System.Windows.Forms.LinkLabel linkLabel6;
         private System.Windows.Forms.Label label_version;
+        private System.Windows.Forms.CheckBox checkBox_ListenForConfigChanges;
     }
 }
 

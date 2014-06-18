@@ -68,6 +68,11 @@ namespace vimage
             get { return (Boolean)Settings["OPENSETTINGSEXE"]; }
             set { Settings["OPENSETTINGSEXE"] = value; }
         }
+        public bool Setting_ListenForConfigChanges
+        {
+            get { return (Boolean)Settings["LISTENFORCONFIGCHANGES"]; }
+            set { Settings["LISTENFORCONFIGCHANGES"] = value; }
+        }
         public int Setting_MinImageSize
         {
             get { return (int)Settings["MINIMAGESIZE"]; }
@@ -157,8 +162,7 @@ namespace vimage
             ContextMenu.Add(new { name = "Open file location", func = MenuFuncs.OPEN_FILE_LOCATION });
             ContextMenu.Add(new { name = "Delete", func = MenuFuncs.DELETE });
             ContextMenu.Add(new { name = "-", func = "-" });
-            ContextMenu.Add(new { name = "Open Settings", func = MenuFuncs.OPEN_SETTINGS });
-            ContextMenu.Add(new { name = "Reload Settings", func = MenuFuncs.RELOAD_SETTINGS });
+            ContextMenu.Add(new { name = "Settings", func = MenuFuncs.OPEN_SETTINGS });
             ContextMenu.Add(new { name = "", func = MenuFuncs.VERSION_NAME });
 
             ContextMenu_Animation.Add(new { name = "Next Frame", func = MenuFuncs.NEXT_FRAME });
@@ -178,6 +182,7 @@ namespace vimage
                 { "POSITIONLARGEWIDEIMAGESINCORNER", true },
                 { "PRELOADNEXTIMAGE", true },
                 { "OPENSETTINGSEXE", true },
+                { "LISTENFORCONFIGCHANGES", true },
                 { "MINIMAGESIZE", 64 },
                 { "SMOOTHINGMINIMAGESIZE", 65 },
 
@@ -417,6 +422,8 @@ namespace vimage
             WriteSetting(writer, "PreloadNextImage", Setting_PreloadNextImage, 
                 "when using the next/prev image buttons, the image after the one just loaded will be loaded as well");
             WriteSetting(writer, "OpenSettingsEXE", Setting_OpenSettingsEXE, "if false, will open config.txt instead");
+            WriteSetting(writer, "ListenForConfigChanges", Setting_ListenForConfigChanges,
+                "vimage will reload settings automatically when they are changed.");
             WriteSetting(writer, "MinImageSize", Setting_MinImageSize, 
                 "if an image is smaller than this (in width or height) it will scaled up to it automatically");
             WriteSetting(writer, "SmoothingMinImageSize", Setting_SmoothingMinImageSize, 

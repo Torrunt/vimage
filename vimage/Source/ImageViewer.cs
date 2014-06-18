@@ -37,6 +37,8 @@ namespace vimage
         private ContextMenu ContextMenu;
 
         public Config Config;
+        private FileSystemWatcher ConfigFileWatcher;
+        private bool ReloadConfigNextTick = false;
 
         private bool Updated = false;
         public bool CloseNextTick = false;
@@ -90,7 +92,15 @@ namespace vimage
             // Load Config File
             Config = new Config();
             Config.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
-            
+
+            if (Config.Setting_ListenForConfigChanges)
+            {
+                ConfigFileWatcher = new FileSystemWatcher(AppDomain.CurrentDomain.BaseDirectory, "config.txt");
+                ConfigFileWatcher.NotifyFilter = NotifyFilters.LastWrite;
+                ConfigFileWatcher.Changed += new FileSystemEventHandler(OnConfigChanged);
+                ConfigFileWatcher.EnableRaisingEvents = true;
+            }
+
             // Create Context Menu
             ContextMenu = new ContextMenu(this);
             ContextMenu.LoadItems(Config.ContextMenu, Config.ContextMenu_Animation, Config.ContextMenu_Animation_InsertAtIndex);
@@ -207,6 +217,12 @@ namespace vimage
 
                 // Process events
                 Window.DispatchEvents();
+
+                if (ReloadConfigNextTick)
+                {
+                    ReloadConfig();
+                    ReloadConfigNextTick = false;
+                }
                 
                 // Animated Image?
                 if (Image is AnimatedImage)
@@ -980,6 +996,12 @@ namespace vimage
             Config.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
             ContextMenu.LoadItems(Config.ContextMenu, Config.ContextMenu_Animation, Config.ContextMenu_Animation_InsertAtIndex);
             ContextMenu.Setup(true);
+        }
+        private void OnConfigChanged(object source, FileSystemEventArgs e)
+        {
+            // Wait a bit for the config file to be unlocked
+            Thread.Sleep(500);
+            ReloadConfigNextTick = true;
         }
 
     }
