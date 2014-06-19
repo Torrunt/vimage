@@ -138,7 +138,7 @@ namespace vimage
                     AutomaticallyZoomed = true;
                 }
             }
-            else if (Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_MinImageSize)
+            if (Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_MinImageSize)
             {
                 // Reisze images smaller than min size to min size
                 AutomaticallyZoomed = true;
@@ -146,6 +146,7 @@ namespace vimage
             }
                 // Use Texture Size * Zoom instead of Window.Size since it wouldn't have updated yet
             Vector2i winSize = new Vector2i((int)(Image.Texture.Size.X * CurrentZoom), (int)(Image.Texture.Size.Y * CurrentZoom));
+
 
             // Position Window
             Vector2i winPos;
@@ -630,6 +631,12 @@ namespace vimage
                     Zoom(1 + (((float)currentBounds.Width - Image.Texture.Size.X) / Image.Texture.Size.X), true);
                     AutomaticallyZoomed = true;
                 }
+            }
+            if (Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_MinImageSize)
+            {
+                // Reisze images smaller than min size to min size
+                AutomaticallyZoomed = true;
+                Zoom(Config.Setting_MinImageSize / Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y), true);
             }
 
             // Center image or place in top-left corner if it's a large/wide image.

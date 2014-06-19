@@ -56,6 +56,9 @@ namespace vimage
                 int imageID = IL.GenerateImage();
                 IL.BindImage(imageID);
 
+                IL.Enable(ILEnable.AbsoluteOrigin);
+                IL.SetOriginLocation(DevIL.OriginLocation.UpperLeft);
+
                 bool loaded = false;
                 using (FileStream fileStream = File.OpenRead(fileName))
                     loaded = IL.LoadImageFromStream(fileStream);
@@ -92,7 +95,7 @@ namespace vimage
 
             int width = IL.GetImageInfo().Width;
             int height = IL.GetImageInfo().Height;
-            
+
             Texture texture = new Texture((uint)width, (uint)height);
             Texture.Bind(texture);
             {
@@ -104,15 +107,6 @@ namespace vimage
                     IL.GetInteger(ILIntegerMode.ImageFormat), ILDefines.IL_UNSIGNED_BYTE,
                     IL.GetData()
                     );
-
-                Gl.glBegin(Gl.GL_QUADS);
-                {
-                    Gl.glTexCoord2f(0.0f, 0.0f); Gl.glVertex2f(-width / 2.0f, height / 2.0f);
-                    Gl.glTexCoord2f(0.0f, 1.0f); Gl.glVertex2f(-width / 2.0f, height / 2.0f);
-                    Gl.glTexCoord2f(1, 1); Gl.glVertex2f(1, -1);
-                    Gl.glTexCoord2f(1, 0); Gl.glVertex2f(1, 1);
-                }
-                Gl.glEnd();
             }
             Texture.Bind(null);
 
