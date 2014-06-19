@@ -56,9 +56,10 @@ namespace vimage
         private int DefaultRotation = 0;
         public bool FlippedX = false;
         public bool FitToMonitorHeight = false;
+        public bool FitToMonitorWidth = false;
         private bool FitToMonitorHeightForced = false;
-        /// <summary>If true will resize to bounds height instead of working area height</summary>
-        private bool FitToMonitorHeightAlternative = false;
+        /// <summary>If true will resize based on working area instead of bounds (ie: screen area minus task bar).</summary>
+        private bool FitToMonitorAlt = false;
         public bool BackgroundsForImagesWithTransparency = false;
         public bool AlwaysOnTop = false;
         private bool AlwaysOnTopForced = false;
@@ -315,6 +316,7 @@ namespace vimage
             AutomaticallyZoomed = false;
             FitToMonitorHeightForced = false;
             FitToMonitorHeight = false;
+            FitToMonitorWidth = false;
         }
 
         private void OnMouseDown(Object sender, MouseButtonEventArgs e) { ControlDown(e.Button); }
@@ -354,9 +356,11 @@ namespace vimage
             if (Config.IsControl(code, Config.Control_ResetImage))
                 ResetImage();
 
-            // Fit To Monitor Height
+            // Fit To Monitor Height/Width
             if (Config.IsControl(code, Config.Control_FitToMonitorHeight))
-                ToggleFitToMonitorHeight();
+                ToggleFitToMonitor(Config.HEIGHT);
+            if (Config.IsControl(code, Config.Control_FitToMonitorWidth))
+                ToggleFitToMonitor(Config.WIDTH);
 
             // Animated Image - Pause/Play
             if (Config.IsControl(code, Config.Control_PauseAnimation))
@@ -404,7 +408,7 @@ namespace vimage
 
             ZoomFaster = false;
             ZoomAlt = false;
-            FitToMonitorHeightAlternative = false;
+            FitToMonitorAlt = false;
         }
         private void ControlDown(object code)
         {
@@ -429,8 +433,8 @@ namespace vimage
                 ZoomAlt = true;
 
             // Fit To Monitor Height Alternative
-            if (Config.IsControl(code, Config.Control_FitToMonitorHeightAlternative))
-                FitToMonitorHeightAlternative = true;
+            if (Config.IsControl(code, Config.Control_FitToMonitorAlt))
+                FitToMonitorAlt = true;
         }
      
 
@@ -553,12 +557,12 @@ namespace vimage
             Redraw();
         }
 
-        public void ToggleFitToMonitorHeight()
+        public void ToggleFitToMonitor(int dimension)
         {
             UnforceAlwaysOnTop();
 
             IntRect bounds;
-            if (FitToMonitorHeightAlternative)
+            if (FitToMonitorAlt)
                 bounds = ImageViewerUtils.GetCurrentWorkingArea(Mouse.GetPosition());
             else
                 bounds = ImageViewerUtils.GetCurrentBounds(Mouse.GetPosition());
@@ -566,17 +570,30 @@ namespace vimage
             if (CurrentZoom == 1)
             {
                 // Fit to Monitor Height
-                FitToMonitorHeight = true;
-                if (Image.Rotation == 90 || Image.Rotation == 270)
-                    Zoom(1 + (((float)bounds.Height - Image.Texture.Size.X) / Image.Texture.Size.X), true);
-                else
-                    Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
-                NextWindowPos = new Vector2i(NextWindowPos.X, bounds.Top);
+                if (dimension == Config.HEIGHT)
+                {
+                    FitToMonitorHeight = true;
+                    if (Image.Rotation == 90 || Image.Rotation == 270)
+                        Zoom(1 + (((float)bounds.Height - Image.Texture.Size.X) / Image.Texture.Size.X), true);
+                    else
+                        Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
+                    NextWindowPos = new Vector2i(NextWindowPos.X, bounds.Top);
+                }
+                else if (dimension == Config.WIDTH)
+                {
+                    FitToMonitorWidth = true;
+                    if (Image.Rotation == 90 || Image.Rotation == 270)
+                        Zoom(1 + (((float)bounds.Width - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
+                    else
+                        Zoom(1 + (((float)bounds.Width - Image.Texture.Size.X) / Image.Texture.Size.X), true);
+                    NextWindowPos = new Vector2i(bounds.Left, NextWindowPos.Y);
+                }
             }
             else
             {
                 // Full Size
                 FitToMonitorHeight = false;
+                FitToMonitorWidth = false;
                 Zoom(1, true);
                 NextWindowPos = new Vector2i(NextWindowPos.X < 0 ? 0 : NextWindowPos.X, NextWindowPos.Y < 0 ? 0 : NextWindowPos.Y);
             }
@@ -584,7 +601,7 @@ namespace vimage
 
             if (Image.Texture.Size.X * CurrentZoom >= bounds.Width)
                 NextWindowPos = new Vector2i(bounds.Left, bounds.Top); // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
-            else if (!FitToMonitorHeightAlternative)
+            else if (!FitToMonitorAlt)
                 ForceAlwaysOnTopNextTick = true;
 
             AutomaticallyZoomed = false;

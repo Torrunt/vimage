@@ -56,8 +56,9 @@ namespace vimage_settings
             AddControlItem("Toggle Smoothing", vimageConfig.Control_ToggleSmoothing);
             AddControlItem("Zoom Alt", vimageConfig.Control_ZoomAlt);
             AddControlItem("Zoom Faster", vimageConfig.Control_ZoomFaster);
-            AddControlItem("Fit To Monitor Height Alternative", vimageConfig.Control_FitToMonitorHeightAlternative);
+            AddControlItem("Fit To Monitor Alt", vimageConfig.Control_FitToMonitorAlt);
             AddControlItem("Fit To Monitor Height", vimageConfig.Control_FitToMonitorHeight);
+            AddControlItem("Fit To Monitor Width", vimageConfig.Control_FitToMonitorWidth);
             AddControlItem("Flip", vimageConfig.Control_Flip);
             AddControlItem("Rotate Anti-Clockwise", vimageConfig.Control_RotateAntiClockwise);
             AddControlItem("Rotate Clockwise", vimageConfig.Control_RotateClockwise);
@@ -83,7 +84,7 @@ namespace vimage_settings
         private void AddControlItem(string name, List<int> control)
         {
             ControlItem item = new ControlItem(name, control);
-            tabPage2.Controls.Add(item);
+            panel_Controls.Controls.Add(item);
             ControlItems.Add(item);
         }
 
@@ -215,11 +216,21 @@ namespace vimage_settings
             }
         }
 
+        private void button_ControlsDefault_Click(object sender, EventArgs e)
+        {
+            // Reset Controls to Default
+            vimageConfig.SetDefaultControls();
+
+            foreach (ControlItem item in ControlItems)
+                item.UpdateBindings();
+
+            panel_Controls.Focus();
+        }
+
         private void button_ContextMenuDefault_Click(object sender, EventArgs e)
         {
             // Reset Context Menu Setup to Default
-            vimageConfig.ContextMenu = new List<object>(vimageConfig.ContextMenu_Default);
-            vimageConfig.ContextMenu_Animation = new List<object>(vimageConfig.ContextMenu_Animation_Default);
+            vimageConfig.SetDefaultContextMenu();
 
             // Clear items
             if (ContextMenuItems.Count != 0)
@@ -276,7 +287,9 @@ namespace vimage_settings
         {
             // focus on tab change to allow for scrolling with mouse wheel
             TabControl.SelectedTab.Focus();
-            if (TabControl.SelectedTab == tabPage3)
+            if (TabControl.SelectedTab == tabPage2)
+                panel_Controls.Focus();
+            else if (TabControl.SelectedTab == tabPage3)
                 tabControl_ContextMenus.SelectedTab.Focus();
         }
 

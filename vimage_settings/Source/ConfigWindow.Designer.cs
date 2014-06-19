@@ -32,6 +32,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigWindow));
             this.TabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.comboBox_LimitImagesToMonitor = new System.Windows.Forms.ComboBox();
+            this.label15 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
@@ -52,15 +54,15 @@
             this.checkBox_SmoothingDefault = new System.Windows.Forms.CheckBox();
             this.checkBox_OpenAtMousePosition = new System.Windows.Forms.CheckBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.panel_Controls = new System.Windows.Forms.Panel();
+            this.button_ControlsDefault = new System.Windows.Forms.Button();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.checkBox_ContextMenuShowMargin = new System.Windows.Forms.CheckBox();
             this.numericUpDown_ContextMenu_Animation_InsertAtIndex = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.button_ContextMenuAddNew = new System.Windows.Forms.Button();
-            this.button_ContextMenuDefault = new System.Windows.Forms.Button();
             this.tabControl_ContextMenus = new System.Windows.Forms.TabControl();
             this.tabPage_ContextMenuGeneral = new System.Windows.Forms.TabPage();
             this.tabPage_ContextMenuAnimation = new System.Windows.Forms.TabPage();
@@ -82,23 +84,28 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.label15 = new System.Windows.Forms.Label();
-            this.comboBox_LimitImagesToMonitor = new System.Windows.Forms.ComboBox();
+            this.button_ContextMenuDefault = new System.Windows.Forms.Button();
+            this.button_ContextMenuAddNew = new System.Windows.Forms.Button();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.panel4 = new System.Windows.Forms.Panel();
             this.TabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ZoomSpeedFast)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ZoomSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_SmoothingMinImageSize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_MinImageSize)).BeginInit();
+            this.tabPage2.SuspendLayout();
+            this.tableLayoutPanel3.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ContextMenu_Animation_InsertAtIndex)).BeginInit();
-            this.panel2.SuspendLayout();
             this.tabControl_ContextMenus.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.panel1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
+            this.panel2.SuspendLayout();
+            this.panel4.SuspendLayout();
             this.SuspendLayout();
             // 
             // TabControl
@@ -112,7 +119,7 @@
             this.TabControl.Margin = new System.Windows.Forms.Padding(0);
             this.TabControl.Name = "TabControl";
             this.TabControl.SelectedIndex = 0;
-            this.TabControl.Size = new System.Drawing.Size(434, 331);
+            this.TabControl.Size = new System.Drawing.Size(434, 321);
             this.TabControl.TabIndex = 0;
             this.TabControl.TabStop = false;
             this.TabControl.SelectedIndexChanged += new System.EventHandler(this.TabControl_SelectedIndexChanged);
@@ -148,6 +155,28 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "General";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // comboBox_LimitImagesToMonitor
+            // 
+            this.comboBox_LimitImagesToMonitor.FormattingEnabled = true;
+            this.comboBox_LimitImagesToMonitor.Items.AddRange(new object[] {
+            "NONE",
+            "HEIGHT",
+            "WIDTH"});
+            this.comboBox_LimitImagesToMonitor.Location = new System.Drawing.Point(330, 166);
+            this.comboBox_LimitImagesToMonitor.Name = "comboBox_LimitImagesToMonitor";
+            this.comboBox_LimitImagesToMonitor.Size = new System.Drawing.Size(72, 21);
+            this.comboBox_LimitImagesToMonitor.TabIndex = 21;
+            this.comboBox_LimitImagesToMonitor.Text = "HEIGHT";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(6, 169);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(113, 13);
+            this.label15.TabIndex = 20;
+            this.label15.Text = "Limit images to monitor";
             // 
             // label13
             // 
@@ -341,13 +370,50 @@
             // tabPage2
             // 
             this.tabPage2.AutoScroll = true;
+            this.tabPage2.Controls.Add(this.tableLayoutPanel3);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(426, 305);
+            this.tabPage2.Size = new System.Drawing.Size(426, 295);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Control Bindings";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // tableLayoutPanel3
+            // 
+            this.tableLayoutPanel3.ColumnCount = 1;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel3.Controls.Add(this.panel_Controls, 0, 0);
+            this.tableLayoutPanel3.Controls.Add(this.panel4, 0, 1);
+            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            this.tableLayoutPanel3.RowCount = 2;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(420, 289);
+            this.tableLayoutPanel3.TabIndex = 0;
+            // 
+            // panel_Controls
+            // 
+            this.panel_Controls.AutoScroll = true;
+            this.panel_Controls.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel_Controls.Location = new System.Drawing.Point(3, 3);
+            this.panel_Controls.Name = "panel_Controls";
+            this.panel_Controls.Size = new System.Drawing.Size(414, 253);
+            this.panel_Controls.TabIndex = 13;
+            // 
+            // button_ControlsDefault
+            // 
+            this.button_ControlsDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_ControlsDefault.Location = new System.Drawing.Point(346, 5);
+            this.button_ControlsDefault.Name = "button_ControlsDefault";
+            this.button_ControlsDefault.Size = new System.Drawing.Size(75, 23);
+            this.button_ControlsDefault.TabIndex = 12;
+            this.button_ControlsDefault.TabStop = false;
+            this.button_ControlsDefault.Text = "Default";
+            this.button_ControlsDefault.UseVisualStyleBackColor = true;
+            this.button_ControlsDefault.Click += new System.EventHandler(this.button_ControlsDefault_Click);
             // 
             // tabPage3
             // 
@@ -417,42 +483,6 @@
             this.label3.Size = new System.Drawing.Size(150, 13);
             this.label3.TabIndex = 9;
             this.label3.Text = "Insert animation menu at index";
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.button_ContextMenuAddNew);
-            this.panel2.Controls.Add(this.button_ContextMenuDefault);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(3, 278);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(420, 24);
-            this.panel2.TabIndex = 16;
-            // 
-            // button_ContextMenuAddNew
-            // 
-            this.button_ContextMenuAddNew.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button_ContextMenuAddNew.BackgroundImage = global::vimage_settings.Properties.Resources.add;
-            this.button_ContextMenuAddNew.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.button_ContextMenuAddNew.Location = new System.Drawing.Point(-1, -1);
-            this.button_ContextMenuAddNew.Name = "button_ContextMenuAddNew";
-            this.button_ContextMenuAddNew.Size = new System.Drawing.Size(23, 23);
-            this.button_ContextMenuAddNew.TabIndex = 13;
-            this.button_ContextMenuAddNew.TabStop = false;
-            this.toolTip1.SetToolTip(this.button_ContextMenuAddNew, "Add item below currently selected");
-            this.button_ContextMenuAddNew.UseVisualStyleBackColor = true;
-            this.button_ContextMenuAddNew.Click += new System.EventHandler(this.button_ContextMenuAddNew_Click);
-            // 
-            // button_ContextMenuDefault
-            // 
-            this.button_ContextMenuDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_ContextMenuDefault.Location = new System.Drawing.Point(346, -1);
-            this.button_ContextMenuDefault.Name = "button_ContextMenuDefault";
-            this.button_ContextMenuDefault.Size = new System.Drawing.Size(75, 23);
-            this.button_ContextMenuDefault.TabIndex = 11;
-            this.button_ContextMenuDefault.TabStop = false;
-            this.button_ContextMenuDefault.Text = "Default";
-            this.button_ContextMenuDefault.UseVisualStyleBackColor = true;
-            this.button_ContextMenuDefault.Click += new System.EventHandler(this.button_ContextMenuDefault_Click);
             // 
             // tabControl_ContextMenus
             // 
@@ -659,7 +689,7 @@
             this.panel1.Controls.Add(this.linkLabel1);
             this.panel1.Controls.Add(this.button_Save);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(3, 334);
+            this.panel1.Location = new System.Drawing.Point(3, 324);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(428, 24);
             this.panel1.TabIndex = 12;
@@ -677,36 +707,60 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(434, 361);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(434, 351);
             this.tableLayoutPanel1.TabIndex = 13;
             // 
-            // label15
+            // button_ContextMenuDefault
             // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(6, 169);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(113, 13);
-            this.label15.TabIndex = 20;
-            this.label15.Text = "Limit images to monitor";
+            this.button_ContextMenuDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_ContextMenuDefault.Location = new System.Drawing.Point(346, -1);
+            this.button_ContextMenuDefault.Name = "button_ContextMenuDefault";
+            this.button_ContextMenuDefault.Size = new System.Drawing.Size(75, 23);
+            this.button_ContextMenuDefault.TabIndex = 11;
+            this.button_ContextMenuDefault.TabStop = false;
+            this.button_ContextMenuDefault.Text = "Default";
+            this.button_ContextMenuDefault.UseVisualStyleBackColor = true;
+            this.button_ContextMenuDefault.Click += new System.EventHandler(this.button_ContextMenuDefault_Click);
             // 
-            // comboBox_LimitImagesToMonitor
+            // button_ContextMenuAddNew
             // 
-            this.comboBox_LimitImagesToMonitor.FormattingEnabled = true;
-            this.comboBox_LimitImagesToMonitor.Items.AddRange(new object[] {
-            "NONE",
-            "HEIGHT",
-            "WIDTH"});
-            this.comboBox_LimitImagesToMonitor.Location = new System.Drawing.Point(330, 166);
-            this.comboBox_LimitImagesToMonitor.Name = "comboBox_LimitImagesToMonitor";
-            this.comboBox_LimitImagesToMonitor.Size = new System.Drawing.Size(72, 21);
-            this.comboBox_LimitImagesToMonitor.TabIndex = 21;
-            this.comboBox_LimitImagesToMonitor.Text = "HEIGHT";
+            this.button_ContextMenuAddNew.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button_ContextMenuAddNew.BackgroundImage = global::vimage_settings.Properties.Resources.add;
+            this.button_ContextMenuAddNew.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.button_ContextMenuAddNew.Location = new System.Drawing.Point(-1, -1);
+            this.button_ContextMenuAddNew.Name = "button_ContextMenuAddNew";
+            this.button_ContextMenuAddNew.Size = new System.Drawing.Size(23, 23);
+            this.button_ContextMenuAddNew.TabIndex = 13;
+            this.button_ContextMenuAddNew.TabStop = false;
+            this.toolTip1.SetToolTip(this.button_ContextMenuAddNew, "Add item below currently selected");
+            this.button_ContextMenuAddNew.UseVisualStyleBackColor = true;
+            this.button_ContextMenuAddNew.Click += new System.EventHandler(this.button_ContextMenuAddNew_Click);
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.button_ContextMenuAddNew);
+            this.panel2.Controls.Add(this.button_ContextMenuDefault);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(3, 278);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(420, 24);
+            this.panel2.TabIndex = 16;
+            // 
+            // panel4
+            // 
+            this.panel4.Controls.Add(this.button_ControlsDefault);
+            this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel4.Location = new System.Drawing.Point(0, 259);
+            this.panel4.Margin = new System.Windows.Forms.Padding(0);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(420, 30);
+            this.panel4.TabIndex = 14;
             // 
             // ConfigWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(434, 361);
+            this.ClientSize = new System.Drawing.Size(434, 351);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -720,18 +774,21 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ZoomSpeed)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_SmoothingMinImageSize)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_MinImageSize)).EndInit();
+            this.tabPage2.ResumeLayout(false);
+            this.tableLayoutPanel3.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ContextMenu_Animation_InsertAtIndex)).EndInit();
-            this.panel2.ResumeLayout(false);
             this.tabControl_ContextMenus.ResumeLayout(false);
             this.tabPage4.ResumeLayout(false);
             this.tabPage4.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
+            this.panel4.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -756,15 +813,12 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown numericUpDown_ContextMenu_Animation_InsertAtIndex;
         private System.Windows.Forms.LinkLabel linkLabel1;
-        private System.Windows.Forms.Button button_ContextMenuDefault;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip_Empty;
         private System.Windows.Forms.ToolTip toolTip1;
-        private System.Windows.Forms.Button button_ContextMenuAddNew;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.Panel panel3;
-        private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.CheckBox checkBox_ContextMenuShowMargin;
         private System.Windows.Forms.TabControl tabControl_ContextMenus;
         private System.Windows.Forms.TabPage tabPage_ContextMenuGeneral;
@@ -792,6 +846,13 @@
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.ComboBox comboBox_LimitImagesToMonitor;
         private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.Button button_ControlsDefault;
+        private System.Windows.Forms.Panel panel_Controls;
+        private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Button button_ContextMenuAddNew;
+        private System.Windows.Forms.Button button_ContextMenuDefault;
     }
 }
 

@@ -17,7 +17,8 @@ namespace vimage
         public List<int> Control_RotateAntiClockwise = new List<int>();
         public List<int> Control_Flip = new List<int>();
         public List<int> Control_FitToMonitorHeight = new List<int>();
-        public List<int> Control_FitToMonitorHeightAlternative = new List<int>();
+        public List<int> Control_FitToMonitorWidth = new List<int>();
+        public List<int> Control_FitToMonitorAlt = new List<int>();
         public List<int> Control_ZoomFaster = new List<int>();
         public List<int> Control_ZoomAlt = new List<int>();
         public List<int> Control_ToggleSmoothing = new List<int>();
@@ -100,9 +101,6 @@ namespace vimage
 
         public List<object> ContextMenu = new List<object>();
         public List<object> ContextMenu_Animation = new List<object>();
-        public List<object> ContextMenu_Default = new List<object>();
-        public List<object> ContextMenu_Animation_Default = new List<object>();
-
         public int ContextMenu_Animation_InsertAtIndex
         {
             get { return (int)Settings["CONTEXTMENU_ANIMATION_INSERTATINDEX"]; }
@@ -124,68 +122,9 @@ namespace vimage
         }
         public void Init()
         {
-            SetControls(Control_Drag, "MOUSELEFT");
-            SetControls(Control_Close, "ESC", "BACKSPACE");
-            SetControls(Control_OpenContextMenu, "MOUSERIGHT");
-            SetControls(Control_PrevImage, "LEFT", "PAGE UP", "MOUSE4");
-            SetControls(Control_NextImage, "RIGHT", "PAGE DOWN", "MOUSE5");
-            SetControls(Control_RotateClockwise, "UP");
-            SetControls(Control_RotateAntiClockwise, "DOWN");
-            SetControls(Control_Flip, "F");
-            SetControls(Control_FitToMonitorHeight, "MOUSEMIDDLE");
-            SetControls(Control_FitToMonitorHeightAlternative, "RSHIFT", "LSHIFT");
-            SetControls(Control_ZoomFaster, "RSHIFT", "LSHIFT");
-            SetControls(Control_ZoomAlt, "RCONTROL", "LCONTROL");
-            SetControls(Control_ToggleSmoothing, "S");
-            SetControls(Control_ToggleBackgroundForTransparency, "T");
-            SetControls(Control_ToggleAlwaysOnTop, "L");
-            SetControls(Control_PauseAnimation, "SPACE");
-            SetControls(Control_PrevFrame, "<");
-            SetControls(Control_NextFrame, ">");
-            SetControls(Control_OpenConfig, "O");
-            SetControls(Control_ReloadConfig, "P");
-            SetControls(Control_ResetImage, "R");
-            SetControls(Control_OpenAtLocation, "");
-            SetControls(Control_Delete, "DELETE");
-            SetControls(Control_OpenDuplicateImage, "C");
+            SetDefaultControls();
 
-            ContextMenu.Add(new { name = "Close", func = MenuFuncs.CLOSE });
-            ContextMenu.Add(new { name = "-", func = "-" });
-            ContextMenu.Add(new { name = "Next Image", func = MenuFuncs.NEXT_IMAGE });
-            ContextMenu.Add(new { name = "Prev Image", func = MenuFuncs.PREV_IMAGE });
-            ContextMenu.Add("Sort by");
-            List<object> SubMenu_SortBy = new List<object>();
-            SubMenu_SortBy.Add(new { name = "Name", func = MenuFuncs.SORT_NAME });
-            SubMenu_SortBy.Add(new { name = "Date modified", func = MenuFuncs.SORT_DATE_MODIFIED });
-            SubMenu_SortBy.Add(new { name = "Date created", func = MenuFuncs.SORT_DATE_CREATED });
-            SubMenu_SortBy.Add(new { name = "Size", func = MenuFuncs.SORT_SIZE });
-            SubMenu_SortBy.Add(new { name = "-", func = "-" });
-            SubMenu_SortBy.Add(new { name = "Ascending", func = MenuFuncs.SORT_ASCENDING });
-            SubMenu_SortBy.Add(new { name = "Descending", func = MenuFuncs.SORT_DESCENDING });
-            ContextMenu.Add(SubMenu_SortBy);
-            ContextMenu.Add(new { name = "-", func = "-" });
-            ContextMenu.Add(new { name = "Rotate Clockwise", func = MenuFuncs.ROTATE_CLOCKWISE });
-            ContextMenu.Add(new { name = "Rotate Anti-Clockwise", func = MenuFuncs.ROTATE_ANTICLOCKWISE });
-            ContextMenu.Add(new { name = "Flip", func = MenuFuncs.FLIP });
-            ContextMenu.Add(new { name = "Fit to monitor height", func = MenuFuncs.FIT_TO_HEIGHT });
-            ContextMenu.Add(new { name = "Reset Image", func = MenuFuncs.RESET_IMAGE });
-            ContextMenu.Add(new { name = "Smoothing", func = MenuFuncs.TOGGLE_SMOOTHING });
-            ContextMenu.Add(new { name = "Background", func = MenuFuncs.TOGGLE_BACKGROUND });
-            ContextMenu.Add(new { name = "Always on top", func = MenuFuncs.ALWAYS_ON_TOP });
-            ContextMenu.Add(new { name = "-", func = "-" });
-            ContextMenu.Add(new { name = "Open file location", func = MenuFuncs.OPEN_FILE_LOCATION });
-            ContextMenu.Add(new { name = "Delete", func = MenuFuncs.DELETE });
-            ContextMenu.Add(new { name = "-", func = "-" });
-            ContextMenu.Add(new { name = "Settings", func = MenuFuncs.OPEN_SETTINGS });
-            ContextMenu.Add(new { name = "", func = MenuFuncs.VERSION_NAME });
-
-            ContextMenu_Animation.Add(new { name = "Next Frame", func = MenuFuncs.NEXT_FRAME });
-            ContextMenu_Animation.Add(new { name = "Prev Frame", func = MenuFuncs.PREV_FRAME });
-            ContextMenu_Animation.Add(new { name = "Pause/Play Animation", func = MenuFuncs.TOGGLE_ANIMATION });
-            ContextMenu_Animation.Add(new { name = "-", func = "-" });
-
-            ContextMenu_Default = new List<object>(ContextMenu);
-            ContextMenu_Animation_Default = new List<object>(ContextMenu_Animation);
+            SetDefaultContextMenu();
 
             Settings = new Dictionary<string, object>()
             {
@@ -211,7 +150,8 @@ namespace vimage
                 { "ROTATEANTICLOCKWISE", Control_RotateAntiClockwise },
                 { "FLIP", Control_Flip },
                 { "FITTOMONITORHEIGHT", Control_FitToMonitorHeight },
-                { "FITTOMONITORHEIGHTALTERNATIVE", Control_FitToMonitorHeightAlternative },
+                { "FITTOMONITORWIDTH", Control_FitToMonitorWidth },
+                { "FITTOMONITORALT", Control_FitToMonitorAlt },
                 { "ZOOMFASTER", Control_ZoomFaster },
                 { "ZOOMALT", Control_ZoomAlt },
                 { "TOGGLESMOOTHING", Control_ToggleSmoothing },
@@ -232,6 +172,102 @@ namespace vimage
                 { "CONTEXTMENU_ANIMATION_INSERTATINDEX", 2 },
                 { "CONTEXTMENU_SHOWMARGIN", false }
             };
+        }
+
+        public void SetDefaultControls()
+        {
+            Control_Drag.Clear();
+            Control_Close.Clear();
+            Control_OpenContextMenu.Clear();
+            Control_PrevImage.Clear();
+            Control_NextImage.Clear();
+            Control_RotateClockwise.Clear();
+            Control_RotateAntiClockwise.Clear();
+            Control_Flip.Clear();
+            Control_FitToMonitorHeight.Clear();
+            Control_FitToMonitorWidth.Clear();
+            Control_FitToMonitorAlt.Clear();
+            Control_ZoomFaster.Clear();
+            Control_ZoomAlt.Clear();
+            Control_ToggleSmoothing.Clear();
+            Control_ToggleBackgroundForTransparency.Clear();
+            Control_ToggleAlwaysOnTop.Clear();
+            Control_PauseAnimation.Clear();
+            Control_PrevFrame.Clear();
+            Control_NextFrame.Clear();
+            Control_OpenConfig.Clear();
+            Control_ReloadConfig.Clear();
+            Control_ResetImage.Clear();
+            Control_OpenAtLocation.Clear();
+            Control_Delete.Clear();
+            Control_OpenDuplicateImage.Clear();
+
+            SetControls(Control_Drag, "MOUSELEFT");
+            SetControls(Control_Close, "ESC", "BACKSPACE");
+            SetControls(Control_OpenContextMenu, "MOUSERIGHT");
+            SetControls(Control_PrevImage, "LEFT", "PAGE UP", "MOUSE4");
+            SetControls(Control_NextImage, "RIGHT", "PAGE DOWN", "MOUSE5");
+            SetControls(Control_RotateClockwise, "UP");
+            SetControls(Control_RotateAntiClockwise, "DOWN");
+            SetControls(Control_Flip, "F");
+            SetControls(Control_FitToMonitorHeight, "MOUSEMIDDLE");
+            SetControls(Control_FitToMonitorWidth, "");
+            SetControls(Control_FitToMonitorAlt, "RSHIFT", "LSHIFT");
+            SetControls(Control_ZoomFaster, "RSHIFT", "LSHIFT");
+            SetControls(Control_ZoomAlt, "RCONTROL", "LCONTROL");
+            SetControls(Control_ToggleSmoothing, "S");
+            SetControls(Control_ToggleBackgroundForTransparency, "T");
+            SetControls(Control_ToggleAlwaysOnTop, "L");
+            SetControls(Control_PauseAnimation, "SPACE");
+            SetControls(Control_PrevFrame, "<");
+            SetControls(Control_NextFrame, ">");
+            SetControls(Control_OpenConfig, "O");
+            SetControls(Control_ReloadConfig, "P");
+            SetControls(Control_ResetImage, "R");
+            SetControls(Control_OpenAtLocation, "");
+            SetControls(Control_Delete, "DELETE");
+            SetControls(Control_OpenDuplicateImage, "C");
+        }
+        public void SetDefaultContextMenu()
+        {
+            ContextMenu.Clear();
+            ContextMenu_Animation.Clear();
+
+            ContextMenu.Add(new { name = "Close", func = MenuFuncs.CLOSE });
+            ContextMenu.Add(new { name = "-", func = "-" });
+            ContextMenu.Add(new { name = "Next Image", func = MenuFuncs.NEXT_IMAGE });
+            ContextMenu.Add(new { name = "Prev Image", func = MenuFuncs.PREV_IMAGE });
+            ContextMenu.Add("Sort by");
+            List<object> SubMenu_SortBy = new List<object>();
+            SubMenu_SortBy.Add(new { name = "Name", func = MenuFuncs.SORT_NAME });
+            SubMenu_SortBy.Add(new { name = "Date modified", func = MenuFuncs.SORT_DATE_MODIFIED });
+            SubMenu_SortBy.Add(new { name = "Date created", func = MenuFuncs.SORT_DATE_CREATED });
+            SubMenu_SortBy.Add(new { name = "Size", func = MenuFuncs.SORT_SIZE });
+            SubMenu_SortBy.Add(new { name = "-", func = "-" });
+            SubMenu_SortBy.Add(new { name = "Ascending", func = MenuFuncs.SORT_ASCENDING });
+            SubMenu_SortBy.Add(new { name = "Descending", func = MenuFuncs.SORT_DESCENDING });
+            ContextMenu.Add(SubMenu_SortBy);
+            ContextMenu.Add(new { name = "-", func = "-" });
+            ContextMenu.Add(new { name = "Rotate Clockwise", func = MenuFuncs.ROTATE_CLOCKWISE });
+            ContextMenu.Add(new { name = "Rotate Anti-Clockwise", func = MenuFuncs.ROTATE_ANTICLOCKWISE });
+            ContextMenu.Add(new { name = "Flip", func = MenuFuncs.FLIP });
+            ContextMenu.Add(new { name = "Fit to monitor height", func = MenuFuncs.FIT_TO_HEIGHT });
+            ContextMenu.Add(new { name = "Fit to monitor width", func = MenuFuncs.FIT_TO_WIDTH });
+            ContextMenu.Add(new { name = "Reset Image", func = MenuFuncs.RESET_IMAGE });
+            ContextMenu.Add(new { name = "Smoothing", func = MenuFuncs.TOGGLE_SMOOTHING });
+            ContextMenu.Add(new { name = "Background", func = MenuFuncs.TOGGLE_BACKGROUND });
+            ContextMenu.Add(new { name = "Always on top", func = MenuFuncs.ALWAYS_ON_TOP });
+            ContextMenu.Add(new { name = "-", func = "-" });
+            ContextMenu.Add(new { name = "Open file location", func = MenuFuncs.OPEN_FILE_LOCATION });
+            ContextMenu.Add(new { name = "Delete", func = MenuFuncs.DELETE });
+            ContextMenu.Add(new { name = "-", func = "-" });
+            ContextMenu.Add(new { name = "Settings", func = MenuFuncs.OPEN_SETTINGS });
+            ContextMenu.Add(new { name = "", func = MenuFuncs.VERSION_NAME });
+
+            ContextMenu_Animation.Add(new { name = "Next Frame", func = MenuFuncs.NEXT_FRAME });
+            ContextMenu_Animation.Add(new { name = "Prev Frame", func = MenuFuncs.PREV_FRAME });
+            ContextMenu_Animation.Add(new { name = "Pause/Play Animation", func = MenuFuncs.TOGGLE_ANIMATION });
+            ContextMenu_Animation.Add(new { name = "-", func = "-" });
         }
 
         /// <summary> Loads and parses a config txt file. If it doesn't exist, a default one will be made. </summary>
@@ -459,7 +495,8 @@ namespace vimage
             WriteControl(writer, "RotateAntiClockwise", Control_RotateAntiClockwise);
             WriteControl(writer, "Flip", Control_Flip);
             WriteControl(writer, "FitToMonitorHeight", Control_FitToMonitorHeight);
-            WriteControl(writer, "FitToMonitorHeightAlternative", Control_FitToMonitorHeightAlternative);
+            WriteControl(writer, "FitToMonitorWidth", Control_FitToMonitorWidth);
+            WriteControl(writer, "FitToMonitorAlt", Control_FitToMonitorAlt);
             WriteControl(writer, "ZoomFaster", Control_ZoomFaster);
             WriteControl(writer, "ZoomAlt", Control_ZoomAlt);
             WriteControl(writer, "ToggleSmoothing", Control_ToggleSmoothing);

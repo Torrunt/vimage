@@ -204,7 +204,8 @@ namespace vimage
                 case MenuFuncs.ROTATE_CLOCKWISE: ImageViewer.RotateImage((int)ImageViewer.Image.Rotation + 90); break;
                 case MenuFuncs.ROTATE_ANTICLOCKWISE: ImageViewer.RotateImage((int)ImageViewer.Image.Rotation - 90); break;
                 case MenuFuncs.FLIP: ImageViewer.FlipImage(); break;
-                case MenuFuncs.FIT_TO_HEIGHT: ImageViewer.ToggleFitToMonitorHeight(); break;
+                case MenuFuncs.FIT_TO_HEIGHT: ImageViewer.ToggleFitToMonitor(Config.HEIGHT); break;
+                case MenuFuncs.FIT_TO_WIDTH: ImageViewer.ToggleFitToMonitor(Config.WIDTH); break;
                 case MenuFuncs.RESET_IMAGE: ImageViewer.ResetImage(); break;
                 case MenuFuncs.TOGGLE_SMOOTHING: ImageViewer.ToggleSmoothing(); break;
                 case MenuFuncs.TOGGLE_BACKGROUND: ImageViewer.ToggleBackground(); break;

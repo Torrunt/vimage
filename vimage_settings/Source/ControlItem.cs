@@ -24,6 +24,11 @@ namespace vimage_settings
             textBox_Binding.Text = Config.ControlsToString(Control);
         }
 
+        public void UpdateBindings()
+        {
+            textBox_Binding.Text = Config.ControlsToString(Control);
+        }
+
         private void button_Clear_Click(object sender, EventArgs e)
         {
             // Clear Control

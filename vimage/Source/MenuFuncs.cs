@@ -9,6 +9,7 @@
         public const string ROTATE_ANTICLOCKWISE = "ROTATEANTICLOCKWISE";
         public const string FLIP = "FLIP";
         public const string FIT_TO_HEIGHT = "FITTOHEIGHT";
+        public const string FIT_TO_WIDTH = "FITTOWIDTH";
         public const string RESET_IMAGE = "RESETIMAGE";
         public const string TOGGLE_SMOOTHING = "TOGGLESMOOTHING";
         public const string TOGGLE_BACKGROUND = "TOGGLEBACKGROUND";
@@ -33,10 +34,10 @@
         public static readonly string[] FUNCS =
         {
             CLOSE, NEXT_IMAGE, PREV_IMAGE, ROTATE_CLOCKWISE, ROTATE_ANTICLOCKWISE,
-            FLIP, FIT_TO_HEIGHT, RESET_IMAGE, TOGGLE_SMOOTHING, TOGGLE_BACKGROUND,
+            FLIP, FIT_TO_HEIGHT, FIT_TO_WIDTH, RESET_IMAGE, TOGGLE_SMOOTHING, TOGGLE_BACKGROUND,
             ALWAYS_ON_TOP, OPEN_FILE_LOCATION, DELETE, OPEN_SETTINGS, RELOAD_SETTINGS,
             VERSION_NAME, SORT_NAME, SORT_DATE_MODIFIED, SORT_DATE_CREATED, SORT_SIZE,
-            SORT_ASCENDING, SORT_DESCENDING, NEXT_FRAME, PREV_FRAME, TOGGLE_ANIMATION
+            SORT_ASCENDING, SORT_DESCENDING, NEXT_FRAME, PREV_FRAME, TOGGLE_ANIMATION,
         };
 
         // <summary>Takes a MenuFunc name and adds space between certain words (for ease of reading).</summary>
