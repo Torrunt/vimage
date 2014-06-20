@@ -816,8 +816,13 @@ namespace vimage
                 else if (Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) * CurrentZoom < Config.Setting_MinImageSize)
                 {
                     // Reisze images smaller than min size to min size
-                    AutomaticallyZoomed = true;
-                    Zoom(Config.Setting_MinImageSize / Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y), true);
+                    if (Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_MinImageSize)
+                    {
+                        AutomaticallyZoomed = true;
+                        Zoom(Config.Setting_MinImageSize / Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y), true);
+                    }
+                    else
+                        Zoom(1, true);
                 }
                 else
                     Zoom(CurrentZoom, true);
