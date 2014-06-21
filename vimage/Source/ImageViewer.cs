@@ -15,7 +15,7 @@ namespace vimage
 {
     class ImageViewer
     {
-        public const string VERSION_NAME = "vimage version 6";
+        public const string VERSION_NAME = "vimage version 7";
 
         public readonly string[] EXTENSIONS =
         {
