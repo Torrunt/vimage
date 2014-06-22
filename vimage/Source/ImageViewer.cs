@@ -15,7 +15,7 @@ namespace vimage
 {
     class ImageViewer
     {
-        public const string VERSION_NAME = "vimage version 7";
+        public const string VERSION_NAME = "vimage version #";
 
         public readonly string[] EXTENSIONS =
         {
@@ -748,6 +748,7 @@ namespace vimage
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
 
             Dragging = false;
+            Vector2u prevSize = new Vector2u(Image.Texture.Size.X, Image.Texture.Size.Y);
             float prevRotation = Image.Rotation;
             int prevDefaultRotation = DefaultRotation;
 
@@ -778,10 +779,10 @@ namespace vimage
                 Image.Texture.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
             
             bool wasFitToMonitorDimension = false;
-            if (Config.Setting_LimitImagesToMonitor != Config.NONE)
+            if (Config.Setting_LimitImagesToMonitor != Config.NONE && !prevSize.Equals(Image.Texture.Size))
             {
                 // Fit to monitor height/width
-                if (Config.Setting_LimitImagesToMonitor == Config.HEIGHT && (FitToMonitorHeight || Image.Texture.Size.Y >= bounds.Height))
+                if (Config.Setting_LimitImagesToMonitor == Config.HEIGHT && (FitToMonitorHeight || Image.Texture.Size.Y * CurrentZoom > bounds.Height))
                 {
                     Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
 
@@ -794,7 +795,7 @@ namespace vimage
 
                     wasFitToMonitorDimension = true;
                 }
-                else if (Config.Setting_LimitImagesToMonitor == Config.WIDTH && Image.Texture.Size.X > bounds.Width)
+                else if (Config.Setting_LimitImagesToMonitor == Config.WIDTH && Image.Texture.Size.X * CurrentZoom > bounds.Width)
                 {
                     Zoom(1 + (((float)bounds.Width - Image.Texture.Size.X) / Image.Texture.Size.X), true);
 
@@ -835,7 +836,8 @@ namespace vimage
             // Otherwise, if image is hanging off monitor just center it.
             if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X > Image.Texture.Size.Y && Image.Texture.Size.X * CurrentZoom >= bounds.Width)
                 NextWindowPos = new Vector2i(bounds.Left, bounds.Top);
-            else if (NextWindowPos.X + (Image.Texture.Size.X * CurrentZoom) >= bounds.Left + bounds.Width || NextWindowPos.Y + (Image.Texture.Size.Y * CurrentZoom) >= bounds.Top + bounds.Height)
+            else if (!prevSize.Equals(Image.Texture.Size) && (NextWindowPos.X + (Image.Texture.Size.X * CurrentZoom) >= bounds.Left + bounds.Width || 
+                     NextWindowPos.Y + (Image.Texture.Size.Y * CurrentZoom) >= bounds.Top + bounds.Height))
                 NextWindowPos = new Vector2i(bounds.Left + (int)((bounds.Width - (Image.Texture.Size.X * CurrentZoom)) / 2), bounds.Top + (int)((bounds.Height - (Image.Texture.Size.Y * CurrentZoom)) / 2));
 
             // Force Always On Top Mode (so it's above the task bar) - will only happen if height >= window height
