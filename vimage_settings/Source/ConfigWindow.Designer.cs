@@ -56,6 +56,7 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.panel_Controls = new System.Windows.Forms.Panel();
+            this.panel4 = new System.Windows.Forms.Panel();
             this.button_ControlsDefault = new System.Windows.Forms.Button();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
@@ -63,6 +64,9 @@
             this.checkBox_ContextMenuShowMargin = new System.Windows.Forms.CheckBox();
             this.numericUpDown_ContextMenu_Animation_InsertAtIndex = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.button_ContextMenuAddNew = new System.Windows.Forms.Button();
+            this.button_ContextMenuDefault = new System.Windows.Forms.Button();
             this.tabControl_ContextMenus = new System.Windows.Forms.TabControl();
             this.tabPage_ContextMenuGeneral = new System.Windows.Forms.TabPage();
             this.tabPage_ContextMenuAnimation = new System.Windows.Forms.TabPage();
@@ -84,10 +88,6 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.button_ContextMenuDefault = new System.Windows.Forms.Button();
-            this.button_ContextMenuAddNew = new System.Windows.Forms.Button();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.panel4 = new System.Windows.Forms.Panel();
             this.TabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ZoomSpeedFast)).BeginInit();
@@ -96,16 +96,16 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_MinImageSize)).BeginInit();
             this.tabPage2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
+            this.panel4.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ContextMenu_Animation_InsertAtIndex)).BeginInit();
+            this.panel2.SuspendLayout();
             this.tabControl_ContextMenus.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.panel1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
-            this.panel2.SuspendLayout();
-            this.panel4.SuspendLayout();
             this.SuspendLayout();
             // 
             // TabControl
@@ -151,7 +151,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(426, 305);
+            this.tabPage1.Size = new System.Drawing.Size(426, 295);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "General";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -403,6 +403,16 @@
             this.panel_Controls.Size = new System.Drawing.Size(414, 253);
             this.panel_Controls.TabIndex = 13;
             // 
+            // panel4
+            // 
+            this.panel4.Controls.Add(this.button_ControlsDefault);
+            this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel4.Location = new System.Drawing.Point(0, 259);
+            this.panel4.Margin = new System.Windows.Forms.Padding(0);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(420, 30);
+            this.panel4.TabIndex = 14;
+            // 
             // button_ControlsDefault
             // 
             this.button_ControlsDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -420,7 +430,7 @@
             this.tabPage3.Controls.Add(this.tableLayoutPanel2);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(426, 305);
+            this.tabPage3.Size = new System.Drawing.Size(426, 295);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Context Menu";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -439,7 +449,7 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(426, 305);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(426, 295);
             this.tableLayoutPanel2.TabIndex = 17;
             // 
             // panel3
@@ -484,6 +494,42 @@
             this.label3.TabIndex = 9;
             this.label3.Text = "Insert animation menu at index";
             // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.button_ContextMenuAddNew);
+            this.panel2.Controls.Add(this.button_ContextMenuDefault);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(3, 268);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(420, 24);
+            this.panel2.TabIndex = 16;
+            // 
+            // button_ContextMenuAddNew
+            // 
+            this.button_ContextMenuAddNew.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button_ContextMenuAddNew.BackgroundImage = global::vimage_settings.Properties.Resources.add;
+            this.button_ContextMenuAddNew.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.button_ContextMenuAddNew.Location = new System.Drawing.Point(-1, -1);
+            this.button_ContextMenuAddNew.Name = "button_ContextMenuAddNew";
+            this.button_ContextMenuAddNew.Size = new System.Drawing.Size(23, 23);
+            this.button_ContextMenuAddNew.TabIndex = 13;
+            this.button_ContextMenuAddNew.TabStop = false;
+            this.toolTip1.SetToolTip(this.button_ContextMenuAddNew, "Add item below currently selected");
+            this.button_ContextMenuAddNew.UseVisualStyleBackColor = true;
+            this.button_ContextMenuAddNew.Click += new System.EventHandler(this.button_ContextMenuAddNew_Click);
+            // 
+            // button_ContextMenuDefault
+            // 
+            this.button_ContextMenuDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_ContextMenuDefault.Location = new System.Drawing.Point(346, -1);
+            this.button_ContextMenuDefault.Name = "button_ContextMenuDefault";
+            this.button_ContextMenuDefault.Size = new System.Drawing.Size(75, 23);
+            this.button_ContextMenuDefault.TabIndex = 11;
+            this.button_ContextMenuDefault.TabStop = false;
+            this.button_ContextMenuDefault.Text = "Default";
+            this.button_ContextMenuDefault.UseVisualStyleBackColor = true;
+            this.button_ContextMenuDefault.Click += new System.EventHandler(this.button_ContextMenuDefault_Click);
+            // 
             // tabControl_ContextMenus
             // 
             this.tabControl_ContextMenus.Controls.Add(this.tabPage_ContextMenuGeneral);
@@ -492,7 +538,7 @@
             this.tabControl_ContextMenus.Location = new System.Drawing.Point(3, 33);
             this.tabControl_ContextMenus.Name = "tabControl_ContextMenus";
             this.tabControl_ContextMenus.SelectedIndex = 0;
-            this.tabControl_ContextMenus.Size = new System.Drawing.Size(420, 239);
+            this.tabControl_ContextMenus.Size = new System.Drawing.Size(420, 229);
             this.tabControl_ContextMenus.TabIndex = 19;
             this.tabControl_ContextMenus.SelectedIndexChanged += new System.EventHandler(this.tabControl_ContextMenus_SelectedIndexChanged);
             // 
@@ -503,7 +549,7 @@
             this.tabPage_ContextMenuGeneral.Location = new System.Drawing.Point(4, 22);
             this.tabPage_ContextMenuGeneral.Name = "tabPage_ContextMenuGeneral";
             this.tabPage_ContextMenuGeneral.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage_ContextMenuGeneral.Size = new System.Drawing.Size(412, 213);
+            this.tabPage_ContextMenuGeneral.Size = new System.Drawing.Size(412, 203);
             this.tabPage_ContextMenuGeneral.TabIndex = 0;
             this.tabPage_ContextMenuGeneral.Text = "General";
             // 
@@ -514,7 +560,7 @@
             this.tabPage_ContextMenuAnimation.Location = new System.Drawing.Point(4, 22);
             this.tabPage_ContextMenuAnimation.Name = "tabPage_ContextMenuAnimation";
             this.tabPage_ContextMenuAnimation.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage_ContextMenuAnimation.Size = new System.Drawing.Size(412, 213);
+            this.tabPage_ContextMenuAnimation.Size = new System.Drawing.Size(412, 203);
             this.tabPage_ContextMenuAnimation.TabIndex = 1;
             this.tabPage_ContextMenuAnimation.Text = "Animation";
             // 
@@ -534,7 +580,7 @@
             this.tabPage4.Controls.Add(this.label4);
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size(426, 305);
+            this.tabPage4.Size = new System.Drawing.Size(426, 295);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "About";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -710,52 +756,6 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(434, 351);
             this.tableLayoutPanel1.TabIndex = 13;
             // 
-            // button_ContextMenuDefault
-            // 
-            this.button_ContextMenuDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_ContextMenuDefault.Location = new System.Drawing.Point(346, -1);
-            this.button_ContextMenuDefault.Name = "button_ContextMenuDefault";
-            this.button_ContextMenuDefault.Size = new System.Drawing.Size(75, 23);
-            this.button_ContextMenuDefault.TabIndex = 11;
-            this.button_ContextMenuDefault.TabStop = false;
-            this.button_ContextMenuDefault.Text = "Default";
-            this.button_ContextMenuDefault.UseVisualStyleBackColor = true;
-            this.button_ContextMenuDefault.Click += new System.EventHandler(this.button_ContextMenuDefault_Click);
-            // 
-            // button_ContextMenuAddNew
-            // 
-            this.button_ContextMenuAddNew.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button_ContextMenuAddNew.BackgroundImage = global::vimage_settings.Properties.Resources.add;
-            this.button_ContextMenuAddNew.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.button_ContextMenuAddNew.Location = new System.Drawing.Point(-1, -1);
-            this.button_ContextMenuAddNew.Name = "button_ContextMenuAddNew";
-            this.button_ContextMenuAddNew.Size = new System.Drawing.Size(23, 23);
-            this.button_ContextMenuAddNew.TabIndex = 13;
-            this.button_ContextMenuAddNew.TabStop = false;
-            this.toolTip1.SetToolTip(this.button_ContextMenuAddNew, "Add item below currently selected");
-            this.button_ContextMenuAddNew.UseVisualStyleBackColor = true;
-            this.button_ContextMenuAddNew.Click += new System.EventHandler(this.button_ContextMenuAddNew_Click);
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.button_ContextMenuAddNew);
-            this.panel2.Controls.Add(this.button_ContextMenuDefault);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(3, 278);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(420, 24);
-            this.panel2.TabIndex = 16;
-            // 
-            // panel4
-            // 
-            this.panel4.Controls.Add(this.button_ControlsDefault);
-            this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel4.Location = new System.Drawing.Point(0, 259);
-            this.panel4.Margin = new System.Windows.Forms.Padding(0);
-            this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(420, 30);
-            this.panel4.TabIndex = 14;
-            // 
             // ConfigWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -776,19 +776,19 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_MinImageSize)).EndInit();
             this.tabPage2.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);
+            this.panel4.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ContextMenu_Animation_InsertAtIndex)).EndInit();
+            this.panel2.ResumeLayout(false);
             this.tabControl_ContextMenus.ResumeLayout(false);
             this.tabPage4.ResumeLayout(false);
             this.tabPage4.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
-            this.panel2.ResumeLayout(false);
-            this.panel4.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

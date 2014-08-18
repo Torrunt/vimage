@@ -755,10 +755,11 @@ namespace vimage
             IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position +
                 new Vector2i((int)(Image.Texture.Size.X * CurrentZoom) / 2, (int)(Image.Texture.Size.Y * CurrentZoom) / 2));
 
-            if (AutomaticallyZoomed)
+            if (AutomaticallyZoomed || FitToMonitorHeightForced)
             {
                 // don't keep current zoom value if it wasn't set by user
                 AutomaticallyZoomed = false;
+                FitToMonitorHeightForced = false;
                 CurrentZoom = 1;
             }
 
@@ -777,9 +778,9 @@ namespace vimage
                 Image.Data.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
             else
                 Image.Texture.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
-            
-            bool wasFitToMonitorDimension = false;
-            if (Config.Setting_LimitImagesToMonitor != Config.NONE && !prevSize.Equals(Image.Texture.Size))
+
+            bool wasFitToMonitorDimension = FitToMonitorHeightForced;
+            if (Config.Setting_LimitImagesToMonitor != Config.NONE)
             {
                 // Fit to monitor height/width
                 if (Config.Setting_LimitImagesToMonitor == Config.HEIGHT && (FitToMonitorHeight || Image.Texture.Size.Y * CurrentZoom > bounds.Height))
