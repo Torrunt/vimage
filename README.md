@@ -7,7 +7,7 @@ A simplistic image viewer for Windows, inspired by [vjpeg](http://stereopsis.com
 ![](http://i.imgur.com/09GLCun.jpg)
 
 ### Created by
-Corey Zeke Womack (Torrunt) - [me@torrunt.net](me@torrunt.net)
+Corey Zeke Womack (Torrunt) - [me@torrunt.net](mailto:me@torrunt.net) - [torrunt.net](http://torrunt.net)
 
 ### Features
 - No ugly interface, just the image
