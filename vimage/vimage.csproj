@@ -59,34 +59,35 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DevILNet">
-      <HintPath>.\DevILNet.dll</HintPath>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="DevILNet, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libraries\DevILNet.dll</HintPath>
     </Reference>
-    <Reference Include="gma.Drawing.ImageInfo">
-      <HintPath>.\gma.Drawing.ImageInfo.dll</HintPath>
+    <Reference Include="gma.Drawing.ImageInfo, Version=1.0.0.0, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libraries\gma.Drawing.ImageInfo.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="sfmlnet-graphics-2, Version=2.1.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\sfmlnet-graphics-2.dll</HintPath>
+      <HintPath>Libraries\sfmlnet-graphics-2.dll</HintPath>
     </Reference>
     <Reference Include="sfmlnet-window-2, Version=2.1.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\sfmlnet-window-2.dll</HintPath>
+      <HintPath>Libraries\sfmlnet-window-2.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
     <Reference Include="Tao.OpenGl, Version=2.1.0.12, Culture=neutral, PublicKeyToken=1ca010269a4501ef, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Tao.OpenGl.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>Libraries\Tao.OpenGl.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -106,21 +107,16 @@
     <Compile Include="Source\Program.cs" />
     <Compile Include="Source\Utils\EnumerableComparer.cs" />
     <Compile Include="Source\Utils\ImageViewerUtils.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="csfml-graphics-2.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="csfml-window-2.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="DevIL.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="icon.ico" />
+    <None Include="Properties\App.config" />
+    <None Include="Libraries\csfml-graphics-2.dll" />
+    <None Include="Libraries\csfml-window-2.dll" />
+    <None Include="Libraries\DevIL.dll" />
+    <None Include="Libraries\DevILNet.dll" />
+    <None Include="Libraries\gma.Drawing.ImageInfo.dll" />
+    <None Include="Libraries\sfmlnet-graphics-2.dll" />
+    <None Include="Libraries\sfmlnet-window-2.dll" />
+    <None Include="Libraries\Tao.OpenGl.dll" />
+    <None Include="icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
