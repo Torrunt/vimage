@@ -110,7 +110,9 @@
     <None Include="Properties\App.config" />
     <None Include="Libraries\csfml-graphics-2.dll" />
     <None Include="Libraries\csfml-window-2.dll" />
-    <None Include="Libraries\DevIL.dll" />
+    <None Include="Libraries\DevIL.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Libraries\DevILNet.dll" />
     <None Include="Libraries\gma.Drawing.ImageInfo.dll" />
     <None Include="Libraries\sfmlnet-graphics-2.dll" />

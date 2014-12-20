@@ -62,7 +62,6 @@
     <Compile Include="..\vimage\Source\MenuFuncs.cs">
       <Link>Source\MenuFuncs.cs</Link>
     </Compile>
-    <Compile Include="FileAssociations.cs" />
     <Compile Include="Source\ConfigWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -81,6 +80,7 @@
     <Compile Include="Source\ControlItem.Designer.cs">
       <DependentUpon>ControlItem.cs</DependentUpon>
     </Compile>
+    <Compile Include="Source\FileAssociation.cs" />
     <Compile Include="Source\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Source\ConfigWindow.resx">
