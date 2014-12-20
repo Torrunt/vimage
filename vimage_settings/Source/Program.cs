@@ -28,7 +28,6 @@ namespace vimage_settings
                 Console.ResetColor();
                 Association.FileAssocation ext_assoc = new Association.FileAssocation("." + extension);
 
-
                 Console.Write("Registered: ");
                 if (ext_assoc.Registered)
                     Console.ForegroundColor = ConsoleColor.Green;
@@ -39,14 +38,14 @@ namespace vimage_settings
 
                 if (ext_assoc.Registered)
                 {
-                    Console.WriteLine("ProgramAssociationName: " + ext_assoc.GetProgramAssociationName(false));
+                    Console.WriteLine("ProgramAssociationName: " + ext_assoc.GetAssociatedProgID(false));
 
-                    if (!String.IsNullOrWhiteSpace(ext_assoc.GetProgramAssociationName(true)))
+                    if (!String.IsNullOrWhiteSpace(ext_assoc.GetAssociatedProgID(true)))
                     {
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.Write("User ProgID: ");
                         Console.ResetColor();
-                        Console.WriteLine(ext_assoc.GetProgramAssociationName(true));
+                        Console.WriteLine(ext_assoc.GetAssociatedProgID(true));
                     }
 
                     Console.WriteLine("Description: " + ext_assoc.Description);
@@ -63,7 +62,7 @@ namespace vimage_settings
                         Console.WriteLine(ext_assoc.Icon);
                     }
 
-                    if (!String.IsNullOrWhiteSpace(ext_assoc.GetProgramAssociationName(true)))
+                    if (!String.IsNullOrWhiteSpace(ext_assoc.GetAssociatedProgID(true)))
                     {
                         if (!String.IsNullOrWhiteSpace(ext_assoc.UserIcon))
                         {
@@ -86,7 +85,7 @@ namespace vimage_settings
                         Console.WriteLine(ext_assoc.Executable);
                     }
 
-                    if (!String.IsNullOrWhiteSpace(ext_assoc.GetProgramAssociationName(true)))
+                    if (!String.IsNullOrWhiteSpace(ext_assoc.GetAssociatedProgID(true)))
                     {
                         if (!String.IsNullOrWhiteSpace(ext_assoc.UserExecutable))
                         {

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Security.Principal;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using System.Security;
 using System.Security.AccessControl;
 using System.IO;
 
@@ -26,8 +27,91 @@ namespace vimage_settings
             {
                 this.Extension = extension;
             }
-            // TODO: this should be private
-            public string GetProgramAssociationName(bool userspaceProgID)
+
+            private const string Default_OpenAs = @"""C:\Windows\system32\rundll32.exe " +
+                @"C:\Windows\system32\shell32.dll,OpenAs_RunDLL"" ""%1""";
+
+            public void Create(string progID)
+            {
+                // Creates the skeleton of the registry keys for an extension
+                if (!this.Registered)
+                {
+                    try
+                    {
+                        RegistryKey extKey = Registry.ClassesRoot.CreateSubKey(Extension,
+                            RegistryKeyPermissionCheck.ReadWriteSubTree);
+
+                        MakeProgID(progID);
+
+                        // The link to the ProgID key
+                        extKey.SetValue(String.Empty, progID, RegistryValueKind.String);
+                        extKey.Close(); extKey.Dispose();
+                    }
+                    catch (SecurityException e)
+                    {
+                        throw new FieldAccessException("Failed to open the registry for writing.", e);
+                    }
+                }
+                else
+                    throw new InvalidOperationException("This extension is already registered, there is no need to Create() it.");
+            }
+
+            public static void MakeProgID(string progID)
+            {
+                try
+                {
+                    RegistryKey progIDKey = Registry.ClassesRoot.CreateSubKey(progID,
+                            RegistryKeyPermissionCheck.ReadWriteSubTree);
+
+                    progIDKey.SetValue(String.Empty, progID + " file", RegistryValueKind.String);
+                    progIDKey.CreateSubKey(@"DefaultIcon");
+
+                    RegistryKey shellKey = progIDKey.CreateSubKey(@"shell");
+                    RegistryKey openKey = shellKey.CreateSubKey(@"open");
+                    RegistryKey comKey = openKey.CreateSubKey(@"command");
+
+                    comKey.SetValue(String.Empty, Default_OpenAs, RegistryValueKind.String);
+                    comKey.Close(); comKey.Dispose();
+
+                    openKey.SetValue(String.Empty, @"&Open", RegistryValueKind.String);
+                    openKey.SetValue(@"FriendlyAppName", "Open self");
+                    openKey.Close(); openKey.Dispose();
+
+                    shellKey.SetValue(String.Empty, @"open", RegistryValueKind.String);
+                    shellKey.Close(); shellKey.Dispose();
+
+                    progIDKey.Close(); progIDKey.Dispose();
+                }
+                catch (SecurityException e)
+                {
+                    throw new FieldAccessException("Failed to open the registry for writing.", e);
+                }
+            }
+            
+            public void Delete(bool ext, bool progID)
+            {
+                if (this.Registered)
+                {
+                    try
+                    {
+                        string pra = GetAssociatedProgID(false);
+                        
+                        if (ext)
+                            Registry.ClassesRoot.DeleteSubKeyTree(Extension, false);
+                        
+                        if (progID)
+                            Registry.ClassesRoot.DeleteSubKeyTree(pra, false);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new FieldAccessException("Failed to delete the extension.", e);
+                    }
+                }
+                else
+                    throw new NullReferenceException("The extension is not registered.");
+            }
+
+            private string GetAssociatedProgID(bool userspaceProgID)
             {
                 string retVal = String.Empty;
 
@@ -73,6 +157,86 @@ namespace vimage_settings
                 return retVal;
             }
 
+            public void MakeUserChoice()
+            {
+                // Set the extension's user choice (in the HKCU) to the HKCR (system-wide) value.
+                if (this.Registered)
+                {
+                    try
+                    {
+                        RegistryKey hkcu_ExtsRoot = Registry.CurrentUser.OpenSubKey(
+                               @"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts",
+                               RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.ReadKey);
+
+                        if (hkcu_ExtsRoot != null)
+                        {
+                            // Creates (or write-access opens) the extension's key.
+                            RegistryKey extKey = hkcu_ExtsRoot.CreateSubKey(Extension,
+                                RegistryKeyPermissionCheck.ReadWriteSubTree);
+
+                            if (extKey != null)
+                            {
+                                RegistryKey userChoiceKey = extKey.CreateSubKey(@"UserChoice",
+                                    RegistryKeyPermissionCheck.ReadWriteSubTree);
+
+                                if (userChoiceKey != null)
+                                {
+                                    userChoiceKey.SetValue("Progid", this.GetAssociatedProgID(false), RegistryValueKind.String);
+
+                                    userChoiceKey.Close(); userChoiceKey.Dispose();
+                                }
+
+                                extKey.Close(); extKey.Dispose();
+                            }
+
+                            hkcu_ExtsRoot.Close(); hkcu_ExtsRoot.Dispose();
+                        }
+                    }
+                    catch (SecurityException e)
+                    {
+                        throw new FieldAccessException("Failed to open the registry for writing.", e);
+                    }
+                }
+                else
+                    throw new NullReferenceException("The extension is not registered.");
+            }
+
+            public void ResetUserChoice()
+            {
+                // Remove the user's HKCU choice to let the system fall-back to the default one.
+                if (this.Registered)
+                {
+                    try
+                    {
+                        RegistryKey hkcu_ExtsRoot = Registry.CurrentUser.OpenSubKey(
+                               @"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts",
+                               RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.ReadKey);
+
+                        if (hkcu_ExtsRoot != null)
+                        {
+                            // Creates (or write-access opens) the extension's key.
+                            RegistryKey extKey = hkcu_ExtsRoot.CreateSubKey(Extension,
+                                RegistryKeyPermissionCheck.ReadWriteSubTree);
+
+                            if (extKey != null)
+                            {
+                                extKey.DeleteSubKeyTree(@"UserChoice", false);
+
+                                extKey.Close(); extKey.Dispose();
+                            }
+
+                            hkcu_ExtsRoot.Close(); hkcu_ExtsRoot.Dispose();
+                        }
+                    }
+                    catch (SecurityException e)
+                    {
+                        throw new FieldAccessException("Failed to open the registry for writing.", e);
+                    }
+                }
+                else
+                    throw new NullReferenceException("The extension is not registered.");
+            }
+
             public bool Registered
             {
                 get
@@ -87,7 +251,7 @@ namespace vimage_settings
                     {
                         extensionKeyExists = true;
 
-                        string pra = GetProgramAssociationName(false);
+                        string pra = GetAssociatedProgID(false);
                         if (!String.IsNullOrEmpty(pra))
                         {
                             RegistryKey praKey = Registry.ClassesRoot.OpenSubKey(pra,
@@ -121,7 +285,7 @@ namespace vimage_settings
 
                         if (extKey != null)
                         {
-                            string pra = GetProgramAssociationName(false);
+                            string pra = GetAssociatedProgID(false);
                             RegistryKey praKey = Registry.ClassesRoot.OpenSubKey(pra,
                                 RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey);
 
@@ -133,21 +297,47 @@ namespace vimage_settings
 
                                 praKey.Close(); praKey.Dispose();
                             }
-                            //else
-                                //throw new KeyNotFoundException("The extension has a program association (to: " + pra + "), but the referenced key does not exist.");
 
                             extKey.Close(); extKey.Dispose();
                         }
-                        //else
-                            //throw new KeyNotFoundException("The extension appears to be registered, but the key does not exist.\n" +
-                                //"This indicates an error in this.Registered's logic, or that the key has been deleted in the meantime.");
                     }
-                    //else
-                        //throw new NullReferenceException("This extension is not registered!");
 
                     return desc;
                 }
-                // TODO: Description Set
+                set
+                {
+                    if (this.Registered)
+                    {
+                        RegistryKey extKey = Registry.ClassesRoot.OpenSubKey(Extension,
+                                RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.ReadKey);
+
+                        if (extKey != null)
+                        {
+                            string pra = GetAssociatedProgID(false);
+                            RegistryKey praKey;
+                            try
+                            {
+                                praKey = Registry.ClassesRoot.OpenSubKey(pra,
+                                    RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.WriteKey);
+                            }
+                            catch (SecurityException e)
+                            {
+                                throw new FieldAccessException("Failed to open the registry for writing.", e);
+                            }
+
+                            if (praKey != null)
+                            {
+                                praKey.SetValue(String.Empty, value, RegistryValueKind.String);
+
+                                praKey.Close(); praKey.Dispose();
+                            }
+
+                            extKey.Close(); extKey.Dispose();
+                        }
+                    }
+                    else
+                        throw new NullReferenceException("The extension is not registered.");
+                }
             }
 
             private string GetIcon(bool userspaceProgID)
@@ -161,7 +351,7 @@ namespace vimage_settings
 
                     if (extKey != null)
                     {
-                        string pra = GetProgramAssociationName(userspaceProgID);
+                        string pra = GetAssociatedProgID(userspaceProgID);
                         RegistryKey praKey = Registry.ClassesRoot.OpenSubKey(pra,
                             RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey);
 
@@ -178,24 +368,58 @@ namespace vimage_settings
 
                                 iconKey.Close(); iconKey.Dispose();
                             }
-                            //else
-                            //throw new KeyNotFoundException("The default icon key does not exist.");
 
                             praKey.Close(); praKey.Dispose();
                         }
-                        //else
-                        //throw new KeyNotFoundException("The extension has a program association (to: " + pra + "), but the referenced key does not exist.");
+                        extKey.Close(); extKey.Dispose();
+                    }
+                }
+
+                return icon;
+            }
+
+            private void SetIcon(string iconPath, bool userspaceProgID)
+            {
+                if (this.Registered)
+                {
+                    RegistryKey extKey = Registry.ClassesRoot.OpenSubKey(Extension,
+                            RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.ReadKey);
+
+                    if (extKey != null)
+                    {
+                        string pra = GetAssociatedProgID(userspaceProgID);
+                        RegistryKey praKey = Registry.ClassesRoot.OpenSubKey(pra,
+                                    RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.ReadKey);
+                        
+                        if (praKey != null)
+                        {
+                            RegistryKey iconKey;
+
+                            try
+                            {
+                                iconKey = praKey.CreateSubKey(@"DefaultIcon",
+                                    RegistryKeyPermissionCheck.ReadWriteSubTree);
+                            }
+                            catch (SecurityException e)
+                            {
+                                throw new FieldAccessException("Failed to open the registry for writing.", e);
+                            }
+
+                            if (iconKey != null)
+                            {
+                                iconKey.SetValue(String.Empty, iconPath, RegistryValueKind.String);
+
+                                iconKey.Close(); iconKey.Dispose();
+                            }
+
+                            praKey.Close(); praKey.Dispose();
+                        }
 
                         extKey.Close(); extKey.Dispose();
                     }
-                    //else
-                    //throw new KeyNotFoundException("The extension appears to be registered, but the key does not exist.\n" +
-                    //"This indicates an error in this.Registered's logic, or that the key has been deleted in the meantime.");
                 }
-                //else
-                //throw new NullReferenceException("This extension is not registered!");
-
-                return icon;
+                else
+                    throw new NullReferenceException("The extension is not registered.");
             }
 
             public string Icon
@@ -204,7 +428,10 @@ namespace vimage_settings
                 {
                     return this.GetIcon(false);
                 }
-                // TODO: Icon Set
+                set
+                {
+                    this.SetIcon(value, false);
+                }
             }
 
             public string UserIcon
@@ -212,6 +439,10 @@ namespace vimage_settings
                 get
                 {
                     return this.GetIcon(true);
+                }
+                set
+                {
+                    this.SetIcon(value, true);
                 }
             }
 
@@ -245,7 +476,7 @@ namespace vimage_settings
 
                     if (extKey != null)
                     {
-                        string pra = GetProgramAssociationName(userspaceProgID);
+                        string pra = GetAssociatedProgID(userspaceProgID);
                         RegistryKey praKey = Registry.ClassesRoot.OpenSubKey(pra,
                             RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey);
 
@@ -286,29 +517,80 @@ namespace vimage_settings
                                         }
                                     }
                                 }
-                                //else
-                                    //throw new KeyNotFoundException("The shell's open key does not exist.");
 
                                 praShellKey.Close(); praShellKey.Dispose();
                             }
-                            //else
-                                //throw new KeyNotFoundException("The shell key does not exist.");
 
                             praKey.Close(); praKey.Dispose();
                         }
-                        //else
-                            //throw new KeyNotFoundException("The extension has a program association (to: " + pra + "), but the referenced key does not exist.");
 
                         extKey.Close(); extKey.Dispose();
                     }
-                    //else
-                        //throw new KeyNotFoundException("The extension appears to be registered, but the key does not exist.\n" +
-                            //"This indicates an error in this.Registered's logic, or that the key has been deleted in the meantime.");
                 }
-                //else
-                    //throw new NullReferenceException("This extension is not registered!");
 
                 return exec;
+            }
+
+            public void SetExecutable(string exeCmd, string openName, string friendlyAppName, bool userspaceProgID)
+            {
+                if (this.Registered)
+                {
+                    RegistryKey extKey = Registry.ClassesRoot.OpenSubKey(Extension,
+                            RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.ReadKey);
+
+                    if (extKey != null)
+                    {
+                        string pra = GetAssociatedProgID(userspaceProgID);
+                        RegistryKey praKey = Registry.ClassesRoot.OpenSubKey(pra,
+                                    RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.ReadKey);
+
+                        if (praKey != null)
+                        {
+                            try
+                            {
+                                RegistryKey shellKey = praKey.CreateSubKey(@"shell",
+                                    RegistryKeyPermissionCheck.ReadWriteSubTree);
+
+                                if (shellKey != null)
+                                {
+                                    RegistryKey openKey = shellKey.CreateSubKey(@"open",
+                                        RegistryKeyPermissionCheck.ReadWriteSubTree);
+
+                                    if (openKey != null)
+                                    {
+                                        // Set the command
+                                        RegistryKey commandKey = openKey.CreateSubKey(@"command",
+                                            RegistryKeyPermissionCheck.ReadWriteSubTree);
+
+                                        commandKey.SetValue(String.Empty, exeCmd, RegistryValueKind.String);
+
+                                        commandKey.Close(); commandKey.Dispose();
+
+                                        // Set values for the "Open" option
+                                        openKey.SetValue(String.Empty, openName, RegistryValueKind.String);
+                                        openKey.SetValue(@"FriendlyAppName", friendlyAppName, RegistryValueKind.String);
+
+                                        openKey.Close(); openKey.Dispose();
+                                    }
+
+                                    shellKey.SetValue(String.Empty, @"open", RegistryValueKind.String);
+
+                                    shellKey.Close(); shellKey.Dispose();
+                                }
+                            }
+                            catch (SecurityException e)
+                            {
+                                throw new FieldAccessException("Failed to open the registry for writing.", e);
+                            }
+
+                            praKey.Close(); praKey.Dispose();
+                        }
+
+                        extKey.Close(); extKey.Dispose();
+                    }
+                }
+                else
+                    throw new NullReferenceException("The extension is not registered.");
             }
 
             public string Executable
@@ -317,7 +599,6 @@ namespace vimage_settings
                 {
                     return this.GetExecutable(false);
                 }
-                // TODO: Executable Set
             }
 
             // This separate property must exist, because users CAN specify their own "open with" executable
@@ -348,7 +629,6 @@ namespace vimage_settings
                         return false;
                 }
             }
-
         }
     }
 }
