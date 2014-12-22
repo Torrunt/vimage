@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Principal;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace vimage_settings
@@ -22,9 +23,17 @@ namespace vimage_settings
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ConfigWindow());
+            bool createdNew = true;
+            using (Mutex mutex = new Mutex(true, @"vimage_settings_lock", out createdNew))
+            {
+                if (createdNew)
+                {
+                    // Start vimage_settings if it would be the only instance running
+                    Application.EnableVisualStyles();
+                    Application.SetCompatibleTextRenderingDefault(false);
+                    Application.Run(new ConfigWindow());
+                }
+            }
         }
 
         public static bool IsAdministrator

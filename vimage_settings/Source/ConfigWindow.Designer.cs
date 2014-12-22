@@ -614,8 +614,10 @@
             // 
             // panel_FileAssociations
             // 
+            this.panel_FileAssociations.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panel_FileAssociations.AutoScroll = true;
-            this.panel_FileAssociations.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel_FileAssociations.Location = new System.Drawing.Point(0, 0);
             this.panel_FileAssociations.Name = "panel_FileAssociations";
             this.panel_FileAssociations.Size = new System.Drawing.Size(426, 251);
