@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace vimage_settings
 {
@@ -12,7 +13,7 @@ namespace vimage_settings
         public FileAssociationItem(string extension)
         {
             InitializeComponent();
-            
+
             Dock = DockStyle.Top;
             Extension = extension;
             Association = new FileAssociation(extension);
@@ -36,16 +37,15 @@ namespace vimage_settings
                 SetAssociatedState(false);
 
                 if (Association.Registered)
-                {
-                    lbl_AssociatedWith.Text = "Associated with " + System.IO.Path.GetFileName(Association.UserExecutablePath);
-                }
+                    if (String.IsNullOrWhiteSpace(Association.UserExecutablePath))
+                        lbl_AssociatedWith.Text = "Known file type, not associated with anything.";
+                    else
+                        lbl_AssociatedWith.Text = "Associated with " + System.IO.Path.GetFileName(Association.UserExecutablePath);
                 else
-                {
                     lbl_AssociatedWith.Text = "Not associated with anything.";
-                }
             }
-            
-            SetIcon(SharpGMad.FileAssocation.GetIcon(Extension));
+
+            SetIcon(FileAssociation.GetIcon(Extension));
         }
 
         private void SetAssociatedState(bool associated)
@@ -59,7 +59,7 @@ namespace vimage_settings
                 btn_Associate.Visible = false;
 
                 //     have the tick icon shown
-                tableLayoutPanel1.ColumnStyles[4].Width = 18;
+                tableLayoutPanel1.ColumnStyles[4].Width = 22;
                 pibTickIcon.Visible = true;
             }
             else
@@ -98,6 +98,34 @@ namespace vimage_settings
             // The registry calls would fail.
             if (!Program.IsAdministrator)
                 return;
+
+            // Associate the file
+            string progID = "vimage." + Extension.TrimStart('.');
+            if (Association.Registered)
+            {
+                // Save out the previous ProgID as a backup
+                RegistryKey extKey = Registry.ClassesRoot.OpenSubKey(Extension,
+                    RegistryKeyPermissionCheck.ReadWriteSubTree, System.Security.AccessControl.RegistryRights.WriteKey);
+                extKey.SetValue("Vimage.ProgID.bak", Association.ProgID);
+                extKey.Close();
+
+                FileAssociation.MakeProgID(progID);
+                Association.ProgID = progID;
+            }
+            else
+            {
+                Association.Create(progID);
+            }
+
+            // Remove the users choice to make Windows fall back to the system-wide settings
+            Association.ResetUserChoice();
+
+            Association.SetExecutable(@"""" + Program.vimagePath + @""" ""%1""",
+                @"Open", @"vimage", false);
+            Association.Icon = @"""" + Program.vimagePath + @""",0";
+            Association.Description = "vimage " + Extension.TrimStart('.') + " file";
+
+            UpdateKnowledge();
         }
     }
 }

@@ -22,6 +22,31 @@ namespace vimage_settings
         public ConfigWindow()
         {
             InitializeComponent();
+            this.Icon = global::vimage_settings.Properties.Resources.icon;
+
+            if (!Program.IsAdministrator)
+            {
+                // Commented out, because these are defaults set in Designer.cs
+                /*panel_FileAssociations.Dock = DockStyle.Top;
+                panel_becomeAdmin.Dock = DockStyle.Bottom;
+                panel_becomeAdmin.Visible = true;
+                label_FA_AdminNotice.Visible = true;
+                button_becomeAdmin.Visible = true;
+                button_becomeAdmin.Enabled = true;*/
+
+                // Put the UAC shield on the button
+                // Via http://www.codeproject.com/Articles/18509/Add-a-UAC-shield-to-a-button-when-elevation-is-req
+                SendMessage(button_becomeAdmin.Handle, (0x1600 + 0x000C), 0, 0xFFFFFFFF);
+            }
+            else
+            {
+                panel_FileAssociations.Dock = DockStyle.Fill;
+                panel_becomeAdmin.Dock = DockStyle.None;
+                panel_becomeAdmin.Visible = false;
+                label_FA_AdminNotice.Visible = false;
+                button_becomeAdmin.Visible = false;
+                button_becomeAdmin.Enabled = false;
+            }
 
             linkLabel1.TabStop = false; // won't set to false in the Designer.cs for weird reason
 
@@ -350,5 +375,31 @@ namespace vimage_settings
             Process.Start("http://github.com/Torrunt/vimage");
         }
 
+        // Required to put an UAC shield on a button
+        // Via http://www.codeproject.com/Articles/18509/Add-a-UAC-shield-to-a-button-when-elevation-is-req
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern UInt32 SendMessage
+            (IntPtr hWnd, UInt32 msg, UInt32 wParam, UInt32 lParam);
+
+        // Restart the process as Administrator
+        // Via http://www.codeproject.com/Articles/18509/Add-a-UAC-shield-to-a-button-when-elevation-is-req
+        private void button_becomeAdmin_Click(object sender, EventArgs e)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.UseShellExecute = true;
+            startInfo.WorkingDirectory = Environment.CurrentDirectory;
+            startInfo.FileName = Application.ExecutablePath;
+            startInfo.Verb = "runas";
+            try
+            {
+                Process p = Process.Start(startInfo);
+            }
+            catch (System.ComponentModel.Win32Exception ex)
+            {
+                return;
+            }
+
+            Application.Exit();
+        }
     }
 }

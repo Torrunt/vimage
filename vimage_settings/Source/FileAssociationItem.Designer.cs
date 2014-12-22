@@ -42,9 +42,10 @@
             // label_Name
             // 
             this.label_Name.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label_Name.Location = new System.Drawing.Point(23, 0);
+            this.label_Name.Location = new System.Drawing.Point(23, 3);
+            this.label_Name.Margin = new System.Windows.Forms.Padding(3);
             this.label_Name.Name = "label_Name";
-            this.label_Name.Size = new System.Drawing.Size(94, 25);
+            this.label_Name.Size = new System.Drawing.Size(69, 19);
             this.label_Name.TabIndex = 6;
             this.label_Name.Text = ".ext files";
             this.label_Name.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -53,10 +54,10 @@
             // 
             this.tableLayoutPanel1.ColumnCount = 5;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 18F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 22F));
             this.tableLayoutPanel1.Controls.Add(this.btn_Associate, 3, 0);
             this.tableLayoutPanel1.Controls.Add(this.label_Name, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.lbl_AssociatedWith, 2, 0);
@@ -73,23 +74,22 @@
             // 
             // btn_Associate
             // 
-            this.btn_Associate.Enabled = false;
-            this.btn_Associate.Location = new System.Drawing.Point(275, 3);
+            this.btn_Associate.Location = new System.Drawing.Point(271, 3);
             this.btn_Associate.Name = "btn_Associate";
             this.btn_Associate.Size = new System.Drawing.Size(69, 19);
             this.btn_Associate.TabIndex = 8;
             this.btn_Associate.Text = "Associate";
             this.btn_Associate.UseVisualStyleBackColor = true;
-            this.btn_Associate.Visible = false;
             this.btn_Associate.Click += new System.EventHandler(this.btn_Associate_Click);
             // 
             // lbl_AssociatedWith
             // 
             this.lbl_AssociatedWith.AutoSize = true;
             this.lbl_AssociatedWith.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lbl_AssociatedWith.Location = new System.Drawing.Point(123, 0);
+            this.lbl_AssociatedWith.Location = new System.Drawing.Point(98, 3);
+            this.lbl_AssociatedWith.Margin = new System.Windows.Forms.Padding(3);
             this.lbl_AssociatedWith.Name = "lbl_AssociatedWith";
-            this.lbl_AssociatedWith.Size = new System.Drawing.Size(146, 25);
+            this.lbl_AssociatedWith.Size = new System.Drawing.Size(167, 19);
             this.lbl_AssociatedWith.TabIndex = 7;
             this.lbl_AssociatedWith.Text = "Associated with Program";
             this.lbl_AssociatedWith.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -98,24 +98,21 @@
             // 
             this.pibTickIcon.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pibTickIcon.Image = global::vimage_settings.Properties.Resources.tick;
-            this.pibTickIcon.Location = new System.Drawing.Point(348, 3);
-            this.pibTickIcon.Margin = new System.Windows.Forms.Padding(1, 3, 2, 2);
+            this.pibTickIcon.Location = new System.Drawing.Point(346, 3);
             this.pibTickIcon.Name = "pibTickIcon";
-            this.pibTickIcon.Size = new System.Drawing.Size(15, 20);
+            this.pibTickIcon.Size = new System.Drawing.Size(16, 19);
             this.pibTickIcon.TabIndex = 9;
             this.pibTickIcon.TabStop = false;
-            this.pibTickIcon.Visible = false;
             // 
             // pibIcon
             // 
             this.pibIcon.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pibIcon.Location = new System.Drawing.Point(1, 3);
-            this.pibIcon.Margin = new System.Windows.Forms.Padding(1, 3, 2, 2);
+            this.pibIcon.Location = new System.Drawing.Point(2, 2);
+            this.pibIcon.Margin = new System.Windows.Forms.Padding(2);
             this.pibIcon.Name = "pibIcon";
-            this.pibIcon.Size = new System.Drawing.Size(17, 20);
+            this.pibIcon.Size = new System.Drawing.Size(16, 21);
             this.pibIcon.TabIndex = 10;
             this.pibIcon.TabStop = false;
-            this.pibIcon.Visible = false;
             // 
             // FileAssociationItem
             // 

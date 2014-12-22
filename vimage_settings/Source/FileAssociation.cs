@@ -229,6 +229,8 @@ namespace vimage_settings
                             hkcu_ExtsKey.Close();
                         }
                     }
+
+                    NotifySystem();
                 }
                 catch (SecurityException e)
                 {
@@ -274,6 +276,7 @@ namespace vimage_settings
                         }
 
                         hkcu_ExtsRoot.Close();
+                        NotifySystem();
                     }
                 }
                 catch (SecurityException e)
@@ -313,6 +316,7 @@ namespace vimage_settings
                         }
 
                         hkcu_ExtsRoot.Close();
+                        NotifySystem();
                     }
                 }
                 catch (SecurityException e)
@@ -343,6 +347,8 @@ namespace vimage_settings
 
                     if (progID)
                         Registry.ClassesRoot.DeleteSubKeyTree(pra, false);
+
+                    NotifySystem();
                 }
                 catch (Exception e)
                 {
@@ -456,6 +462,7 @@ namespace vimage_settings
                         }
 
                         extKey.Close();
+                        NotifySystem();
                     }
                 }
                 else
@@ -612,6 +619,7 @@ namespace vimage_settings
                     }
 
                     extKey.Close();
+                    NotifySystem();
                 }
             }
             else
@@ -649,7 +657,7 @@ namespace vimage_settings
         {
             get
             {
-                return this.ExecuteCommand.Replace(@"""", String.Empty).Replace(@"%1", String.Empty);
+                return this.ExecuteCommand.Replace(@"""", String.Empty).Replace(@"%1", String.Empty).TrimEnd(' ');
             }
         }
 
@@ -660,7 +668,7 @@ namespace vimage_settings
         {
             get
             {
-                return this.UserExecuteCommand.Replace(@"""", String.Empty).Replace(@"%1", String.Empty);
+                return this.UserExecuteCommand.Replace(@"""", String.Empty).Replace(@"%1", String.Empty).TrimEnd(' ');
             }
         }
 
@@ -819,6 +827,7 @@ namespace vimage_settings
                     }
 
                     extKey.Close();
+                    NotifySystem();
                 }
             }
             else
@@ -835,8 +844,28 @@ namespace vimage_settings
             FileInfo fileInfo = new FileInfo(path);
             return (fileInfo != null && fileInfo.Exists);
         }
-    }
-}
+
+        /// <summary>
+        /// Sends a system call which notifies Windows that a Shell-affecting call has occured.
+        /// </summary>
+        /// <param name="wEventId">The event's identification code</param>
+        /// <param name="uFlags">Flags fine-tuning the event's handling</param>
+        /// <param name="dwItem1">(Optional) Event-dependent value</param>
+        /// <param name="dwItem2">(Optional) Event-dependent value</param>
+        [DllImport("shell32.dll", EntryPoint = "SHChangeNotify", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern void ShChangeNotify(int wEventId, int uFlags, int dwItem1, int dwItem2);
+
+        /// <summary>
+        /// Notifies the system about a change in the Shell
+        /// </summary>
+        private void NotifySystem()
+        {
+            // 0x8000000 is SHCNE_ASSOCCHANGED: A file type association has changed.
+            // 0 is SHCNF_IDLIST: The 3rd and 4th parameters are items in an IDList structure.
+            // Not used, though SHCNE_ASSOCCHANGED requires it.
+            // 0 and 0 are null values as required by SHCNE_ASSOCCHANGED
+            ShChangeNotify(0x8000000, 0, 0, 0);
+        }
 
 /* Written by Whisperity
  * Taken directly from my other project, SharpGMad
@@ -845,13 +874,6 @@ namespace vimage_settings
  * 
  * A handy way with WinAPI to get the icon of a file extension via the Windows shell.
  */
-namespace SharpGMad
-{
-    /// <summary>
-    /// Provides methods to retrieve information for file associations
-    /// </summary>
-    static class FileAssocation
-    {
         /// <summary>
         /// Gets the icon (using a Windows API call) of the file specified.
         /// </summary>
@@ -871,7 +893,7 @@ namespace SharpGMad
 
             // Copy the retrieved icon into a local resource to disconnect it from the external one.
             if (small.hIcon != IntPtr.Zero && small.iIcon != 0)
-                retIcon = (Icon)Icon.FromHandle(small.hIcon).Clone();
+                retIcon = (Icon)global::System.Drawing.Icon.FromHandle(small.hIcon).Clone();
 
             DestroyIcon(small.hIcon);
             return retIcon;
@@ -932,7 +954,6 @@ namespace SharpGMad
             Icon = 0x000000100,
             /// <summary>Retrieves the index of a system image list icon. If successful, ShFileInfo.iIcon is populated with the value.</summary>
             SysIconIndex = 0x000004000,
-            /// <summary>Adds the little file link arrow overlaid on the icon if Icon is set.</summary>
             /// <summary>If Icon is set, the retrieved icon will be a small (16x16) icon.
             /// If SysIconIndex is set, the call will return a handle to the system image list of small icons. (?)</summary>
             SmallIcon = 0x000000001,

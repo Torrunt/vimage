@@ -137,11 +137,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-      copy "$(SolutionDir)\vimage\Libraries\DevIL.dll" "$(TargetDir)"
+    <PostBuildEvent>copy "$(SolutionDir)\vimage\Libraries\DevIL.dll" "$(TargetDir)"
       copy "$(SolutionDir)\vimage\Libraries\csfml-graphics-2.dll" "$(TargetDir)"
-      copy "$(SolutionDir)\vimage\Libraries\csfml-window-2.dll" "$(TargetDir)"
-    </PostBuildEvent>
+      copy "$(SolutionDir)\vimage\Libraries\csfml-window-2.dll" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
