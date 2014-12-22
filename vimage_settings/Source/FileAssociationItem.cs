@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Security.AccessControl;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
@@ -100,12 +101,41 @@ namespace vimage_settings
                 return;
 
             // Associate the file
+
+            // Windows 8 hack to make file association register work.
+            // http://forum.xda-developers.com/showthread.php?t=1801781
+            // You guys rock! ;)
+            RegistryKey hkcu_ExtsKey = Registry.CurrentUser.OpenSubKey(
+                @"Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" + Extension,
+                RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.FullControl);
+            if (hkcu_ExtsKey != null)
+            {
+                hkcu_ExtsKey.DeleteSubKeyTree(@"OpenWithList", false);
+                hkcu_ExtsKey.DeleteSubKeyTree(@"OpenWithProgids", false);
+                hkcu_ExtsKey.DeleteSubKeyTree(@"UserChoice", false);
+
+                hkcu_ExtsKey.Close();
+            }
+
+            // Delete the 'Open with' stuff in the HKCR
+            RegistryKey hkcr_extKey = Registry.ClassesRoot.OpenSubKey(Extension,
+                RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.FullControl);
+            if (hkcr_extKey != null)
+            {
+                hkcr_extKey.DeleteSubKeyTree(@"OpenWithList", false);
+                hkcr_extKey.DeleteSubKeyTree(@"OpenWithProgids", false);
+                hkcr_extKey.DeleteSubKeyTree(@"PersistentHandler", false);
+
+                hkcr_extKey.Close();
+            }
+            // End of Windows 8 stuff...
+
             string progID = "vimage." + Extension.TrimStart('.');
             if (Association.Registered)
             {
                 // Save out the previous ProgID as a backup
                 RegistryKey extKey = Registry.ClassesRoot.OpenSubKey(Extension,
-                    RegistryKeyPermissionCheck.ReadWriteSubTree, System.Security.AccessControl.RegistryRights.WriteKey);
+                    RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.WriteKey);
                 extKey.SetValue("Vimage.ProgID.bak", Association.ProgID);
                 extKey.Close();
 
