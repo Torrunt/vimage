@@ -70,6 +70,8 @@
             this.tabControl_ContextMenus = new System.Windows.Forms.TabControl();
             this.tabPage_ContextMenuGeneral = new System.Windows.Forms.TabPage();
             this.tabPage_ContextMenuAnimation = new System.Windows.Forms.TabPage();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.panel_FileAssociations = new System.Windows.Forms.Panel();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.label_version = new System.Windows.Forms.Label();
             this.linkLabel6 = new System.Windows.Forms.LinkLabel();
@@ -103,6 +105,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ContextMenu_Animation_InsertAtIndex)).BeginInit();
             this.panel2.SuspendLayout();
             this.tabControl_ContextMenus.SuspendLayout();
+            this.tabPage5.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.panel1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -113,6 +116,7 @@
             this.TabControl.Controls.Add(this.tabPage1);
             this.TabControl.Controls.Add(this.tabPage2);
             this.TabControl.Controls.Add(this.tabPage3);
+            this.TabControl.Controls.Add(this.tabPage5);
             this.TabControl.Controls.Add(this.tabPage4);
             this.TabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TabControl.Location = new System.Drawing.Point(0, 0);
@@ -564,6 +568,25 @@
             this.tabPage_ContextMenuAnimation.TabIndex = 1;
             this.tabPage_ContextMenuAnimation.Text = "Animation";
             // 
+            // tabPage5
+            // 
+            this.tabPage5.Controls.Add(this.panel_FileAssociations);
+            this.tabPage5.Location = new System.Drawing.Point(4, 22);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Size = new System.Drawing.Size(426, 295);
+            this.tabPage5.TabIndex = 4;
+            this.tabPage5.Text = "File Associations";
+            this.tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // panel_FileAssociations
+            // 
+            this.panel_FileAssociations.AutoScroll = true;
+            this.panel_FileAssociations.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel_FileAssociations.Location = new System.Drawing.Point(0, 0);
+            this.panel_FileAssociations.Name = "panel_FileAssociations";
+            this.panel_FileAssociations.Size = new System.Drawing.Size(426, 295);
+            this.panel_FileAssociations.TabIndex = 14;
+            // 
             // tabPage4
             // 
             this.tabPage4.AutoScroll = true;
@@ -784,6 +807,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ContextMenu_Animation_InsertAtIndex)).EndInit();
             this.panel2.ResumeLayout(false);
             this.tabControl_ContextMenus.ResumeLayout(false);
+            this.tabPage5.ResumeLayout(false);
             this.tabPage4.ResumeLayout(false);
             this.tabPage4.PerformLayout();
             this.panel1.ResumeLayout(false);
@@ -853,6 +877,8 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button button_ContextMenuAddNew;
         private System.Windows.Forms.Button button_ContextMenuDefault;
+        private System.Windows.Forms.TabPage tabPage5;
+        private System.Windows.Forms.Panel panel_FileAssociations;
     }
 }
 

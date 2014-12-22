@@ -15,6 +15,8 @@ namespace vimage_settings
         public List<ContextMenuItem> ContextMenuItems = new List<ContextMenuItem>();
         public List<ContextMenuItem> ContextMenuItems_Animation = new List<ContextMenuItem>();
 
+        public List<FileAssociationItem> FileAssociationItems = new List<FileAssociationItem>();
+
         public ContextMenuItem ContextMenuItemFocused;
 
         public ConfigWindow()
@@ -79,6 +81,13 @@ namespace vimage_settings
 
             if (ContextMenuItems.Count > 0)
                 ContextMenuItems[0].GiveItemFocus();
+
+            // Load file associations
+            // (Have to use reverse order here so that the first extension is the first in the list)
+            for (int i = Program.EXTENSIONS.Length; i > 0; i--)
+            {
+                AddFileAssociationItem("." + Program.EXTENSIONS[i - 1]);
+            }
         }
 
         private void AddControlItem(string name, List<int> control)
@@ -86,6 +95,13 @@ namespace vimage_settings
             ControlItem item = new ControlItem(name, control);
             panel_Controls.Controls.Add(item);
             ControlItems.Add(item);
+        }
+
+        private void AddFileAssociationItem(string extension)
+        {
+            FileAssociationItem item = new FileAssociationItem(extension);
+            panel_FileAssociations.Controls.Add(item);
+            FileAssociationItems.Add(item);
         }
 
         private void AddContextMenuItems(List<object> contextItems, int depth = 0)
@@ -100,6 +116,7 @@ namespace vimage_settings
                     AddContextMenuItem((contextItems[i] as dynamic).name, (contextItems[i] as dynamic).func, depth); // item
             }
         }
+
         private ContextMenuItem AddContextMenuItem(string name = "", string func = "", int subitem = 0, bool submenu = false, int position = -1)
         {
             List<ContextMenuItem> CurrentList = GetContextMenuList();
@@ -127,6 +144,7 @@ namespace vimage_settings
 
             return item;
         }
+
         public void RefreshContextMenuItems(int scrollValue = -1)
         {
             List<ContextMenuItem> CurrentList = GetContextMenuList();
@@ -178,6 +196,7 @@ namespace vimage_settings
             // Save Config File
             vimageConfig.Save(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
         }
+
         private void SaveContextMenu(List<object> contextMenu, List<ContextMenuItem> contextMenuItems)
         {
             int currentSubLevel = 0;
@@ -283,6 +302,7 @@ namespace vimage_settings
 
             item.GiveItemFocus();
         }
+
         private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
             // focus on tab change to allow for scrolling with mouse wheel

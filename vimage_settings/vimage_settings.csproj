@@ -74,6 +74,12 @@
     <Compile Include="Source\ContextMenuItem.Designer.cs">
       <DependentUpon>ContextMenuItem.cs</DependentUpon>
     </Compile>
+    <Compile Include="Source\FileAssociationItem.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Source\FileAssociationItem.Designer.cs">
+      <DependentUpon>FileAssociationItem.cs</DependentUpon>
+    </Compile>
     <Compile Include="Source\ControlItem.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -99,6 +105,9 @@
     <EmbeddedResource Include="Source\ContextMenuItem.resx">
       <DependentUpon>ContextMenuItem.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Source\FileAssociationItem.resx">
+      <DependentUpon>FileAssociationItem.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Source\ControlItem.resx">
       <DependentUpon>ControlItem.cs</DependentUpon>
     </EmbeddedResource>
@@ -110,6 +119,7 @@
     <None Include="Resources\bullet_arrow_left.png" />
     <None Include="Resources\cross.png" />
     <None Include="Resources\icon.ico" />
+    <None Include="Resources\tick.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

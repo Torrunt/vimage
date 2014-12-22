@@ -13,6 +13,9 @@ namespace vimage_settings
             "pal", "pbm", "pcd", "pcx", "pgm", "pic", "png", "ppm", "psd", "psp", "raw", "sgi", "tga", "tif"
         };
 
+        static public readonly string vimagePath = 
+            System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vimage.exe");
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
