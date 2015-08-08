@@ -162,7 +162,8 @@
             this.comboBox_LimitImagesToMonitor.Items.AddRange(new object[] {
             "NONE",
             "HEIGHT",
-            "WIDTH"});
+            "WIDTH",
+            "AUTO"});
             this.comboBox_LimitImagesToMonitor.Location = new System.Drawing.Point(330, 166);
             this.comboBox_LimitImagesToMonitor.Name = "comboBox_LimitImagesToMonitor";
             this.comboBox_LimitImagesToMonitor.Size = new System.Drawing.Size(72, 21);

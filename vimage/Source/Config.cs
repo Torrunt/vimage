@@ -18,6 +18,7 @@ namespace vimage
         public List<int> Control_Flip = new List<int>();
         public List<int> Control_FitToMonitorHeight = new List<int>();
         public List<int> Control_FitToMonitorWidth = new List<int>();
+        public List<int> Control_FitToMonitorAuto = new List<int>();
         public List<int> Control_FitToMonitorAlt = new List<int>();
         public List<int> Control_ZoomFaster = new List<int>();
         public List<int> Control_ZoomAlt = new List<int>();
@@ -57,6 +58,7 @@ namespace vimage
         public const int NONE   = 0;
         public const int HEIGHT = 1;
         public const int WIDTH  = 2;
+        public const int AUTO   = 3;
 
         public bool Setting_PositionLargeWideImagesInCorner
         {
@@ -151,6 +153,7 @@ namespace vimage
                 { "FLIP", Control_Flip },
                 { "FITTOMONITORHEIGHT", Control_FitToMonitorHeight },
                 { "FITTOMONITORWIDTH", Control_FitToMonitorWidth },
+                { "FITTOMONITORAUTO", Control_FitToMonitorAuto },
                 { "FITTOMONITORALT", Control_FitToMonitorAlt },
                 { "ZOOMFASTER", Control_ZoomFaster },
                 { "ZOOMALT", Control_ZoomAlt },
@@ -186,6 +189,7 @@ namespace vimage
             Control_Flip.Clear();
             Control_FitToMonitorHeight.Clear();
             Control_FitToMonitorWidth.Clear();
+            Control_FitToMonitorAuto.Clear();
             Control_FitToMonitorAlt.Clear();
             Control_ZoomFaster.Clear();
             Control_ZoomAlt.Clear();
@@ -210,8 +214,9 @@ namespace vimage
             SetControls(Control_RotateClockwise, "UP");
             SetControls(Control_RotateAntiClockwise, "DOWN");
             SetControls(Control_Flip, "F");
-            SetControls(Control_FitToMonitorHeight, "MOUSEMIDDLE");
+            SetControls(Control_FitToMonitorHeight, "");
             SetControls(Control_FitToMonitorWidth, "");
+            SetControls(Control_FitToMonitorAuto, "MOUSEMIDDLE");
             SetControls(Control_FitToMonitorAlt, "RSHIFT", "LSHIFT");
             SetControls(Control_ZoomFaster, "RSHIFT", "LSHIFT");
             SetControls(Control_ZoomAlt, "RCONTROL", "LCONTROL");
@@ -496,6 +501,7 @@ namespace vimage
             WriteControl(writer, "Flip", Control_Flip);
             WriteControl(writer, "FitToMonitorHeight", Control_FitToMonitorHeight);
             WriteControl(writer, "FitToMonitorWidth", Control_FitToMonitorWidth);
+            WriteControl(writer, "FitToMonitorAuto", Control_FitToMonitorAuto);
             WriteControl(writer, "FitToMonitorAlt", Control_FitToMonitorAlt);
             WriteControl(writer, "ZoomFaster", Control_ZoomFaster);
             WriteControl(writer, "ZoomAlt", Control_ZoomAlt);

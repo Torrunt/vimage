@@ -127,12 +127,22 @@ namespace vimage
             if (Config.Setting_LimitImagesToMonitor != Config.NONE)
             {
                 // Fit to monitor height/width
-                if (Config.Setting_LimitImagesToMonitor == Config.HEIGHT && Image.Texture.Size.Y > bounds.Height)
+                int limit = Config.Setting_LimitImagesToMonitor;
+
+                if (limit == Config.AUTO)
+                {
+                    if (bounds.Height < bounds.Width)
+                        limit = Config.HEIGHT;
+                    else
+                        limit = Config.WIDTH;
+                }
+
+                if (limit == Config.HEIGHT && Image.Texture.Size.Y > bounds.Height)
                 {
                     Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
                     FitToMonitorHeightForced = true;
                 }
-                else if (Config.Setting_LimitImagesToMonitor == Config.WIDTH && Image.Texture.Size.X > bounds.Width)
+                else if (limit == Config.WIDTH && Image.Texture.Size.X > bounds.Width)
                 {
                     Zoom(1 + (((float)bounds.Width - Image.Texture.Size.X) / Image.Texture.Size.X), true);
                     AutomaticallyZoomed = true;
@@ -362,6 +372,8 @@ namespace vimage
                 ToggleFitToMonitor(Config.HEIGHT);
             if (Config.IsControl(code, Config.Control_FitToMonitorWidth))
                 ToggleFitToMonitor(Config.WIDTH);
+            if (Config.IsControl(code, Config.Control_FitToMonitorAuto))
+                ToggleFitToMonitor(Config.AUTO);
 
             // Animated Image - Pause/Play
             if (Config.IsControl(code, Config.Control_PauseAnimation))
@@ -571,6 +583,14 @@ namespace vimage
             if (CurrentZoom == 1)
             {
                 // Fit to Monitor Height
+                if (dimension == Config.AUTO)
+                {
+                    if (bounds.Height < bounds.Width)
+                        dimension = Config.HEIGHT;
+                    else
+                        dimension = Config.WIDTH;
+                }
+
                 if (dimension == Config.HEIGHT)
                 {
                     FitToMonitorHeight = true;
@@ -621,12 +641,22 @@ namespace vimage
             if (Config.Setting_LimitImagesToMonitor != Config.NONE)
             {
                 // Fit to monitor height/width
-                if (Config.Setting_LimitImagesToMonitor == Config.HEIGHT && Image.Texture.Size.Y > currentBounds.Height)
+                int limit = Config.Setting_LimitImagesToMonitor;
+
+                if (limit == Config.AUTO)
+                {
+                    if (currentBounds.Height < currentBounds.Width)
+                        limit = Config.HEIGHT;
+                    else
+                        limit = Config.WIDTH;
+                }
+
+                if (limit == Config.HEIGHT && Image.Texture.Size.Y > currentBounds.Height)
                 {
                     Zoom(1 + (((float)currentBounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
                     FitToMonitorHeightForced = true;
                 }
-                else if (Config.Setting_LimitImagesToMonitor == Config.WIDTH && Image.Texture.Size.X > currentBounds.Width)
+                else if (limit == Config.WIDTH && Image.Texture.Size.X > currentBounds.Width)
                 {
                     Zoom(1 + (((float)currentBounds.Width - Image.Texture.Size.X) / Image.Texture.Size.X), true);
                     AutomaticallyZoomed = true;
@@ -783,7 +813,17 @@ namespace vimage
             if (Config.Setting_LimitImagesToMonitor != Config.NONE)
             {
                 // Fit to monitor height/width
-                if (Config.Setting_LimitImagesToMonitor == Config.HEIGHT && (FitToMonitorHeight || Image.Texture.Size.Y * CurrentZoom > bounds.Height))
+                int limit = Config.Setting_LimitImagesToMonitor;
+
+                if (limit == Config.AUTO)
+                {
+                    if (bounds.Height < bounds.Width)
+                        limit = Config.HEIGHT;
+                    else
+                        limit = Config.WIDTH;
+                }
+
+                if (limit == Config.HEIGHT && (FitToMonitorHeight || Image.Texture.Size.Y * CurrentZoom > bounds.Height))
                 {
                     Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
 
@@ -796,7 +836,7 @@ namespace vimage
 
                     wasFitToMonitorDimension = true;
                 }
-                else if (Config.Setting_LimitImagesToMonitor == Config.WIDTH && Image.Texture.Size.X * CurrentZoom > bounds.Width)
+                else if (limit == Config.WIDTH && Image.Texture.Size.X * CurrentZoom > bounds.Width)
                 {
                     Zoom(1 + (((float)bounds.Width - Image.Texture.Size.X) / Image.Texture.Size.X), true);
 

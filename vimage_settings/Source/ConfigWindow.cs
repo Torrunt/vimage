@@ -59,6 +59,7 @@ namespace vimage_settings
             AddControlItem("Fit To Monitor Alt", vimageConfig.Control_FitToMonitorAlt);
             AddControlItem("Fit To Monitor Height", vimageConfig.Control_FitToMonitorHeight);
             AddControlItem("Fit To Monitor Width", vimageConfig.Control_FitToMonitorWidth);
+            AddControlItem("Fit To Monitor Auto", vimageConfig.Control_FitToMonitorAuto);
             AddControlItem("Flip", vimageConfig.Control_Flip);
             AddControlItem("Rotate Anti-Clockwise", vimageConfig.Control_RotateAntiClockwise);
             AddControlItem("Rotate Clockwise", vimageConfig.Control_RotateClockwise);
