@@ -275,7 +275,7 @@ namespace vimage
                         ForceAlwaysOnTopNextTick = false;
                 }
 
-                if (Updated && PreloadNextImageStart)
+                if (PreloadNextImageStart)
                     PreloadNextImage();
             }
         }
@@ -774,9 +774,6 @@ namespace vimage
         }
         private bool ChangeImage(string fileName)
         {
-            Image.Dispose();
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-
             Dragging = false;
             Vector2u prevSize = new Vector2u(Image.Texture.Size.X, Image.Texture.Size.Y);
             float prevRotation = Image.Rotation;
@@ -793,6 +790,12 @@ namespace vimage
                 CurrentZoom = 1;
             }
 
+            // Dispose of previous image
+            Image.Dispose();
+            Image = null;
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+
+            // Load new image
             if (!LoadImage(fileName))
                 return false;
             
@@ -896,13 +899,12 @@ namespace vimage
             if (ImageViewerUtils.GetExtension(fileName).Equals("gif"))
             {
                 // Animated Image
-                AnimatedImageData image = Graphics.GetAnimatedImageData(fileName);
+                Graphics.GetAnimatedImageData(fileName);
             }
             else
             {
                 // Image
-                Texture texture = Graphics.GetTexture(fileName);
-                if (texture == null)
+                if (Graphics.GetTexture(fileName) == null)
                     return false;
             }
 

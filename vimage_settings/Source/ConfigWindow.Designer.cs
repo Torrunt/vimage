@@ -331,8 +331,8 @@
             this.checkBox_PositionLargeWideImagesInCorner.Size = new System.Drawing.Size(331, 17);
             this.checkBox_PositionLargeWideImagesInCorner.TabIndex = 4;
             this.checkBox_PositionLargeWideImagesInCorner.Text = "Position large/wide images in corner (ie: wallpapers/screenshots)";
-            this.toolTip1.SetToolTip(this.checkBox_PositionLargeWideImagesInCorner, "Images that are wider than the current monitor width will be placed in the top le" +
-        "ft corner.");
+            this.toolTip1.SetToolTip(this.checkBox_PositionLargeWideImagesInCorner, "Images that are wider than or the same width as the current monitor will be place" +
+        "d in the top left corner.");
             this.checkBox_PositionLargeWideImagesInCorner.UseVisualStyleBackColor = true;
             // 
             // checkBox_BackgroundForImagesWithTransparencyDefault

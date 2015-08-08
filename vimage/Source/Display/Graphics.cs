@@ -66,20 +66,21 @@ namespace vimage
                 if (loaded)
                 {
                     texture = GetTextureFromBoundImage();
-                    IL.DeleteImage(imageID);
 
                     Textures.Add(texture);
                     TextureFileNames.Add(fileName);
 
                     // Limit amount of Textures in Memory
-                    if (Textures.Count >= MAX_TEXTURES)
+                    if (Textures.Count > MAX_TEXTURES)
                     {
                         Textures[0].Dispose();
                         Textures.RemoveAt(0);
                         TextureFileNames.RemoveAt(0);
                     }
                 }
-                IL.DeleteImage(imageID);
+                IL.DeleteImages(new ImageID[] { imageID });
+
+                Console.WriteLine(Textures.Count);
 
                 return texture;
             }
@@ -161,7 +162,7 @@ namespace vimage
                 AnimatedImageDataFileNames.Add(fileName);
 
                 // Limit amount of Animations in Memory
-                if (AnimatedImageDatas.Count >= MAX_ANIMATIONS)
+                if (AnimatedImageDatas.Count > MAX_ANIMATIONS)
                 {
                     for (int i = 0; i < AnimatedImageDatas[0].Frames.Count; i++)
                         AnimatedImageDatas[0].Frames[i].Dispose();
