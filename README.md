@@ -3,8 +3,8 @@
 
 A simplistic image viewer for Windows, inspired by [vjpeg](http://stereopsis.com/vjpeg/).
 
-![](http://i.imgur.com/BV6s8Z6.jpg)
-![](http://i.imgur.com/09GLCun.jpg)
+![](http://i.imgur.com/rq0QSkt.png)
+![](http://i.imgur.com/8NrdEcc.png)
 
 ### Created by
 Corey Zeke Womack (Torrunt) - [me@torrunt.net](mailto:me@torrunt.net) - [torrunt.net](http://torrunt.net)
