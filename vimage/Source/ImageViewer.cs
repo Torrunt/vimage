@@ -912,7 +912,7 @@ namespace vimage
         }
         private void PreloadNextImage()
         {
-            if (PreloadingNextImage == 0)
+            if (PreloadingNextImage == 0 || FolderContents.Count == 0)
                 return;
 
             PreloadNextImageStart = false;
