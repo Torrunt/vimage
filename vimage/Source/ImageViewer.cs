@@ -161,7 +161,7 @@ namespace vimage
             // Position Window
             Vector2i winPos;
 
-            if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X > Image.Texture.Size.Y && Image.Texture.Size.X * CurrentZoom >= bounds.Width)
+            if (Config.Setting_PositionLargeWideImagesInCorner && CurrentImageSize().X > CurrentImageSize().Y && CurrentImageSize().X * CurrentZoom >= bounds.Width)
             {
                 // Position Window in top-left if the image is wide (ie: a Desktop Wallpaper / Screenshot)
                 winPos = new Vector2i(bounds.Left, bounds.Top);
@@ -563,6 +563,8 @@ namespace vimage
             Updated = true;
         }
 
+        public Vector2u CurrentImageSize() { return (Image.Rotation == 0 || Image.Rotation == 180) ? Image.Texture.Size : new Vector2u(Image.Texture.Size.Y, Image.Texture.Size.X); }
+
         public void FlipImage()
         {
             FlippedX = !FlippedX;
@@ -620,7 +622,7 @@ namespace vimage
             }
 
 
-            if (Image.Texture.Size.X * CurrentZoom >= bounds.Width)
+            if (CurrentImageSize().X * CurrentZoom >= bounds.Width)
                 NextWindowPos = new Vector2i(bounds.Left, bounds.Top); // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
             else if (!FitToMonitorAlt)
                 ForceAlwaysOnTopNextTick = true;
@@ -798,7 +800,7 @@ namespace vimage
             // Load new image
             if (!LoadImage(fileName))
                 return false;
-            
+
             SFML.Graphics.View view = new SFML.Graphics.View(Window.DefaultView);
             view.Center = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             view.Size = new Vector2f(Image.Texture.Size.X, Image.Texture.Size.Y);
@@ -826,12 +828,12 @@ namespace vimage
                         limit = Config.WIDTH;
                 }
 
-                if (limit == Config.HEIGHT && (FitToMonitorHeight || Image.Texture.Size.Y * CurrentZoom > bounds.Height))
+                if (limit == Config.HEIGHT && (FitToMonitorHeight || CurrentImageSize().Y * CurrentZoom > bounds.Height))
                 {
-                    Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
+                    Zoom(1 + (((float)bounds.Height - CurrentImageSize().Y) / CurrentImageSize().Y), true);
 
                     bounds = ImageViewerUtils.GetCurrentBounds(NextWindowPos +
-                        new Vector2i((int)(Image.Texture.Size.X * CurrentZoom) / 2, (int)(Image.Texture.Size.Y * CurrentZoom) / 2));
+                        new Vector2i((int)(CurrentImageSize().X * CurrentZoom) / 2, (int)(CurrentImageSize().Y * CurrentZoom) / 2));
                     NextWindowPos = new Vector2i(NextWindowPos.X, bounds.Top);
 
                     if (!FitToMonitorHeight)
@@ -839,12 +841,12 @@ namespace vimage
 
                     wasFitToMonitorDimension = true;
                 }
-                else if (limit == Config.WIDTH && Image.Texture.Size.X * CurrentZoom > bounds.Width)
+                else if (limit == Config.WIDTH && CurrentImageSize().X * CurrentZoom > bounds.Width)
                 {
-                    Zoom(1 + (((float)bounds.Width - Image.Texture.Size.X) / Image.Texture.Size.X), true);
+                    Zoom(1 + (((float)bounds.Width - CurrentImageSize().X) / CurrentImageSize().X), true);
 
                     bounds = ImageViewerUtils.GetCurrentBounds(NextWindowPos +
-                        new Vector2i((int)(Image.Texture.Size.X * CurrentZoom) / 2, (int)(Image.Texture.Size.Y * CurrentZoom) / 2));
+                        new Vector2i((int)(CurrentImageSize().X * CurrentZoom) / 2, (int)(CurrentImageSize().Y * CurrentZoom) / 2));
                     NextWindowPos = new Vector2i(bounds.Left, NextWindowPos.Y);
 
                     AutomaticallyZoomed = true;
@@ -878,7 +880,7 @@ namespace vimage
 
             // Position Window at top-left if the image is wide (ie: a Desktop Wallpaper / Screenshot)
             // Otherwise, if image is hanging off monitor just center it.
-            if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X > Image.Texture.Size.Y && Image.Texture.Size.X * CurrentZoom >= bounds.Width)
+            if (Config.Setting_PositionLargeWideImagesInCorner && CurrentImageSize().X > CurrentImageSize().Y && CurrentImageSize().X * CurrentZoom >= bounds.Width)
                 NextWindowPos = new Vector2i(bounds.Left, bounds.Top);
             else if (!prevSize.Equals(Image.Texture.Size) && (NextWindowPos.X + (Image.Texture.Size.X * CurrentZoom) >= bounds.Left + bounds.Width || 
                      NextWindowPos.Y + (Image.Texture.Size.Y * CurrentZoom) >= bounds.Top + bounds.Height))

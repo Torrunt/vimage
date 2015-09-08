@@ -80,8 +80,6 @@ namespace vimage
                 }
                 IL.DeleteImages(new ImageID[] { imageID });
 
-                Console.WriteLine(Textures.Count);
-
                 return texture;
             }
         }
