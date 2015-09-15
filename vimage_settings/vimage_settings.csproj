@@ -34,22 +34,26 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="sfmlnet-window-2">
-      <HintPath>..\vimage\sfmlnet-window-2.dll</HintPath>
+      <HintPath>..\vimage\Libraries\sfmlnet-window-2.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\vimage\Source\Config.cs">
@@ -70,12 +74,19 @@
     <Compile Include="Source\ContextMenuItem.Designer.cs">
       <DependentUpon>ContextMenuItem.cs</DependentUpon>
     </Compile>
+    <Compile Include="Source\FileAssociationItem.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Source\FileAssociationItem.Designer.cs">
+      <DependentUpon>FileAssociationItem.cs</DependentUpon>
+    </Compile>
     <Compile Include="Source\ControlItem.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Source\ControlItem.Designer.cs">
       <DependentUpon>ControlItem.cs</DependentUpon>
     </Compile>
+    <Compile Include="Source\FileAssociation.cs" />
     <Compile Include="Source\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Source\ConfigWindow.resx">
@@ -94,47 +105,27 @@
     <EmbeddedResource Include="Source\ContextMenuItem.resx">
       <DependentUpon>ContextMenuItem.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Source\FileAssociationItem.resx">
+      <DependentUpon>FileAssociationItem.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Source\ControlItem.resx">
       <DependentUpon>ControlItem.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\bullet_arrow_down.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\bullet_arrow_up.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\bullet_arrow_right.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\bullet_arrow_left.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\cross.png" />
-  </ItemGroup>
-  <ItemGroup>
+    <None Include="Properties\App.config" />
     <None Include="Resources\add.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="icon.ico" />
+    <None Include="Resources\bullet_arrow_down.png" />
+    <None Include="Resources\bullet_arrow_up.png" />
+    <None Include="Resources\bullet_arrow_right.png" />
+    <None Include="Resources\bullet_arrow_left.png" />
+    <None Include="Resources\cross.png" />
+    <None Include="Resources\icon.ico" />
+    <None Include="Resources\tick.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "$(SolutionDir)\vimage\bin\Release"
-copy "$(TargetPath)" "$(SolutionDir)\vimage\bin\Debug"</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetPath)" "$(SolutionDir)\vimage\$(OutDir)"
+
+</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

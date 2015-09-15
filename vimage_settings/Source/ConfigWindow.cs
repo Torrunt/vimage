@@ -15,11 +15,38 @@ namespace vimage_settings
         public List<ContextMenuItem> ContextMenuItems = new List<ContextMenuItem>();
         public List<ContextMenuItem> ContextMenuItems_Animation = new List<ContextMenuItem>();
 
+        public List<FileAssociationItem> FileAssociationItems = new List<FileAssociationItem>();
+
         public ContextMenuItem ContextMenuItemFocused;
 
         public ConfigWindow()
         {
             InitializeComponent();
+            this.Icon = global::vimage_settings.Properties.Resources.icon;
+
+            if (!Program.IsAdministrator)
+            {
+                // Commented out, because these are defaults set in Designer.cs
+                /*panel_FileAssociations.Dock = DockStyle.Top;
+                panel_becomeAdmin.Dock = DockStyle.Bottom;
+                panel_becomeAdmin.Visible = true;
+                label_FA_AdminNotice.Visible = true;
+                button_becomeAdmin.Visible = true;
+                button_becomeAdmin.Enabled = true;*/
+
+                // Put the UAC shield on the button
+                // Via http://www.codeproject.com/Articles/18509/Add-a-UAC-shield-to-a-button-when-elevation-is-req
+                SendMessage(button_becomeAdmin.Handle, (0x1600 + 0x000C), 0, 0xFFFFFFFF);
+            }
+            else
+            {
+                panel_FileAssociations.Dock = DockStyle.Fill;
+                panel_becomeAdmin.Dock = DockStyle.None;
+                panel_becomeAdmin.Visible = false;
+                label_FA_AdminNotice.Visible = false;
+                button_becomeAdmin.Visible = false;
+                button_becomeAdmin.Enabled = false;
+            }
 
             linkLabel1.TabStop = false; // won't set to false in the Designer.cs for weird reason
 
@@ -80,6 +107,13 @@ namespace vimage_settings
 
             if (ContextMenuItems.Count > 0)
                 ContextMenuItems[0].GiveItemFocus();
+
+            // Load file associations
+            // (Have to use reverse order here so that the first extension is the first in the list)
+            for (int i = Program.EXTENSIONS.Length; i > 0; i--)
+            {
+                AddFileAssociationItem("." + Program.EXTENSIONS[i - 1]);
+            }
         }
 
         private void AddControlItem(string name, List<int> control)
@@ -87,6 +121,13 @@ namespace vimage_settings
             ControlItem item = new ControlItem(name, control);
             panel_Controls.Controls.Add(item);
             ControlItems.Add(item);
+        }
+
+        private void AddFileAssociationItem(string extension)
+        {
+            FileAssociationItem item = new FileAssociationItem(extension);
+            panel_FileAssociations.Controls.Add(item);
+            FileAssociationItems.Add(item);
         }
 
         private void AddContextMenuItems(List<object> contextItems, int depth = 0)
@@ -101,6 +142,7 @@ namespace vimage_settings
                     AddContextMenuItem((contextItems[i] as dynamic).name, (contextItems[i] as dynamic).func, depth); // item
             }
         }
+
         private ContextMenuItem AddContextMenuItem(string name = "", string func = "", int subitem = 0, bool submenu = false, int position = -1)
         {
             List<ContextMenuItem> CurrentList = GetContextMenuList();
@@ -128,6 +170,7 @@ namespace vimage_settings
 
             return item;
         }
+
         public void RefreshContextMenuItems(int scrollValue = -1)
         {
             List<ContextMenuItem> CurrentList = GetContextMenuList();
@@ -179,6 +222,7 @@ namespace vimage_settings
             // Save Config File
             vimageConfig.Save(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
         }
+
         private void SaveContextMenu(List<object> contextMenu, List<ContextMenuItem> contextMenuItems)
         {
             int currentSubLevel = 0;
@@ -284,6 +328,7 @@ namespace vimage_settings
 
             item.GiveItemFocus();
         }
+
         private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
             // focus on tab change to allow for scrolling with mouse wheel
@@ -331,5 +376,31 @@ namespace vimage_settings
             Process.Start("http://github.com/Torrunt/vimage");
         }
 
+        // Required to put an UAC shield on a button
+        // Via http://www.codeproject.com/Articles/18509/Add-a-UAC-shield-to-a-button-when-elevation-is-req
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern UInt32 SendMessage
+            (IntPtr hWnd, UInt32 msg, UInt32 wParam, UInt32 lParam);
+
+        // Restart the process as Administrator
+        // Via http://www.codeproject.com/Articles/18509/Add-a-UAC-shield-to-a-button-when-elevation-is-req
+        private void button_becomeAdmin_Click(object sender, EventArgs e)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.UseShellExecute = true;
+            startInfo.WorkingDirectory = Environment.CurrentDirectory;
+            startInfo.FileName = Application.ExecutablePath;
+            startInfo.Verb = "runas";
+            try
+            {
+                Process p = Process.Start(startInfo);
+            }
+            catch (System.ComponentModel.Win32Exception ex)
+            {
+                return;
+            }
+
+            Application.Exit();
+        }
     }
 }
