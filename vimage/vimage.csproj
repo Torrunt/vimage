@@ -59,6 +59,9 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CrashReporter.NET">
+      <HintPath>.\CrashReporter.NET.dll</HintPath>
+    </Reference>
     <Reference Include="DevILNet">
       <HintPath>.\DevILNet.dll</HintPath>
     </Reference>

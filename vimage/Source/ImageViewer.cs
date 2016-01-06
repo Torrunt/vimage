@@ -234,7 +234,10 @@ namespace vimage
                 Thread.Sleep(1);
 
                 if (CloseNextTick)
+                {
+                    Window.Close();
                     break;
+                }
 
                 // Process events
                 Window.DispatchEvents();
