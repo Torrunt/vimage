@@ -25,7 +25,6 @@ namespace vimage
 
         public readonly float ZOOM_MIN = 0.05f;
         public readonly float ZOOM_MAX = 75f;
-        public uint ZOOM_MAX_WIDTH;
 
         public RenderWindow Window;
         public dynamic Image;
@@ -87,6 +86,9 @@ namespace vimage
 
             // Get Image
             LoadImage(file);
+
+            if (Image == null)
+                return;
             
             // Load Config File
             Config = new Config();
@@ -108,8 +110,6 @@ namespace vimage
             // Create Window
             Window = new RenderWindow(new VideoMode(Image.Texture.Size.X, Image.Texture.Size.Y), File + " - vimage", Styles.None);
             Window.SetActive();
-
-            ZOOM_MAX_WIDTH = (uint)Math.Ceiling(VideoMode.DesktopMode.Width * 2.5);
 
             // Make Window Transparent (can only tell if image being viewed has transparency)
             DWM_BLURBEHIND bb = new DWM_BLURBEHIND(false);
@@ -491,8 +491,8 @@ namespace vimage
 
         private void Zoom(float value, bool center = false)
         {
-            // Limit Zooming at 2.5x the screen width (ZOOM_MAX_WIDTH) if it hasn't already reached 75x (ZOOM_MAX)
-            if (value > CurrentZoom && (uint)Math.Ceiling(Image.Texture.Size.X * value) >= ZOOM_MAX_WIDTH)
+            // Limit zooming to prevent the going past the GPU's max texture size
+            if (value > CurrentZoom && (uint)Math.Ceiling(Image.Texture.Size.X * value) >= Texture.MaximumSize)
                 value = CurrentZoom;
 
             CurrentZoom = value;
