@@ -25,7 +25,7 @@ namespace vimage
         public const uint MAX_ANIMATIONS = 6;
         public static int TextureMaxSize = 16000;
 
-        public Graphics()
+        public static void Init()
         {
             Texture.Bind(new Texture(1, 1));
             Gl.glGetIntegerv(Gl.GL_MAX_TEXTURE_SIZE, out TextureMaxSize);
@@ -74,7 +74,7 @@ namespace vimage
 
                 if (IL.GetImageInfo().Width > TextureMaxSize || IL.GetImageInfo().Height > TextureMaxSize)
                 {
-                    System.Windows.Forms.MessageBox.Show("Image is too large and exceeds the GPU's maximum supported texture size.", "vimage");
+                    System.Windows.Forms.MessageBox.Show("Image exceeds the GPU's maximum supported texture size (" + TextureMaxSize + ").", "vimage");
                     return null;
                 }
 

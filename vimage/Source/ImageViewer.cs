@@ -76,6 +76,7 @@ namespace vimage
         public ImageViewer(string file)
         {
             IL.Initialize();
+            Graphics.Init();
 
             // Extension supported?
             if (!ImageViewerUtils.IsValidExtension(file, EXTENSIONS))
