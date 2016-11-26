@@ -31,6 +31,9 @@
         public const string PREV_FRAME = "PREVFRAME";
         public const string TOGGLE_ANIMATION = "TOGGLEANIMATION";
 
+        public const string OPEN_DUPLICATE = "OPENDUPLICATE";
+        public const string RANDOM_IMAGE = "RANDOMIMAGE";
+
         public static readonly string[] FUNCS =
         {
             CLOSE, NEXT_IMAGE, PREV_IMAGE, ROTATE_CLOCKWISE, ROTATE_ANTICLOCKWISE,
@@ -38,6 +41,7 @@
             ALWAYS_ON_TOP, OPEN_FILE_LOCATION, DELETE, OPEN_SETTINGS, RELOAD_SETTINGS,
             VERSION_NAME, SORT_NAME, SORT_DATE_MODIFIED, SORT_DATE_CREATED, SORT_SIZE,
             SORT_ASCENDING, SORT_DESCENDING, NEXT_FRAME, PREV_FRAME, TOGGLE_ANIMATION,
+            OPEN_DUPLICATE, RANDOM_IMAGE
         };
 
         // <summary>Takes a MenuFunc name and adds space between certain words (for ease of reading).</summary>
@@ -60,6 +64,8 @@
             func = func.Replace("RELOAD", "RELOAD ");
             func = func.Replace("OPEN", "OPEN ");
             func = func.Replace("FILELOCATION", "FILE LOCATION");
+            func = func.Replace("OPENDUPLICATE", "OPEN DUPLICATE");
+            func = func.Replace("RANDOMIMAGE", "RANDOM IMAGE");
 
             return func;
         }

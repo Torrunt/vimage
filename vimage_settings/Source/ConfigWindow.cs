@@ -42,6 +42,7 @@ namespace vimage_settings
             numericUpDown_ZoomSpeedFast.Value = vimageConfig.Setting_ZoomSpeedFast;
 
             // Setup Control Bindings
+            AddControlItem("Random Image", vimageConfig.Control_RandomImage);
             AddControlItem("Open Duplicate Image", vimageConfig.Control_OpenDuplicateImage);
             AddControlItem("Delete", vimageConfig.Control_Delete);
             AddControlItem("Open At Location", vimageConfig.Control_OpenAtLocation);

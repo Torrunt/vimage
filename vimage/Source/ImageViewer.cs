@@ -73,6 +73,8 @@ namespace vimage
         public SortBy SortImagesBy = SortBy.Name;
         public SortDirection SortImagesByDir = SortDirection.Ascending;
 
+        private static readonly Random rnd = new Random();
+
         public ImageViewer(string file)
         {
             IL.Initialize();
@@ -416,12 +418,10 @@ namespace vimage
                 DeleteFile();
 
             if (Config.IsControl(code, Config.Control_OpenDuplicateImage))
-            {
-                Process p = new Process();
-                p.StartInfo.FileName = Application.ExecutablePath;
-                p.StartInfo.Arguments = "\"" + File + "\"";
-                p.Start();
-            }
+                OpenDuplicateWindow();
+
+            if (Config.IsControl(code, Config.Control_RandomImage))
+                RandomImage();
 
             ZoomFaster = false;
             ZoomAlt = false;
@@ -985,6 +985,16 @@ namespace vimage
                 PreloadNextImageStart = true;
             }
         }
+        public void RandomImage()
+        {
+            GetFolderContents();
+            if (FolderContents.Count() <= 1)
+                return;
+
+            bool success = false;
+            do { success = ChangeImage(FolderContents[rnd.Next(0, FolderContents.Count)]); }
+            while (!success);
+        }
 
         public void ChangeSortBy(SortBy by)
         {
@@ -1103,6 +1113,14 @@ namespace vimage
         public void OpenFileAtLocation()
         {
             Process.Start("explorer.exe", "/select, " + File);
+        }
+
+        public void OpenDuplicateWindow()
+        {
+            Process p = new Process();
+            p.StartInfo.FileName = Application.ExecutablePath;
+            p.StartInfo.Arguments = "\"" + File + "\"";
+            p.Start();
         }
 
         public void OpenConfig()

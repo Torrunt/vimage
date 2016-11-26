@@ -213,6 +213,8 @@ namespace vimage
 
                 case MenuFuncs.OPEN_FILE_LOCATION: ImageViewer.OpenFileAtLocation(); break;
                 case MenuFuncs.DELETE: ImageViewer.DeleteFile(); break;
+                case MenuFuncs.OPEN_DUPLICATE: ImageViewer.OpenDuplicateWindow(); break;
+                case MenuFuncs.RANDOM_IMAGE: ImageViewer.RandomImage(); break;
 
                 case MenuFuncs.OPEN_SETTINGS: ImageViewer.OpenConfig(); break;
                 case MenuFuncs.RELOAD_SETTINGS: ImageViewer.ReloadConfig(); break;

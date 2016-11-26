@@ -34,6 +34,7 @@ namespace vimage
         public List<int> Control_OpenAtLocation = new List<int>();
         public List<int> Control_Delete = new List<int>();
         public List<int> Control_OpenDuplicateImage = new List<int>();
+        public List<int> Control_RandomImage = new List<int>();
 
         public bool Setting_OpenAtMousePosition
         {
@@ -169,6 +170,7 @@ namespace vimage
                 { "OPENATLOCATION", Control_OpenAtLocation },
                 { "DELETE", Control_Delete },
                 { "OPENDUPLICATEIMAGE", Control_OpenDuplicateImage },
+                { "RANDOMIMAGE", Control_RandomImage },
 
                 { "CONTEXTMENU", ContextMenu },
                 { "CONTEXTMENU_ANIMATION", ContextMenu_Animation },
@@ -205,6 +207,7 @@ namespace vimage
             Control_OpenAtLocation.Clear();
             Control_Delete.Clear();
             Control_OpenDuplicateImage.Clear();
+            Control_RandomImage.Clear();
 
             SetControls(Control_Drag, "MOUSELEFT");
             SetControls(Control_Close, "ESC", "BACKSPACE");
@@ -232,6 +235,7 @@ namespace vimage
             SetControls(Control_OpenAtLocation, "");
             SetControls(Control_Delete, "DELETE");
             SetControls(Control_OpenDuplicateImage, "C");
+            SetControls(Control_RandomImage, "M");
         }
         public void SetDefaultContextMenu()
         {
@@ -517,6 +521,7 @@ namespace vimage
             WriteControl(writer, "OpenAtLocation", Control_OpenAtLocation);
             WriteControl(writer, "Delete", Control_Delete);
             WriteControl(writer, "OpenDuplicateImage", Control_OpenDuplicateImage);
+            WriteControl(writer, "RandomImage", Control_RandomImage);
 
             writer.Write(Environment.NewLine);
             writer.Write("// Context Menu" + Environment.NewLine);
