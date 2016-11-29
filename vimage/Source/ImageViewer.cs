@@ -749,29 +749,32 @@ namespace vimage
             File = fileName;
 
             string extension = ImageViewerUtils.GetExtension(fileName);
-            bool isGif = extension.Equals("gif");
-            bool success = false;
 
             // Image
-            if (!isGif)
+            if (extension.Equals("gif"))
             {
+                // Animated GIF
+                Image = Graphics.GetAnimatedImage(fileName);
+            }
+            else if (extension.Equals("ico"))
+            {
+                // Icon
+                Image = Graphics.GetSpriteFromIcon(fileName);
+            }
+            else
+            {
+                // Other
                 Texture texture = Graphics.GetTexture(fileName);
                 if (texture != null)
                 {
-                    success = true;
                     texture.Smooth = true;
                     Image = new Sprite(texture);
                 }
-                else if (!extension.Equals("ico"))
-                    return false;
             }
-            // Animated GIF or image that failed to load normally (ie some .icos)
-            if (isGif || !success)
-            {
-                Image = Graphics.GetAnimatedImage(fileName);
-                if (Image.Texture == null)
-                    return false;
-            }
+
+            if (Image?.Texture == null)
+                return false;
+
             Image.Origin = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             Image.Position = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
             DefaultRotation = ImageViewerUtils.GetDefaultRotationFromEXIF(fileName);
@@ -907,7 +910,13 @@ namespace vimage
                 // Animated Image
                 Graphics.GetAnimatedImageData(fileName);
             }
-            else
+            else if (ImageViewerUtils.GetExtension(fileName).Equals("ico"))
+            {
+                // Icon
+                if (Graphics.GetSpriteFromIcon(fileName) == null)
+                    return false;
+            }
+            else 
             {
                 // Image
                 if (Graphics.GetTexture(fileName) == null)

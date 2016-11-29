@@ -127,6 +127,64 @@ namespace vimage
             return texture;
         }
 
+        public static Sprite GetSpriteFromIcon(string fileName)
+        {
+            try
+            {
+                System.Drawing.Icon icon = new System.Drawing.Icon(fileName, 256, 256);
+                System.Drawing.Bitmap iconImage = ExtractVistaIcon(icon);
+                if (iconImage == null)
+                    iconImage = icon.ToBitmap();
+
+                Sprite iconSprite;
+
+                using (MemoryStream iconStream = new MemoryStream())
+                {
+                    iconImage.Save(iconStream, System.Drawing.Imaging.ImageFormat.Png);
+                    iconSprite = new Sprite(new Texture(iconStream));
+                }
+
+                return iconSprite;
+            }
+            catch (Exception) { }
+            return null;
+        }
+        // http://stackoverflow.com/questions/220465/using-256-x-256-vista-icon-in-application/1945764#1945764
+        // Based on: http://www.codeproject.com/KB/cs/IconExtractor.aspx
+        // And a hint from: http://www.codeproject.com/KB/cs/IconLib.aspx
+        public static System.Drawing.Bitmap ExtractVistaIcon(System.Drawing.Icon icoIcon)
+        {
+            System.Drawing.Bitmap bmpPngExtracted = null;
+            try
+            {
+                byte[] srcBuf = null;
+                using (MemoryStream stream = new MemoryStream())
+                { icoIcon.Save(stream); srcBuf = stream.ToArray(); }
+                const int SizeICONDIR = 6;
+                const int SizeICONDIRENTRY = 16;
+                int iCount = BitConverter.ToInt16(srcBuf, 4);
+                for (int iIndex = 0; iIndex < iCount; iIndex++)
+                {
+                    int iWidth = srcBuf[SizeICONDIR + SizeICONDIRENTRY * iIndex];
+                    int iHeight = srcBuf[SizeICONDIR + SizeICONDIRENTRY * iIndex + 1];
+                    int iBitCount = BitConverter.ToInt16(srcBuf, SizeICONDIR + SizeICONDIRENTRY * iIndex + 6);
+                    if (iWidth == 0 && iHeight == 0 && iBitCount == 32)
+                    {
+                        int iImageSize = BitConverter.ToInt32(srcBuf, SizeICONDIR + SizeICONDIRENTRY * iIndex + 8);
+                        int iImageOffset = BitConverter.ToInt32(srcBuf, SizeICONDIR + SizeICONDIRENTRY * iIndex + 12);
+                        MemoryStream destStream = new MemoryStream();
+                        BinaryWriter writer = new BinaryWriter(destStream);
+                        writer.Write(srcBuf, iImageOffset, iImageSize);
+                        destStream.Seek(0, SeekOrigin.Begin);
+                        bmpPngExtracted = new System.Drawing.Bitmap(destStream); // This is PNG! :)
+                        break;
+                    }
+                }
+            }
+            catch { return null; }
+            return bmpPngExtracted;
+        }
+
         /// <param name="filename">Animated Image (ie: animated gif).</param>
         public static AnimatedImage GetAnimatedImage(string fileName)
         {
