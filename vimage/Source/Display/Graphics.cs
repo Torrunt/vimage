@@ -4,7 +4,6 @@ using System;
 using DevIL.Unmanaged;
 using Tao.OpenGl;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace vimage
@@ -23,14 +22,7 @@ namespace vimage
 
         public const uint MAX_TEXTURES = 20;
         public const uint MAX_ANIMATIONS = 6;
-        public static int TextureMaxSize = 16000;
-
-        public static void Init()
-        {
-            Texture.Bind(new Texture(1, 1));
-            Gl.glGetIntegerv(Gl.GL_MAX_TEXTURE_SIZE, out TextureMaxSize);
-            Texture.Bind(null);
-        }
+        public static int TextureMaxSize = (int)Texture.MaximumSize;
 
         public static Sprite GetSprite(string fileName, bool smooth = false)
         {

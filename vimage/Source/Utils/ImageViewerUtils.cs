@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using SFML.Window;
 using SFML.Graphics;
+using SFML.System;
 
 namespace vimage
 {

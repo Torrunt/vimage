@@ -4,6 +4,7 @@ using System.Linq;
 using System.IO;
 using SFML.Window;
 using SFML.Graphics;
+using SFML.System;
 using Tao.OpenGl;
 using DevIL.Unmanaged;
 using System.Diagnostics;
@@ -78,7 +79,6 @@ namespace vimage
         public ImageViewer(string file)
         {
             IL.Initialize();
-            Graphics.Init();
 
             // Extension supported?
             if (!ImageViewerUtils.IsValidExtension(file, EXTENSIONS))
@@ -222,7 +222,7 @@ namespace vimage
             Window.Closed += OnWindowClosed;
             Window.MouseButtonPressed += OnMouseDown;
             Window.MouseButtonReleased += OnMouseUp;
-            Window.MouseWheelMoved += OnMouseWheelMoved;
+            Window.MouseWheelScrolled += OnMouseWheelScrolled;
             Window.MouseMoved += OnMouseMoved;
             Window.KeyReleased += OnKeyUp;
             Window.KeyPressed += OnKeyDown;
@@ -231,7 +231,7 @@ namespace vimage
             Stopwatch clock = new Stopwatch();
             clock.Start();
             
-            while (Window.IsOpen())
+            while (Window.IsOpen)
             {
                 // Add in some idle time to not thrash the CPU
                 Thread.Sleep(1);
@@ -323,7 +323,7 @@ namespace vimage
             if (Dragging)
                 UnforceAlwaysOnTop();
         }
-        private void OnMouseWheelMoved(Object sender, MouseWheelEventArgs e)
+        private void OnMouseWheelScrolled(Object sender, MouseWheelScrollEventArgs e)
         {
             if (e.Delta > 0)
                 Zoom(Math.Min(CurrentZoom + (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MAX), !ZoomAlt);

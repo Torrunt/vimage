@@ -890,7 +890,7 @@ namespace vimage
                     return Keyboard.Key.Return;
                 case "BACK":
                 case "BACKSPACE":
-                    return Keyboard.Key.Back;
+                    return Keyboard.Key.BackSpace;
                 case "TAB":
                     return Keyboard.Key.Tab;
                 case "PAGEUP":
@@ -1105,7 +1105,7 @@ namespace vimage
 	                return "SPACE";
                 case Keyboard.Key.Return:
 	                return "RETURN";
-                case Keyboard.Key.Back:
+                case Keyboard.Key.BackSpace:
 	                return "BACK";
                 case Keyboard.Key.Tab:
 	                return "TAB";
