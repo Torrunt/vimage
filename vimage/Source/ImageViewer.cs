@@ -764,12 +764,14 @@ namespace vimage
             else
             {
                 // Other
-                Texture texture = Graphics.GetTexture(fileName);
-                if (texture != null)
+                dynamic texture = Graphics.GetTexture(fileName);
+                if (texture is Texture)
                 {
                     texture.Smooth = true;
                     Image = new Sprite(texture);
                 }
+                else if (texture is DisplayObject)
+                    Image = (DisplayObject)texture;
             }
 
             if (Image?.Texture == null)
@@ -943,9 +945,7 @@ namespace vimage
                 else
                     return;
 
-                Gl.glActiveTexture(Gl.GL_TEXTURE1);
                 success = PreloadImage(FolderContents[pos]);
-                Gl.glActiveTexture(Gl.GL_TEXTURE0);
             }
             while (!success);
             

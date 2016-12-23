@@ -1,10 +1,12 @@
 ﻿using SFML.Graphics;
+using SFML.System;
 using System.Collections.Generic;
 using System;
 using DevIL.Unmanaged;
 using Tao.OpenGl;
 using System.IO;
 using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace vimage
 {
@@ -20,20 +22,17 @@ namespace vimage
         private static List<AnimatedImageData> AnimatedImageDatas = new List<AnimatedImageData>();
         private static List<string> AnimatedImageDataFileNames = new List<string>();
 
+        private static List<DisplayObject> SplitTextures = new List<DisplayObject>();
+        private static List<string> SplitTextureFileNames = new List<string>();
+
         public const uint MAX_TEXTURES = 20;
         public const uint MAX_ANIMATIONS = 6;
         public static int TextureMaxSize = (int)Texture.MaximumSize;
 
-        public static Sprite GetSprite(string fileName, bool smooth = false)
-        {
-            Sprite sprite = new Sprite(GetTexture(fileName));
-            sprite.Texture.Smooth = smooth;
-
-            return sprite;
-        }
-        public static Texture GetTexture(string fileName)
+        public static dynamic GetTexture(string fileName)
         {
             int index = TextureFileNames.IndexOf(fileName);
+            int splitTextureIndex = SplitTextureFileNames.Count == 0 ? -1 : SplitTextureFileNames.IndexOf(fileName);
 
             if (index >= 0)
             {
@@ -49,10 +48,16 @@ namespace vimage
 
                 return Textures[Textures.Count - 1];
             }
+            else if (splitTextureIndex >= 0)
+            {
+                // Texture Already Exists (as split texture)
+                return SplitTextures[splitTextureIndex];
+            }
             else
             {
                 // New Texture
                 Texture texture = null;
+                DisplayObject textureLarge = null;
                 int imageID = IL.GenerateImage();
                 IL.BindImage(imageID);
 
@@ -63,37 +68,67 @@ namespace vimage
                 using (FileStream fileStream = File.OpenRead(fileName))
                     loaded = IL.LoadImageFromStream(fileStream);
 
-
-                if (IL.GetImageInfo().Width > TextureMaxSize || IL.GetImageInfo().Height > TextureMaxSize)
-                {
-                    System.Windows.Forms.MessageBox.Show("Image exceeds the GPU's maximum supported texture size (" + TextureMaxSize + ").", "vimage");
-                    return null;
-                }
-
                 if (loaded)
                 {
-                    texture = GetTextureFromBoundImage();
+                    if (IL.GetImageInfo().Width > TextureMaxSize || IL.GetImageInfo().Height > TextureMaxSize)
+                    {
+                        // Image is larger than GPU's max texture size - split up
+                        textureLarge = GetCutUpTexturesFromBoundImage(TextureMaxSize / 2, fileName);
+                    }
+                    else
+                    {
+                        texture = GetTextureFromBoundImage();
 
-                    Textures.Add(texture);
-                    TextureFileNames.Add(fileName);
+                        Textures.Add(texture);
+                        TextureFileNames.Add(fileName);
+                    }
 
                     // Limit amount of Textures in Memory
                     if (Textures.Count > MAX_TEXTURES)
                     {
-                        Textures[0].Dispose();
-                        Textures.RemoveAt(0);
-                        TextureFileNames.RemoveAt(0);
+                        if (TextureFileNames[0].IndexOf('^') == TextureFileNames[0].Length - 1)
+                        {
+                            // if part of split texture - remove all parts
+                            string name = TextureFileNames[0].Substring(0, TextureFileNames[0].Length - 7);
+
+                            int i = 0;
+                            for (i = 1; i < TextureFileNames.Count; i++)
+                            {
+                                if (TextureFileNames[i].IndexOf(name) != 0)
+                                    break;
+                            }
+                            for (int d = 0; d < i; d++)
+                            {
+                                Textures[0].Dispose();
+                                Textures.RemoveAt(0);
+                                TextureFileNames.RemoveAt(0);
+                            }
+
+                            int splitIndex = SplitTextureFileNames.Count == 0 ? -1 : SplitTextureFileNames.IndexOf(name);
+                            if (splitIndex != -1)
+                            {
+                                SplitTextures.RemoveAt(splitIndex);
+                                SplitTextureFileNames.RemoveAt(splitIndex);
+                            }
+                        }
+                        else
+                        {
+                            Textures[0].Dispose();
+                            Textures.RemoveAt(0);
+                            TextureFileNames.RemoveAt(0);
+                        }
                     }
                 }
                 IL.DeleteImages(new ImageID[] { imageID });
 
-                return texture;
+                if (texture == null)
+                    return textureLarge;
+                else
+                    return texture;
             }
         }
-        private static Texture GetTextureFromBoundImage(int imageNum = 0)
+        private static Texture GetTextureFromBoundImage()
         {
-            IL.ActiveImage(imageNum);
-            
             bool success = IL.ConvertImage(DevIL.DataFormat.RGBA, DevIL.DataType.UnsignedByte);
             
             if (!success)
@@ -117,6 +152,69 @@ namespace vimage
             Texture.Bind(null);
 
             return texture;
+        }
+        private static DisplayObject GetCutUpTexturesFromBoundImage(int sectionSize, string fileName = "")
+        {
+            bool success = IL.ConvertImage(DevIL.DataFormat.RGBA, DevIL.DataType.UnsignedByte);
+
+            if (!success)
+                return null;
+
+            DisplayObject image = new DisplayObject();
+
+            Vector2i size = new Vector2i(IL.GetImageInfo().Width, IL.GetImageInfo().Height);
+            Vector2u amount = new Vector2u((uint)Math.Ceiling(size.X / (float)sectionSize), (uint)Math.Ceiling(size.Y / (float)sectionSize));
+            Vector2i currentSize = new Vector2i(size.X, size.Y);
+            Vector2i pos = new Vector2i();
+
+            for (int iy = 0; iy < amount.Y; iy++)
+            {
+                int h = Math.Min(currentSize.Y, sectionSize);
+                currentSize.Y -= h;
+                currentSize.X = size.X;
+
+                for (int ix = 0; ix < amount.X; ix++)
+                {
+                    int w = Math.Min(currentSize.X, sectionSize);
+                    currentSize.X -= w;
+
+                    Texture texture = new Texture((uint)w, (uint)h);
+                    IntPtr partPtr = Marshal.AllocHGlobal((w * h) * 4);
+                    IL.CopyPixels(pos.X, pos.Y, 0, w, h, 1, DevIL.DataFormat.RGBA, DevIL.DataType.UnsignedByte, partPtr);
+                    Texture.Bind(texture);
+                    {
+                        Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, Gl.GL_LINEAR);
+                        Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, Gl.GL_LINEAR);
+                        Gl.glTexImage2D(
+                            Gl.GL_TEXTURE_2D, 0, IL.GetInteger(ILIntegerMode.ImageBytesPerPixel),
+                            w, h, 0,
+                            IL.GetInteger(ILIntegerMode.ImageFormat), ILDefines.IL_UNSIGNED_BYTE,
+                            partPtr);
+                    }
+                    Texture.Bind(null);
+                    Marshal.FreeHGlobal(partPtr);
+
+                    Sprite sprite = new Sprite(texture);
+                    sprite.Position = new Vector2f(pos.X, pos.Y);
+                    image.AddChild(sprite);
+
+                    if (fileName != "")
+                    {
+                        Textures.Add(texture);
+                        TextureFileNames.Add(fileName + "_" + ix.ToString("00") + "_" + iy.ToString("00") + "^");
+                    }
+
+                    pos.X += w;
+                }
+                pos.Y += h;
+                pos.X = 0;
+            }
+
+            image.Texture.Size = new Vector2u((uint)size.X, (uint)size.Y);
+            SplitTextures.Add(image);
+            SplitTextureFileNames.Add(fileName);
+
+            return image;
         }
 
         public static Sprite GetSpriteFromIcon(string fileName)

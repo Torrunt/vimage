@@ -14,6 +14,10 @@ namespace vimage
 
         public bool Visible = true;
 
+        public TextureInfo Texture;
+
+        public DisplayObject() { Texture = new TextureInfo(this); }
+
         public int NumChildren { get { return Children.Count; } }
         public void AddChild(dynamic child)
         {
@@ -119,5 +123,24 @@ namespace vimage
 
     }
 
-    class Layer : DisplayObject { }
+    class TextureInfo
+    {
+        private DisplayObject Obj;
+        public TextureInfo(DisplayObject obj) { Obj = obj; }
+
+        public Vector2u Size = new Vector2u();
+
+        private bool _Smooth = true;
+        public bool Smooth
+        {
+            get { return _Smooth; }
+            set
+            {
+                _Smooth = value;
+                for (int i = 0; i < Obj.NumChildren; i++)
+                    Obj.GetChildAt(i).Texture.Smooth = _Smooth;
+            }
+        }
+    }
+
 }
