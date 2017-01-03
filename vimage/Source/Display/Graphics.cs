@@ -370,7 +370,7 @@ namespace vimage
 
                 System.Drawing.Bitmap quantized = Quantizer.Quantize(Image);
                 MemoryStream stream = new MemoryStream();
-                quantized.Save(stream, System.Drawing.Imaging.ImageFormat.Gif);
+                quantized.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
                 Data.Frames.Add(new Texture(stream));
 
                 stream.Dispose();
