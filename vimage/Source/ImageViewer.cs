@@ -891,8 +891,9 @@ namespace vimage
             // Otherwise, if image is hanging off monitor just center it.
             if (Config.Setting_PositionLargeWideImagesInCorner && CurrentImageSize().X > CurrentImageSize().Y && CurrentImageSize().X * CurrentZoom >= bounds.Width)
                 NextWindowPos = new Vector2i(bounds.Left, bounds.Top);
-            else if (!prevSize.Equals(Image.Texture.Size) && (NextWindowPos.X + (Image.Texture.Size.X * CurrentZoom) >= bounds.Left + bounds.Width || 
-                     NextWindowPos.Y + (Image.Texture.Size.Y * CurrentZoom) >= bounds.Top + bounds.Height))
+            else if (!prevSize.Equals(Image.Texture.Size) && (NextWindowPos.Y <= bounds.Top ||
+                NextWindowPos.X + (Image.Texture.Size.X * CurrentZoom) >= bounds.Left + bounds.Width ||
+                NextWindowPos.Y + (Image.Texture.Size.Y * CurrentZoom) >= bounds.Top + bounds.Height))
                 NextWindowPos = new Vector2i(bounds.Left + (int)((bounds.Width - (Image.Texture.Size.X * CurrentZoom)) / 2), bounds.Top + (int)((bounds.Height - (Image.Texture.Size.Y * CurrentZoom)) / 2));
 
             // Force Always On Top Mode (so it's above the task bar) - will only happen if height >= window height
