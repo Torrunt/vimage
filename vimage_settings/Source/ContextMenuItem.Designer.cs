@@ -43,7 +43,7 @@
             this.comboBox_Function.Location = new System.Drawing.Point(146, 3);
             this.comboBox_Function.Name = "comboBox_Function";
             this.comboBox_Function.Size = new System.Drawing.Size(160, 21);
-            this.comboBox_Function.TabIndex = 5;
+            this.comboBox_Function.TabIndex = 2;
             this.comboBox_Function.Click += new System.EventHandler(this.comboBox_Function_Click);
             // 
             // textBox_Name
@@ -51,7 +51,7 @@
             this.textBox_Name.Location = new System.Drawing.Point(3, 3);
             this.textBox_Name.Name = "textBox_Name";
             this.textBox_Name.Size = new System.Drawing.Size(140, 20);
-            this.textBox_Name.TabIndex = 4;
+            this.textBox_Name.TabIndex = 1;
             this.textBox_Name.Click += new System.EventHandler(this.textBox_Name_Click);
             // 
             // button_Right
@@ -62,7 +62,7 @@
             this.button_Right.Location = new System.Drawing.Point(355, 3);
             this.button_Right.Name = "button_Right";
             this.button_Right.Size = new System.Drawing.Size(16, 20);
-            this.button_Right.TabIndex = 12;
+            this.button_Right.TabIndex = 6;
             this.button_Right.UseVisualStyleBackColor = true;
             this.button_Right.Click += new System.EventHandler(this.button_Right_Click);
             // 
@@ -74,7 +74,7 @@
             this.button_Left.Location = new System.Drawing.Point(339, 3);
             this.button_Left.Name = "button_Left";
             this.button_Left.Size = new System.Drawing.Size(16, 20);
-            this.button_Left.TabIndex = 11;
+            this.button_Left.TabIndex = 5;
             this.button_Left.UseVisualStyleBackColor = true;
             this.button_Left.Click += new System.EventHandler(this.button_Left_Click);
             // 
@@ -86,7 +86,7 @@
             this.button_Down.Location = new System.Drawing.Point(323, 3);
             this.button_Down.Name = "button_Down";
             this.button_Down.Size = new System.Drawing.Size(16, 20);
-            this.button_Down.TabIndex = 10;
+            this.button_Down.TabIndex = 4;
             this.button_Down.UseVisualStyleBackColor = true;
             this.button_Down.Click += new System.EventHandler(this.button_Down_Click);
             // 
@@ -98,7 +98,7 @@
             this.button_Up.Location = new System.Drawing.Point(307, 3);
             this.button_Up.Name = "button_Up";
             this.button_Up.Size = new System.Drawing.Size(16, 20);
-            this.button_Up.TabIndex = 9;
+            this.button_Up.TabIndex = 3;
             this.button_Up.UseVisualStyleBackColor = true;
             this.button_Up.Click += new System.EventHandler(this.button_Up_Click);
             // 
@@ -110,7 +110,7 @@
             this.button_Delete.Location = new System.Drawing.Point(371, 3);
             this.button_Delete.Name = "button_Delete";
             this.button_Delete.Size = new System.Drawing.Size(20, 20);
-            this.button_Delete.TabIndex = 8;
+            this.button_Delete.TabIndex = 7;
             this.button_Delete.UseVisualStyleBackColor = true;
             this.button_Delete.Click += new System.EventHandler(this.button_Delete_Click);
             // 

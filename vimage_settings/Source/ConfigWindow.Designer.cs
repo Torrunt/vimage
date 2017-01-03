@@ -32,6 +32,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigWindow));
             this.TabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.comboBox_DefaultSortDir = new System.Windows.Forms.ComboBox();
+            this.comboBox_DefaultSortBy = new System.Windows.Forms.ComboBox();
+            this.label16 = new System.Windows.Forms.Label();
             this.comboBox_LimitImagesToMonitor = new System.Windows.Forms.ComboBox();
             this.label15 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
@@ -119,7 +122,7 @@
             this.TabControl.Margin = new System.Windows.Forms.Padding(0);
             this.TabControl.Name = "TabControl";
             this.TabControl.SelectedIndex = 0;
-            this.TabControl.Size = new System.Drawing.Size(434, 321);
+            this.TabControl.Size = new System.Drawing.Size(434, 331);
             this.TabControl.TabIndex = 0;
             this.TabControl.TabStop = false;
             this.TabControl.SelectedIndexChanged += new System.EventHandler(this.TabControl_SelectedIndexChanged);
@@ -127,6 +130,9 @@
             // tabPage1
             // 
             this.tabPage1.AutoScroll = true;
+            this.tabPage1.Controls.Add(this.comboBox_DefaultSortDir);
+            this.tabPage1.Controls.Add(this.comboBox_DefaultSortBy);
+            this.tabPage1.Controls.Add(this.label16);
             this.tabPage1.Controls.Add(this.comboBox_LimitImagesToMonitor);
             this.tabPage1.Controls.Add(this.label15);
             this.tabPage1.Controls.Add(this.label13);
@@ -151,24 +157,61 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(426, 295);
+            this.tabPage1.Size = new System.Drawing.Size(426, 305);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "General";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // comboBox_DefaultSortDir
+            // 
+            this.comboBox_DefaultSortDir.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_DefaultSortDir.FormattingEnabled = true;
+            this.comboBox_DefaultSortDir.Items.AddRange(new object[] {
+            "Ascending",
+            "Descending"});
+            this.comboBox_DefaultSortDir.Location = new System.Drawing.Point(320, 276);
+            this.comboBox_DefaultSortDir.Name = "comboBox_DefaultSortDir";
+            this.comboBox_DefaultSortDir.Size = new System.Drawing.Size(82, 21);
+            this.comboBox_DefaultSortDir.TabIndex = 13;
+            this.toolTip1.SetToolTip(this.comboBox_DefaultSortDir, "Default sorting when stepping through images in a folder");
+            // 
+            // comboBox_DefaultSortBy
+            // 
+            this.comboBox_DefaultSortBy.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_DefaultSortBy.FormattingEnabled = true;
+            this.comboBox_DefaultSortBy.Items.AddRange(new object[] {
+            "Name",
+            "Date Modified",
+            "Date Created",
+            "Size"});
+            this.comboBox_DefaultSortBy.Location = new System.Drawing.Point(235, 276);
+            this.comboBox_DefaultSortBy.Name = "comboBox_DefaultSortBy";
+            this.comboBox_DefaultSortBy.Size = new System.Drawing.Size(82, 21);
+            this.comboBox_DefaultSortBy.TabIndex = 12;
+            this.toolTip1.SetToolTip(this.comboBox_DefaultSortBy, "Default sorting when stepping through images in a folder");
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(6, 279);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(77, 13);
+            this.label16.TabIndex = 22;
+            this.label16.Text = "Default Sorting";
+            // 
             // comboBox_LimitImagesToMonitor
             // 
+            this.comboBox_LimitImagesToMonitor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_LimitImagesToMonitor.FormattingEnabled = true;
             this.comboBox_LimitImagesToMonitor.Items.AddRange(new object[] {
             "NONE",
             "HEIGHT",
             "WIDTH",
             "AUTO"});
-            this.comboBox_LimitImagesToMonitor.Location = new System.Drawing.Point(330, 166);
+            this.comboBox_LimitImagesToMonitor.Location = new System.Drawing.Point(320, 166);
             this.comboBox_LimitImagesToMonitor.Name = "comboBox_LimitImagesToMonitor";
-            this.comboBox_LimitImagesToMonitor.Size = new System.Drawing.Size(72, 21);
-            this.comboBox_LimitImagesToMonitor.TabIndex = 21;
-            this.comboBox_LimitImagesToMonitor.Text = "HEIGHT";
+            this.comboBox_LimitImagesToMonitor.Size = new System.Drawing.Size(82, 21);
+            this.comboBox_LimitImagesToMonitor.TabIndex = 7;
             // 
             // label15
             // 
@@ -217,10 +260,11 @@
             // 
             // numericUpDown_ZoomSpeedFast
             // 
-            this.numericUpDown_ZoomSpeedFast.Location = new System.Drawing.Point(330, 254);
+            this.numericUpDown_ZoomSpeedFast.Location = new System.Drawing.Point(320, 254);
             this.numericUpDown_ZoomSpeedFast.Name = "numericUpDown_ZoomSpeedFast";
-            this.numericUpDown_ZoomSpeedFast.Size = new System.Drawing.Size(40, 20);
-            this.numericUpDown_ZoomSpeedFast.TabIndex = 15;
+            this.numericUpDown_ZoomSpeedFast.Size = new System.Drawing.Size(50, 20);
+            this.numericUpDown_ZoomSpeedFast.TabIndex = 11;
+            this.toolTip1.SetToolTip(this.numericUpDown_ZoomSpeedFast, "Zoom speed when holding down SHIFT (default)");
             // 
             // label10
             // 
@@ -242,10 +286,10 @@
             // 
             // numericUpDown_ZoomSpeed
             // 
-            this.numericUpDown_ZoomSpeed.Location = new System.Drawing.Point(330, 232);
+            this.numericUpDown_ZoomSpeed.Location = new System.Drawing.Point(320, 232);
             this.numericUpDown_ZoomSpeed.Name = "numericUpDown_ZoomSpeed";
-            this.numericUpDown_ZoomSpeed.Size = new System.Drawing.Size(40, 20);
-            this.numericUpDown_ZoomSpeed.TabIndex = 12;
+            this.numericUpDown_ZoomSpeed.Size = new System.Drawing.Size(50, 20);
+            this.numericUpDown_ZoomSpeed.TabIndex = 10;
             // 
             // checkBox_ListenForConfigChanges
             // 
@@ -253,7 +297,7 @@
             this.checkBox_ListenForConfigChanges.Location = new System.Drawing.Point(9, 145);
             this.checkBox_ListenForConfigChanges.Name = "checkBox_ListenForConfigChanges";
             this.checkBox_ListenForConfigChanges.Size = new System.Drawing.Size(147, 17);
-            this.checkBox_ListenForConfigChanges.TabIndex = 11;
+            this.checkBox_ListenForConfigChanges.TabIndex = 6;
             this.checkBox_ListenForConfigChanges.Text = "Listen for setting changes";
             this.toolTip1.SetToolTip(this.checkBox_ListenForConfigChanges, "If ticked, vimage will reload settings automatically when they are changed.");
             this.checkBox_ListenForConfigChanges.UseVisualStyleBackColor = true;
@@ -264,7 +308,7 @@
             this.checkBox_OpenSettingsEXE.Location = new System.Drawing.Point(9, 122);
             this.checkBox_OpenSettingsEXE.Name = "checkBox_OpenSettingsEXE";
             this.checkBox_OpenSettingsEXE.Size = new System.Drawing.Size(324, 17);
-            this.checkBox_OpenSettingsEXE.TabIndex = 10;
+            this.checkBox_OpenSettingsEXE.TabIndex = 5;
             this.checkBox_OpenSettingsEXE.Text = "Use vimage_settings.exe (otherwise will open config.txt directly)";
             this.toolTip1.SetToolTip(this.checkBox_OpenSettingsEXE, "What will open when the \'Open Config\' button is clicked or the shortcut is used.");
             this.checkBox_OpenSettingsEXE.UseVisualStyleBackColor = true;
@@ -280,15 +324,15 @@
             // 
             // numericUpDown_SmoothingMinImageSize
             // 
-            this.numericUpDown_SmoothingMinImageSize.Location = new System.Drawing.Point(330, 210);
+            this.numericUpDown_SmoothingMinImageSize.Location = new System.Drawing.Point(320, 210);
             this.numericUpDown_SmoothingMinImageSize.Maximum = new decimal(new int[] {
             10000,
             0,
             0,
             0});
             this.numericUpDown_SmoothingMinImageSize.Name = "numericUpDown_SmoothingMinImageSize";
-            this.numericUpDown_SmoothingMinImageSize.Size = new System.Drawing.Size(50, 20);
-            this.numericUpDown_SmoothingMinImageSize.TabIndex = 8;
+            this.numericUpDown_SmoothingMinImageSize.Size = new System.Drawing.Size(60, 20);
+            this.numericUpDown_SmoothingMinImageSize.TabIndex = 9;
             // 
             // label1
             // 
@@ -301,15 +345,15 @@
             // 
             // numericUpDown_MinImageSize
             // 
-            this.numericUpDown_MinImageSize.Location = new System.Drawing.Point(330, 188);
+            this.numericUpDown_MinImageSize.Location = new System.Drawing.Point(320, 188);
             this.numericUpDown_MinImageSize.Maximum = new decimal(new int[] {
             10000,
             0,
             0,
             0});
             this.numericUpDown_MinImageSize.Name = "numericUpDown_MinImageSize";
-            this.numericUpDown_MinImageSize.Size = new System.Drawing.Size(50, 20);
-            this.numericUpDown_MinImageSize.TabIndex = 6;
+            this.numericUpDown_MinImageSize.Size = new System.Drawing.Size(60, 20);
+            this.numericUpDown_MinImageSize.TabIndex = 8;
             // 
             // checkBox_PreloadNextImage
             // 
@@ -317,7 +361,7 @@
             this.checkBox_PreloadNextImage.Location = new System.Drawing.Point(9, 99);
             this.checkBox_PreloadNextImage.Name = "checkBox_PreloadNextImage";
             this.checkBox_PreloadNextImage.Size = new System.Drawing.Size(116, 17);
-            this.checkBox_PreloadNextImage.TabIndex = 5;
+            this.checkBox_PreloadNextImage.TabIndex = 4;
             this.checkBox_PreloadNextImage.Text = "Preload next image";
             this.toolTip1.SetToolTip(this.checkBox_PreloadNextImage, "When using the next/prev image buttons, the image after the one just loaded will " +
         "be loaded as well.");
@@ -329,7 +373,7 @@
             this.checkBox_PositionLargeWideImagesInCorner.Location = new System.Drawing.Point(9, 76);
             this.checkBox_PositionLargeWideImagesInCorner.Name = "checkBox_PositionLargeWideImagesInCorner";
             this.checkBox_PositionLargeWideImagesInCorner.Size = new System.Drawing.Size(331, 17);
-            this.checkBox_PositionLargeWideImagesInCorner.TabIndex = 4;
+            this.checkBox_PositionLargeWideImagesInCorner.TabIndex = 3;
             this.checkBox_PositionLargeWideImagesInCorner.Text = "Position large/wide images in corner (ie: wallpapers/screenshots)";
             this.toolTip1.SetToolTip(this.checkBox_PositionLargeWideImagesInCorner, "Images that are wider than or the same width as the current monitor will be place" +
         "d in the top left corner.");
@@ -375,7 +419,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(426, 295);
+            this.tabPage2.Size = new System.Drawing.Size(426, 334);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Control Bindings";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -392,7 +436,7 @@
             this.tableLayoutPanel3.RowCount = 2;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(420, 289);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(420, 328);
             this.tableLayoutPanel3.TabIndex = 0;
             // 
             // panel_Controls
@@ -401,14 +445,14 @@
             this.panel_Controls.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel_Controls.Location = new System.Drawing.Point(3, 3);
             this.panel_Controls.Name = "panel_Controls";
-            this.panel_Controls.Size = new System.Drawing.Size(414, 253);
+            this.panel_Controls.Size = new System.Drawing.Size(414, 292);
             this.panel_Controls.TabIndex = 13;
             // 
             // panel4
             // 
             this.panel4.Controls.Add(this.button_ControlsDefault);
             this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel4.Location = new System.Drawing.Point(0, 259);
+            this.panel4.Location = new System.Drawing.Point(0, 298);
             this.panel4.Margin = new System.Windows.Forms.Padding(0);
             this.panel4.Name = "panel4";
             this.panel4.Size = new System.Drawing.Size(420, 30);
@@ -431,7 +475,7 @@
             this.tabPage3.Controls.Add(this.tableLayoutPanel2);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(426, 295);
+            this.tabPage3.Size = new System.Drawing.Size(426, 334);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Context Menu";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -450,7 +494,7 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(426, 295);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(426, 334);
             this.tableLayoutPanel2.TabIndex = 17;
             // 
             // panel3
@@ -482,7 +526,7 @@
             this.numericUpDown_ContextMenu_Animation_InsertAtIndex.Location = new System.Drawing.Point(379, 2);
             this.numericUpDown_ContextMenu_Animation_InsertAtIndex.Name = "numericUpDown_ContextMenu_Animation_InsertAtIndex";
             this.numericUpDown_ContextMenu_Animation_InsertAtIndex.Size = new System.Drawing.Size(40, 20);
-            this.numericUpDown_ContextMenu_Animation_InsertAtIndex.TabIndex = 8;
+            this.numericUpDown_ContextMenu_Animation_InsertAtIndex.TabIndex = 2;
             this.numericUpDown_ContextMenu_Animation_InsertAtIndex.TabStop = false;
             // 
             // label3
@@ -500,7 +544,7 @@
             this.panel2.Controls.Add(this.button_ContextMenuAddNew);
             this.panel2.Controls.Add(this.button_ContextMenuDefault);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(3, 268);
+            this.panel2.Location = new System.Drawing.Point(3, 307);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(420, 24);
             this.panel2.TabIndex = 16;
@@ -513,7 +557,7 @@
             this.button_ContextMenuAddNew.Location = new System.Drawing.Point(-1, -1);
             this.button_ContextMenuAddNew.Name = "button_ContextMenuAddNew";
             this.button_ContextMenuAddNew.Size = new System.Drawing.Size(23, 23);
-            this.button_ContextMenuAddNew.TabIndex = 13;
+            this.button_ContextMenuAddNew.TabIndex = 4;
             this.button_ContextMenuAddNew.TabStop = false;
             this.toolTip1.SetToolTip(this.button_ContextMenuAddNew, "Add item below currently selected");
             this.button_ContextMenuAddNew.UseVisualStyleBackColor = true;
@@ -525,7 +569,7 @@
             this.button_ContextMenuDefault.Location = new System.Drawing.Point(346, -1);
             this.button_ContextMenuDefault.Name = "button_ContextMenuDefault";
             this.button_ContextMenuDefault.Size = new System.Drawing.Size(75, 23);
-            this.button_ContextMenuDefault.TabIndex = 11;
+            this.button_ContextMenuDefault.TabIndex = 5;
             this.button_ContextMenuDefault.TabStop = false;
             this.button_ContextMenuDefault.Text = "Default";
             this.button_ContextMenuDefault.UseVisualStyleBackColor = true;
@@ -539,8 +583,8 @@
             this.tabControl_ContextMenus.Location = new System.Drawing.Point(3, 33);
             this.tabControl_ContextMenus.Name = "tabControl_ContextMenus";
             this.tabControl_ContextMenus.SelectedIndex = 0;
-            this.tabControl_ContextMenus.Size = new System.Drawing.Size(420, 229);
-            this.tabControl_ContextMenus.TabIndex = 19;
+            this.tabControl_ContextMenus.Size = new System.Drawing.Size(420, 268);
+            this.tabControl_ContextMenus.TabIndex = 3;
             this.tabControl_ContextMenus.SelectedIndexChanged += new System.EventHandler(this.tabControl_ContextMenus_SelectedIndexChanged);
             // 
             // tabPage_ContextMenuGeneral
@@ -550,7 +594,7 @@
             this.tabPage_ContextMenuGeneral.Location = new System.Drawing.Point(4, 22);
             this.tabPage_ContextMenuGeneral.Name = "tabPage_ContextMenuGeneral";
             this.tabPage_ContextMenuGeneral.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage_ContextMenuGeneral.Size = new System.Drawing.Size(412, 203);
+            this.tabPage_ContextMenuGeneral.Size = new System.Drawing.Size(412, 242);
             this.tabPage_ContextMenuGeneral.TabIndex = 0;
             this.tabPage_ContextMenuGeneral.Text = "General";
             // 
@@ -561,7 +605,7 @@
             this.tabPage_ContextMenuAnimation.Location = new System.Drawing.Point(4, 22);
             this.tabPage_ContextMenuAnimation.Name = "tabPage_ContextMenuAnimation";
             this.tabPage_ContextMenuAnimation.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage_ContextMenuAnimation.Size = new System.Drawing.Size(412, 203);
+            this.tabPage_ContextMenuAnimation.Size = new System.Drawing.Size(412, 242);
             this.tabPage_ContextMenuAnimation.TabIndex = 1;
             this.tabPage_ContextMenuAnimation.Text = "Animation";
             // 
@@ -581,7 +625,7 @@
             this.tabPage4.Controls.Add(this.label4);
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size(426, 295);
+            this.tabPage4.Size = new System.Drawing.Size(426, 334);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "About";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -603,7 +647,7 @@
             this.linkLabel6.Location = new System.Drawing.Point(10, 87);
             this.linkLabel6.Name = "linkLabel6";
             this.linkLabel6.Size = new System.Drawing.Size(137, 13);
-            this.linkLabel6.TabIndex = 19;
+            this.linkLabel6.TabIndex = 2;
             this.linkLabel6.TabStop = true;
             this.linkLabel6.Text = "github.com/Torrunt/vimage";
             this.linkLabel6.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel6_LinkClicked);
@@ -614,7 +658,7 @@
             this.linkLabel5.Location = new System.Drawing.Point(10, 71);
             this.linkLabel5.Name = "linkLabel5";
             this.linkLabel5.Size = new System.Drawing.Size(94, 13);
-            this.linkLabel5.TabIndex = 12;
+            this.linkLabel5.TabIndex = 1;
             this.linkLabel5.TabStop = true;
             this.linkLabel5.Text = "torrunt.net/vimage";
             this.linkLabel5.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
@@ -625,7 +669,7 @@
             this.linkLabel4.Location = new System.Drawing.Point(48, 168);
             this.linkLabel4.Name = "linkLabel4";
             this.linkLabel4.Size = new System.Drawing.Size(150, 13);
-            this.linkLabel4.TabIndex = 17;
+            this.linkLabel4.TabIndex = 5;
             this.linkLabel4.TabStop = true;
             this.linkLabel4.Text = "famfamfam.com/lab/icons/silk";
             this.linkLabel4.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel4_LinkClicked);
@@ -645,7 +689,7 @@
             this.linkLabel3.Location = new System.Drawing.Point(142, 145);
             this.linkLabel3.Name = "linkLabel3";
             this.linkLabel3.Size = new System.Drawing.Size(112, 13);
-            this.linkLabel3.TabIndex = 15;
+            this.linkLabel3.TabIndex = 4;
             this.linkLabel3.TabStop = true;
             this.linkLabel3.Text = "openil.sourceforge.net";
             this.linkLabel3.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel3_LinkClicked);
@@ -665,7 +709,7 @@
             this.linkLabel2.Location = new System.Drawing.Point(220, 122);
             this.linkLabel2.Name = "linkLabel2";
             this.linkLabel2.Size = new System.Drawing.Size(80, 13);
-            this.linkLabel2.TabIndex = 12;
+            this.linkLabel2.TabIndex = 3;
             this.linkLabel2.TabStop = true;
             this.linkLabel2.Text = "me@torrunt.net";
             this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel2_LinkClicked);
@@ -736,7 +780,7 @@
             this.panel1.Controls.Add(this.linkLabel1);
             this.panel1.Controls.Add(this.button_Save);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(3, 324);
+            this.panel1.Location = new System.Drawing.Point(3, 334);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(428, 24);
             this.panel1.TabIndex = 12;
@@ -754,14 +798,14 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(434, 351);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(434, 361);
             this.tableLayoutPanel1.TabIndex = 13;
             // 
             // ConfigWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(434, 351);
+            this.ClientSize = new System.Drawing.Size(434, 361);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -854,6 +898,9 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button button_ContextMenuAddNew;
         private System.Windows.Forms.Button button_ContextMenuDefault;
+        private System.Windows.Forms.ComboBox comboBox_DefaultSortDir;
+        private System.Windows.Forms.ComboBox comboBox_DefaultSortBy;
+        private System.Windows.Forms.Label label16;
     }
 }
 

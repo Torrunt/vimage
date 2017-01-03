@@ -5,6 +5,9 @@ using SFML.Window;
 
 namespace vimage
 {
+    public enum SortBy { Name, DateModified, DateCreated, Size }
+    public enum SortDirection { Ascending, Descending }
+
     class Config
     {
 
@@ -102,6 +105,17 @@ namespace vimage
             set { Settings["ZOOMSPEEDFAST"] = value; }
         }
 
+        public SortBy Setting_DefaultSortBy
+        {
+            get { return (SortBy)Settings["DEFAULTSORTBY"]; }
+            set { Settings["DEFAULTSORTBY"] = value; }
+        }
+        public SortDirection Setting_DefaultSortDir
+        {
+            get { return (SortDirection)Settings["DEFAULTSORTDIR"]; }
+            set { Settings["DEFAULTSORTDIR"] = value; }
+        }
+
         public List<object> ContextMenu = new List<object>();
         public List<object> ContextMenu_Animation = new List<object>();
         public int ContextMenu_Animation_InsertAtIndex
@@ -143,6 +157,8 @@ namespace vimage
                 { "SMOOTHINGMINIMAGESIZE", 65 },
                 { "ZOOMSPEED", 2 },
                 { "ZOOMSPEEDFAST", 10 },
+                { "DEFAULTSORTBY", SortBy.Name },
+                { "DEFAULTSORTDIR", SortDirection.Ascending },
 
                 { "DRAG", Control_Drag },
                 { "CLOSE", Control_Close },
@@ -369,7 +385,7 @@ namespace vimage
                         }
                     }
                 }
-                else if (Settings[name] is int)
+                else if (Settings[name] is int || Settings[name] is Enum)
                 {
                     // Integer
                     int i;
@@ -477,7 +493,7 @@ namespace vimage
             WriteSetting(writer, "OpenAtMousePosition", Setting_OpenAtMousePosition);
             WriteSetting(writer, "SmoothingDefault", Setting_SmoothingDefault);
             WriteSetting(writer, "BackgroundForImagesWithTransparencyDefault", Setting_BackgroundForImagesWithTransparencyDefault);
-            WriteSetting(writer, "LimitImagesToMonitor", Setting_LimitImagesToMonitor, "0=NONE, 1=HEIGHT, 2=WIDTH");
+            WriteSetting(writer, "LimitImagesToMonitor", Setting_LimitImagesToMonitor, "0=NONE, 1=HEIGHT, 2=WIDTH, 3=AUTO");
             WriteSetting(writer, "PositionLargeWideImagesInCorner", Setting_PositionLargeWideImagesInCorner, 
                 "ie: Desktop Wallpapers and Screenshots");
             WriteSetting(writer, "PreloadNextImage", Setting_PreloadNextImage, 
@@ -491,6 +507,8 @@ namespace vimage
                 "images smaller than this will not have smoothing turned on (if 0, all images with use smoothing)");
             WriteSetting(writer, "ZoomSpeed", Setting_ZoomSpeed);
             WriteSetting(writer, "ZoomSpeedFast", Setting_ZoomSpeedFast);
+            WriteSetting(writer, "DefaultSortBy", (int)Setting_DefaultSortBy);
+            WriteSetting(writer, "DefaultSortDir", (int)Setting_DefaultSortDir);
 
             writer.Write(Environment.NewLine);
             writer.Write("// Bindings" + Environment.NewLine);

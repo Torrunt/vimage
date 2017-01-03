@@ -40,6 +40,8 @@ namespace vimage_settings
             numericUpDown_SmoothingMinImageSize.Value = vimageConfig.Setting_SmoothingMinImageSize;
             numericUpDown_ZoomSpeed.Value = vimageConfig.Setting_ZoomSpeed;
             numericUpDown_ZoomSpeedFast.Value = vimageConfig.Setting_ZoomSpeedFast;
+            comboBox_DefaultSortBy.SelectedIndex = (int)vimageConfig.Setting_DefaultSortBy;
+            comboBox_DefaultSortDir.SelectedIndex = (int)vimageConfig.Setting_DefaultSortDir;
 
             // Setup Control Bindings
             AddControlItem("Random Image", vimageConfig.Control_RandomImage);
@@ -167,6 +169,8 @@ namespace vimage_settings
             vimageConfig.Setting_SmoothingMinImageSize = (int)numericUpDown_SmoothingMinImageSize.Value;
             vimageConfig.Setting_ZoomSpeed = (int)numericUpDown_ZoomSpeed.Value;
             vimageConfig.Setting_ZoomSpeedFast = (int)numericUpDown_ZoomSpeedFast.Value;
+            vimageConfig.Setting_DefaultSortBy = (SortBy)comboBox_DefaultSortBy.SelectedIndex;
+            vimageConfig.Setting_DefaultSortDir = (SortDirection)comboBox_DefaultSortDir.SelectedIndex;
 
             vimageConfig.ContextMenuShowMargin = checkBox_ContextMenuShowMargin.Checked;
             vimageConfig.ContextMenu_Animation_InsertAtIndex = (int)numericUpDown_ContextMenu_Animation_InsertAtIndex.Value;

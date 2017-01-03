@@ -105,6 +105,9 @@ namespace vimage
                 ConfigFileWatcher.EnableRaisingEvents = true;
             }
 
+            SortImagesBy = Config.Setting_DefaultSortBy;
+            SortImagesByDir = Config.Setting_DefaultSortDir;
+
             // Create Context Menu
             ContextMenu = new ContextMenu(this);
             ContextMenu.LoadItems(Config.ContextMenu, Config.ContextMenu_Animation, Config.ContextMenu_Animation_InsertAtIndex);
@@ -1162,7 +1165,4 @@ namespace vimage
         }
 
     }
-
-    enum SortBy { Name, DateModified, DateCreated, Size }
-    enum SortDirection { Ascending, Descending }
 }
