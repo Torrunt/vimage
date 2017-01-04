@@ -132,7 +132,8 @@ namespace vimage
                 item.Name = name;
             }
 
-            ((ToolStripMenuItem)Items[ImageViewer.VERSION_NAME]).BackColor = System.Drawing.Color.CornflowerBlue;
+            if (Items.ContainsKey(ImageViewer.VERSION_NAME))
+                ((ToolStripMenuItem)Items[ImageViewer.VERSION_NAME]).BackColor = System.Drawing.Color.CornflowerBlue;
 
             RefreshItems();
         }
@@ -159,6 +160,9 @@ namespace vimage
 
             item = GetItemByFunc(MenuFuncs.SORT_NAME);
             if (item != null) item.Checked = ImageViewer.SortImagesBy == SortBy.Name;
+
+            item = GetItemByFunc(MenuFuncs.SORT_DATE);
+            if (item != null) item.Checked = ImageViewer.SortImagesBy == SortBy.Date;
 
             item = GetItemByFunc(MenuFuncs.SORT_DATE_MODIFIED);
             if (item != null) item.Checked = ImageViewer.SortImagesBy == SortBy.DateModified;
@@ -191,6 +195,7 @@ namespace vimage
                 case MenuFuncs.PREV_IMAGE: ImageViewer.PrevImage(); break;
 
                 case MenuFuncs.SORT_NAME: ImageViewer.ChangeSortBy(SortBy.Name); break;
+                case MenuFuncs.SORT_DATE: ImageViewer.ChangeSortBy(SortBy.Date); break;
                 case MenuFuncs.SORT_DATE_MODIFIED: ImageViewer.ChangeSortBy(SortBy.DateModified); break;
                 case MenuFuncs.SORT_DATE_CREATED: ImageViewer.ChangeSortBy(SortBy.DateCreated); break;
                 case MenuFuncs.SORT_SIZE: ImageViewer.ChangeSortBy(SortBy.Size); break;

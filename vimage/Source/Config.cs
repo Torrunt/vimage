@@ -5,8 +5,8 @@ using SFML.Window;
 
 namespace vimage
 {
-    public enum SortBy { Name, DateModified, DateCreated, Size }
-    public enum SortDirection { Ascending, Descending }
+    public enum SortBy { FolderDefault, Name, Date, DateModified, DateCreated, Size }
+    public enum SortDirection { FolderDefault, Ascending, Descending }
 
     class Config
     {
@@ -157,8 +157,8 @@ namespace vimage
                 { "SMOOTHINGMINIMAGESIZE", 65 },
                 { "ZOOMSPEED", 2 },
                 { "ZOOMSPEEDFAST", 10 },
-                { "DEFAULTSORTBY", SortBy.Name },
-                { "DEFAULTSORTDIR", SortDirection.Ascending },
+                { "DEFAULTSORTBY", SortBy.FolderDefault },
+                { "DEFAULTSORTDIR", SortDirection.FolderDefault },
 
                 { "DRAG", Control_Drag },
                 { "CLOSE", Control_Close },
@@ -265,6 +265,7 @@ namespace vimage
             ContextMenu.Add("Sort by");
             List<object> SubMenu_SortBy = new List<object>();
             SubMenu_SortBy.Add(new { name = "Name", func = MenuFuncs.SORT_NAME });
+            SubMenu_SortBy.Add(new { name = "Date", func = MenuFuncs.SORT_DATE });
             SubMenu_SortBy.Add(new { name = "Date modified", func = MenuFuncs.SORT_DATE_MODIFIED });
             SubMenu_SortBy.Add(new { name = "Date created", func = MenuFuncs.SORT_DATE_CREATED });
             SubMenu_SortBy.Add(new { name = "Size", func = MenuFuncs.SORT_SIZE });

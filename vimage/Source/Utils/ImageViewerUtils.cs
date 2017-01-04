@@ -2,6 +2,7 @@
 using System.Linq;
 using SFML.Graphics;
 using SFML.System;
+using ExifLib;
 
 namespace vimage
 {
@@ -52,26 +53,47 @@ namespace vimage
         {
             if (!(GetExtension(fileName).Equals("jpg") || GetExtension(fileName).Equals("jpeg")))
                 return 0;
-            gma.Drawing.ImageInfo.Info info = new gma.Drawing.ImageInfo.Info(fileName);
+            ushort orientation = 0;
             try
             {
-                switch (info.Orientation.ToString())
+                using (ExifReader reader = new ExifReader(fileName))
                 {
-                    case "RightTop": return 90;
-                    case "BottomLeft": return 180;
-                    case "LeftBottom": return 270;
-                    default: return 0;
+                    if (!reader.GetTagValue(ExifTags.Orientation, out orientation))
+                        return 0;
+
+                    switch (orientation)
+                    {
+                        case 6: return 90;
+                        case 3: return 180;
+                        case 8: return 270;
+                        default: return 0;
+                    }
                 }
             }
-            catch (Exception)
+            catch (Exception) { }
+            return 0;
+        }
+
+        /// <summary>Returns DateTime from EXIF data or the FileInfo is there isn't one</summary>
+        public static DateTime GetDateValueFromEXIF(string fileName)
+        {
+            try
             {
-                return 0;
+                using (ExifReader reader = new ExifReader(fileName))
+                {
+                    DateTime date;
+                    if (reader.GetTagValue(ExifTags.DateTime, out date))
+                        return date;
+                }
             }
+            catch (Exception) { }
+
+            return new System.IO.FileInfo(fileName).LastWriteTime;
         }
 
         public static bool IsValidExtension(string fileName, string[] extensions)
         {
-            string extension = ImageViewerUtils.GetExtension(fileName);
+            string extension = GetExtension(fileName);
             return Array.Exists(extensions, delegate(string s) { return s == extension; });
         }
 

@@ -336,5 +336,14 @@ namespace vimage_settings
             Process.Start("http://github.com/Torrunt/vimage");
         }
 
+        private void linkLabel7_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("https://www.codeproject.com/articles/36342/exiflib-a-fast-exif-data-extractor-for-net-2-0");
+        }
+
+        private void linkLabel8_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("https://crashreporterdotnet.codeplex.com/");
+        }
     }
 }

@@ -105,8 +105,53 @@ namespace vimage
                 ConfigFileWatcher.EnableRaisingEvents = true;
             }
 
+            // Get/Set Folder Sorting
             SortImagesBy = Config.Setting_DefaultSortBy;
             SortImagesByDir = Config.Setting_DefaultSortDir;
+
+            if (SortImagesBy == SortBy.FolderDefault || SortImagesByDir == SortDirection.FolderDefault)
+            {
+                // Get parent folder name
+                string parentFolder = file.Substring(0, file.LastIndexOf('\\'));
+                parentFolder = parentFolder.Substring(parentFolder.LastIndexOf('\\') + 1, parentFolder.Length - parentFolder.LastIndexOf('\\') - 1);
+
+                // Get sort column info from window with corresponding name
+                SHDocVw.ShellWindows shellWindows = new SHDocVw.ShellWindows();
+                foreach (SHDocVw.ShellBrowserWindow shellWindow in shellWindows)
+                {
+                    if (shellWindow.LocationName != parentFolder)
+                        continue;
+
+                    Shell32.ShellFolderView view = (Shell32.ShellFolderView)shellWindow.Document;
+
+                    string sort = view.SortColumns;
+                    sort = sort.Substring(5, sort.Length - 5);
+
+                    // Direction
+                    if (sort[0] == '-')
+                    {
+                        sort = sort.Substring(1, sort.Length - 1);
+
+                        if (SortImagesByDir == SortDirection.FolderDefault)
+                            SortImagesByDir = SortDirection.Descending;
+                    }
+                    else if (SortImagesByDir == SortDirection.FolderDefault)
+                        SortImagesByDir = SortDirection.Ascending;
+
+                    // By
+                    if (SortImagesBy == SortBy.FolderDefault)
+                    {
+                        switch (sort)
+                        {
+                            case "System.ItemDate;": SortImagesBy = SortBy.Date; break;
+                            case "System.DateModified;": SortImagesBy = SortBy.DateModified; break;
+                            case "System.DateCreated;": SortImagesBy = SortBy.DateCreated; break;
+                            case "System.Size;": SortImagesBy = SortBy.Size; break;
+                            default: SortImagesBy = SortBy.Name; break;
+                        }
+                    }
+                }
+            }
 
             // Create Context Menu
             ContextMenu = new ContextMenu(this);
@@ -1073,6 +1118,14 @@ namespace vimage
                             new EnumerableComparer<object>()));
                     }
 
+                    break;
+                }
+                case SortBy.Date:
+                {
+                    if (SortImagesByDir == SortDirection.Ascending)
+                        FolderContents.AddRange(contents.OrderBy(d => ImageViewerUtils.GetDateValueFromEXIF(d)));
+                    else
+                        FolderContents.AddRange(contents.OrderByDescending(d => ImageViewerUtils.GetDateValueFromEXIF(d)));
                     break;
                 }
                 case SortBy.DateModified:
