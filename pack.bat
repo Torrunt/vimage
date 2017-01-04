@@ -1,16 +1,16 @@
 cd "C:\Program Files (x86)\Microsoft\ILMerge"
 
-ILMerge.exe /target:winexe /targetplatform:"v4,C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5" /out:"C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\bin\vimage\vimage.exe" "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\bin\Release\vimage.exe" "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\sfmlnet-graphics-2.dll" "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\sfmlnet-window-2.dll" "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\sfmlnet-system-2.dll" "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\Tao.OpenGl.dll" "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\DevILNet.dll" "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\CrashReporter.NET.dll" "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\ExifLib.dll"
+ILMerge.exe /target:winexe /targetplatform:"v4,C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5" /out:"%~dp0vimage\bin\vimage\vimage.exe" "%~dp0vimage\bin\Release\vimage.exe" "%~dp0vimage\sfmlnet-graphics-2.dll" "%~dp0vimage\sfmlnet-window-2.dll" "%~dp0vimage\sfmlnet-system-2.dll" "%~dp0vimage\Tao.OpenGl.dll" "%~dp0vimage\DevILNet.dll" "%~dp0vimage\CrashReporter.NET.dll" "%~dp0vimage\ExifLib.dll"
 
-ILMerge.exe /target:winexe /targetplatform:"v4,C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5" /out:"C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\bin\vimage\vimage_settings.exe" "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage_settings\bin\Release\vimage_settings.exe" "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\sfmlnet-window-2.dll"
+ILMerge.exe /target:winexe /targetplatform:"v4,C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5" /out:"%~dp0vimage\bin\vimage\vimage_settings.exe" "%~dp0vimage_settings\bin\Release\vimage_settings.exe" "%~dp0vimage\sfmlnet-window-2.dll"
 
-copy "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\csfml-graphics-2.dll" "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\bin\vimage"
+copy "%~dp0vimage\csfml-graphics-2.dll" "%~dp0vimage\bin\vimage"
 
-copy "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\csfml-window-2.dll" "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\bin\vimage"
+copy "%~dp0vimage\csfml-window-2.dll" "%~dp0vimage\bin\vimage"
 
-copy "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\csfml-system-2.dll" "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\bin\vimage"
+copy "%~dp0vimage\csfml-system-2.dll" "%~dp0vimage\bin\vimage"
 
-copy "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\DevIL.dll" "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\bin\vimage"
+copy "%~dp0vimage\DevIL.dll" "%~dp0vimage\bin\vimage"
 
-del "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\bin\vimage\vimage.pdb"
-del "C:\Users\Corey\Documents\Projects\Visual Studio\vimage\vimage\bin\vimage\vimage_settings.pdb"
+del "%~dp0vimage\bin\vimage\vimage.pdb"
+del "%~dp0vimage\bin\vimage\vimage_settings.pdb"
