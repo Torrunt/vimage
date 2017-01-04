@@ -148,7 +148,7 @@ namespace vimage
                 { "OPENATMOUSEPOSITION", true },
                 { "SMOOTHINGDEFAULT", true },
                 { "BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT", false },
-                { "LIMITIMAGESTOMONITOR", HEIGHT },
+                { "LIMITIMAGESTOMONITOR", AUTO },
                 { "POSITIONLARGEWIDEIMAGESINCORNER", true },
                 { "PRELOADNEXTIMAGE", true },
                 { "OPENSETTINGSEXE", true },
