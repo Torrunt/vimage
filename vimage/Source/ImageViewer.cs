@@ -470,6 +470,10 @@ namespace vimage
             if (Config.IsControl(code, Config.Control_Delete))
                 DeleteFile();
 
+            // Copy File
+            if (Config.IsControl(code, Config.Control_Copy))
+                CopyFile();
+
             if (Config.IsControl(code, Config.Control_OpenDuplicateImage))
                 OpenDuplicateWindow();
 
@@ -1180,6 +1184,17 @@ namespace vimage
             }
 
             Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(fileName, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+        }
+        public void CopyFile()
+        {
+            Thread thread = new Thread(() =>
+            {
+                System.Collections.Specialized.StringCollection files = new System.Collections.Specialized.StringCollection();
+                files.Add(File);
+                Clipboard.SetFileDropList(files);
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
         public void OpenFileAtLocation()
         {

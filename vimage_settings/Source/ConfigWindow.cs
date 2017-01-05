@@ -46,6 +46,7 @@ namespace vimage_settings
             // Setup Control Bindings
             AddControlItem("Random Image", vimageConfig.Control_RandomImage);
             AddControlItem("Open Duplicate Image", vimageConfig.Control_OpenDuplicateImage);
+            AddControlItem("Copy", vimageConfig.Control_Copy);
             AddControlItem("Delete", vimageConfig.Control_Delete);
             AddControlItem("Open At Location", vimageConfig.Control_OpenAtLocation);
             AddControlItem("Reset Image", vimageConfig.Control_ResetImage);
