@@ -152,6 +152,11 @@ namespace vimage
                     }
                 }
             }
+            // Default sorting if folder was closed
+            if (SortImagesBy == SortBy.FolderDefault)
+                SortImagesBy = SortBy.Name;
+            if (SortImagesByDir == SortDirection.FolderDefault)
+                SortImagesByDir = SortDirection.Ascending;
 
             // Create Context Menu
             ContextMenu = new ContextMenu(this);
@@ -572,7 +577,7 @@ namespace vimage
             Updated = true;
         }
 
-        public void RotateImage(int Rotation, bool aroundCenter = true)
+        public void RotateImage(int Rotation, bool aroundCenter = true, bool updateWindowSize = true)
         {
             if (Rotation >= 360)
                 Rotation = 0;
@@ -605,7 +610,8 @@ namespace vimage
             Image.Scale = new Vector2f(Math.Abs(Image.Scale.X) * (FlippedX ? -1 : 1), Math.Abs(Image.Scale.Y));
             Image.Rotation = Rotation;
 
-            Window.Size = WindowSize;
+            if (updateWindowSize)
+                Window.Size = WindowSize;
             if (aroundCenter)
                 NextWindowPos = new Vector2i((int)center.X - (int)(WindowSize.X / 2), (int)center.Y - (int)(WindowSize.Y / 2));
             else
@@ -840,14 +846,6 @@ namespace vimage
             IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position +
                 new Vector2i((int)(Image.Texture.Size.X * CurrentZoom) / 2, (int)(Image.Texture.Size.Y * CurrentZoom) / 2));
 
-            if (AutomaticallyZoomed || FitToMonitorHeightForced)
-            {
-                // don't keep current zoom value if it wasn't set by user
-                AutomaticallyZoomed = false;
-                FitToMonitorHeightForced = false;
-                CurrentZoom = 1;
-            }
-
             // Dispose of previous image
             Image.Dispose();
             Image = null;
@@ -863,12 +861,20 @@ namespace vimage
             Window.SetView(view);
 
             // Rotation
-            RotateImage(prevRotation == prevDefaultRotation ? DefaultRotation : (int)prevRotation, false);
+            RotateImage(prevRotation == prevDefaultRotation ? DefaultRotation : (int)prevRotation, false, false);
             // Smoothing
             if (Image is AnimatedImage)
                 Image.Data.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
             else
                 Image.Texture.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
+
+            // Don't keep current zoom value if it wasn't set by user
+            if (AutomaticallyZoomed || FitToMonitorHeightForced)
+            {
+                AutomaticallyZoomed = false;
+                FitToMonitorHeightForced = false;
+                CurrentZoom = 1;
+            }
 
             bool wasFitToMonitorDimension = FitToMonitorHeightForced;
             if (Config.Setting_LimitImagesToMonitor != Config.NONE)
