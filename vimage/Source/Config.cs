@@ -40,6 +40,7 @@ namespace vimage
         public List<int> Control_OpenAtLocation = new List<int>();
         public List<int> Control_Delete = new List<int>();
         public List<int> Control_Copy = new List<int>();
+        public List<int> Control_CopyAsImage = new List<int>();
         public List<int> Control_OpenDuplicateImage = new List<int>();
         public List<int> Control_RandomImage = new List<int>();
 
@@ -190,6 +191,7 @@ namespace vimage
                 { "OPENATLOCATION", Control_OpenAtLocation },
                 { "DELETE", Control_Delete },
                 { "COPY", Control_Copy },
+                { "COPYASIMAGE", Control_CopyAsImage },
                 { "OPENDUPLICATEIMAGE", Control_OpenDuplicateImage },
                 { "RANDOMIMAGE", Control_RandomImage },
 
@@ -228,6 +230,7 @@ namespace vimage
             Control_OpenAtLocation.Clear();
             Control_Delete.Clear();
             Control_Copy.Clear();
+            Control_CopyAsImage.Clear();
             Control_OpenDuplicateImage.Clear();
             Control_RandomImage.Clear();
 
@@ -257,6 +260,7 @@ namespace vimage
             SetControls(Control_OpenAtLocation, "O");
             SetControls(Control_Delete, "DELETE");
             SetControls(Control_Copy, "CTRL+C");
+            SetControls(Control_CopyAsImage, "ALT+C");
             SetControls(Control_OpenDuplicateImage, "D");
             SetControls(Control_RandomImage, "M");
         }
@@ -293,6 +297,7 @@ namespace vimage
             ContextMenu.Add(new { name = "-", func = "-" });
             ContextMenu.Add(new { name = "Open file location", func = MenuFuncs.OPEN_FILE_LOCATION });
             ContextMenu.Add(new { name = "Copy", func = MenuFuncs.COPY });
+            ContextMenu.Add(new { name = "Copy as image", func = MenuFuncs.COPY_AS_IMAGE });
             ContextMenu.Add(new { name = "Delete", func = MenuFuncs.DELETE });
             ContextMenu.Add(new { name = "-", func = "-" });
             ContextMenu.Add(new { name = "Settings", func = MenuFuncs.OPEN_SETTINGS });
@@ -562,6 +567,7 @@ namespace vimage
             WriteControl(writer, "OpenAtLocation", Control_OpenAtLocation);
             WriteControl(writer, "Delete", Control_Delete);
             WriteControl(writer, "Copy", Control_Copy);
+            WriteControl(writer, "CopyAsImage", Control_CopyAsImage);
             WriteControl(writer, "OpenDuplicateImage", Control_OpenDuplicateImage);
             WriteControl(writer, "RandomImage", Control_RandomImage);
 

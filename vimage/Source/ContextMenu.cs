@@ -219,6 +219,7 @@ namespace vimage
                 case MenuFuncs.OPEN_FILE_LOCATION: ImageViewer.OpenFileAtLocation(); break;
                 case MenuFuncs.DELETE: ImageViewer.DeleteFile(); break;
                 case MenuFuncs.COPY: ImageViewer.CopyFile(); break;
+                case MenuFuncs.COPY_AS_IMAGE: ImageViewer.CopyAsImage(); break;
                 case MenuFuncs.OPEN_DUPLICATE: ImageViewer.OpenDuplicateWindow(); break;
                 case MenuFuncs.RANDOM_IMAGE: ImageViewer.RandomImage(); break;
 

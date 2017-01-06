@@ -17,6 +17,7 @@
         public const string OPEN_FILE_LOCATION = "OPENFILELOCATION";
         public const string DELETE = "DELETE";
         public const string COPY = "COPY";
+        public const string COPY_AS_IMAGE = "COPYASIMAGE";
         public const string OPEN_SETTINGS = "OPENSETTINGS";
         public const string RELOAD_SETTINGS = "RELOADSETTINGS";
         public const string VERSION_NAME = "VERSIONNAME";
@@ -40,7 +41,7 @@
         {
             CLOSE, NEXT_IMAGE, PREV_IMAGE, ROTATE_CLOCKWISE, ROTATE_ANTICLOCKWISE,
             FLIP, FIT_TO_HEIGHT, FIT_TO_WIDTH, RESET_IMAGE, TOGGLE_SMOOTHING, TOGGLE_BACKGROUND,
-            ALWAYS_ON_TOP, OPEN_FILE_LOCATION, DELETE, COPY, OPEN_SETTINGS, RELOAD_SETTINGS,
+            ALWAYS_ON_TOP, OPEN_FILE_LOCATION, DELETE, COPY, COPY_AS_IMAGE, OPEN_SETTINGS, RELOAD_SETTINGS,
             VERSION_NAME, SORT_NAME, SORT_DATE, SORT_DATE_MODIFIED, SORT_DATE_CREATED, SORT_SIZE,
             SORT_ASCENDING, SORT_DESCENDING, NEXT_FRAME, PREV_FRAME, TOGGLE_ANIMATION,
             OPEN_DUPLICATE, RANDOM_IMAGE
@@ -57,8 +58,8 @@
             func = func.Replace("DATE", "DATE ");
             func = func.Replace("FRAME", " FRAME");
             func = func.Replace("TOGGLE", "TOGGLE ");
-            func = func.Replace("RESET", "RESET ");
             func = func.Replace("FITTO", "FIT TO ");
+            func = func.Replace("ASIMAGE", " ASIMAGE");
             func = func.Replace("IMAGE", " IMAGE");
             func = func.Replace("ROTATE", "ROTATE ");
             func = func.Replace("ALWAYSONTOP", "ALWAYS ON TOP");

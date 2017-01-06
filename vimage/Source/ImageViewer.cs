@@ -473,6 +473,8 @@ namespace vimage
             // Copy File
             if (Config.IsControl(code, Config.Control_Copy))
                 CopyFile();
+            if (Config.IsControl(code, Config.Control_CopyAsImage))
+                CopyAsImage();
 
             if (Config.IsControl(code, Config.Control_OpenDuplicateImage))
                 OpenDuplicateWindow();
@@ -1206,6 +1208,16 @@ namespace vimage
                 System.Collections.Specialized.StringCollection files = new System.Collections.Specialized.StringCollection();
                 files.Add(File);
                 Clipboard.SetFileDropList(files);
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+        }
+        public void CopyAsImage()
+        {
+            Thread thread = new Thread(() =>
+            {
+                System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(File);
+                Clipboard.SetImage(bitmap);
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
