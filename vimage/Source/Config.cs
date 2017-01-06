@@ -10,6 +10,9 @@ namespace vimage
 
     class Config
     {
+        public static bool CtrlDown = false;
+        public static bool ShiftDown = false;
+        public static bool AltDown = false;
 
         public List<int> Control_Drag = new List<int>();
         public List<int> Control_Close = new List<int>();
@@ -241,20 +244,20 @@ namespace vimage
             SetControls(Control_FitToMonitorAuto, "MOUSEMIDDLE");
             SetControls(Control_FitToMonitorAlt, "RSHIFT", "LSHIFT");
             SetControls(Control_ZoomFaster, "RSHIFT", "LSHIFT");
-            SetControls(Control_ZoomAlt, "RCONTROL", "LCONTROL");
+            SetControls(Control_ZoomAlt, "RCTRL", "CTRL");
             SetControls(Control_ToggleSmoothing, "S");
             SetControls(Control_ToggleBackgroundForTransparency, "T");
             SetControls(Control_ToggleAlwaysOnTop, "L");
             SetControls(Control_PauseAnimation, "SPACE");
             SetControls(Control_PrevFrame, "<");
             SetControls(Control_NextFrame, ">");
-            SetControls(Control_OpenConfig, "O");
-            SetControls(Control_ReloadConfig, "P");
+            SetControls(Control_OpenConfig, "");
+            SetControls(Control_ReloadConfig, "");
             SetControls(Control_ResetImage, "R");
-            SetControls(Control_OpenAtLocation, "");
+            SetControls(Control_OpenAtLocation, "O");
             SetControls(Control_Delete, "DELETE");
-            SetControls(Control_Copy, "");
-            SetControls(Control_OpenDuplicateImage, "C");
+            SetControls(Control_Copy, "CTRL+C");
+            SetControls(Control_OpenDuplicateImage, "D");
             SetControls(Control_RandomImage, "M");
         }
         public void SetDefaultContextMenu()
@@ -381,6 +384,20 @@ namespace vimage
                             int btn = StringToMouseButton(values[i].ToUpper());
                             if (btn != -1)
                                 list.Add(btn);
+                        }
+                        else if (values[i].Contains("+"))
+                        {
+                            // Keboard Combo
+                            list.Add(-2); // denote that it's a key combo
+
+                            string[] v = values[i].Split('+');
+
+                            Keyboard.Key key1 = StringToKey(v[0].ToUpper());
+                            if (key1 != Keyboard.Key.Unknown)
+                                list.Add((int)key1);
+                            Keyboard.Key key2 = StringToKey(v[1].ToUpper());
+                            if (key2 != Keyboard.Key.Unknown)
+                                list.Add((int)key2);
                         }
                         else
                         {
@@ -628,10 +645,23 @@ namespace vimage
         public static string ControlsToString(List<int> controls)
         {
             string str = "";
+            bool nextIsKeyCombo = false;
 
             for (int i = 0; i < controls.Count; i++)
             {
-                str += ControlToString(controls[i]);
+                if (controls[i] == -2 && controls.Count > 2)
+                {
+                    nextIsKeyCombo = true;
+                    continue;
+                }
+                if (nextIsKeyCombo)
+                {
+                    str += ControlToString(controls[i]) + "+" + ControlToString(controls[i+1]);
+                    nextIsKeyCombo = false;
+                    i++;
+                }
+                else
+                    str += ControlToString(controls[i]);
 
                 if (i != controls.Count - 1)
                     str += ", ";
@@ -663,6 +693,20 @@ namespace vimage
         public static bool IsControl(Keyboard.Key keyCode, List<int> Control)
         {
             // Keyboard key?
+
+            // key-combo?
+            if (Control.Count > 2 && Control[0] == -2 && (keyCode == (Keyboard.Key)Control[1] ||
+                ((Keyboard.Key)Control[1] == Keyboard.Key.LControl && !CtrlDown) ||
+                ((Keyboard.Key)Control[1] == Keyboard.Key.LShift && !ShiftDown) ||
+                ((Keyboard.Key)Control[1] == Keyboard.Key.LAlt && !AltDown)))
+                return false;
+
+            // not key-combo but Ctrl, Shift or Alt is down?
+            if ((CtrlDown && !Control.Contains((int)Keyboard.Key.LControl)) ||
+                (ShiftDown && !Control.Contains((int)Keyboard.Key.LShift)) ||
+                (AltDown && !Control.Contains((int)Keyboard.Key.LAlt)))
+                return false;
+
             foreach (Keyboard.Key key in Control)
             {
                 if (keyCode == key)
@@ -689,7 +733,21 @@ namespace vimage
                 if (str.Equals(""))
                     continue;
 
-                if (str.StartsWith("MOUSE"))
+                if (str.Contains("+"))
+                {
+                    controls.Add(-2); // denote that it's a key combo
+
+                    string[] v = str.Split('+');
+
+                    Keyboard.Key key1 = StringToKey(v[0].ToUpper());
+                    if (key1 != Keyboard.Key.Unknown)
+                        controls.Add((int)key1);
+                    Keyboard.Key key2 = StringToKey(v[1].ToUpper());
+                    if (key2 != Keyboard.Key.Unknown)
+                        controls.Add((int)key2);
+
+                }
+                else if (str.StartsWith("MOUSE"))
                     controls.Add(StringToMouseButton(str));
                 else
                     controls.Add((int)StringToKey(str.Replace(" ", "")));
@@ -844,6 +902,7 @@ namespace vimage
                     return Keyboard.Key.Escape;
                 case "LCONTROL":
                 case "CONTROL":
+                case "CTRL":
                     return Keyboard.Key.LControl;
                 case "LSHIFT":
                 case "SHIFT":
@@ -853,7 +912,7 @@ namespace vimage
                     return Keyboard.Key.LAlt;
                 case "LSYSTEM":
                     return Keyboard.Key.LSystem;
-                case "RCONTROL":
+                case "RCTRL":
                     return Keyboard.Key.RControl;
                 case "RSHIFT":
                     return Keyboard.Key.RShift;
@@ -901,7 +960,6 @@ namespace vimage
                     return Keyboard.Key.Tilde;
                 case "EQUAL":
                 case "PLUS":
-                case "+":
                 case "=":
                     return Keyboard.Key.Equal;
                 case "DASH":
@@ -1087,15 +1145,15 @@ namespace vimage
                 case Keyboard.Key.Escape:
 	                return "ESC";
                 case Keyboard.Key.LControl:
-	                return "LCONTROL";
+	                return "CTRL";
                 case Keyboard.Key.LShift:
-	                return "LSHIFT";
+	                return "SHIFT";
                 case Keyboard.Key.LAlt:
-	                return "LALT";
+	                return "ALT";
                 case Keyboard.Key.LSystem:
-	                return "LSYSTEM";
+	                return "SYSTEM";
                 case Keyboard.Key.RControl:
-	                return "RCONTROL";
+	                return "RCTRL";
                 case Keyboard.Key.RShift:
 	                return "RSHIFT";
                 case Keyboard.Key.RAlt:

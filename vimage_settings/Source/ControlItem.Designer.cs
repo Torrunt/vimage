@@ -72,6 +72,7 @@
             this.textBox_Binding.TabIndex = 5;
             this.textBox_Binding.TabStop = false;
             this.textBox_Binding.KeyDown += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyDown);
+            this.textBox_Binding.KeyUp += new System.Windows.Forms.KeyEventHandler(this.control_OnKeyUp);
             this.textBox_Binding.Leave += new System.EventHandler(this.control_OnLoseFocus);
             this.textBox_Binding.MouseUp += new System.Windows.Forms.MouseEventHandler(this.control_OnMouseUp);
             // 

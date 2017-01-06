@@ -38,10 +38,22 @@ namespace vimage_settings
 
         private void control_OnKeyDown(object sender, KeyEventArgs e)
         {
-            // Record Key Press
-            string name = ((TextBox)sender).Name.Replace("textBox_", "");
+            if (e.KeyCode == Keys.ControlKey || e.KeyCode == Keys.ShiftKey || e.KeyCode == Keys.Alt || e.KeyCode == Keys.Menu)
+                return;
+
+            RecordKey(((TextBox)sender).Name.Replace("textBox_", ""), e);
+        }
+        private void control_OnKeyUp(object sender, KeyEventArgs e)
+        {
+            // Only record CTRL, SHIFT and ALT as single keys on key up (in case they are part of a key combo)
+            if (e.KeyCode == Keys.ControlKey || e.KeyCode == Keys.ShiftKey || e.KeyCode == Keys.Alt || e.KeyCode == Keys.Menu)
+                RecordKey(((TextBox)sender).Name.Replace("textBox_", ""), e, false);
+        }
+        private void RecordKey(string name, KeyEventArgs e, bool canBeKeyCombo = true)
+        {
             string key = e.KeyCode.ToString().ToUpper();
 
+            // Record Key Press
             if (key.Equals("SCROLL") || key.Equals("NUMLOCK") || key.Equals("CAPITAL") ||
                 key.Equals("LWIN") || key.Equals("RWIN"))
                 return;
@@ -58,11 +70,23 @@ namespace vimage_settings
 
             key = key.Replace("OEM", ""); // eg: OEMTILDE to TILDE
             key = key.Replace("KEY", ""); // eg: CONTROLKEY to CONTROL
+            if (key == "MENU") key = "ALT"; // sometimes ALT is returned as Key.Menu
 
             // Update Control and Text Box
             int bind = (int)Config.StringToKey(key);
             if (Control.IndexOf(bind) == -1)
             {
+                if (canBeKeyCombo && (e.Control || e.Shift || e.Alt))
+                {
+                    // Key Combo? (eg: CTRL+C)
+                    Control.Add(-2);
+                    if (e.Control)
+                        Control.Add((int)SFML.Window.Keyboard.Key.LControl);
+                    else if (e.Shift)
+                        Control.Add((int)SFML.Window.Keyboard.Key.LShift);
+                    else if (e.Alt)
+                        Control.Add((int)SFML.Window.Keyboard.Key.LAlt);
+                }
                 Control.Add(bind);
                 textBox_Binding.Text = Config.ControlsToString(Control);
             }

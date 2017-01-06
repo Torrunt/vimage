@@ -483,6 +483,13 @@ namespace vimage
             ZoomFaster = false;
             ZoomAlt = false;
             FitToMonitorAlt = false;
+
+            if ((Keyboard.Key)code == Keyboard.Key.LControl)
+                Config.CtrlDown = false;
+            if ((Keyboard.Key)code == Keyboard.Key.LShift)
+                Config.ShiftDown = false;
+            if ((Keyboard.Key)code == Keyboard.Key.LAlt)
+                Config.AltDown = false;
         }
         private void ControlDown(object code)
         {
@@ -509,6 +516,13 @@ namespace vimage
             // Fit To Monitor Height Alternative
             if (Config.IsControl(code, Config.Control_FitToMonitorAlt))
                 FitToMonitorAlt = true;
+
+            if ((Keyboard.Key)code == Keyboard.Key.LControl)
+                Config.CtrlDown = true;
+            if ((Keyboard.Key)code == Keyboard.Key.LShift)
+                Config.ShiftDown = true;
+            if ((Keyboard.Key)code == Keyboard.Key.LAlt)
+                Config.AltDown = true;
         }
      
 

@@ -52,7 +52,7 @@ namespace vimage_settings
             AddControlItem("Reset Image", vimageConfig.Control_ResetImage);
             AddControlItem("Reload Config", vimageConfig.Control_ReloadConfig);
             AddControlItem("Open Config", vimageConfig.Control_OpenConfig);
-            AddControlItem("NextF rame", vimageConfig.Control_NextFrame);
+            AddControlItem("Next Frame", vimageConfig.Control_NextFrame);
             AddControlItem("Prev Frame", vimageConfig.Control_PrevFrame);
             AddControlItem("Pause Animation", vimageConfig.Control_PauseAnimation);
             AddControlItem("Toggle Always On Top", vimageConfig.Control_ToggleAlwaysOnTop);
