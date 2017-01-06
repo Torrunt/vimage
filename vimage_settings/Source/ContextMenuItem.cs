@@ -14,7 +14,7 @@ namespace vimage_settings
 
         private const int SUB_ITEM_INDENT = 20;
 
-        public ContextMenuItem(string name, string func)
+        public ContextMenuItem(string name, string func, Config config)
         {
             InitializeComponent();
 
@@ -22,6 +22,11 @@ namespace vimage_settings
             comboBox_Function.Items.Add("-");
             for (int i = 0; i < MenuFuncs.FUNCS.Length; i++)
                 comboBox_Function.Items.Add(MenuFuncs.WithSpaces(MenuFuncs.FUNCS[i]));
+            if (config != null)
+            {
+                for (int i = 0; i < config.CustomActions.Count; i++)
+                    comboBox_Function.Items.Add((config.CustomActions[i] as dynamic).name);
+            }
             comboBox_Function.SelectedIndex = 0;
 
             // name

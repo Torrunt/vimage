@@ -30,7 +30,7 @@ namespace vimage
     {
         public AnimatedImageData Data;
         public Sprite Sprite;
-        public Texture Texture { get { return Sprite.Texture; } private set { } }
+        public new Texture Texture { get { return Sprite.Texture; } private set { } }
 
         public int CurrentFrame;
         public int TotalFrames { get { return Data.Frames.Count; } private set { } }

@@ -2,13 +2,14 @@
 using System.IO;
 using System.Collections.Generic;
 using SFML.Window;
+using System.Text.RegularExpressions;
 
 namespace vimage
 {
     public enum SortBy { FolderDefault, Name, Date, DateModified, DateCreated, Size }
     public enum SortDirection { FolderDefault, Ascending, Descending }
 
-    class Config
+    public class Config
     {
         public static bool CtrlDown = false;
         public static bool ShiftDown = false;
@@ -134,6 +135,8 @@ namespace vimage
             set { Settings["CONTEXTMENU_SHOWMARGIN"] = value; }
         }
 
+        public List<object> CustomActions = new List<object>();
+
         private Dictionary<string, object> Settings;
 
         public const int MouseCodeOffset = 150;
@@ -147,6 +150,7 @@ namespace vimage
             SetDefaultControls();
 
             SetDefaultContextMenu();
+            SetDefaultCustomActions();
 
             Settings = new Dictionary<string, object>()
             {
@@ -198,7 +202,9 @@ namespace vimage
                 { "CONTEXTMENU", ContextMenu },
                 { "CONTEXTMENU_ANIMATION", ContextMenu_Animation },
                 { "CONTEXTMENU_ANIMATION_INSERTATINDEX", 2 },
-                { "CONTEXTMENU_SHOWMARGIN", false }
+                { "CONTEXTMENU_SHOWMARGIN", false },
+
+                { "CUSTOMACTIONS", CustomActions }
             };
         }
 
@@ -308,6 +314,12 @@ namespace vimage
             ContextMenu_Animation.Add(new { name = "Pause/Play Animation", func = MenuFuncs.TOGGLE_ANIMATION });
             ContextMenu_Animation.Add(new { name = "-", func = "-" });
         }
+        public void SetDefaultCustomActions()
+        {
+            CustomActions.Clear();
+
+            CustomActions.Add(new { name = "EDIT", func = @"%windir%\system32\mspaint.exe %f" });
+        }
 
         /// <summary> Loads and parses a config txt file. If it doesn't exist, a default one will be made. </summary>
         public void Load(string configFile)
@@ -323,6 +335,7 @@ namespace vimage
             }
             ContextMenu.Clear();
             ContextMenu_Animation.Clear();
+            CustomActions.Clear();
 
             
             StreamReader reader = File.OpenText(configFile);
@@ -338,7 +351,7 @@ namespace vimage
                 }
 
                 // trim spaces
-                line = line.Replace(" ", "");
+                line = RemoveSpaces(line);
 
                 // ignore comments
                 if (line.IndexOf("//") != -1)
@@ -358,7 +371,7 @@ namespace vimage
                 // nothing after '='?, check next line
                 if (nameValue[1].Equals(""))
                 {
-                    line = reader.ReadLine().Replace(" ", "").Replace("\t", "");
+                    line = RemoveSpaces(reader.ReadLine());
 
                     // line is empty or is part of another setting, skip
                     if (line.Equals("") || line.IndexOf('=') != -1)
@@ -442,8 +455,11 @@ namespace vimage
         private string ReadSection(StreamReader reader, List<object> setting)
         {
             string line = reader.ReadLine();
-            string trimedLine = line.Replace(" ", "").Replace("\t", "");
+            string trimedLine = RemoveSpaces(line);
             string[] splitValues;
+
+            if (trimedLine.Equals("}"))
+                return line;
 
             while (line != null)
             {
@@ -452,7 +468,7 @@ namespace vimage
                     // Subsection
                     string subSectionName = line.Replace("\t", "");
 
-                    line = reader.ReadLine().Replace(" ", "").Replace("\t", "");
+                    line = RemoveSpaces(reader.ReadLine());
 
                     // line is empty or is part of another setting, skip
                     if (line.Equals("") || line.IndexOf('=') != -1)
@@ -474,24 +490,26 @@ namespace vimage
                     if (trimedLine.Equals("-"))
                         splitValues = new[] { "-", "-" }; // line break
                     else
-                        splitValues = line.Split(':');
+                        splitValues = line.Split(new char[] { ':' }, 2);
 
                     // trim tabs from name, spaces from map name
                     splitValues[0] = splitValues[0].Replace("\t", "");
-                    splitValues[1] = splitValues[1].Replace(" ", "");
+                    splitValues[1] = RemoveSpaces(splitValues[1]);
 
                     // assign Values
                     setting.Add(new { name = splitValues[0].Trim(), func = splitValues[1].Trim() });
 
                     // next line
                     line = reader.ReadLine();
-                    trimedLine = line.Replace(" ", "").Replace("\t", "");
+                    trimedLine = RemoveSpaces(line);
                 }
 
                 // break if end brace
                 if (trimedLine.Equals("}"))
                 {
-                    line = reader.ReadLine().Replace(" ", "").Replace("\t", "");
+                    if (reader.Peek() == -1)
+                        return line;
+                    line = RemoveSpaces(reader.ReadLine());
                     break;
                 }
             }
@@ -580,6 +598,9 @@ namespace vimage
             WriteSetting(writer, "ContextMenu_Animation_InsertAtIndex", ContextMenu_Animation_InsertAtIndex);
             WriteSetting(writer, "ContextMenu_ShowMargin", ContextMenuShowMargin, "shows checkboxes for certain menu items");
 
+            writer.Write(Environment.NewLine);
+            WriteCustomActions(writer, "CustomActions", CustomActions);
+
             // Close
             writer.Close();
         }
@@ -644,6 +665,15 @@ namespace vimage
                         writer.Write(itemName + " : " + itemFunc + Environment.NewLine);
                 }
             }
+        }
+        private void WriteCustomActions(StreamWriter writer, string name, List<object> customActions)
+        {
+            writer.Write(name + " =" + Environment.NewLine + "{" + Environment.NewLine);
+            for (int i = 0; i < CustomActions.Count; i++)
+            {
+                writer.Write("\t" + (customActions[i] as dynamic).name + " : " + (customActions[i] as dynamic).func + Environment.NewLine);
+            }
+            writer.Write("}" + Environment.NewLine);
         }
 
 
@@ -1294,5 +1324,7 @@ namespace vimage
                 str += s;
             return str;
         }
+
+        private static string RemoveSpaces(string str) { return Regex.Replace(str, @"(""[^""\\]*(?:\\.[^""\\]*)*"")|\s+", "$1").Replace("\t", ""); }
     }
 }

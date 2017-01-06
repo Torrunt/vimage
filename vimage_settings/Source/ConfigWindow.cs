@@ -110,7 +110,7 @@ namespace vimage_settings
         {
             List<ContextMenuItem> CurrentList = GetContextMenuList();
 
-            ContextMenuItem item = new ContextMenuItem(name, func);
+            ContextMenuItem item = new ContextMenuItem(name, func, vimageConfig);
             item.Location = new System.Drawing.Point(0, (item.Height - 2) * CurrentList.Count);
 
             GetCurrentContextMenuPanel().Controls.Add(item);

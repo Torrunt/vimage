@@ -187,46 +187,63 @@ namespace vimage
             if (!(item as ToolStripDropDownItem).HasDropDownItems)
                 Close();
 
-            switch (FuncByName[item.Name])
+            string func = FuncByName[item.Name];
+            switch (func)
             {
-                case MenuFuncs.CLOSE: ImageViewer.CloseNextTick = true; break;
+                case MenuFuncs.CLOSE: ImageViewer.CloseNextTick = true; return;
 
-                case MenuFuncs.NEXT_IMAGE: ImageViewer.NextImage(); break;
-                case MenuFuncs.PREV_IMAGE: ImageViewer.PrevImage(); break;
+                case MenuFuncs.NEXT_IMAGE: ImageViewer.NextImage(); return;
+                case MenuFuncs.PREV_IMAGE: ImageViewer.PrevImage(); return;
 
-                case MenuFuncs.SORT_NAME: ImageViewer.ChangeSortBy(SortBy.Name); break;
-                case MenuFuncs.SORT_DATE: ImageViewer.ChangeSortBy(SortBy.Date); break;
-                case MenuFuncs.SORT_DATE_MODIFIED: ImageViewer.ChangeSortBy(SortBy.DateModified); break;
-                case MenuFuncs.SORT_DATE_CREATED: ImageViewer.ChangeSortBy(SortBy.DateCreated); break;
-                case MenuFuncs.SORT_SIZE: ImageViewer.ChangeSortBy(SortBy.Size); break;
-                case MenuFuncs.SORT_ASCENDING: ImageViewer.ChangeSortByDirection(SortDirection.Ascending); break;
-                case MenuFuncs.SORT_DESCENDING: ImageViewer.ChangeSortByDirection(SortDirection.Descending); break;
+                case MenuFuncs.SORT_NAME: ImageViewer.ChangeSortBy(SortBy.Name); return;
+                case MenuFuncs.SORT_DATE: ImageViewer.ChangeSortBy(SortBy.Date); return;
+                case MenuFuncs.SORT_DATE_MODIFIED: ImageViewer.ChangeSortBy(SortBy.DateModified); return;
+                case MenuFuncs.SORT_DATE_CREATED: ImageViewer.ChangeSortBy(SortBy.DateCreated); return;
+                case MenuFuncs.SORT_SIZE: ImageViewer.ChangeSortBy(SortBy.Size); return;
+                case MenuFuncs.SORT_ASCENDING: ImageViewer.ChangeSortByDirection(SortDirection.Ascending); return;
+                case MenuFuncs.SORT_DESCENDING: ImageViewer.ChangeSortByDirection(SortDirection.Descending); return;
 
-                case MenuFuncs.NEXT_FRAME: ImageViewer.NextFrame(); break;
-                case MenuFuncs.PREV_FRAME: ImageViewer.PrevFrame(); break;
-                case MenuFuncs.TOGGLE_ANIMATION: ImageViewer.ToggleAnimation(); break;
+                case MenuFuncs.NEXT_FRAME: ImageViewer.NextFrame(); return;
+                case MenuFuncs.PREV_FRAME: ImageViewer.PrevFrame(); return;
+                case MenuFuncs.TOGGLE_ANIMATION: ImageViewer.ToggleAnimation(); return;
 
-                case MenuFuncs.ROTATE_CLOCKWISE: ImageViewer.RotateImage((int)ImageViewer.Image.Rotation + 90); break;
-                case MenuFuncs.ROTATE_ANTICLOCKWISE: ImageViewer.RotateImage((int)ImageViewer.Image.Rotation - 90); break;
-                case MenuFuncs.FLIP: ImageViewer.FlipImage(); break;
-                case MenuFuncs.FIT_TO_HEIGHT: ImageViewer.ToggleFitToMonitor(Config.HEIGHT); break;
-                case MenuFuncs.FIT_TO_WIDTH: ImageViewer.ToggleFitToMonitor(Config.WIDTH); break;
-                case MenuFuncs.RESET_IMAGE: ImageViewer.ResetImage(); break;
-                case MenuFuncs.TOGGLE_SMOOTHING: ImageViewer.ToggleSmoothing(); break;
-                case MenuFuncs.TOGGLE_BACKGROUND: ImageViewer.ToggleBackground(); break;
-                case MenuFuncs.ALWAYS_ON_TOP: ImageViewer.ToggleAlwaysOnTop(); break;
+                case MenuFuncs.ROTATE_CLOCKWISE: ImageViewer.RotateImage((int)ImageViewer.Image.Rotation + 90); return;
+                case MenuFuncs.ROTATE_ANTICLOCKWISE: ImageViewer.RotateImage((int)ImageViewer.Image.Rotation - 90); return;
+                case MenuFuncs.FLIP: ImageViewer.FlipImage(); return;
+                case MenuFuncs.FIT_TO_HEIGHT: ImageViewer.ToggleFitToMonitor(Config.HEIGHT); return;
+                case MenuFuncs.FIT_TO_WIDTH: ImageViewer.ToggleFitToMonitor(Config.WIDTH); return;
+                case MenuFuncs.RESET_IMAGE: ImageViewer.ResetImage(); return;
+                case MenuFuncs.TOGGLE_SMOOTHING: ImageViewer.ToggleSmoothing(); return;
+                case MenuFuncs.TOGGLE_BACKGROUND: ImageViewer.ToggleBackground(); return;
+                case MenuFuncs.ALWAYS_ON_TOP: ImageViewer.ToggleAlwaysOnTop(); return;
 
-                case MenuFuncs.OPEN_FILE_LOCATION: ImageViewer.OpenFileAtLocation(); break;
-                case MenuFuncs.DELETE: ImageViewer.DeleteFile(); break;
-                case MenuFuncs.COPY: ImageViewer.CopyFile(); break;
-                case MenuFuncs.COPY_AS_IMAGE: ImageViewer.CopyAsImage(); break;
-                case MenuFuncs.OPEN_DUPLICATE: ImageViewer.OpenDuplicateWindow(); break;
-                case MenuFuncs.RANDOM_IMAGE: ImageViewer.RandomImage(); break;
+                case MenuFuncs.OPEN_FILE_LOCATION: ImageViewer.OpenFileAtLocation(); return;
+                case MenuFuncs.DELETE: ImageViewer.DeleteFile(); return;
+                case MenuFuncs.COPY: ImageViewer.CopyFile(); return;
+                case MenuFuncs.COPY_AS_IMAGE: ImageViewer.CopyAsImage(); return;
+                case MenuFuncs.OPEN_DUPLICATE: ImageViewer.OpenDuplicateWindow(); return;
+                case MenuFuncs.RANDOM_IMAGE: ImageViewer.RandomImage(); return;
 
-                case MenuFuncs.OPEN_SETTINGS: ImageViewer.OpenConfig(); break;
-                case MenuFuncs.RELOAD_SETTINGS: ImageViewer.ReloadConfig(); break;
+                case MenuFuncs.OPEN_SETTINGS: ImageViewer.OpenConfig(); return;
+                case MenuFuncs.RELOAD_SETTINGS: ImageViewer.ReloadConfig(); return;
 
-                case MenuFuncs.VERSION_NAME: Process.Start("http://torrunt.net/vimage"); break;
+                case MenuFuncs.VERSION_NAME: Process.Start("http://torrunt.net/vimage"); return;
+            }
+
+            for (int i = 0; i < ImageViewer.Config.CustomActions.Count; i++)
+            {
+                if ((ImageViewer.Config.CustomActions[i] as dynamic).name != func)
+                    continue;
+
+                string action = (ImageViewer.Config.CustomActions[i] as dynamic).func;
+                action = action.Replace("%f", "`" + ImageViewer.File);
+
+                string[] s = action.Split('`');
+
+                if (s[0].Contains("%"))
+                    s[0] = Environment.ExpandEnvironmentVariables(s[0]);
+
+                Process.Start(s[0], "\"" + s[1] + "\"");
             }
         }
 
