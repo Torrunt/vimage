@@ -1216,7 +1216,17 @@ namespace vimage
         {
             Thread thread = new Thread(() =>
             {
-                System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(File);
+                System.Drawing.Bitmap bitmap;
+                if (File.IndexOf(".ico") == File.Length - 4)
+                {
+                    // If .ico - copy largest version
+                    System.Drawing.Icon icon = new System.Drawing.Icon(File, 256, 256);
+                    bitmap = Graphics.ExtractVistaIcon(icon);
+                    if (bitmap == null)
+                        bitmap = icon.ToBitmap();
+                }
+                else
+                    bitmap = new System.Drawing.Bitmap(File);
                 Clipboard.SetImage(bitmap);
             });
             thread.SetApartmentState(ApartmentState.STA);
