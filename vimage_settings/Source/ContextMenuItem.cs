@@ -19,15 +19,7 @@ namespace vimage_settings
             InitializeComponent();
 
             // func drop down list
-            comboBox_Function.Items.Add("-");
-            for (int i = 0; i < MenuFuncs.FUNCS.Length; i++)
-                comboBox_Function.Items.Add(MenuFuncs.WithSpaces(MenuFuncs.FUNCS[i]));
-            if (config != null)
-            {
-                for (int i = 0; i < config.CustomActions.Count; i++)
-                    comboBox_Function.Items.Add((config.CustomActions[i] as dynamic).name);
-            }
-            comboBox_Function.SelectedIndex = 0;
+            RefreshFunctions(config);
 
             // name
             textBox_Name.Text = name;
@@ -41,6 +33,28 @@ namespace vimage_settings
 
         public string GetName() { return textBox_Name.Text; }
         public string GetFunc() { return comboBox_Function.Text; }
+
+        public void RefreshFunctions(Config config)
+        {
+            int prevIndex = -1;
+            if (comboBox_Function.Items.Count != 0)
+                prevIndex = comboBox_Function.SelectedIndex;
+
+            comboBox_Function.Items.Clear();
+
+            comboBox_Function.Items.Add("-");
+            for (int i = 0; i < MenuFuncs.FUNCS.Length; i++)
+                comboBox_Function.Items.Add(MenuFuncs.WithSpaces(MenuFuncs.FUNCS[i]));
+            if (config != null)
+            {
+                for (int i = 0; i < config.CustomActions.Count; i++)
+                    comboBox_Function.Items.Add((config.CustomActions[i] as dynamic).name);
+            }
+            comboBox_Function.SelectedIndex = 0;
+
+            if (prevIndex != -1)
+                comboBox_Function.SelectedIndex = prevIndex;
+        }
 
         public void SetSubmenu(bool submenu)
         {
@@ -130,10 +144,7 @@ namespace vimage_settings
             }
         }
 
-        public void AddConfigWindowReference(ConfigWindow configWindow)
-        {
-            ConfigWindow = configWindow;
-        }
+        public void AddConfigWindowReference(ConfigWindow configWindow) { ConfigWindow = configWindow; }
 
         private void button_Delete_Click(object sender, EventArgs e)
         {

@@ -14,6 +14,7 @@ namespace vimage_settings
         public List<ControlItem> ControlItems = new List<ControlItem>();
         public List<ContextMenuItem> ContextMenuItems = new List<ContextMenuItem>();
         public List<ContextMenuItem> ContextMenuItems_Animation = new List<ContextMenuItem>();
+        public List<CustomActionItem> CustomActionItems = new List<CustomActionItem>();
 
         public ContextMenuItem ContextMenuItemFocused;
 
@@ -85,6 +86,8 @@ namespace vimage_settings
 
             if (ContextMenuItems.Count > 0)
                 ContextMenuItems[0].GiveItemFocus();
+
+            AddCustomActionItems(vimageConfig.CustomActions);
         }
 
         private void AddControlItem(string name, List<int> control)
@@ -154,7 +157,40 @@ namespace vimage_settings
         public List<ContextMenuItem> GetContextMenuList() { return tabControl_ContextMenus.SelectedIndex == 1 ? ContextMenuItems_Animation : ContextMenuItems; }
         public TabPage GetCurrentContextMenuPanel() { return tabControl_ContextMenus.SelectedTab; }
         public int GetContextMenuPanelScrollValue() { return (int)GetCurrentContextMenuPanel().VerticalScroll.Value; }
+        public int GetCustomActionPanelScrollValue() { return (int)panel_CustomActions.VerticalScroll.Value; }
 
+        private void AddCustomActionItems(List<object> customActions)
+        {
+            for (int i = 0; i < customActions.Count; i++)
+                AddCustomActionItem((customActions[i] as dynamic).name, (customActions[i] as dynamic).func);
+        }
+        private CustomActionItem AddCustomActionItem(string name = "", string func = "", int position = -1)
+        {
+            CustomActionItem item = new CustomActionItem(name, func);
+
+            panel_CustomActions.Controls.Add(item);
+            panel_CustomActions.Controls.SetChildIndex(item, 0);
+
+            CustomActionItems.Add(item);
+            item.AddConfigWindowReference(this);
+
+            return item;
+        }
+        public void RefreshCustomAcionItems(int scrollValue = -1)
+        {
+            // scroll back to top temporarily
+            if (scrollValue == -1)
+                scrollValue = panel_CustomActions.VerticalScroll.Value;
+            panel_CustomActions.VerticalScroll.Value = 0;
+
+            // refresh positions of each item
+            for (int i = 0; i < CustomActionItems.Count; i++)
+                CustomActionItems[i].Location = new System.Drawing.Point(0, (CustomActionItems[i].Height - 2) * i);
+
+            // scroll back
+            panel_CustomActions.VerticalScroll.Value = Math.Min(scrollValue, panel_CustomActions.VerticalScroll.Maximum);
+            panel_CustomActions.PerformLayout();
+        }
 
         private void button_Save_Click(object sender, EventArgs e)
         {
@@ -182,6 +218,10 @@ namespace vimage_settings
             SaveContextMenu(vimageConfig.ContextMenu, ContextMenuItems);
             vimageConfig.ContextMenu_Animation.Clear();
             SaveContextMenu(vimageConfig.ContextMenu_Animation, ContextMenuItems_Animation);
+
+            // Update Custom Actions
+            vimageConfig.CustomActions.Clear();
+            SaveCustomActions(vimageConfig.CustomActions, CustomActionItems);
 
             // Save Config File
             vimageConfig.Save(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
@@ -222,6 +262,16 @@ namespace vimage_settings
                     currentMenu.Add(new { name = contextMenuItems[i].GetName(), func = contextMenuItems[i].GetFunc() });
                 }
             }
+        }
+        private void SaveCustomActions(List<object> customActions, List<CustomActionItem> customActionitems)
+        {
+            for (int i = 0; i < customActionitems.Count; i++)
+                customActions.Add(new { name = customActionitems[i].GetName(), func = customActionitems[i].GetFunc() });
+
+            for (int c = 0; c < ContextMenuItems.Count; c++)
+                ContextMenuItems[c].RefreshFunctions(vimageConfig);
+            for (int c = 0; c < ContextMenuItems_Animation.Count; c++)
+                ContextMenuItems_Animation[c].RefreshFunctions(vimageConfig);
         }
 
         private void button_ControlsDefault_Click(object sender, EventArgs e)
@@ -291,13 +341,22 @@ namespace vimage_settings
 
             item.GiveItemFocus();
         }
+        private void button_CustomActionsAddNew_Click(object sender, EventArgs e)
+        {
+            AddCustomActionItem();
+
+            // scroll to bottom
+            GetCurrentContextMenuPanel().VerticalScroll.Visible = true;
+            GetCurrentContextMenuPanel().VerticalScroll.Value = GetCurrentContextMenuPanel().VerticalScroll.Maximum;
+            GetCurrentContextMenuPanel().PerformLayout();
+        }
         private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
             // focus on tab change to allow for scrolling with mouse wheel
             TabControl.SelectedTab.Focus();
-            if (TabControl.SelectedTab == tabPage2)
+            if (TabControl.SelectedTab == tabControls)
                 panel_Controls.Focus();
-            else if (TabControl.SelectedTab == tabPage3)
+            else if (TabControl.SelectedTab == tabContextMenu)
                 tabControl_ContextMenus.SelectedTab.Focus();
         }
 

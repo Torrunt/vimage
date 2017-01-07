@@ -76,6 +76,12 @@
     <Compile Include="Source\ControlItem.Designer.cs">
       <DependentUpon>ControlItem.cs</DependentUpon>
     </Compile>
+    <Compile Include="Source\CustomActionItem.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Source\CustomActionItem.Designer.cs">
+      <DependentUpon>CustomActionItem.cs</DependentUpon>
+    </Compile>
     <Compile Include="Source\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Source\ConfigWindow.resx">
@@ -96,6 +102,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Source\ControlItem.resx">
       <DependentUpon>ControlItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Source\CustomActionItem.resx">
+      <DependentUpon>CustomActionItem.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

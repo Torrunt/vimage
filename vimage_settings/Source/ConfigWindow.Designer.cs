@@ -31,7 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigWindow));
             this.TabControl = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabGeneral = new System.Windows.Forms.TabPage();
             this.comboBox_DefaultSortDir = new System.Windows.Forms.ComboBox();
             this.comboBox_DefaultSortBy = new System.Windows.Forms.ComboBox();
             this.label16 = new System.Windows.Forms.Label();
@@ -56,12 +56,12 @@
             this.checkBox_BackgroundForImagesWithTransparencyDefault = new System.Windows.Forms.CheckBox();
             this.checkBox_SmoothingDefault = new System.Windows.Forms.CheckBox();
             this.checkBox_OpenAtMousePosition = new System.Windows.Forms.CheckBox();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tabControls = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.panel_Controls = new System.Windows.Forms.Panel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.button_ControlsDefault = new System.Windows.Forms.Button();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.tabContextMenu = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.checkBox_ContextMenuShowMargin = new System.Windows.Forms.CheckBox();
@@ -73,7 +73,14 @@
             this.tabControl_ContextMenus = new System.Windows.Forms.TabControl();
             this.tabPage_ContextMenuGeneral = new System.Windows.Forms.TabPage();
             this.tabPage_ContextMenuAnimation = new System.Windows.Forms.TabPage();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.tabCustomActions = new System.Windows.Forms.TabPage();
+            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+            this.panel_CustomActions = new System.Windows.Forms.Panel();
+            this.panel6 = new System.Windows.Forms.Panel();
+            this.button_CustomActionsAddNew = new System.Windows.Forms.Button();
+            this.tabAbout = new System.Windows.Forms.TabPage();
+            this.linkLabel8 = new System.Windows.Forms.LinkLabel();
+            this.label18 = new System.Windows.Forms.Label();
             this.linkLabel7 = new System.Windows.Forms.LinkLabel();
             this.label17 = new System.Windows.Forms.Label();
             this.label_version = new System.Windows.Forms.Label();
@@ -93,34 +100,36 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.panel1 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.linkLabel8 = new System.Windows.Forms.LinkLabel();
-            this.label18 = new System.Windows.Forms.Label();
             this.TabControl.SuspendLayout();
-            this.tabPage1.SuspendLayout();
+            this.tabGeneral.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ZoomSpeedFast)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ZoomSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_SmoothingMinImageSize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_MinImageSize)).BeginInit();
-            this.tabPage2.SuspendLayout();
+            this.tabControls.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.panel4.SuspendLayout();
-            this.tabPage3.SuspendLayout();
+            this.tabContextMenu.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ContextMenu_Animation_InsertAtIndex)).BeginInit();
             this.panel2.SuspendLayout();
             this.tabControl_ContextMenus.SuspendLayout();
-            this.tabPage4.SuspendLayout();
+            this.tabCustomActions.SuspendLayout();
+            this.tableLayoutPanel4.SuspendLayout();
+            this.panel6.SuspendLayout();
+            this.tabAbout.SuspendLayout();
             this.panel1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // TabControl
             // 
-            this.TabControl.Controls.Add(this.tabPage1);
-            this.TabControl.Controls.Add(this.tabPage2);
-            this.TabControl.Controls.Add(this.tabPage3);
-            this.TabControl.Controls.Add(this.tabPage4);
+            this.TabControl.Controls.Add(this.tabGeneral);
+            this.TabControl.Controls.Add(this.tabControls);
+            this.TabControl.Controls.Add(this.tabContextMenu);
+            this.TabControl.Controls.Add(this.tabCustomActions);
+            this.TabControl.Controls.Add(this.tabAbout);
             this.TabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TabControl.Location = new System.Drawing.Point(0, 0);
             this.TabControl.Margin = new System.Windows.Forms.Padding(0);
@@ -131,40 +140,40 @@
             this.TabControl.TabStop = false;
             this.TabControl.SelectedIndexChanged += new System.EventHandler(this.TabControl_SelectedIndexChanged);
             // 
-            // tabPage1
+            // tabGeneral
             // 
-            this.tabPage1.AutoScroll = true;
-            this.tabPage1.Controls.Add(this.comboBox_DefaultSortDir);
-            this.tabPage1.Controls.Add(this.comboBox_DefaultSortBy);
-            this.tabPage1.Controls.Add(this.label16);
-            this.tabPage1.Controls.Add(this.comboBox_LimitImagesToMonitor);
-            this.tabPage1.Controls.Add(this.label15);
-            this.tabPage1.Controls.Add(this.label13);
-            this.tabPage1.Controls.Add(this.label14);
-            this.tabPage1.Controls.Add(this.label11);
-            this.tabPage1.Controls.Add(this.label12);
-            this.tabPage1.Controls.Add(this.numericUpDown_ZoomSpeedFast);
-            this.tabPage1.Controls.Add(this.label10);
-            this.tabPage1.Controls.Add(this.label9);
-            this.tabPage1.Controls.Add(this.numericUpDown_ZoomSpeed);
-            this.tabPage1.Controls.Add(this.checkBox_ListenForConfigChanges);
-            this.tabPage1.Controls.Add(this.checkBox_OpenSettingsEXE);
-            this.tabPage1.Controls.Add(this.label2);
-            this.tabPage1.Controls.Add(this.numericUpDown_SmoothingMinImageSize);
-            this.tabPage1.Controls.Add(this.label1);
-            this.tabPage1.Controls.Add(this.numericUpDown_MinImageSize);
-            this.tabPage1.Controls.Add(this.checkBox_PreloadNextImage);
-            this.tabPage1.Controls.Add(this.checkBox_PositionLargeWideImagesInCorner);
-            this.tabPage1.Controls.Add(this.checkBox_BackgroundForImagesWithTransparencyDefault);
-            this.tabPage1.Controls.Add(this.checkBox_SmoothingDefault);
-            this.tabPage1.Controls.Add(this.checkBox_OpenAtMousePosition);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(426, 305);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "General";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.tabGeneral.AutoScroll = true;
+            this.tabGeneral.Controls.Add(this.comboBox_DefaultSortDir);
+            this.tabGeneral.Controls.Add(this.comboBox_DefaultSortBy);
+            this.tabGeneral.Controls.Add(this.label16);
+            this.tabGeneral.Controls.Add(this.comboBox_LimitImagesToMonitor);
+            this.tabGeneral.Controls.Add(this.label15);
+            this.tabGeneral.Controls.Add(this.label13);
+            this.tabGeneral.Controls.Add(this.label14);
+            this.tabGeneral.Controls.Add(this.label11);
+            this.tabGeneral.Controls.Add(this.label12);
+            this.tabGeneral.Controls.Add(this.numericUpDown_ZoomSpeedFast);
+            this.tabGeneral.Controls.Add(this.label10);
+            this.tabGeneral.Controls.Add(this.label9);
+            this.tabGeneral.Controls.Add(this.numericUpDown_ZoomSpeed);
+            this.tabGeneral.Controls.Add(this.checkBox_ListenForConfigChanges);
+            this.tabGeneral.Controls.Add(this.checkBox_OpenSettingsEXE);
+            this.tabGeneral.Controls.Add(this.label2);
+            this.tabGeneral.Controls.Add(this.numericUpDown_SmoothingMinImageSize);
+            this.tabGeneral.Controls.Add(this.label1);
+            this.tabGeneral.Controls.Add(this.numericUpDown_MinImageSize);
+            this.tabGeneral.Controls.Add(this.checkBox_PreloadNextImage);
+            this.tabGeneral.Controls.Add(this.checkBox_PositionLargeWideImagesInCorner);
+            this.tabGeneral.Controls.Add(this.checkBox_BackgroundForImagesWithTransparencyDefault);
+            this.tabGeneral.Controls.Add(this.checkBox_SmoothingDefault);
+            this.tabGeneral.Controls.Add(this.checkBox_OpenAtMousePosition);
+            this.tabGeneral.Location = new System.Drawing.Point(4, 22);
+            this.tabGeneral.Name = "tabGeneral";
+            this.tabGeneral.Padding = new System.Windows.Forms.Padding(3);
+            this.tabGeneral.Size = new System.Drawing.Size(426, 305);
+            this.tabGeneral.TabIndex = 0;
+            this.tabGeneral.Text = "General";
+            this.tabGeneral.UseVisualStyleBackColor = true;
             // 
             // comboBox_DefaultSortDir
             // 
@@ -421,17 +430,17 @@
         "ly where the image file is).");
             this.checkBox_OpenAtMousePosition.UseVisualStyleBackColor = true;
             // 
-            // tabPage2
+            // tabControls
             // 
-            this.tabPage2.AutoScroll = true;
-            this.tabPage2.Controls.Add(this.tableLayoutPanel3);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(426, 305);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Control Bindings";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.tabControls.AutoScroll = true;
+            this.tabControls.Controls.Add(this.tableLayoutPanel3);
+            this.tabControls.Location = new System.Drawing.Point(4, 22);
+            this.tabControls.Name = "tabControls";
+            this.tabControls.Padding = new System.Windows.Forms.Padding(3);
+            this.tabControls.Size = new System.Drawing.Size(426, 305);
+            this.tabControls.TabIndex = 1;
+            this.tabControls.Text = "Control Bindings";
+            this.tabControls.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel3
             // 
@@ -479,15 +488,15 @@
             this.button_ControlsDefault.UseVisualStyleBackColor = true;
             this.button_ControlsDefault.Click += new System.EventHandler(this.button_ControlsDefault_Click);
             // 
-            // tabPage3
+            // tabContextMenu
             // 
-            this.tabPage3.Controls.Add(this.tableLayoutPanel2);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(426, 305);
-            this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "Context Menu";
-            this.tabPage3.UseVisualStyleBackColor = true;
+            this.tabContextMenu.Controls.Add(this.tableLayoutPanel2);
+            this.tabContextMenu.Location = new System.Drawing.Point(4, 22);
+            this.tabContextMenu.Name = "tabContextMenu";
+            this.tabContextMenu.Size = new System.Drawing.Size(426, 305);
+            this.tabContextMenu.TabIndex = 2;
+            this.tabContextMenu.Text = "Context Menu";
+            this.tabContextMenu.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel2
             // 
@@ -618,30 +627,107 @@
             this.tabPage_ContextMenuAnimation.TabIndex = 1;
             this.tabPage_ContextMenuAnimation.Text = "Animation";
             // 
-            // tabPage4
+            // tabCustomActions
             // 
-            this.tabPage4.AutoScroll = true;
-            this.tabPage4.Controls.Add(this.linkLabel8);
-            this.tabPage4.Controls.Add(this.label18);
-            this.tabPage4.Controls.Add(this.linkLabel7);
-            this.tabPage4.Controls.Add(this.label17);
-            this.tabPage4.Controls.Add(this.label_version);
-            this.tabPage4.Controls.Add(this.linkLabel6);
-            this.tabPage4.Controls.Add(this.linkLabel5);
-            this.tabPage4.Controls.Add(this.linkLabel4);
-            this.tabPage4.Controls.Add(this.label8);
-            this.tabPage4.Controls.Add(this.linkLabel3);
-            this.tabPage4.Controls.Add(this.label7);
-            this.tabPage4.Controls.Add(this.linkLabel2);
-            this.tabPage4.Controls.Add(this.label6);
-            this.tabPage4.Controls.Add(this.label5);
-            this.tabPage4.Controls.Add(this.label4);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size(426, 305);
-            this.tabPage4.TabIndex = 3;
-            this.tabPage4.Text = "About";
-            this.tabPage4.UseVisualStyleBackColor = true;
+            this.tabCustomActions.Controls.Add(this.tableLayoutPanel4);
+            this.tabCustomActions.Location = new System.Drawing.Point(4, 22);
+            this.tabCustomActions.Name = "tabCustomActions";
+            this.tabCustomActions.Size = new System.Drawing.Size(426, 305);
+            this.tabCustomActions.TabIndex = 4;
+            this.tabCustomActions.Text = "Custom Actions";
+            this.tabCustomActions.UseVisualStyleBackColor = true;
+            // 
+            // tableLayoutPanel4
+            // 
+            this.tableLayoutPanel4.ColumnCount = 1;
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel4.Controls.Add(this.panel_CustomActions, 0, 0);
+            this.tableLayoutPanel4.Controls.Add(this.panel6, 0, 1);
+            this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
+            this.tableLayoutPanel4.RowCount = 2;
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(426, 305);
+            this.tableLayoutPanel4.TabIndex = 2;
+            // 
+            // panel_CustomActions
+            // 
+            this.panel_CustomActions.AutoScroll = true;
+            this.panel_CustomActions.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel_CustomActions.Location = new System.Drawing.Point(3, 3);
+            this.panel_CustomActions.Name = "panel_CustomActions";
+            this.panel_CustomActions.Size = new System.Drawing.Size(420, 269);
+            this.panel_CustomActions.TabIndex = 0;
+            // 
+            // panel6
+            // 
+            this.panel6.Controls.Add(this.button_CustomActionsAddNew);
+            this.panel6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel6.Location = new System.Drawing.Point(3, 278);
+            this.panel6.Name = "panel6";
+            this.panel6.Size = new System.Drawing.Size(420, 24);
+            this.panel6.TabIndex = 1;
+            // 
+            // button_CustomActionsAddNew
+            // 
+            this.button_CustomActionsAddNew.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button_CustomActionsAddNew.BackgroundImage = global::vimage_settings.Properties.Resources.add;
+            this.button_CustomActionsAddNew.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.button_CustomActionsAddNew.Location = new System.Drawing.Point(-1, -1);
+            this.button_CustomActionsAddNew.Name = "button_CustomActionsAddNew";
+            this.button_CustomActionsAddNew.Size = new System.Drawing.Size(23, 23);
+            this.button_CustomActionsAddNew.TabIndex = 5;
+            this.button_CustomActionsAddNew.TabStop = false;
+            this.toolTip1.SetToolTip(this.button_CustomActionsAddNew, "Add item below currently selected");
+            this.button_CustomActionsAddNew.UseVisualStyleBackColor = true;
+            this.button_CustomActionsAddNew.Click += new System.EventHandler(this.button_CustomActionsAddNew_Click);
+            // 
+            // tabAbout
+            // 
+            this.tabAbout.AutoScroll = true;
+            this.tabAbout.Controls.Add(this.linkLabel8);
+            this.tabAbout.Controls.Add(this.label18);
+            this.tabAbout.Controls.Add(this.linkLabel7);
+            this.tabAbout.Controls.Add(this.label17);
+            this.tabAbout.Controls.Add(this.label_version);
+            this.tabAbout.Controls.Add(this.linkLabel6);
+            this.tabAbout.Controls.Add(this.linkLabel5);
+            this.tabAbout.Controls.Add(this.linkLabel4);
+            this.tabAbout.Controls.Add(this.label8);
+            this.tabAbout.Controls.Add(this.linkLabel3);
+            this.tabAbout.Controls.Add(this.label7);
+            this.tabAbout.Controls.Add(this.linkLabel2);
+            this.tabAbout.Controls.Add(this.label6);
+            this.tabAbout.Controls.Add(this.label5);
+            this.tabAbout.Controls.Add(this.label4);
+            this.tabAbout.Location = new System.Drawing.Point(4, 22);
+            this.tabAbout.Name = "tabAbout";
+            this.tabAbout.Size = new System.Drawing.Size(426, 305);
+            this.tabAbout.TabIndex = 3;
+            this.tabAbout.Text = "About";
+            this.tabAbout.UseVisualStyleBackColor = true;
+            // 
+            // linkLabel8
+            // 
+            this.linkLabel8.AutoSize = true;
+            this.linkLabel8.Location = new System.Drawing.Point(122, 214);
+            this.linkLabel8.Name = "linkLabel8";
+            this.linkLabel8.Size = new System.Drawing.Size(168, 13);
+            this.linkLabel8.TabIndex = 7;
+            this.linkLabel8.TabStop = true;
+            this.linkLabel8.Text = "crashreporterdotnet.codeplex.com";
+            this.linkLabel8.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel8_LinkClicked);
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(10, 214);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(106, 13);
+            this.label18.TabIndex = 24;
+            this.label18.Text = "CrashReporter.NET -";
             // 
             // linkLabel7
             // 
@@ -834,26 +920,6 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(434, 361);
             this.tableLayoutPanel1.TabIndex = 13;
             // 
-            // linkLabel8
-            // 
-            this.linkLabel8.AutoSize = true;
-            this.linkLabel8.Location = new System.Drawing.Point(122, 214);
-            this.linkLabel8.Name = "linkLabel8";
-            this.linkLabel8.Size = new System.Drawing.Size(168, 13);
-            this.linkLabel8.TabIndex = 7;
-            this.linkLabel8.TabStop = true;
-            this.linkLabel8.Text = "crashreporterdotnet.codeplex.com";
-            this.linkLabel8.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel8_LinkClicked);
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(10, 214);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(106, 13);
-            this.label18.TabIndex = 24;
-            this.label18.Text = "CrashReporter.NET -";
-            // 
             // ConfigWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -866,24 +932,27 @@
             this.Name = "ConfigWindow";
             this.Text = "vimage settings";
             this.TabControl.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
+            this.tabGeneral.ResumeLayout(false);
+            this.tabGeneral.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ZoomSpeedFast)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ZoomSpeed)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_SmoothingMinImageSize)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_MinImageSize)).EndInit();
-            this.tabPage2.ResumeLayout(false);
+            this.tabControls.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);
             this.panel4.ResumeLayout(false);
-            this.tabPage3.ResumeLayout(false);
+            this.tabContextMenu.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_ContextMenu_Animation_InsertAtIndex)).EndInit();
             this.panel2.ResumeLayout(false);
             this.tabControl_ContextMenus.ResumeLayout(false);
-            this.tabPage4.ResumeLayout(false);
-            this.tabPage4.PerformLayout();
+            this.tabCustomActions.ResumeLayout(false);
+            this.tableLayoutPanel4.ResumeLayout(false);
+            this.panel6.ResumeLayout(false);
+            this.tabAbout.ResumeLayout(false);
+            this.tabAbout.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
@@ -894,9 +963,9 @@
         #endregion
 
         private System.Windows.Forms.TabControl TabControl;
-        private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.TabPage tabGeneral;
+        private System.Windows.Forms.TabPage tabControls;
+        private System.Windows.Forms.TabPage tabContextMenu;
         private System.Windows.Forms.CheckBox checkBox_OpenAtMousePosition;
         private System.Windows.Forms.CheckBox checkBox_SmoothingDefault;
         private System.Windows.Forms.CheckBox checkBox_BackgroundForImagesWithTransparencyDefault;
@@ -921,7 +990,7 @@
         private System.Windows.Forms.TabControl tabControl_ContextMenus;
         private System.Windows.Forms.TabPage tabPage_ContextMenuGeneral;
         private System.Windows.Forms.TabPage tabPage_ContextMenuAnimation;
-        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.TabPage tabAbout;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.LinkLabel linkLabel2;
@@ -958,6 +1027,11 @@
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.LinkLabel linkLabel8;
         private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.TabPage tabCustomActions;
+        private System.Windows.Forms.Panel panel6;
+        private System.Windows.Forms.Panel panel_CustomActions;
+        private System.Windows.Forms.Button button_CustomActionsAddNew;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
     }
 }
 
