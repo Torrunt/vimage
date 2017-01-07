@@ -77,6 +77,7 @@
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.panel_CustomActions = new System.Windows.Forms.Panel();
             this.panel6 = new System.Windows.Forms.Panel();
+            this.labelCustomActionsInfo = new System.Windows.Forms.Label();
             this.button_CustomActionsAddNew = new System.Windows.Forms.Button();
             this.tabAbout = new System.Windows.Forms.TabPage();
             this.linkLabel8 = new System.Windows.Forms.LinkLabel();
@@ -663,19 +664,31 @@
             // 
             // panel6
             // 
+            this.panel6.Controls.Add(this.labelCustomActionsInfo);
             this.panel6.Controls.Add(this.button_CustomActionsAddNew);
             this.panel6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel6.Location = new System.Drawing.Point(3, 278);
+            this.panel6.Location = new System.Drawing.Point(3, 275);
+            this.panel6.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(420, 24);
+            this.panel6.Size = new System.Drawing.Size(420, 27);
             this.panel6.TabIndex = 1;
+            // 
+            // labelCustomActionsInfo
+            // 
+            this.labelCustomActionsInfo.AutoSize = true;
+            this.labelCustomActionsInfo.Dock = System.Windows.Forms.DockStyle.Right;
+            this.labelCustomActionsInfo.Location = new System.Drawing.Point(233, 0);
+            this.labelCustomActionsInfo.Name = "labelCustomActionsInfo";
+            this.labelCustomActionsInfo.Size = new System.Drawing.Size(187, 26);
+            this.labelCustomActionsInfo.TabIndex = 6;
+            this.labelCustomActionsInfo.Text = " %f = current file (with quotes)\r\n%d = current directory (without quotes)";
             // 
             // button_CustomActionsAddNew
             // 
             this.button_CustomActionsAddNew.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.button_CustomActionsAddNew.BackgroundImage = global::vimage_settings.Properties.Resources.add;
             this.button_CustomActionsAddNew.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.button_CustomActionsAddNew.Location = new System.Drawing.Point(-1, -1);
+            this.button_CustomActionsAddNew.Location = new System.Drawing.Point(-1, 2);
             this.button_CustomActionsAddNew.Name = "button_CustomActionsAddNew";
             this.button_CustomActionsAddNew.Size = new System.Drawing.Size(23, 23);
             this.button_CustomActionsAddNew.TabIndex = 5;
@@ -951,6 +964,7 @@
             this.tabCustomActions.ResumeLayout(false);
             this.tableLayoutPanel4.ResumeLayout(false);
             this.panel6.ResumeLayout(false);
+            this.panel6.PerformLayout();
             this.tabAbout.ResumeLayout(false);
             this.tabAbout.PerformLayout();
             this.panel1.ResumeLayout(false);
@@ -1032,6 +1046,7 @@
         private System.Windows.Forms.Panel panel_CustomActions;
         private System.Windows.Forms.Button button_CustomActionsAddNew;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
+        private System.Windows.Forms.Label labelCustomActionsInfo;
     }
 }
 

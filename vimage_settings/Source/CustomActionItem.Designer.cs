@@ -40,7 +40,7 @@
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 28.25928F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 71.74072F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 22F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 23F));
             this.tableLayoutPanel1.Controls.Add(this.textBox_Name, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.textBox_Func, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.button_Delete, 3, 0);
@@ -68,7 +68,7 @@
             this.textBox_Func.Location = new System.Drawing.Point(109, 0);
             this.textBox_Func.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.textBox_Func.Name = "textBox_Func";
-            this.textBox_Func.Size = new System.Drawing.Size(265, 20);
+            this.textBox_Func.Size = new System.Drawing.Size(264, 20);
             this.textBox_Func.TabIndex = 2;
             // 
             // button_Delete
@@ -76,7 +76,7 @@
             this.button_Delete.BackgroundImage = global::vimage_settings.Properties.Resources.cross;
             this.button_Delete.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.button_Delete.FlatAppearance.BorderSize = 0;
-            this.button_Delete.Location = new System.Drawing.Point(377, 0);
+            this.button_Delete.Location = new System.Drawing.Point(376, 0);
             this.button_Delete.Margin = new System.Windows.Forms.Padding(0);
             this.button_Delete.Name = "button_Delete";
             this.button_Delete.Size = new System.Drawing.Size(20, 20);

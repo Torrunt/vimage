@@ -238,6 +238,7 @@ namespace vimage
 
                 string action = (ImageViewer.Config.CustomActions[i] as dynamic).func;
                 action = action.Replace("%f", "\"" + ImageViewer.File + "\"");
+                action = action.Replace("%d", ImageViewer.File.Substring(0, ImageViewer.File.LastIndexOf('\\') + 1));
 
                 // Split exe and arguments by the first space (regex to exclude the spaces within the quotes of the exe's path)
                 Regex rgx = new Regex("(?<=^[^\"]*(?:\"[^\"]*\"[^\"]*)*) (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
