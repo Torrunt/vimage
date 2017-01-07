@@ -350,7 +350,7 @@ namespace vimage
                     continue;
                 }
 
-                // trim spaces
+                // trim
                 line = RemoveSpaces(line);
 
                 // ignore comments
@@ -493,11 +493,14 @@ namespace vimage
                         splitValues = line.Split(new char[] { ':' }, 2);
 
                     // trim tabs from name, spaces from map name
-                    splitValues[0] = splitValues[0].Replace("\t", "");
-                    splitValues[1] = RemoveSpaces(splitValues[1]);
+                    splitValues[0] = splitValues[0].Replace("\t", "").Trim();
+                    if (splitValues[1].IndexOf('\"') != -1 || splitValues[1].IndexOf('%') != -1)
+                        splitValues[1] = splitValues[1].Trim(); // keep spaces if custom action
+                    else
+                        splitValues[1] = RemoveSpaces(splitValues[1]);
 
                     // assign Values
-                    setting.Add(new { name = splitValues[0].Trim(), func = splitValues[1].Trim() });
+                    setting.Add(new { name = splitValues[0], func = splitValues[1] });
 
                     // next line
                     line = reader.ReadLine();
@@ -670,9 +673,7 @@ namespace vimage
         {
             writer.Write(name + " =" + Environment.NewLine + "{" + Environment.NewLine);
             for (int i = 0; i < CustomActions.Count; i++)
-            {
                 writer.Write("\t" + (customActions[i] as dynamic).name + " : " + (customActions[i] as dynamic).func + Environment.NewLine);
-            }
             writer.Write("}" + Environment.NewLine);
         }
 
@@ -1325,6 +1326,6 @@ namespace vimage
             return str;
         }
 
-        private static string RemoveSpaces(string str) { return Regex.Replace(str, @"(""[^""\\]*(?:\\.[^""\\]*)*"")|\s+", "$1").Replace("\t", ""); }
+        private static string RemoveSpaces(string str) { return str.Replace(" ", "").Replace("\t", ""); }
     }
 }

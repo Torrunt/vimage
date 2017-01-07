@@ -45,35 +45,35 @@ namespace vimage_settings
             comboBox_DefaultSortDir.SelectedIndex = (int)vimageConfig.Setting_DefaultSortDir;
 
             // Setup Control Bindings
-            AddControlItem("Random Image", vimageConfig.Control_RandomImage);
-            AddControlItem("Open Duplicate Image", vimageConfig.Control_OpenDuplicateImage);
-            AddControlItem("Copy as Image", vimageConfig.Control_CopyAsImage);
-            AddControlItem("Copy", vimageConfig.Control_Copy);
-            AddControlItem("Delete", vimageConfig.Control_Delete);
-            AddControlItem("Open At Location", vimageConfig.Control_OpenAtLocation);
-            AddControlItem("Reset Image", vimageConfig.Control_ResetImage);
-            AddControlItem("Reload Config", vimageConfig.Control_ReloadConfig);
-            AddControlItem("Open Config", vimageConfig.Control_OpenConfig);
-            AddControlItem("Next Frame", vimageConfig.Control_NextFrame);
-            AddControlItem("Prev Frame", vimageConfig.Control_PrevFrame);
-            AddControlItem("Pause Animation", vimageConfig.Control_PauseAnimation);
-            AddControlItem("Toggle Always On Top", vimageConfig.Control_ToggleAlwaysOnTop);
-            AddControlItem("Toggle Background For Transparency", vimageConfig.Control_ToggleBackgroundForTransparency);
-            AddControlItem("Toggle Smoothing", vimageConfig.Control_ToggleSmoothing);
-            AddControlItem("Zoom Alt", vimageConfig.Control_ZoomAlt);
-            AddControlItem("Zoom Faster", vimageConfig.Control_ZoomFaster);
-            AddControlItem("Fit To Monitor Alt", vimageConfig.Control_FitToMonitorAlt);
-            AddControlItem("Fit To Monitor Height", vimageConfig.Control_FitToMonitorHeight);
-            AddControlItem("Fit To Monitor Width", vimageConfig.Control_FitToMonitorWidth);
-            AddControlItem("Fit To Monitor Auto", vimageConfig.Control_FitToMonitorAuto);
-            AddControlItem("Flip", vimageConfig.Control_Flip);
-            AddControlItem("Rotate Anti-Clockwise", vimageConfig.Control_RotateAntiClockwise);
-            AddControlItem("Rotate Clockwise", vimageConfig.Control_RotateClockwise);
-            AddControlItem("Next Image", vimageConfig.Control_NextImage);
-            AddControlItem("Prev Image", vimageConfig.Control_PrevImage);
-            AddControlItem("Open Context Menu", vimageConfig.Control_OpenContextMenu);
-            AddControlItem("Close", vimageConfig.Control_Close);
             AddControlItem("Drag", vimageConfig.Control_Drag);
+            AddControlItem("Close", vimageConfig.Control_Close);
+            AddControlItem("Open Context Menu", vimageConfig.Control_OpenContextMenu);
+            AddControlItem("Prev Image", vimageConfig.Control_PrevImage);
+            AddControlItem("Next Image", vimageConfig.Control_NextImage);
+            AddControlItem("Rotate Clockwise", vimageConfig.Control_RotateClockwise);
+            AddControlItem("Rotate Anti-Clockwise", vimageConfig.Control_RotateAntiClockwise);
+            AddControlItem("Flip", vimageConfig.Control_Flip);
+            AddControlItem("Fit To Monitor Auto", vimageConfig.Control_FitToMonitorAuto);
+            AddControlItem("Fit To Monitor Width", vimageConfig.Control_FitToMonitorWidth);
+            AddControlItem("Fit To Monitor Height", vimageConfig.Control_FitToMonitorHeight);
+            AddControlItem("Fit To Monitor Alt", vimageConfig.Control_FitToMonitorAlt);
+            AddControlItem("Zoom Faster", vimageConfig.Control_ZoomFaster);
+            AddControlItem("Zoom Alt", vimageConfig.Control_ZoomAlt);
+            AddControlItem("Toggle Smoothing", vimageConfig.Control_ToggleSmoothing);
+            AddControlItem("Toggle Background For Transparency", vimageConfig.Control_ToggleBackgroundForTransparency);
+            AddControlItem("Toggle Always On Top", vimageConfig.Control_ToggleAlwaysOnTop);
+            AddControlItem("Pause Animation", vimageConfig.Control_PauseAnimation);
+            AddControlItem("Prev Frame", vimageConfig.Control_PrevFrame);
+            AddControlItem("Next Frame", vimageConfig.Control_NextFrame);
+            AddControlItem("Open Config", vimageConfig.Control_OpenConfig);
+            AddControlItem("Reload Config", vimageConfig.Control_ReloadConfig);
+            AddControlItem("Reset Image", vimageConfig.Control_ResetImage);
+            AddControlItem("Open At Location", vimageConfig.Control_OpenAtLocation);
+            AddControlItem("Delete", vimageConfig.Control_Delete);
+            AddControlItem("Copy", vimageConfig.Control_Copy);
+            AddControlItem("Copy as Image", vimageConfig.Control_CopyAsImage);
+            AddControlItem("Open Duplicate Image", vimageConfig.Control_OpenDuplicateImage);
+            AddControlItem("Random Image", vimageConfig.Control_RandomImage);
 
             // Setup Context Menu Editor
             checkBox_ContextMenuShowMargin.Checked = vimageConfig.ContextMenuShowMargin;
@@ -94,6 +94,7 @@ namespace vimage_settings
         {
             ControlItem item = new ControlItem(name, control);
             panel_Controls.Controls.Add(item);
+            panel_Controls.Controls.SetChildIndex(item, 0);
             ControlItems.Add(item);
         }
 

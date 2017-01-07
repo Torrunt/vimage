@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace vimage
 {
@@ -236,14 +237,16 @@ namespace vimage
                     continue;
 
                 string action = (ImageViewer.Config.CustomActions[i] as dynamic).func;
-                action = action.Replace("%f", "`" + ImageViewer.File);
+                action = action.Replace("%f", "\"" + ImageViewer.File + "\"");
 
-                string[] s = action.Split('`');
+                // Split exe and arguments by the first space (regex to exclude the spaces within the quotes of the exe's path)
+                Regex rgx = new Regex("(?<=^[^\"]*(?:\"[^\"]*\"[^\"]*)*) (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                string[] s = rgx.Split(action, 2);
 
                 if (s[0].Contains("%"))
                     s[0] = Environment.ExpandEnvironmentVariables(s[0]);
 
-                Process.Start(s[0], "\"" + s[1] + "\"");
+                Process.Start(s[0], s[1]);
             }
         }
 

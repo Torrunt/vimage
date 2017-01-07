@@ -52,7 +52,7 @@ namespace vimage_settings
             }
             comboBox_Function.SelectedIndex = 0;
 
-            if (prevIndex != -1)
+            if (prevIndex != -1 && prevIndex < comboBox_Function.Items.Count)
                 comboBox_Function.SelectedIndex = prevIndex;
         }
 
