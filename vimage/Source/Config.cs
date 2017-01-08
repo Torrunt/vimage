@@ -322,6 +322,7 @@ namespace vimage
             CustomActionBindings.Clear();
 
             CustomActions.Add(new { name = "EDIT", func = @"%windir%\system32\mspaint.exe %f" });
+            CustomActionBindings.Add(new { name = "EDIT", bindings = new List<int>() });
         }
 
         /// <summary> Loads and parses a config txt file. If it doesn't exist, a default one will be made. </summary>
