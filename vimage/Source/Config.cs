@@ -136,6 +136,7 @@ namespace vimage
         }
 
         public List<object> CustomActions = new List<object>();
+        public List<object> CustomActionBindings = new List<object>();
 
         private Dictionary<string, object> Settings;
 
@@ -204,7 +205,8 @@ namespace vimage
                 { "CONTEXTMENU_ANIMATION_INSERTATINDEX", 2 },
                 { "CONTEXTMENU_SHOWMARGIN", false },
 
-                { "CUSTOMACTIONS", CustomActions }
+                { "CUSTOMACTIONS", CustomActions },
+                { "CUSTOMACTIONBINDINGS", CustomActionBindings }
             };
         }
 
@@ -317,6 +319,7 @@ namespace vimage
         public void SetDefaultCustomActions()
         {
             CustomActions.Clear();
+            CustomActionBindings.Clear();
 
             CustomActions.Add(new { name = "EDIT", func = @"%windir%\system32\mspaint.exe %f" });
         }
@@ -336,8 +339,9 @@ namespace vimage
             ContextMenu.Clear();
             ContextMenu_Animation.Clear();
             CustomActions.Clear();
+            CustomActionBindings.Clear();
 
-            
+
             StreamReader reader = File.OpenText(configFile);
             string line = reader.ReadLine();
 
@@ -381,7 +385,7 @@ namespace vimage
                         continue;
 
                     // read section
-                    line = ReadSection(reader, Settings[name] as List<object>);
+                    line = ReadSection(reader, Settings[name] as List<object>, name);
                     continue;
                 }
 
@@ -452,7 +456,7 @@ namespace vimage
 
             reader.Close();
         }
-        private string ReadSection(StreamReader reader, List<object> setting)
+        private string ReadSection(StreamReader reader, List<object> setting, string sectionName = "")
         {
             string line = reader.ReadLine();
             string trimedLine = RemoveSpaces(line);
@@ -500,7 +504,10 @@ namespace vimage
                         splitValues[1] = RemoveSpaces(splitValues[1]);
 
                     // assign Values
-                    setting.Add(new { name = splitValues[0], func = splitValues[1] });
+                    if (sectionName == "CUSTOMACTIONBINDINGS")
+                        setting.Add(new { name = splitValues[0], bindings = StringToControls(splitValues[1]) });
+                    else
+                        setting.Add(new { name = splitValues[0], func = splitValues[1] });
 
                     // next line
                     line = reader.ReadLine();
@@ -603,6 +610,7 @@ namespace vimage
 
             writer.Write(Environment.NewLine);
             WriteCustomActions(writer, "CustomActions", CustomActions);
+            WriteCustomActionBindings(writer, "CustomActionBindings", CustomActionBindings);
 
             // Close
             writer.Close();
@@ -676,6 +684,13 @@ namespace vimage
                 writer.Write("\t" + (customActions[i] as dynamic).name + " : " + (customActions[i] as dynamic).func + Environment.NewLine);
             writer.Write("}" + Environment.NewLine);
         }
+        private void WriteCustomActionBindings(StreamWriter writer, string name, List<object> customActionBindings)
+        {
+            writer.Write(name + " =" + Environment.NewLine + "{" + Environment.NewLine);
+            for (int i = 0; i < customActionBindings.Count; i++)
+                writer.Write("\t" + (customActionBindings[i] as dynamic).name + " : " + ControlsToString((customActionBindings[i] as dynamic).func) + Environment.NewLine);
+            writer.Write("}" + Environment.NewLine);
+        }
 
 
         /// <summary> Converts list of controls (Keyboard.Key and Mouse.Button) to their string names seperated by commas. </summary>
@@ -713,6 +728,49 @@ namespace vimage
                 return MouseButtonToString((int)code);
             else
                 return KeyToString((Keyboard.Key)code);
+        }
+
+        public static List<int> StringToControls(string str)
+        {
+            List<int> list = new List<int>();
+
+            // split values by commas
+            string[] values = str.Split(',');
+
+            // Control
+            for (int i = 0; i < values.Length; i++)
+            {
+                if (values[i].ToUpper().StartsWith("MOUSE"))
+                {
+                    // Mouse Button
+                    int btn = StringToMouseButton(values[i].ToUpper());
+                    if (btn != -1)
+                        list.Add(btn);
+                }
+                else if (values[i].Contains("+"))
+                {
+                    // Keboard Combo
+                    list.Add(-2); // denote that it's a key combo
+
+                    string[] v = values[i].Split('+');
+
+                    Keyboard.Key key1 = StringToKey(v[0].ToUpper());
+                    if (key1 != Keyboard.Key.Unknown)
+                        list.Add((int)key1);
+                    Keyboard.Key key2 = StringToKey(v[1].ToUpper());
+                    if (key2 != Keyboard.Key.Unknown)
+                        list.Add((int)key2);
+                }
+                else
+                {
+                    // Keyboard Key
+                    Keyboard.Key key = StringToKey(values[i].ToUpper());
+                    if (key != Keyboard.Key.Unknown)
+                        list.Add((int)key);
+                }
+            }
+
+            return list;
         }
 
 

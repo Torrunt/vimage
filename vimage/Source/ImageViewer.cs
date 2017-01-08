@@ -482,6 +482,13 @@ namespace vimage
             if (Config.IsControl(code, Config.Control_RandomImage))
                 RandomImage();
 
+            // Custom Actions
+            for (int i = 0; i < Config.CustomActionBindings.Count; i++)
+            {
+                if (Config.IsControl(code, ((Config.CustomActionBindings[i] as dynamic).bindings as List<int>)))
+                    DoCustomAction((Config.CustomActions.Where(a => (a as dynamic).name == (Config.CustomActionBindings[i] as dynamic).name).First() as dynamic).func);
+            }
+
             ZoomFaster = false;
             ZoomAlt = false;
             FitToMonitorAlt = false;
@@ -1216,18 +1223,22 @@ namespace vimage
         {
             Thread thread = new Thread(() =>
             {
-                System.Drawing.Bitmap bitmap;
-                if (File.IndexOf(".ico") == File.Length - 4)
+                try
                 {
-                    // If .ico - copy largest version
-                    System.Drawing.Icon icon = new System.Drawing.Icon(File, 256, 256);
-                    bitmap = Graphics.ExtractVistaIcon(icon);
-                    if (bitmap == null)
-                        bitmap = icon.ToBitmap();
+                    System.Drawing.Bitmap bitmap;
+                    if (File.IndexOf(".ico") == File.Length - 4)
+                    {
+                        // If .ico - copy largest version
+                        System.Drawing.Icon icon = new System.Drawing.Icon(File, 256, 256);
+                        bitmap = Graphics.ExtractVistaIcon(icon);
+                        if (bitmap == null)
+                            bitmap = icon.ToBitmap();
+                    }
+                    else
+                        bitmap = new System.Drawing.Bitmap(File);
+                    Clipboard.SetImage(bitmap);
                 }
-                else
-                    bitmap = new System.Drawing.Bitmap(File);
-                Clipboard.SetImage(bitmap);
+                catch (Exception) { }
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
@@ -1271,6 +1282,21 @@ namespace vimage
             // Wait a bit for the config file to be unlocked
             Thread.Sleep(500);
             ReloadConfigNextTick = true;
+        }
+
+        public void DoCustomAction(string action)
+        {
+            action = action.Replace("%f", "\"" + File + "\"");
+            action = action.Replace("%d", File.Substring(0, File.LastIndexOf('\\') + 1));
+
+            // Split exe and arguments by the first space (regex to exclude the spaces within the quotes of the exe's path)
+            Regex rgx = new Regex("(?<=^[^\"]*(?:\"[^\"]*\"[^\"]*)*) (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+            string[] s = rgx.Split(action, 2);
+
+            if (s[0].Contains("%"))
+                s[0] = Environment.ExpandEnvironmentVariables(s[0]);
+
+            Process.Start(s[0], s[1]);
         }
 
     }
