@@ -688,7 +688,7 @@ namespace vimage
         {
             writer.Write(name + " =" + Environment.NewLine + "{" + Environment.NewLine);
             for (int i = 0; i < customActionBindings.Count; i++)
-                writer.Write("\t" + (customActionBindings[i] as dynamic).name + " : " + ControlsToString((customActionBindings[i] as dynamic).func) + Environment.NewLine);
+                writer.Write("\t" + (customActionBindings[i] as dynamic).name + " : " + ControlsToString((customActionBindings[i] as dynamic).bindings) + Environment.NewLine);
             writer.Write("}" + Environment.NewLine);
         }
 

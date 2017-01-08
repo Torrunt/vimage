@@ -24,6 +24,8 @@ namespace vimage_settings
             textBox_Binding.Text = Config.ControlsToString(Control);
         }
 
+        public string GetName() { return label_Name.Text; }
+
         public void UpdateBindings()
         {
             textBox_Binding.Text = Config.ControlsToString(Control);

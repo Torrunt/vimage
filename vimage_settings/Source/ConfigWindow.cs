@@ -15,6 +15,7 @@ namespace vimage_settings
         public List<ContextMenuItem> ContextMenuItems = new List<ContextMenuItem>();
         public List<ContextMenuItem> ContextMenuItems_Animation = new List<ContextMenuItem>();
         public List<CustomActionItem> CustomActionItems = new List<CustomActionItem>();
+        public List<ControlItem> CustomActionBindings = new List<ControlItem>();
 
         public ContextMenuItem ContextMenuItemFocused;
 
@@ -88,14 +89,22 @@ namespace vimage_settings
                 ContextMenuItems[0].GiveItemFocus();
 
             AddCustomActionItems(vimageConfig.CustomActions);
+            AddCustomActionBindings(vimageConfig.CustomActionBindings);
         }
 
-        private void AddControlItem(string name, List<int> control)
+        private ControlItem AddControlItem(string name, List<int> control)
         {
             ControlItem item = new ControlItem(name, control);
             panel_Controls.Controls.Add(item);
             panel_Controls.Controls.SetChildIndex(item, 0);
             ControlItems.Add(item);
+
+            return item;
+        }
+        private void RemoveControlitem(ControlItem item)
+        {
+            panel_Controls.Controls.Remove(item);
+            ControlItems.Remove(item);
         }
 
         private void AddContextMenuItems(List<object> contextItems, int depth = 0)
@@ -192,6 +201,12 @@ namespace vimage_settings
             panel_CustomActions.VerticalScroll.Value = Math.Min(scrollValue, panel_CustomActions.VerticalScroll.Maximum);
             panel_CustomActions.PerformLayout();
         }
+        
+        private void AddCustomActionBindings(List<object> customActionBindings)
+        {
+            for (int i = 0; i < customActionBindings.Count; i++)
+                CustomActionBindings.Add(AddControlItem((customActionBindings[i] as dynamic).name, (customActionBindings[i] as dynamic).bindings));
+        }
 
         private void button_Save_Click(object sender, EventArgs e)
         {
@@ -221,8 +236,7 @@ namespace vimage_settings
             SaveContextMenu(vimageConfig.ContextMenu_Animation, ContextMenuItems_Animation);
 
             // Update Custom Actions
-            vimageConfig.CustomActions.Clear();
-            SaveCustomActions(vimageConfig.CustomActions, CustomActionItems);
+            SaveCustomActions(vimageConfig.CustomActions, CustomActionItems, vimageConfig.CustomActionBindings);
 
             // Save Config File
             vimageConfig.Save(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
@@ -264,15 +278,30 @@ namespace vimage_settings
                 }
             }
         }
-        private void SaveCustomActions(List<object> customActions, List<CustomActionItem> customActionitems)
+        private void SaveCustomActions(List<object> customActions, List<CustomActionItem> customActionitems, List<object> customActionBindings)
         {
-            for (int i = 0; i < customActionitems.Count; i++)
-                customActions.Add(new { name = customActionitems[i].GetName(), func = customActionitems[i].GetFunc() });
+            for (int i = 0; i < CustomActionBindings.Count; i++)
+                RemoveControlitem(CustomActionBindings[i]);
+            CustomActionBindings.Clear();
 
+            List<object> oldCustomActionBindings = new List<object>(customActionBindings);
+            customActions.Clear();
+            customActionBindings.Clear();
+
+            for (int i = 0; i < customActionitems.Count; i++)
+            {
+                customActions.Add(new { name = customActionitems[i].GetName(), func = customActionitems[i].GetFunc() });
+                customActionBindings.Add(new { name = customActionitems[i].GetName(), bindings = i < oldCustomActionBindings.Count ? (oldCustomActionBindings[i] as dynamic).bindings : new List<int>() });
+            }
+
+            // Update Context Menu functions list
             for (int c = 0; c < ContextMenuItems.Count; c++)
                 ContextMenuItems[c].RefreshFunctions(vimageConfig);
             for (int c = 0; c < ContextMenuItems_Animation.Count; c++)
                 ContextMenuItems_Animation[c].RefreshFunctions(vimageConfig);
+
+            // Update Controls list
+            AddCustomActionBindings(customActionBindings);
         }
 
         private void button_ControlsDefault_Click(object sender, EventArgs e)
