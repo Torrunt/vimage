@@ -3,8 +3,8 @@
 
 A simplistic image viewer for Windows, inspired by [vjpeg](http://stereopsis.com/vjpeg/).
 
-![](http://i.imgur.com/rq0QSkt.png)
-![](http://i.imgur.com/8NrdEcc.png)
+![](http://i.imgur.com/CZC4Wgc.png)
+![](http://i.imgur.com/g9pUgDr.png)
 
 ### Created by
 Corey Zeke Womack (Torrunt) - [me@torrunt.net](mailto:me@torrunt.net) - [torrunt.net](http://torrunt.net)
@@ -30,4 +30,4 @@ Corey Zeke Womack (Torrunt) - [me@torrunt.net](mailto:me@torrunt.net) - [torrunt
 - L to Toggle Always On Top mode
 - R to Reset Image
 - Space to pause Animated GIFs
-- ,/. to go through Animated GIF frames
+- ,/. to step through Animated GIF frames
