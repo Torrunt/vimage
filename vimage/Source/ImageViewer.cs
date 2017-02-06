@@ -866,17 +866,20 @@ namespace vimage
         private bool ChangeImage(string fileName)
         {
             Dragging = false;
-            Vector2u prevSize = new Vector2u(Image.Texture.Size.X, Image.Texture.Size.Y);
-            float prevRotation = Image.Rotation;
+            Vector2u prevSize = Image == null ? new Vector2u() : new Vector2u(Image.Texture.Size.X, Image.Texture.Size.Y);
+            float prevRotation = Image == null ? 0 : Image.Rotation;
             int prevDefaultRotation = DefaultRotation;
 
             IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position +
-                new Vector2i((int)(Image.Texture.Size.X * CurrentZoom) / 2, (int)(Image.Texture.Size.Y * CurrentZoom) / 2));
+                (Image == null ? new Vector2i() : new Vector2i((int)(Image.Texture.Size.X * CurrentZoom) / 2, (int)(Image.Texture.Size.Y * CurrentZoom) / 2)));
 
             // Dispose of previous image
-            Image.Dispose();
-            Image = null;
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+            if (Image != null)
+            {
+                Image.Dispose();
+                Image = null;
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+            }
 
             // Load new image
             if (!LoadImage(fileName))
@@ -1118,8 +1121,11 @@ namespace vimage
         {
             if (FolderContents != null && FolderContents.Count() > 0)
                 return;
+            string directory = File.Substring(0, File.LastIndexOf("\\"));
+            if (!Directory.Exists(directory))
+                return;
 
-            string[] contents = Directory.GetFiles(File.Substring(0, File.LastIndexOf("\\")));
+            string[] contents = Directory.GetFiles(directory);
             contents = Array.FindAll(contents, delegate(string s) { return ImageViewerUtils.IsValidExtension(s, EXTENSIONS); });
 
             switch (SortImagesBy)
