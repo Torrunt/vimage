@@ -219,24 +219,49 @@ namespace vimage
 
         public static Sprite GetSpriteFromIcon(string fileName)
         {
-            try
+            int index = TextureFileNames.IndexOf(fileName);
+
+            if (index >= 0)
             {
-                System.Drawing.Icon icon = new System.Drawing.Icon(fileName, 256, 256);
-                System.Drawing.Bitmap iconImage = ExtractVistaIcon(icon);
-                if (iconImage == null)
-                    iconImage = icon.ToBitmap();
+                // Texture Already Exists
+                // move it to the end of the array and return it
+                Texture texture = Textures[index];
+                string name = TextureFileNames[index];
 
-                Sprite iconSprite;
+                Textures.RemoveAt(index);
+                TextureFileNames.RemoveAt(index);
+                Textures.Add(texture);
+                TextureFileNames.Add(name);
 
-                using (MemoryStream iconStream = new MemoryStream())
-                {
-                    iconImage.Save(iconStream, System.Drawing.Imaging.ImageFormat.Png);
-                    iconSprite = new Sprite(new Texture(iconStream));
-                }
-
-                return iconSprite;
+                return new Sprite(Textures[Textures.Count - 1]);
             }
-            catch (Exception) { }
+            else
+            {
+                // New Texture (from .ico)
+                try
+                {
+                    System.Drawing.Icon icon = new System.Drawing.Icon(fileName, 256, 256);
+                    System.Drawing.Bitmap iconImage = ExtractVistaIcon(icon);
+                    if (iconImage == null)
+                        iconImage = icon.ToBitmap();
+
+                    Sprite iconSprite;
+
+                    using (MemoryStream iconStream = new MemoryStream())
+                    {
+                        iconImage.Save(iconStream, System.Drawing.Imaging.ImageFormat.Png);
+                        Texture iconTexture = new Texture(iconStream);
+                        Textures.Add(iconTexture);
+                        TextureFileNames.Add(fileName);
+
+                        iconSprite = new Sprite(new Texture(iconTexture));
+                    }
+
+                    return iconSprite;
+                }
+                catch (Exception) { }
+            }
+
             return null;
         }
         // http://stackoverflow.com/questions/220465/using-256-x-256-vista-icon-in-application/1945764#1945764
