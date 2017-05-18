@@ -16,6 +16,7 @@ namespace vimage
                 return;
             else
                 file = args[0];
+            //file = @"G:\Google Drive\Pictures\Misc\vimage demostration images\Beaver_Transparent.png";
 
             if (System.IO.File.Exists(file))
             {

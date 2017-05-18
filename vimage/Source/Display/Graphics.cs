@@ -3,7 +3,7 @@ using SFML.System;
 using System.Collections.Generic;
 using System;
 using DevIL.Unmanaged;
-using Tao.OpenGl;
+using OpenTK.Graphics.OpenGL;
 using System.IO;
 using System.Threading;
 using System.Runtime.InteropServices;
@@ -140,14 +140,13 @@ namespace vimage
             Texture texture = new Texture((uint)width, (uint)height);
             Texture.Bind(texture);
             {
-                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, Gl.GL_LINEAR);
-                Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, Gl.GL_LINEAR);
-                Gl.glTexImage2D(
-                    Gl.GL_TEXTURE_2D, 0, IL.GetInteger(ILIntegerMode.ImageBytesPerPixel),
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+                GL.TexImage2D(
+                    TextureTarget.Texture2D, 0, (PixelInternalFormat)IL.GetInteger(ILIntegerMode.ImageBytesPerPixel),
                     width, height, 0,
-                    IL.GetInteger(ILIntegerMode.ImageFormat), ILDefines.IL_UNSIGNED_BYTE,
-                    IL.GetData()
-                    );
+                    (PixelFormat)IL.GetInteger(ILIntegerMode.ImageFormat), PixelType.UnsignedByte,
+                    IL.GetData());
             }
             Texture.Bind(null);
 
@@ -183,12 +182,12 @@ namespace vimage
                     IL.CopyPixels(pos.X, pos.Y, 0, w, h, 1, DevIL.DataFormat.RGBA, DevIL.DataType.UnsignedByte, partPtr);
                     Texture.Bind(texture);
                     {
-                        Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, Gl.GL_LINEAR);
-                        Gl.glTexParameteri(Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, Gl.GL_LINEAR);
-                        Gl.glTexImage2D(
-                            Gl.GL_TEXTURE_2D, 0, IL.GetInteger(ILIntegerMode.ImageBytesPerPixel),
+                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+                        GL.TexImage2D(
+                            TextureTarget.Texture2D, 0, (PixelInternalFormat)IL.GetInteger(ILIntegerMode.ImageBytesPerPixel),
                             w, h, 0,
-                            IL.GetInteger(ILIntegerMode.ImageFormat), ILDefines.IL_UNSIGNED_BYTE,
+                            (PixelFormat)IL.GetInteger(ILIntegerMode.ImageFormat), PixelType.UnsignedByte,
                             partPtr);
                     }
                     Texture.Bind(null);

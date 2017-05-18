@@ -5,7 +5,6 @@ using System.IO;
 using SFML.Window;
 using SFML.Graphics;
 using SFML.System;
-using Tao.OpenGl;
 using DevIL.Unmanaged;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -89,6 +88,7 @@ namespace vimage
             Vector2i mousePos = Mouse.GetPosition();
 
             // Create Window
+            OpenTK.GameWindow OpenTKWindow = new OpenTK.GameWindow();
             Window = new RenderWindow(new VideoMode(0, 0), File + " - vimage", Styles.None);
             Window.SetVisible(false);
 
@@ -289,7 +289,7 @@ namespace vimage
             if (!BackgroundsForImagesWithTransparency)
             {
                 Window.Clear(new Color(0, 0, 0, 0));
-                Gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+                OpenTK.Graphics.OpenGL.GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             }
             else
                 Window.Clear(new Color(230, 230, 230));
