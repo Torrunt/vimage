@@ -46,6 +46,7 @@ namespace vimage
         /// This prevents the old image being shown at the new image location for a split-second before the new image is loaded.
         /// </summary>
         private Vector2i NextWindowPos = new Vector2i();
+        private Vector2u NextWindowSize = new Vector2u();
         private bool Dragging = false;
         private Vector2i DragPos = new Vector2i();
         private Vector2i MousePos = new Vector2i();
@@ -87,12 +88,17 @@ namespace vimage
             // Save Mouse Position -> will open image at this position
             Vector2i mousePos = Mouse.GetPosition();
 
-            // Get Image
-            LoadImage(file);
+            // Create Window
+            Window = new RenderWindow(new VideoMode(0, 0), File + " - vimage", Styles.None);
+            Window.SetVisible(false);
 
-            if (Image == null)
-                return;
-            
+            // Make Window Transparent (can only tell if image being viewed has transparency)
+            DWM_BLURBEHIND bb = new DWM_BLURBEHIND(false);
+            bb.dwFlags = DWM_BB.Enable;
+            bb.fEnable = true;
+            bb.hRgnBlur = new IntPtr();
+            DWM.DwmEnableBlurBehindWindow(Window.SystemHandle, ref bb);
+
             // Load Config File
             Config = new Config();
             Config.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
@@ -158,119 +164,53 @@ namespace vimage
             if (SortImagesByDir == SortDirection.FolderDefault)
                 SortImagesByDir = SortDirection.Ascending;
 
-            // Create Context Menu
-            ContextMenu = new ContextMenu(this);
-            ContextMenu.LoadItems(Config.ContextMenu, Config.ContextMenu_Animation, Config.ContextMenu_Animation_InsertAtIndex);
-            ContextMenu.Setup(false);
+            // Get Image
+            ChangeImage(file);
 
-            // Create Window
-            Window = new RenderWindow(new VideoMode(Image.Texture.Size.X, Image.Texture.Size.Y), File + " - vimage", Styles.None);
-            Window.SetActive();
-
-            // Make Window Transparent (can only tell if image being viewed has transparency)
-            DWM_BLURBEHIND bb = new DWM_BLURBEHIND(false);
-            bb.dwFlags = DWM_BB.Enable;
-            bb.fEnable = true;
-            bb.hRgnBlur = new IntPtr();
-            DWM.DwmEnableBlurBehindWindow(Window.SystemHandle, ref bb);
-
-            bool _forceAlwaysOnTop = false;
-
-            // Get Bounds
-            IntRect bounds = ImageViewerUtils.GetCurrentBounds(mousePos);
-
-            // Resize Window
-            if (Config.Setting_LimitImagesToMonitor != Config.NONE)
+            if (Image == null)
             {
-                // Fit to monitor height/width
-                int limit = Config.Setting_LimitImagesToMonitor;
-
-                if (limit == Config.AUTO)
-                {
-                    if (bounds.Height < bounds.Width)
-                        limit = Config.HEIGHT;
-                    else
-                        limit = Config.WIDTH;
-                }
-
-                if (limit == Config.HEIGHT && Image.Texture.Size.Y > bounds.Height)
-                {
-                    Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
-                    FitToMonitorHeightForced = true;
-                }
-                else if (limit == Config.WIDTH && Image.Texture.Size.X > bounds.Width)
-                {
-                    Zoom(1 + (((float)bounds.Width - Image.Texture.Size.X) / Image.Texture.Size.X), true);
-                    AutomaticallyZoomed = true;
-                }
+                Window.Close();
+                return;
             }
-            if (Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_MinImageSize)
-            {
-                // Reisze images smaller than min size to min size
-                AutomaticallyZoomed = true;
-                Zoom(Config.Setting_MinImageSize / Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y), true);
-            }
-                // Use Texture Size * Zoom instead of Window.Size since it wouldn't have updated yet
-            Vector2i winSize = new Vector2i((int)(Image.Texture.Size.X * CurrentZoom), (int)(Image.Texture.Size.Y * CurrentZoom));
 
-
-            // Position Window
-            Vector2i winPos;
-
-            if (Config.Setting_PositionLargeWideImagesInCorner && CurrentImageSize().X > CurrentImageSize().Y && CurrentImageSize().X * CurrentZoom >= bounds.Width)
-            {
-                // Position Window in top-left if the image is wide (ie: a Desktop Wallpaper / Screenshot)
-                winPos = new Vector2i(bounds.Left, bounds.Top);
-            }
-            else if (Config.Setting_OpenAtMousePosition)
+            // Position window at mouse position?
+            Vector2i winPos = NextWindowPos;
+            IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position);
+            if (Config.Setting_OpenAtMousePosition &&
+                !(Config.Setting_PositionLargeWideImagesInCorner && CurrentImageSize().X > CurrentImageSize().Y && CurrentImageSize().X * CurrentZoom >= bounds.Width))
             {
                 // At Mouse Position
-                winPos = new Vector2i(mousePos.X - (int)(winSize.X / 2), mousePos.Y - (int)(winSize.Y / 2));
+                winPos = new Vector2i(mousePos.X - (int)(NextWindowSize.X / 2), mousePos.Y - (int)(NextWindowSize.Y / 2));
 
                 if (!FitToMonitorHeightForced)
                 {
                     if (winPos.Y < bounds.Top)
                         winPos.Y = 0;
-                    else if (winPos.Y + winSize.Y > bounds.Height)
-                        winPos.Y = bounds.Height - (int)winSize.Y;
+                    else if (winPos.Y + NextWindowSize.Y > bounds.Height)
+                        winPos.Y = bounds.Height - (int)NextWindowSize.Y;
                 }
                 else
                     winPos.Y = bounds.Top;
 
                 if (winPos.X < bounds.Left)
                     winPos.X = bounds.Left;
-                else if (winPos.X + winSize.X > bounds.Left + bounds.Width)
-                    winPos.X = bounds.Left + bounds.Width - (int)winSize.X;
+                else if (winPos.X + NextWindowSize.X > bounds.Left + bounds.Width)
+                    winPos.X = bounds.Left + bounds.Width - (int)NextWindowSize.X;
             }
-            else
-            {
-                // At Monitor Center
-                IntRect monitorBounds = ImageViewerUtils.GetCurrentBounds(mousePos);
-                winPos = new Vector2i(monitorBounds.Left + (int)((monitorBounds.Width - winSize.X) / 2), monitorBounds.Top + (int)((monitorBounds.Height - winSize.Y) / 2));
-            }
+            NextWindowPos = winPos;
 
-            Window.Position = winPos;
+            // Create Context Menu
+            ContextMenu = new ContextMenu(this);
+            ContextMenu.LoadItems(Config.ContextMenu, Config.ContextMenu_Animation, Config.ContextMenu_Animation_InsertAtIndex);
+            ContextMenu.Setup(false);
 
-            // Force Always On Top Mode (so it's above the task bar)
-            if (FitToMonitorHeightForced || (Image.Texture.Size.Y >= bounds.Height && Image.Texture.Size.X < bounds.Width))
-                _forceAlwaysOnTop = true;
-
-            // Defaults
-                // Rotation (some images have a rotation set in their exif data)
-            RotateImage(DefaultRotation, false);
-                // Smoothing
-            if (Image is AnimatedImage)
-                Image.Data.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
-            else
-                Image.Texture.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
-                // Backgrounds For Images With Transparency
-            BackgroundsForImagesWithTransparency = Config.Setting_BackgroundForImagesWithTransparencyDefault;
-
-            ForceAlwaysOnTopNextTick = _forceAlwaysOnTop;
-
+            // Display Window
+            Window.Size = NextWindowSize;
+            Window.Position = NextWindowPos;
             Redraw();
-            NextWindowPos = Window.Position;
-            
+            Window.SetVisible(true);
+            Window.SetActive();
+
             // Interaction
             Window.Closed += OnWindowClosed;
             Window.MouseButtonPressed += OnMouseDown;
@@ -309,20 +249,24 @@ namespace vimage
                 {
                     bool imageUpdated = Image.Update((float)clock.Elapsed.TotalMilliseconds);
                     if (!Updated && imageUpdated)
-                        Update();
+                        Redraw();
                 }
                 clock.Restart();
-                
+
                 // Drag Window
                 if (Dragging)
-                    Window.Position = new Vector2i(Mouse.GetPosition().X - DragPos.X, Mouse.GetPosition().Y - DragPos.Y);
+                {
+                    NextWindowPos = new Vector2i(Mouse.GetPosition().X - DragPos.X, Mouse.GetPosition().Y - DragPos.Y);
+                    Window.Position = NextWindowPos;
+                }
 
                 // Update
                 if (Updated)
                 {
                     Updated = false;
-                    Redraw();
                     Window.Position = NextWindowPos;
+                    Window.Size = NextWindowSize;
+                    Redraw();
                 }
 
                 if (ForceAlwaysOnTopNextTick)
@@ -358,11 +302,13 @@ namespace vimage
         {
             Window.Close();
         }
-        /// <summary>Sets Updated status and refreshes NextWindowPos.</summary>
         private void Update()
         {
-            Updated = true;
-            NextWindowPos = Window.Position; // Refresh the NextWindowPos var just in case the thing that induced the update didn't change the window position
+            Redraw();
+            Updated = false;
+            Window.Position = NextWindowPos;
+            Window.Size = NextWindowSize;
+            Redraw();
         }
 
         ////////////////////////
@@ -589,15 +535,15 @@ namespace vimage
                 else
                     newSize = new Vector2u((uint)Math.Ceiling(Image.Texture.Size.Y * CurrentZoom), (uint)Math.Ceiling(Image.Texture.Size.X * CurrentZoom));
                 Vector2i difference = new Vector2i((int)newSize.X, (int)newSize.Y) - new Vector2i((int)Window.Size.X, (int)Window.Size.Y);
-                Window.Size = newSize;
+                NextWindowSize = newSize;
                 NextWindowPos = new Vector2i(Window.Position.X - (difference.X / 2), Window.Position.Y - (difference.Y / 2));
             }
             else
             {
                 if (Image.Rotation == 0 || Image.Rotation == 180)
-                    Window.Size = new Vector2u((uint)Math.Ceiling(Image.Texture.Size.X * CurrentZoom), (uint)Math.Ceiling(Image.Texture.Size.Y * CurrentZoom));
+                    NextWindowSize = new Vector2u((uint)Math.Ceiling(Image.Texture.Size.X * CurrentZoom), (uint)Math.Ceiling(Image.Texture.Size.Y * CurrentZoom));
                 else
-                    Window.Size = new Vector2u((uint)Math.Ceiling(Image.Texture.Size.Y * CurrentZoom), (uint)Math.Ceiling(Image.Texture.Size.X * CurrentZoom));
+                    NextWindowSize = new Vector2u((uint)Math.Ceiling(Image.Texture.Size.Y * CurrentZoom), (uint)Math.Ceiling(Image.Texture.Size.X * CurrentZoom));
                 NextWindowPos = Window.Position;
             }
 
@@ -638,7 +584,7 @@ namespace vimage
             Image.Rotation = Rotation;
 
             if (updateWindowSize)
-                Window.Size = WindowSize;
+                NextWindowSize = WindowSize;
             if (aroundCenter)
                 NextWindowPos = new Vector2i((int)center.X - (int)(WindowSize.X / 2), (int)center.Y - (int)(WindowSize.Y / 2));
             else
@@ -886,7 +832,7 @@ namespace vimage
                 return false;
 
             SFML.Graphics.View view = new SFML.Graphics.View(Window.DefaultView);
-            view.Center = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
+            view.Center = new Vector2f(Image.Texture.Size.X / 2f, Image.Texture.Size.Y / 2f);
             view.Size = new Vector2f(Image.Texture.Size.X, Image.Texture.Size.Y);
             Window.SetView(view);
 
@@ -983,7 +929,7 @@ namespace vimage
             ForceAlwaysOnTopNextTick = true;
 
             Window.SetTitle(fileName + " - vimage");
-            ContextMenu.Setup(false);
+            ContextMenu?.Setup(false);
 
             return true;
         }
@@ -1050,6 +996,8 @@ namespace vimage
             }
             while (!success);
 
+            Update();
+
             // Preload next image?
             if (Config.Setting_PreloadNextImage)
             {
@@ -1070,6 +1018,8 @@ namespace vimage
                 success = ChangeImage(FolderContents[FolderPosition]);
             }
             while (!success);
+
+            Update();
 
             // Preload next image?
             if (Config.Setting_PreloadNextImage)

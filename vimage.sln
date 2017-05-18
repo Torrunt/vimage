@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vimage", "vimage\vimage.csproj", "{9A1A81DB-F12C-4CF0-90B0-47D27092F484}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vimage_settings", "vimage_settings\vimage_settings.csproj", "{DD1FC968-F2A0-4118-B6BD-35F95C19A236}"
