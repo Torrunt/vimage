@@ -93,10 +93,10 @@ namespace vimage
             Window.SetVisible(false);
 
             // Make Window Transparent (can only tell if image being viewed has transparency)
-            DWM_BLURBEHIND bb = new DWM_BLURBEHIND(false);
-            bb.dwFlags = DWM_BB.Enable;
+            DWM_BLURBEHIND bb = new DWM_BLURBEHIND();
+            bb.dwFlags = DWM_BB.Enable | DWM_BB.BlurRegion;
             bb.fEnable = true;
-            bb.hRgnBlur = new IntPtr();
+            bb.hRgnBlur = DWM.CreateRectRgn(0, 0, 1, 1);
             DWM.DwmEnableBlurBehindWindow(Window.SystemHandle, ref bb);
 
             // Load Config File

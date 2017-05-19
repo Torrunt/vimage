@@ -12,6 +12,9 @@ namespace vimage
         [DllImport("dwmapi.dll")]
         public static extern void DwmEnableBlurBehindWindow(IntPtr hwnd, ref DWM_BLURBEHIND blurBehind);
 
+        [DllImport("gdi32.dll")]
+        public static extern IntPtr CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+
         // Make Window Always On Top
         [DllImport("user32.dll")]
         static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
@@ -50,34 +53,5 @@ namespace vimage
         public bool fEnable;
         public IntPtr hRgnBlur;
         public bool fTransitionOnMaximized;
-
-        public DWM_BLURBEHIND(bool enabled)
-        {
-            fEnable = enabled ? true : false;
-            hRgnBlur = IntPtr.Zero;
-            fTransitionOnMaximized = false;
-            dwFlags = DWM_BB.Enable;
-        }
-
-        public System.Drawing.Region Region
-        {
-            get { return System.Drawing.Region.FromHrgn(hRgnBlur); }
-        }
-
-        public bool TransitionOnMaximized
-        {
-            get { return fTransitionOnMaximized; }
-            set
-            {
-                fTransitionOnMaximized = value ? true : false;
-                dwFlags |= DWM_BB.TransitionOnMaximized;
-            }
-        }
-
-        public void SetRegion(System.Drawing.Graphics graphics, System.Drawing.Region region)
-        {
-            hRgnBlur = region.GetHrgn(graphics);
-            dwFlags |= DWM_BB.BlurRegion;
-        }
     }
 }
