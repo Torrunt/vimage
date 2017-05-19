@@ -96,7 +96,7 @@ namespace vimage
             DWM_BLURBEHIND bb = new DWM_BLURBEHIND();
             bb.dwFlags = DWM_BB.Enable | DWM_BB.BlurRegion;
             bb.fEnable = true;
-            bb.hRgnBlur = DWM.CreateRectRgn(0, 0, 1, 1);
+            bb.hRgnBlur = DWM.CreateRectRgn(0, 0, -1, -1);
             DWM.DwmEnableBlurBehindWindow(Window.SystemHandle, ref bb);
 
             // Load Config File
@@ -264,9 +264,9 @@ namespace vimage
                 if (Updated)
                 {
                     Updated = false;
-                    Window.Position = NextWindowPos;
                     Window.Size = NextWindowSize;
                     Redraw();
+                    Window.Position = NextWindowPos;
                 }
 
                 if (ForceAlwaysOnTopNextTick)
@@ -287,10 +287,7 @@ namespace vimage
         {
             // Clear screen
             if (!BackgroundsForImagesWithTransparency)
-            {
                 Window.Clear(new Color(0, 0, 0, 0));
-                OpenTK.Graphics.OpenGL.GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            }
             else
                 Window.Clear(new Color(230, 230, 230));
             // Display Image
@@ -304,11 +301,11 @@ namespace vimage
         }
         private void Update()
         {
-            Redraw();
-            Updated = false;
+            Window.Clear(new Color(0, 0, 0, 0));
+            Window.Display();
             Window.Position = NextWindowPos;
             Window.Size = NextWindowSize;
-            Redraw();
+            Redraw();     
         }
 
         ////////////////////////
@@ -566,7 +563,7 @@ namespace vimage
             {
                 case 90:
                     Image.Scale = new Vector2f((float)Image.Texture.Size.Y / (float)Image.Texture.Size.X, (float)Image.Texture.Size.X / (float)Image.Texture.Size.Y);
-                    Image.Position = new Vector2f((Image.Texture.Size.X / 2) + 1, (Image.Texture.Size.Y / 2));
+                    Image.Position = new Vector2f((Image.Texture.Size.X / 2), (Image.Texture.Size.Y / 2));
                     WindowSize = new Vector2u((uint)(Image.Texture.Size.Y * CurrentZoom), (uint)(Image.Texture.Size.X * CurrentZoom));
                     break;
                 case 270:
@@ -576,7 +573,7 @@ namespace vimage
                     break;
                 default:
                     Image.Scale = new Vector2f(1f, 1f);
-                    Image.Position = new Vector2f((Image.Texture.Size.X / 2), (Image.Texture.Size.Y / 2) + (Rotation == 180 ? 1 : 0));
+                    Image.Position = new Vector2f((Image.Texture.Size.X / 2), (Image.Texture.Size.Y / 2));
                     WindowSize = new Vector2u((uint)(Image.Texture.Size.X * CurrentZoom), (uint)(Image.Texture.Size.Y * CurrentZoom));
                     break;
             }
