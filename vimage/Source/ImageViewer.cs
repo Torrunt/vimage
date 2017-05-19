@@ -88,9 +88,7 @@ namespace vimage
             Vector2i mousePos = Mouse.GetPosition();
 
             // Create Window
-            OpenTK.GameWindow OpenTKWindow = new OpenTK.GameWindow();
             Window = new RenderWindow(new VideoMode(0, 0), File + " - vimage", Styles.None);
-            Window.SetVisible(false);
 
             // Make Window Transparent (can only tell if image being viewed has transparency)
             DWM_BLURBEHIND bb = new DWM_BLURBEHIND();
@@ -110,6 +108,49 @@ namespace vimage
                 ConfigFileWatcher.Changed += new FileSystemEventHandler(OnConfigChanged);
                 ConfigFileWatcher.EnableRaisingEvents = true;
             }
+            BackgroundsForImagesWithTransparency = Config.Setting_BackgroundForImagesWithTransparencyDefault;
+
+            // Get Image
+            ChangeImage(file);
+
+            if (Image == null)
+            {
+                Window.Close();
+                return;
+            }
+
+            // Position window at mouse position?
+            Vector2i winPos = NextWindowPos;
+            IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position);
+            if (Config.Setting_OpenAtMousePosition &&
+                !(Config.Setting_PositionLargeWideImagesInCorner && CurrentImageSize().X > CurrentImageSize().Y && CurrentImageSize().X * CurrentZoom >= bounds.Width))
+            {
+                // At Mouse Position
+                winPos = new Vector2i(mousePos.X - (int)(NextWindowSize.X / 2), mousePos.Y - (int)(NextWindowSize.Y / 2));
+
+                if (!FitToMonitorHeightForced)
+                {
+                    if (winPos.Y < bounds.Top)
+                        winPos.Y = 0;
+                    else if (winPos.Y + NextWindowSize.Y > bounds.Height)
+                        winPos.Y = bounds.Height - (int)NextWindowSize.Y;
+                }
+                else
+                    winPos.Y = bounds.Top;
+
+                if (winPos.X < bounds.Left)
+                    winPos.X = bounds.Left;
+                else if (winPos.X + NextWindowSize.X > bounds.Left + bounds.Width)
+                    winPos.X = bounds.Left + bounds.Width - (int)NextWindowSize.X;
+            }
+            NextWindowPos = winPos;
+
+            // Display Window
+            Window.Size = NextWindowSize;
+            Window.Position = NextWindowPos;
+            Redraw();
+            Updated = false;
+            Window.SetActive();
 
             // Get/Set Folder Sorting
             SortImagesBy = Config.Setting_DefaultSortBy;
@@ -164,52 +205,10 @@ namespace vimage
             if (SortImagesByDir == SortDirection.FolderDefault)
                 SortImagesByDir = SortDirection.Ascending;
 
-            // Get Image
-            ChangeImage(file);
-
-            if (Image == null)
-            {
-                Window.Close();
-                return;
-            }
-
-            // Position window at mouse position?
-            Vector2i winPos = NextWindowPos;
-            IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position);
-            if (Config.Setting_OpenAtMousePosition &&
-                !(Config.Setting_PositionLargeWideImagesInCorner && CurrentImageSize().X > CurrentImageSize().Y && CurrentImageSize().X * CurrentZoom >= bounds.Width))
-            {
-                // At Mouse Position
-                winPos = new Vector2i(mousePos.X - (int)(NextWindowSize.X / 2), mousePos.Y - (int)(NextWindowSize.Y / 2));
-
-                if (!FitToMonitorHeightForced)
-                {
-                    if (winPos.Y < bounds.Top)
-                        winPos.Y = 0;
-                    else if (winPos.Y + NextWindowSize.Y > bounds.Height)
-                        winPos.Y = bounds.Height - (int)NextWindowSize.Y;
-                }
-                else
-                    winPos.Y = bounds.Top;
-
-                if (winPos.X < bounds.Left)
-                    winPos.X = bounds.Left;
-                else if (winPos.X + NextWindowSize.X > bounds.Left + bounds.Width)
-                    winPos.X = bounds.Left + bounds.Width - (int)NextWindowSize.X;
-            }
-            NextWindowPos = winPos;
-
             // Create Context Menu
             ContextMenu = new ContextMenu(this);
             ContextMenu.LoadItems(Config.ContextMenu, Config.ContextMenu_Animation, Config.ContextMenu_Animation_InsertAtIndex);
             ContextMenu.Setup(false);
-
-            // Display Window
-            Window.Size = NextWindowSize;
-            Window.Position = NextWindowPos;
-            Redraw();
-            Window.SetVisible(true);
-            Window.SetActive();
 
             // Interaction
             Window.Closed += OnWindowClosed;
