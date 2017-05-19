@@ -1078,30 +1078,10 @@ namespace vimage
             {
                 case SortBy.Name:
                 {
-                    // Natural Sorting
-                    Func<string, object> convert = str =>
-                    {
-                        ulong number;
-                        bool success = ulong.TryParse(str.Substring(0, Math.Min(str.Length, 19)), out number);
-                        // max ulong is 18446744073709551615 (20 chars)
-                        if (success)
-                            return number;
-                        else
-                            return str;
-                    };
-                    if (SortImagesByDir == SortDirection.Ascending)
-                    {
-                        FolderContents.AddRange(contents.OrderBy(
-                            str => Regex.Split(str.Replace(" ", ""), "([0-9]+)").Select(convert),
-                            new EnumerableComparer<object>()));
-                    }
-                    else
-                    {
-                        FolderContents.AddRange(contents.OrderByDescending(
-                            str => Regex.Split(str.Replace(" ", ""), "([0-9]+)").Select(convert),
-                            new EnumerableComparer<object>()));
-                    }
-
+                    FolderContents = contents.ToList();
+                    FolderContents.Sort(new WindowsFileSorting.NaturalStringComparer());
+                    if (SortImagesByDir == SortDirection.Descending)
+                        FolderContents.Reverse();
                     break;
                 }
                 case SortBy.Date:
