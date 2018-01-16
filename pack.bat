@@ -12,5 +12,7 @@ copy "%~dp0vimage\csfml-system-2.dll" "%~dp0vimage\bin\vimage"
 
 copy "%~dp0vimage\DevIL.dll" "%~dp0vimage\bin\vimage"
 
+copy "%~dp0vimage_settings\Xceed.Wpf.Toolkit.dll" "%~dp0vimage\bin\vimage"
+
 del "%~dp0vimage\bin\vimage\vimage.pdb"
 del "%~dp0vimage\bin\vimage\vimage_settings.pdb"
