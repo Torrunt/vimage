@@ -2,7 +2,6 @@
 using System.IO;
 using System.Collections.Generic;
 using SFML.Window;
-using System.Text.RegularExpressions;
 
 namespace vimage
 {
@@ -44,6 +43,15 @@ namespace vimage
         public List<int> Control_CopyAsImage = new List<int>();
         public List<int> Control_OpenDuplicateImage = new List<int>();
         public List<int> Control_RandomImage = new List<int>();
+
+        public List<List<int>> Controls;
+        public List<string> ControlNames = new List<string>()
+        {
+            "Drag", "Close", "Open Context Menu", "Prev Image", "Next Image", "Rotate Clockwise", "Rotate Anti-Clockwise", "Flip",
+            "Fit To Monitor Auto", "Fit To Monitor Width", "Fit To Monitor Height", "Fit To Monitor Alt", "Zoom Faster", "Zoom Alt",
+            "Toggle Smoothing", "Toggle Background For Transparency", "Toggle Always On Top", "Pause Animation", "Prev Frame", "Next Frame",
+            "Open Config", "Reload Config", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Random Image"
+        };
 
         public bool Setting_OpenAtMousePosition
         {
@@ -111,6 +119,17 @@ namespace vimage
             set { Settings["ZOOMSPEEDFAST"] = value; }
         }
 
+        public int Setting_SettingsAppWidth
+        {
+            get { return (int)Settings["SETTINGSAPPWIDTH"]; }
+            set { Settings["SETTINGSAPPWIDTH"] = value; }
+        }
+        public int Setting_SettingsAppHeight
+        {
+            get { return (int)Settings["SETTINGSAPPHEIGHT"]; }
+            set { Settings["SETTINGSAPPHEIGHT"] = value; }
+        }
+
         public SortBy Setting_DefaultSortBy
         {
             get { return (SortBy)Settings["DEFAULTSORTBY"]; }
@@ -144,6 +163,15 @@ namespace vimage
 
         public Config()
         {
+            Controls = new List<List<int>>()
+            {
+                Control_Drag, Control_Close, Control_OpenContextMenu, Control_PrevImage, Control_NextImage, Control_RotateClockwise,
+                Control_RotateAntiClockwise, Control_Flip, Control_FitToMonitorHeight, Control_FitToMonitorWidth, Control_FitToMonitorAuto,
+                Control_FitToMonitorAlt, Control_ZoomFaster, Control_ZoomAlt, Control_ToggleSmoothing, Control_ToggleBackgroundForTransparency,
+                Control_ToggleAlwaysOnTop, Control_PauseAnimation, Control_PrevFrame, Control_NextFrame, Control_OpenConfig, Control_ReloadConfig,
+                Control_ResetImage, Control_OpenAtLocation, Control_Delete, Control_Copy, Control_CopyAsImage, Control_OpenDuplicateImage, Control_RandomImage
+            };
+
             Init();
         }
         public void Init()
@@ -167,6 +195,8 @@ namespace vimage
                 { "SMOOTHINGMINIMAGESIZE", 65 },
                 { "ZOOMSPEED", 2 },
                 { "ZOOMSPEEDFAST", 10 },
+                { "SETTINGSAPPWIDTH", 600 },
+                { "SETTINGSAPPHEIGHT", 550 },
                 { "DEFAULTSORTBY", SortBy.FolderDefault },
                 { "DEFAULTSORTDIR", SortDirection.FolderDefault },
 
@@ -564,6 +594,8 @@ namespace vimage
                 "images smaller than this will not have smoothing turned on (if 0, all images with use smoothing)");
             WriteSetting(writer, "ZoomSpeed", Setting_ZoomSpeed);
             WriteSetting(writer, "ZoomSpeedFast", Setting_ZoomSpeedFast);
+            WriteSetting(writer, "SettingsAppWidth", Setting_SettingsAppWidth);
+            WriteSetting(writer, "SettingsAppHeight", Setting_SettingsAppHeight);
             WriteSetting(writer, "DefaultSortBy", (int)Setting_DefaultSortBy);
             WriteSetting(writer, "DefaultSortDir", (int)Setting_DefaultSortDir);
 
@@ -996,25 +1028,37 @@ namespace vimage
                 case "ESCAPE":
                 case "ESC":
                     return Keyboard.Key.Escape;
-                case "LCONTROL":
-                case "CONTROL":
                 case "CTRL":
+                case "CONTROL":
+                case "LCTRL":
+                case "LEFTCTRL":
+                case "LCONTROL":
+                case "LEFTCONTROL":
                     return Keyboard.Key.LControl;
-                case "LSHIFT":
                 case "SHIFT":
+                case "LSHIFT":
+                case "LEFTSHIFT":
                     return Keyboard.Key.LShift;
-                case "LALT":
                 case "ALT":
+                case "LALT":
+                case "LEFTALT":
                     return Keyboard.Key.LAlt;
                 case "LSYSTEM":
+                case "LEFTSYSTEM":
                     return Keyboard.Key.LSystem;
                 case "RCTRL":
+                case "RIGHTCTRL":
+                case "RCONTROL":
+                case "RIGHTCONTROL":
                     return Keyboard.Key.RControl;
                 case "RSHIFT":
+                case "RIGHTSHIFT":
                     return Keyboard.Key.RShift;
                 case "RALT":
+                case "RIGHTALT":
                     return Keyboard.Key.RAlt;
                 case "RSYSTEM":
+                case "RIGHTSYSTEM":
                     return Keyboard.Key.RSystem;
                 case "MENU":
                     return Keyboard.Key.Menu;
