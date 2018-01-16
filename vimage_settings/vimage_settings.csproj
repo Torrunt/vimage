@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>vimage_settings</RootNamespace>
     <AssemblyName>vimage_settings</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -37,19 +38,29 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="sfmlnet-system-2, Version=2.4.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\vimage\sfmlnet-system-2.dll</HintPath>
+    </Reference>
     <Reference Include="sfmlnet-window-2">
       <HintPath>..\vimage\sfmlnet-window-2.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="Xceed.Wpf.Toolkit">
+      <HintPath>.\Xceed.Wpf.Toolkit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\vimage\Source\Config.cs">
@@ -58,35 +69,39 @@
     <Compile Include="..\vimage\Source\MenuFuncs.cs">
       <Link>Source\MenuFuncs.cs</Link>
     </Compile>
-    <Compile Include="Source\ConfigWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Source\ConfigWindow.Designer.cs">
-      <DependentUpon>ConfigWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Source\ContextMenuItem.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Source\ContextMenuItem.Designer.cs">
-      <DependentUpon>ContextMenuItem.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Source\ControlItem.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Source\ControlItem.Designer.cs">
-      <DependentUpon>ControlItem.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Source\CustomActionItem.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Source\CustomActionItem.Designer.cs">
-      <DependentUpon>CustomActionItem.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Source\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Source\ConfigWindow.resx">
-      <DependentUpon>ConfigWindow.cs</DependentUpon>
-    </EmbeddedResource>
+    <Compile Include="Source\About.xaml.cs">
+      <DependentUpon>About.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\ContextMenu.xaml.cs">
+      <DependentUpon>ContextMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\ContextMenuEditorCanvas.cs" />
+    <Compile Include="Source\ContextMenuItem.xaml.cs">
+      <DependentUpon>ContextMenuItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\ControlBindings.xaml.cs">
+      <DependentUpon>ControlBindings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\ControlItem.xaml.cs">
+      <DependentUpon>ControlItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\CustomActionItem.xaml.cs">
+      <DependentUpon>CustomActionItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\CustomActions.xaml.cs">
+      <DependentUpon>CustomActions.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\General.xaml.cs">
+      <DependentUpon>General.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Source\Misc.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -97,15 +112,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="Source\ContextMenuItem.resx">
-      <DependentUpon>ContextMenuItem.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Source\ControlItem.resx">
-      <DependentUpon>ControlItem.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Source\CustomActionItem.resx">
-      <DependentUpon>CustomActionItem.cs</DependentUpon>
-    </EmbeddedResource>
+    <None Include="App.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -117,25 +124,58 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <Resource Include="Resources\cross.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\bullet_arrow_down.png" />
+    <Resource Include="Resources\add.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\bullet_arrow_up.png" />
+    <Page Include="Source\About.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <ApplicationDefinition Include="Source\App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="Source\ContextMenu.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Source\ContextMenuItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Source\ControlBindings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Source\ControlItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Source\CustomActionItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Source\CustomActions.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Source\General.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Source\MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\bullet_arrow_right.png" />
+    <Resource Include="Resources\icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\bullet_arrow_left.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\cross.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\add.png" />
+    <Resource Include="Resources\drag.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
@@ -143,7 +183,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy "$(TargetPath)" "$(SolutionDir)\vimage\bin\Release"
-copy "$(TargetPath)" "$(SolutionDir)\vimage\bin\Debug"</PostBuildEvent>
+copy "$(TargetDir)\Xceed.Wpf.Toolkit.dll" "$(SolutionDir)\vimage\bin\Release"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

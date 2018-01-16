@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="vimage_settings.ControlBindings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:vimage_settings"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="450" Margin="2">
+
+    <DockPanel>
+        <DockPanel DockPanel.Dock="Bottom" Margin="3">
+            <Button Width="70" Height="25" HorizontalAlignment="Right" Click="Default_Click">Default</Button>
+        </DockPanel>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Name="ControlsPanel" />
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

@@ -1,0 +1,71 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:vimage_settings"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="vimage_settings.General"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="450" Margin="2">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type Label}">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </UserControl.Resources>
+
+    <StackPanel>
+        <CheckBox IsChecked="{Binding Setting_OpenAtMousePosition}" Content="Open images at mouse position" ToolTip="When an image is opened it will be centered at the current mouse position (commonly where the image file is)."/>
+        <CheckBox IsChecked="{Binding Setting_SmoothingDefault}" Content="Smooth images by default"/>
+        <CheckBox IsChecked="{Binding Setting_BackgroundForImagesWithTransparencyDefault}" Content="Show background behind images with transparency" ToolTip="Images with partial transparency will have a grey background behind them."/>
+        <CheckBox IsChecked="{Binding Setting_PositionLargeWideImagesInCorner}" Content="Position large/wide images in corner (ie: wallpapers/screenshots)" ToolTip="Images that are wider than or the same width as the current monitor will be placed in the top left corner."/>
+        <CheckBox IsChecked="{Binding Setting_PreloadNextImage}" Content="Preload next image" ToolTip="When using the next/prev image buttons, the image after the one just loaded will be loaded as well."/>
+        <CheckBox IsChecked="{Binding Setting_OpenSettingsEXE}" Content="Use vimage_settings.exe (otherwise will open config.txt directly)" ToolTip="What will open when the 'Open Config' button is clicked or the shortcut is used."/>
+        <CheckBox IsChecked="{Binding Setting_ListenForConfigChanges}" Content="Listen for setting changes" ToolTip="If ticked, vimage will reload settings automatically when they are changed."/>
+
+        <DockPanel>
+            <Label Content="Limit images to monitor"/>
+            <ComboBox SelectedIndex="{Binding Setting_LimitImagesToMonitor}" Margin="10,0" Width="100" HorizontalAlignment="Right" >
+                <System:String>NONE</System:String>
+                <System:String>HEIGHT</System:String>
+                <System:String>WIDTH</System:String>
+                <System:String>AUTO</System:String>
+            </ComboBox>
+        </DockPanel>
+        <DockPanel>
+            <Label Content="Min image size"/>
+            <Label Content="(if image is smaller, it will be scaled up)" FontSize="9" />
+            <xctk:IntegerUpDown Value="{Binding Setting_MinImageSize}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+        </DockPanel>
+        <DockPanel ToolTip="Smoothing will be turned off by default for images smaller that this.">
+            <Label Content="Don't smooth images smaller than"/>
+            <xctk:IntegerUpDown Value="{Binding Setting_SmoothingMinImageSize}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+        </DockPanel>
+        <DockPanel>
+            <Label Content="Zoom Speed"/>
+            <xctk:IntegerUpDown Value="{Binding Setting_ZoomSpeed}" FormatString="0\%" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+        </DockPanel>
+        <DockPanel ToolTip="Zoom speed when holding down SHIFT (default)">
+            <Label Content="Zoom Speed Fast"/>
+            <xctk:IntegerUpDown Value="{Binding Setting_ZoomSpeedFast}" FormatString="0\%" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+        </DockPanel>
+        <DockPanel ToolTip="Default sorting when stepping through images in a folder.&#x0a;(FOLDER = Sort the same way Windows is sorting the folder)">
+            <Label Content="Default Sorting" />
+            <DockPanel HorizontalAlignment="Right">
+                <ComboBox SelectedIndex="{Binding Setting_DefaultSortBy, Converter={StaticResource EnumConverter}}" Width="100">
+                    <System:String>FOLDER</System:String>
+                    <System:String>Name</System:String>
+                    <System:String>Date</System:String>
+                    <System:String>Date Modified</System:String>
+                    <System:String>Date Created</System:String>
+                    <System:String>Size</System:String>
+                </ComboBox>
+                <ComboBox SelectedIndex="{Binding Setting_DefaultSortDir, Converter={StaticResource EnumConverter}}" Margin="0,0,10,0" Width="100">
+                    <System:String>FOLDER</System:String>
+                    <System:String>Ascending</System:String>
+                    <System:String>Descending</System:String>
+                </ComboBox>
+            </DockPanel>
+        </DockPanel>
+    </StackPanel>
+</UserControl>

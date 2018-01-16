@@ -1,0 +1,51 @@
+﻿<UserControl x:Class="vimage_settings.ContextMenu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:vimage_settings"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="450" >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="35" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Margin="4">
+            <CheckBox IsChecked="{Binding ContextMenuShowMargin}" Grid.Row="0" Content="Show margin/checkboxes" Margin="0" VerticalAlignment="Center" />
+            <DockPanel HorizontalAlignment="Right">
+                <Label Content="Insert animation menu at index"/>
+                <xctk:IntegerUpDown Value="{Binding ContextMenu_Animation_InsertAtIndex}" Minimum="0" Margin="10,0" Width="50" HorizontalAlignment="Right" />
+            </DockPanel>
+        </DockPanel>
+        
+        <TabControl Name="Tabs" Grid.Row="1" Background="#FFF0F0F0">
+            <TabItem Header="General">
+                <ScrollViewer Name="ContextMenuItems_GeneralScroll" VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <StackPanel Name="ContextMenuItems_General" />
+                        <local:ContextMenuEditorCanvas x:Name="ContextMenuItems_GeneralCanvas" />
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Animation">
+                <ScrollViewer Name="ContextMenuItems_AnimationScroll" VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <StackPanel Name="ContextMenuItems_Animation" />
+                        <local:ContextMenuEditorCanvas x:Name="ContextMenuItems_AnimationCanvas" />
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+
+        <Button Grid.Row="2" Width="24" Height="24" HorizontalAlignment="Left" Margin="5" BorderBrush="#FFACACAC" Click="Add_Click">
+            <Button.Content>
+                <Image Source="../Resources/add.png" Width="18" Height="18" />
+            </Button.Content>
+        </Button>
+        <Button Grid.Row="2" Width="70" Height="25" HorizontalAlignment="Right" Margin="5" Click="Default_Click">Default</Button>
+    </Grid>
+</UserControl>

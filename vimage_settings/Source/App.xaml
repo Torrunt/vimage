@@ -1,0 +1,12 @@
+﻿<Application x:Class="vimage_settings.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:vimage_settings"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <Style TargetType="{x:Type CheckBox}">
+            <Setter Property="Margin" Value="0,0,0,10" />
+        </Style>
+        <local:EnumConverter xmlns:converter="clr-namespace:vimage_settings" x:Key="EnumConverter"/>
+    </Application.Resources>
+</Application>

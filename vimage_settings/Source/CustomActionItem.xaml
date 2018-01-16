@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="vimage_settings.CustomActionItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:vimage_settings"
+             mc:Ignorable="d" 
+             d:DesignHeight="30" d:DesignWidth="450">
+    <Grid Margin="2">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="4*" />
+            <ColumnDefinition Width="24" />
+        </Grid.ColumnDefinitions>
+
+        <TextBox Name="ItemName" Grid.Column="0" Height="25" VerticalContentAlignment="Center" VerticalAlignment="Center" CharacterCasing="Upper" Margin="0,0,2,0" />
+        <TextBox Name="ItemAction" Grid.Column="1" Height="25" VerticalContentAlignment="Center" VerticalAlignment="Center" Margin="0,0,2,0" />
+        <Button Grid.Column="3" Width="24" Height="25" BorderBrush="#FFACACAC" Click="Delete_Click" >
+            <Button.Content>
+                <Image Source="../Resources/cross.png" Width="16" Height="16" />
+            </Button.Content>
+        </Button>
+    </Grid>
+</UserControl>

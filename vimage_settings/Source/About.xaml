@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="vimage_settings.About"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:vimage_settings"
+      mc:Ignorable="d" 
+      d:DesignHeight="400" d:DesignWidth="450" Margin="2">
+
+    <StackPanel>
+        <DockPanel>
+            <Label Content="vimage" FontWeight="SemiBold" FontSize="26" />
+            <Label Content="version #" FontSize="18" HorizontalAlignment="Right" VerticalAlignment="Center" />
+        </DockPanel>
+        <TextBlock VerticalAlignment="Center" Margin="5,0,0,0" LineHeight="20">
+            A simplistic image viewer for Windows.
+            <LineBreak /><LineBreak />
+            <Hyperlink NavigateUri="http://torrunt.net/vimage" RequestNavigate="Hyperlink_RequestNavigate">torrunt.net/vimage</Hyperlink>
+            <LineBreak />
+            <Hyperlink NavigateUri="http://github.com/Torrunt/vimage" RequestNavigate="Hyperlink_RequestNavigate">github.com/Torrunt/vimage</Hyperlink>
+            <LineBreak /><LineBreak />
+            Created by Corey Zeke Womack (Torrunt) - <Hyperlink NavigateUri="mailto:me@torrunt.net" RequestNavigate="Hyperlink_RequestNavigate">me@torrunt.net</Hyperlink>
+            <LineBreak />
+            Image Loading via DevIL - <Hyperlink NavigateUri="http://openil.sourceforge.net" RequestNavigate="Hyperlink_RequestNavigate">openil.sourceforge.net</Hyperlink>
+            <LineBreak />
+            Icons - <Hyperlink NavigateUri="http://www.famfamfam.com/lab/icons/silk" RequestNavigate="Hyperlink_RequestNavigate">famfamfam.com/lab/icons/silk</Hyperlink>
+            <LineBreak />
+            ExifLib - <Hyperlink NavigateUri="https://www.codeproject.com/articles/36342/exiflib-a-fast-exif-data-extractor-for-net-2-0" RequestNavigate="Hyperlink_RequestNavigate">Simon McKenzie @ CodeProject.com</Hyperlink>
+            <LineBreak />
+            CrashReporter.NET - <Hyperlink NavigateUri="https://crashreporterdotnet.codeplex.com" RequestNavigate="Hyperlink_RequestNavigate">crashreporterdotnet.codeplex.com/</Hyperlink>
+        </TextBlock>
+    </StackPanel>
+</UserControl>
