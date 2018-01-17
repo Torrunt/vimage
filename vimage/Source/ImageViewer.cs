@@ -263,14 +263,28 @@ namespace vimage
                     if (DragLimitToBoundsMod)
                     {
                         // limit to monitor bounds
-                        IntRect currentBounds = ImageViewerUtils.GetCurrentBounds(Window.Position + DragPos);
+                        IntRect currentBounds = ImageViewerUtils.GetCurrentBounds(Mouse.GetPosition());
 
-                        if (NextWindowPos.X < currentBounds.Left)
+                        if (Window.Size.X > currentBounds.Width)
+                        {
+                            if (NextWindowPos.X > currentBounds.Left)
+                                NextWindowPos.X = currentBounds.Left;
+                            else if (NextWindowPos.X < currentBounds.Left + currentBounds.Width - Window.Size.X)
+                                NextWindowPos.X = currentBounds.Left + currentBounds.Width - (int)Window.Size.X;
+                        }
+                        else if (NextWindowPos.X < currentBounds.Left)
                             NextWindowPos.X = currentBounds.Left;
                         else if (NextWindowPos.X > currentBounds.Left + currentBounds.Width - Window.Size.X)
                             NextWindowPos.X = currentBounds.Left + currentBounds.Width - (int)Window.Size.X;
 
-                        if (NextWindowPos.Y < currentBounds.Top)
+                        if (Window.Size.Y > currentBounds.Height)
+                        {
+                            if (NextWindowPos.Y > currentBounds.Top)
+                                NextWindowPos.Y = currentBounds.Top;
+                            else if (NextWindowPos.Y < currentBounds.Top + currentBounds.Height - Window.Size.Y)
+                                NextWindowPos.Y = currentBounds.Top + currentBounds.Height - (int)Window.Size.Y;
+                        }
+                        else if (NextWindowPos.Y < currentBounds.Top)
                             NextWindowPos.Y = currentBounds.Top;
                         else if (NextWindowPos.Y > currentBounds.Top + currentBounds.Height - Window.Size.Y)
                             NextWindowPos.Y = currentBounds.Top + currentBounds.Height - (int)Window.Size.Y;
@@ -544,11 +558,12 @@ namespace vimage
             IntRect currentBounds = new IntRect();
             if (DragLimitToBoundsMod)
             {
-                currentBounds = ImageViewerUtils.GetCurrentBounds(Window.Position + DragPos);
-                if (value > CurrentZoom && (Window.Size.X >= currentBounds.Width || Window.Size.Y >= currentBounds.Height))
+                currentBounds = ImageViewerUtils.GetCurrentBounds(Mouse.GetPosition());
+                if (value >= CurrentZoom && (Window.Size.X >= currentBounds.Width || Window.Size.Y >= currentBounds.Height))
                     return;
             }
 
+            float originalZoom = CurrentZoom;
             CurrentZoom = value;
             
             Dragging = false;
@@ -580,25 +595,30 @@ namespace vimage
                 if (NextWindowSize.X > currentBounds.Width || NextWindowSize.Y > currentBounds.Height)
                 {
                     // recalculate zoom size
-                    if (currentBounds.Height < currentBounds.Width)
-                    {
-                        if (Image.Rotation == 90 || Image.Rotation == 270)
-                            CurrentZoom = 1 + (((float)currentBounds.Height - Image.Texture.Size.X) / Image.Texture.Size.X);
-                        else
-                            CurrentZoom = 1 + (((float)currentBounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y);
-                    }
-                    else
-                    {
-                        if (Image.Rotation == 90 || Image.Rotation == 270)
-                            CurrentZoom = 1 + (((float)currentBounds.Width - Image.Texture.Size.Y) / Image.Texture.Size.Y);
-                        else
-                            CurrentZoom = 1 + (((float)currentBounds.Width - Image.Texture.Size.X) / Image.Texture.Size.X);
-                    }
+                    float monitorRatio = (float)currentBounds.Width / currentBounds.Height;
+                    float windowRatio = (float)NextWindowSize.X / NextWindowSize.Y;
 
-                    if (Image.Rotation == 0 || Image.Rotation == 180)
-                        NextWindowSize = new Vector2u((uint)Math.Ceiling(Image.Texture.Size.X * CurrentZoom), (uint)Math.Ceiling(Image.Texture.Size.Y * CurrentZoom));
+                    if (windowRatio <= monitorRatio)
+                    {
+                        // limit to monitor height
+                        float r = (float)currentBounds.Height / NextWindowSize.Y;
+                        NextWindowSize = new Vector2u((uint)(NextWindowSize.X * r), (uint)currentBounds.Height);
+                    }
                     else
-                        NextWindowSize = new Vector2u((uint)Math.Ceiling(Image.Texture.Size.Y * CurrentZoom), (uint)Math.Ceiling(Image.Texture.Size.X * CurrentZoom));
+                    {
+                        // limit to monitor width
+                        float r = (float)currentBounds.Width / NextWindowSize.X;
+                        NextWindowSize = new Vector2u((uint)currentBounds.Width, (uint)(NextWindowSize.Y * r));
+                    }
+                    CurrentZoom = (float)NextWindowSize.X / ((Image.Rotation == 0 || Image.Rotation == 180) ? Image.Texture.Size.X : Image.Texture.Size.Y);
+
+                    if (center && CurrentZoom != originalZoom)
+                    {
+                        Vector2i difference = new Vector2i((int)NextWindowSize.X, (int)NextWindowSize.Y) - new Vector2i((int)Window.Size.X, (int)Window.Size.Y);
+                        NextWindowPos = new Vector2i(Window.Position.X - (difference.X / 2), Window.Position.Y - (difference.Y / 2));
+                    }
+                    else
+                        NextWindowPos = Window.Position;
                 }
 
                 if (NextWindowPos.X < currentBounds.Left)
