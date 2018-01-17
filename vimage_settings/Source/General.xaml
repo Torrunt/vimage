@@ -17,7 +17,25 @@
     <StackPanel>
         <CheckBox IsChecked="{Binding Setting_OpenAtMousePosition}" Content="Open images at mouse position" ToolTip="When an image is opened it will be centered at the current mouse position (commonly where the image file is)."/>
         <CheckBox IsChecked="{Binding Setting_SmoothingDefault}" Content="Smooth images by default"/>
-        <CheckBox IsChecked="{Binding Setting_BackgroundForImagesWithTransparencyDefault}" Content="Show background behind images with transparency" ToolTip="Images with partial transparency will have a grey background behind them."/>
+        <CheckBox IsChecked="{Binding Setting_BackgroundForImagesWithTransparencyDefault}" Content="Show background behind images with transparency" ToolTip="Images with partial transparency will have a background behind them."/>
+        <DockPanel ToolTip="For transparent images (when transparency is turned off)" Height="15" Margin="0,0,0,10">
+            <Border OverridesDefaultStyle="true" Width="14" Height="13" Margin="1,0,5,0" BorderThickness="1">
+                <DockPanel Width="13" Height="12" ClipToBounds="true" >
+                    <xctk:ColorPicker Width="17" Height="15" ShowTabHeaders="false" ColorMode="ColorCanvas" SelectedColor="{Binding Setting_BackgroundColour}" ShowDropDownButton="False" Padding="0" BorderThickness="0" Margin="-2,-4,0,0" />
+                </DockPanel>
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="BorderBrush" Value="#FF707070"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="#FF5593FF" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+            </Border>
+            <Label Content="Background colour" Padding="-4,0,0,0" Margin="0,-1,0,0"/>
+        </DockPanel>
         <CheckBox IsChecked="{Binding Setting_PositionLargeWideImagesInCorner}" Content="Position large/wide images in corner (ie: wallpapers/screenshots)" ToolTip="Images that are wider than or the same width as the current monitor will be placed in the top left corner."/>
         <CheckBox IsChecked="{Binding Setting_PreloadNextImage}" Content="Preload next image" ToolTip="When using the next/prev image buttons, the image after the one just loaded will be loaded as well."/>
         <CheckBox IsChecked="{Binding Setting_OpenSettingsEXE}" Content="Use vimage_settings.exe (otherwise will open config.txt directly)" ToolTip="What will open when the 'Open Config' button is clicked or the shortcut is used."/>

@@ -68,6 +68,11 @@ namespace vimage
             get { return (Boolean)Settings["BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT"]; }
             set { Settings["BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT"] = value; }
         }
+        public string Setting_BackgroundColour
+        {
+            get { return (string)Settings["BACKGROUNDCOLOUR"]; }
+            set { Settings["BACKGROUNDCOLOUR"] = value; }
+        } 
         public int Setting_LimitImagesToMonitor
         {
             get { return (int)Settings["LIMITIMAGESTOMONITOR"]; }
@@ -186,6 +191,7 @@ namespace vimage
                 { "OPENATMOUSEPOSITION", true },
                 { "SMOOTHINGDEFAULT", true },
                 { "BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT", false },
+                { "BACKGROUNDCOLOUR", "#FFE6E6E6" },
                 { "LIMITIMAGESTOMONITOR", AUTO },
                 { "POSITIONLARGEWIDEIMAGESINCORNER", true },
                 { "PRELOADNEXTIMAGE", true },
@@ -580,6 +586,7 @@ namespace vimage
             WriteSetting(writer, "OpenAtMousePosition", Setting_OpenAtMousePosition);
             WriteSetting(writer, "SmoothingDefault", Setting_SmoothingDefault);
             WriteSetting(writer, "BackgroundForImagesWithTransparencyDefault", Setting_BackgroundForImagesWithTransparencyDefault);
+            WriteSetting(writer, "BackgroundColour", Setting_BackgroundColour);
             WriteSetting(writer, "LimitImagesToMonitor", Setting_LimitImagesToMonitor, "0=NONE, 1=HEIGHT, 2=WIDTH, 3=AUTO");
             WriteSetting(writer, "PositionLargeWideImagesInCorner", Setting_PositionLargeWideImagesInCorner, 
                 "ie: Desktop Wallpapers and Screenshots");

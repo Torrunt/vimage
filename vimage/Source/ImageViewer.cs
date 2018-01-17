@@ -61,6 +61,7 @@ namespace vimage
         /// <summary>If true will resize based on working area instead of bounds (ie: screen area minus task bar).</summary>
         private bool FitToMonitorAlt = false;
         public bool BackgroundsForImagesWithTransparency = false;
+        public Color BackgroundColour = new Color(230, 230, 230);
         public bool AlwaysOnTop = false;
         private bool AlwaysOnTopForced = false;
         /// <summary>
@@ -109,6 +110,8 @@ namespace vimage
                 ConfigFileWatcher.EnableRaisingEvents = true;
             }
             BackgroundsForImagesWithTransparency = Config.Setting_BackgroundForImagesWithTransparencyDefault;
+            System.Drawing.Color backColour = System.Drawing.ColorTranslator.FromHtml(Config.Setting_BackgroundColour);
+            BackgroundColour = new Color(backColour.R, backColour.G, backColour.B, backColour.A);
 
             // Get Image
             ChangeImage(file);
@@ -288,7 +291,7 @@ namespace vimage
             if (!BackgroundsForImagesWithTransparency)
                 Window.Clear(new Color(0, 0, 0, 0));
             else
-                Window.Clear(new Color(230, 230, 230));
+                Window.Clear(BackgroundColour);
             // Display Image
             Window.Draw(Image);
             // Update the window
@@ -1206,8 +1209,20 @@ namespace vimage
         {
             Config.Init();
             Config.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
+
+            // Update ContextMenu
             ContextMenu.LoadItems(Config.ContextMenu, Config.ContextMenu_Animation, Config.ContextMenu_Animation_InsertAtIndex);
             ContextMenu.Setup(true);
+
+            // Update Background Colour?
+            System.Drawing.Color backColour = System.Drawing.ColorTranslator.FromHtml(Config.Setting_BackgroundColour);
+            Color newBackColour = new Color(backColour.R, backColour.G, backColour.B, backColour.A);
+            if (BackgroundColour != newBackColour)
+            {
+                BackgroundColour = newBackColour;
+                if (BackgroundsForImagesWithTransparency)
+                    Update();
+            }
         }
         private void OnConfigChanged(object source, FileSystemEventArgs e)
         {
