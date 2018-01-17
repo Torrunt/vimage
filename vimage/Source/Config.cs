@@ -336,8 +336,7 @@ namespace vimage
             ContextMenu.Add(new { name = "Rotate Clockwise", func = MenuFuncs.ROTATE_CLOCKWISE });
             ContextMenu.Add(new { name = "Rotate Anti-Clockwise", func = MenuFuncs.ROTATE_ANTICLOCKWISE });
             ContextMenu.Add(new { name = "Flip", func = MenuFuncs.FLIP });
-            ContextMenu.Add(new { name = "Fit to monitor height", func = MenuFuncs.FIT_TO_HEIGHT });
-            ContextMenu.Add(new { name = "Fit to monitor width", func = MenuFuncs.FIT_TO_WIDTH });
+            ContextMenu.Add(new { name = "Fit to monitor", func = MenuFuncs.FIT_TO_AUTO });
             ContextMenu.Add(new { name = "Reset Image", func = MenuFuncs.RESET_IMAGE });
             ContextMenu.Add(new { name = "Smoothing", func = MenuFuncs.TOGGLE_SMOOTHING });
             ContextMenu.Add(new { name = "Background", func = MenuFuncs.TOGGLE_BACKGROUND });

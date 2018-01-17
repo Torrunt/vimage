@@ -213,6 +213,7 @@ namespace vimage
                 case MenuFuncs.FLIP: ImageViewer.FlipImage(); return;
                 case MenuFuncs.FIT_TO_HEIGHT: ImageViewer.ToggleFitToMonitor(Config.HEIGHT); return;
                 case MenuFuncs.FIT_TO_WIDTH: ImageViewer.ToggleFitToMonitor(Config.WIDTH); return;
+                case MenuFuncs.FIT_TO_AUTO: ImageViewer.ToggleFitToMonitor(Config.AUTO); return;
                 case MenuFuncs.RESET_IMAGE: ImageViewer.ResetImage(); return;
                 case MenuFuncs.TOGGLE_SMOOTHING: ImageViewer.ToggleSmoothing(); return;
                 case MenuFuncs.TOGGLE_BACKGROUND: ImageViewer.ToggleBackground(); return;
