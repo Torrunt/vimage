@@ -17,7 +17,7 @@
     </UserControl.Resources>
     
     <DockPanel LastChildFill="True">
-        <Label Name="ControlName" Width="220" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="0,0,8,0" />
+        <Label Name="ControlName" Width="220" VerticalAlignment="Center" HorizontalContentAlignment="Right" DockPanel.Dock="Left" Margin="0,0,8,0" />
         <Button Width="52" Height="25" HorizontalAlignment="Right" DockPanel.Dock="Right" Click="Clear_Click" Margin="0,0,5,0">Clear</Button>
         <TextBox Name="ControlSetting" Height="25" VerticalContentAlignment="Center" VerticalAlignment="Center" IsReadOnly="True" BorderThickness="1,1,0,1" GotFocus="ControlSetting_GotFocus" LostFocus="ControlSetting_LostFocus" IsTabStop="False" />
     </DockPanel>
