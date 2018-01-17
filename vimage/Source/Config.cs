@@ -837,10 +837,10 @@ namespace vimage
                 return false;
 
             // not key-combo but Ctrl, Shift or Alt is down?
-            if ((CtrlDown && !Control.Contains((int)Keyboard.Key.LControl)) ||
-                (ShiftDown && !Control.Contains((int)Keyboard.Key.LShift)) ||
-                (AltDown && !Control.Contains((int)Keyboard.Key.LAlt)))
-                return false;
+            if ((CtrlDown && Control.Contains((int)Keyboard.Key.LControl)) ||
+                (ShiftDown && Control.Contains((int)Keyboard.Key.LShift)) ||
+                (AltDown && Control.Contains((int)Keyboard.Key.LAlt)))
+                return true;
 
             foreach (Keyboard.Key key in Control)
             {
