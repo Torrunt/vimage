@@ -38,7 +38,7 @@
         </DockPanel>
         <CheckBox IsChecked="{Binding Setting_PositionLargeWideImagesInCorner}" Content="Position large/wide images in corner (ie: wallpapers/screenshots)" ToolTip="Images that are wider than or the same width as the current monitor will be placed in the top left corner."/>
         <CheckBox IsChecked="{Binding Setting_PreloadNextImage}" Content="Preload next image" ToolTip="When using the next/prev image buttons, the image after the one just loaded will be loaded as well."/>
-        <CheckBox IsChecked="{Binding Setting_OpenSettingsEXE}" Content="Use vimage_settings.exe (otherwise will open config.txt directly)" ToolTip="What will open when the 'Open Config' button is clicked or the shortcut is used."/>
+        <CheckBox IsChecked="{Binding Setting_OpenSettingsEXE}" Content="Use vimage__settings.exe (otherwise will open config.txt directly)" ToolTip="What will open when the 'Open Config' button/shortcut is used."/>
         <CheckBox IsChecked="{Binding Setting_ListenForConfigChanges}" Content="Listen for setting changes" ToolTip="If ticked, vimage will reload settings automatically when they are changed."/>
 
         <DockPanel>

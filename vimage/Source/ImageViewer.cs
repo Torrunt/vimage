@@ -49,6 +49,7 @@ namespace vimage
         private bool Dragging = false;
         private Vector2i DragPos = new Vector2i();
         private Vector2i MousePos = new Vector2i();
+        private bool DragLimitToBoundsMod = false;
         private bool ZoomAlt = false;
         private bool ZoomFaster = false;
         private float CurrentZoom = 1;
@@ -259,6 +260,21 @@ namespace vimage
                 if (Dragging)
                 {
                     NextWindowPos = new Vector2i(Mouse.GetPosition().X - DragPos.X, Mouse.GetPosition().Y - DragPos.Y);
+                    if (DragLimitToBoundsMod)
+                    {
+                        // limit to monitor bounds
+                        IntRect currentBounds = ImageViewerUtils.GetCurrentBounds(Window.Position + DragPos);
+
+                        if (NextWindowPos.X < currentBounds.Left)
+                            NextWindowPos.X = currentBounds.Left;
+                        else if (NextWindowPos.X > currentBounds.Left + currentBounds.Width - Window.Size.X)
+                            NextWindowPos.X = currentBounds.Left + currentBounds.Width - (int)Window.Size.X;
+
+                        if (NextWindowPos.Y < currentBounds.Top)
+                            NextWindowPos.Y = currentBounds.Top;
+                        else if (NextWindowPos.Y > currentBounds.Top + currentBounds.Height - Window.Size.Y)
+                            NextWindowPos.Y = currentBounds.Top + currentBounds.Height - (int)Window.Size.Y;
+                    }
                     Window.Position = NextWindowPos;
                 }
 
@@ -437,6 +453,7 @@ namespace vimage
             ZoomFaster = false;
             ZoomAlt = false;
             FitToMonitorAlt = false;
+            DragLimitToBoundsMod = false;
 
             if ((Keyboard.Key)code == Keyboard.Key.LControl)
                 Config.CtrlDown = false;
@@ -466,6 +483,9 @@ namespace vimage
                 ZoomFaster = true;
             if (Config.IsControl(code, Config.Control_ZoomAlt))
                 ZoomAlt = true;
+
+            if (Config.IsControl(code, Config.Control_DragLimitToMonitorBounds))
+                DragLimitToBoundsMod = true;
 
             // Fit To Monitor Height Alternative
             if (Config.IsControl(code, Config.Control_FitToMonitorAlt))
@@ -521,6 +541,14 @@ namespace vimage
             if (value > CurrentZoom && (uint)Math.Ceiling(Image.Texture.Size.X * value) >= Texture.MaximumSize)
                 value = CurrentZoom;
 
+            IntRect currentBounds = new IntRect();
+            if (DragLimitToBoundsMod)
+            {
+                currentBounds = ImageViewerUtils.GetCurrentBounds(Window.Position + DragPos);
+                if (value > CurrentZoom && (Window.Size.X >= currentBounds.Width || Window.Size.Y >= currentBounds.Height))
+                    return;
+            }
+
             CurrentZoom = value;
             
             Dragging = false;
@@ -544,6 +572,44 @@ namespace vimage
                 else
                     NextWindowSize = new Vector2u((uint)Math.Ceiling(Image.Texture.Size.Y * CurrentZoom), (uint)Math.Ceiling(Image.Texture.Size.X * CurrentZoom));
                 NextWindowPos = Window.Position;
+            }
+
+            if (DragLimitToBoundsMod)
+            {
+                // limit to monitor bounds
+                if (NextWindowSize.X > currentBounds.Width || NextWindowSize.Y > currentBounds.Height)
+                {
+                    // recalculate zoom size
+                    if (currentBounds.Height < currentBounds.Width)
+                    {
+                        if (Image.Rotation == 90 || Image.Rotation == 270)
+                            CurrentZoom = 1 + (((float)currentBounds.Height - Image.Texture.Size.X) / Image.Texture.Size.X);
+                        else
+                            CurrentZoom = 1 + (((float)currentBounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y);
+                    }
+                    else
+                    {
+                        if (Image.Rotation == 90 || Image.Rotation == 270)
+                            CurrentZoom = 1 + (((float)currentBounds.Width - Image.Texture.Size.Y) / Image.Texture.Size.Y);
+                        else
+                            CurrentZoom = 1 + (((float)currentBounds.Width - Image.Texture.Size.X) / Image.Texture.Size.X);
+                    }
+
+                    if (Image.Rotation == 0 || Image.Rotation == 180)
+                        NextWindowSize = new Vector2u((uint)Math.Ceiling(Image.Texture.Size.X * CurrentZoom), (uint)Math.Ceiling(Image.Texture.Size.Y * CurrentZoom));
+                    else
+                        NextWindowSize = new Vector2u((uint)Math.Ceiling(Image.Texture.Size.Y * CurrentZoom), (uint)Math.Ceiling(Image.Texture.Size.X * CurrentZoom));
+                }
+
+                if (NextWindowPos.X < currentBounds.Left)
+                    NextWindowPos.X = currentBounds.Left;
+                else if (NextWindowPos.X > currentBounds.Left + currentBounds.Width - NextWindowSize.X)
+                    NextWindowPos.X = currentBounds.Left + currentBounds.Width - (int)NextWindowSize.X;
+
+                if (NextWindowPos.Y < currentBounds.Top)
+                    NextWindowPos.Y = currentBounds.Top;
+                else if (NextWindowPos.Y > currentBounds.Top + currentBounds.Height - NextWindowSize.Y)
+                    NextWindowPos.Y = currentBounds.Top + currentBounds.Height - (int)NextWindowSize.Y;
             }
 
             Updated = true;

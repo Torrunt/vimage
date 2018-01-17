@@ -28,6 +28,7 @@ namespace vimage
         public List<int> Control_FitToMonitorAlt = new List<int>();
         public List<int> Control_ZoomFaster = new List<int>();
         public List<int> Control_ZoomAlt = new List<int>();
+        public List<int> Control_DragLimitToMonitorBounds = new List<int>();
         public List<int> Control_ToggleSmoothing = new List<int>();
         public List<int> Control_ToggleBackgroundForTransparency = new List<int>();
         public List<int> Control_ToggleAlwaysOnTop = new List<int>();
@@ -48,7 +49,7 @@ namespace vimage
         public List<string> ControlNames = new List<string>()
         {
             "Drag", "Close", "Open Context Menu", "Prev Image", "Next Image", "Rotate Clockwise", "Rotate Anti-Clockwise", "Flip",
-            "Fit To Monitor Auto", "Fit To Monitor Width", "Fit To Monitor Height", "Fit To Monitor Alt", "Zoom Faster", "Zoom Alt",
+            "Fit To Monitor Auto", "Fit To Monitor Width", "Fit To Monitor Height", "Fit To Monitor Alt", "Zoom Faster", "Zoom Alt", "Drag Limit to Monitor Bounds",
             "Toggle Smoothing", "Toggle Background For Transparency", "Toggle Always On Top", "Pause Animation", "Prev Frame", "Next Frame",
             "Open Config", "Reload Config", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Random Image"
         };
@@ -172,7 +173,7 @@ namespace vimage
             {
                 Control_Drag, Control_Close, Control_OpenContextMenu, Control_PrevImage, Control_NextImage, Control_RotateClockwise,
                 Control_RotateAntiClockwise, Control_Flip, Control_FitToMonitorHeight, Control_FitToMonitorWidth, Control_FitToMonitorAuto,
-                Control_FitToMonitorAlt, Control_ZoomFaster, Control_ZoomAlt, Control_ToggleSmoothing, Control_ToggleBackgroundForTransparency,
+                Control_FitToMonitorAlt, Control_ZoomFaster, Control_ZoomAlt, Control_DragLimitToMonitorBounds, Control_ToggleSmoothing, Control_ToggleBackgroundForTransparency,
                 Control_ToggleAlwaysOnTop, Control_PauseAnimation, Control_PrevFrame, Control_NextFrame, Control_OpenConfig, Control_ReloadConfig,
                 Control_ResetImage, Control_OpenAtLocation, Control_Delete, Control_Copy, Control_CopyAsImage, Control_OpenDuplicateImage, Control_RandomImage
             };
@@ -220,6 +221,7 @@ namespace vimage
                 { "FITTOMONITORALT", Control_FitToMonitorAlt },
                 { "ZOOMFASTER", Control_ZoomFaster },
                 { "ZOOMALT", Control_ZoomAlt },
+                { "DRAGLIMITTOMONITORBOUNDS", Control_DragLimitToMonitorBounds },
                 { "TOGGLESMOOTHING", Control_ToggleSmoothing },
                 { "TOGGLEBACKGROUNDFORTRANSPARENCY", Control_ToggleBackgroundForTransparency },
                 { "TOGGLEALWAYSONTOP", Control_ToggleAlwaysOnTop },
@@ -262,6 +264,7 @@ namespace vimage
             Control_FitToMonitorAlt.Clear();
             Control_ZoomFaster.Clear();
             Control_ZoomAlt.Clear();
+            Control_DragLimitToMonitorBounds.Clear();
             Control_ToggleSmoothing.Clear();
             Control_ToggleBackgroundForTransparency.Clear();
             Control_ToggleAlwaysOnTop.Clear();
@@ -292,6 +295,7 @@ namespace vimage
             SetControls(Control_FitToMonitorAlt, "RSHIFT", "LSHIFT");
             SetControls(Control_ZoomFaster, "RSHIFT", "LSHIFT");
             SetControls(Control_ZoomAlt, "RCTRL", "CTRL");
+            SetControls(Control_DragLimitToMonitorBounds, "ALT");
             SetControls(Control_ToggleSmoothing, "S");
             SetControls(Control_ToggleBackgroundForTransparency, "T");
             SetControls(Control_ToggleAlwaysOnTop, "L");
@@ -623,6 +627,7 @@ namespace vimage
             WriteControl(writer, "FitToMonitorAlt", Control_FitToMonitorAlt);
             WriteControl(writer, "ZoomFaster", Control_ZoomFaster);
             WriteControl(writer, "ZoomAlt", Control_ZoomAlt);
+            WriteControl(writer, "DragLimitToMonitorBounds", Control_DragLimitToMonitorBounds);
             WriteControl(writer, "ToggleSmoothing", Control_ToggleSmoothing);
             WriteControl(writer, "ToggleBackgroundForTransparency", Control_ToggleBackgroundForTransparency);
             WriteControl(writer, "ToggleAlwaysOnTop", Control_ToggleAlwaysOnTop);
