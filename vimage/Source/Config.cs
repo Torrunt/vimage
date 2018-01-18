@@ -832,6 +832,8 @@ namespace vimage
         public static bool IsControl(Keyboard.Key keyCode, List<int> Control)
         {
             // Keyboard key?
+            if (Control.Count == 0)
+                return false;
 
             // key-combo?
             if (Control.Count > 2 && Control[0] == -2 && (keyCode == (Keyboard.Key)Control[1] ||
@@ -845,6 +847,9 @@ namespace vimage
                 (ShiftDown && Control.Contains((int)Keyboard.Key.LShift)) ||
                 (AltDown && Control.Contains((int)Keyboard.Key.LAlt)))
                 return true;
+
+            if (Control[0] != -2 && (CtrlDown || ShiftDown || AltDown))
+                return false;
 
             foreach (Keyboard.Key key in Control)
             {
