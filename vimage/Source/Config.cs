@@ -44,6 +44,10 @@ namespace vimage
         public List<int> Control_CopyAsImage = new List<int>();
         public List<int> Control_OpenDuplicateImage = new List<int>();
         public List<int> Control_RandomImage = new List<int>();
+        public List<int> Control_MoveLeft = new List<int>();
+        public List<int> Control_MoveRight = new List<int>();
+        public List<int> Control_MoveUp = new List<int>();
+        public List<int> Control_MoveDown = new List<int>();
 
         public List<List<int>> Controls;
         public List<string> ControlNames = new List<string>()
@@ -51,7 +55,8 @@ namespace vimage
             "Drag", "Close", "Open Context Menu", "Prev Image", "Next Image", "Rotate Clockwise", "Rotate Anti-Clockwise", "Flip",
             "Fit To Monitor Auto", "Fit To Monitor Width", "Fit To Monitor Height", "Fit To Monitor Alt", "Zoom Faster", "Zoom Alt", "Drag Limit to Monitor Bounds",
             "Toggle Smoothing", "Toggle Background For Transparency", "Toggle Always On Top", "Pause Animation", "Prev Frame", "Next Frame",
-            "Open Config", "Reload Config", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Random Image"
+            "Open Config", "Reload Config", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Random Image",
+            "Move Left", "Move Right", "Move Up", "Move Down"
         };
 
         public bool Setting_OpenAtMousePosition
@@ -124,6 +129,16 @@ namespace vimage
             get { return (int)Settings["ZOOMSPEEDFAST"]; }
             set { Settings["ZOOMSPEEDFAST"] = value; }
         }
+        public int Setting_MoveSpeed
+        {
+            get { return (int)Settings["MOVESPEED"]; }
+            set { Settings["MOVESPEED"] = value; }
+        }
+        public int Setting_MoveSpeedFast
+        {
+            get { return (int)Settings["MOVESPEEDFAST"]; }
+            set { Settings["MOVESPEEDFAST"] = value; }
+        }
 
         public int Setting_SettingsAppWidth
         {
@@ -175,7 +190,8 @@ namespace vimage
                 Control_RotateAntiClockwise, Control_Flip, Control_FitToMonitorHeight, Control_FitToMonitorWidth, Control_FitToMonitorAuto,
                 Control_FitToMonitorAlt, Control_ZoomFaster, Control_ZoomAlt, Control_DragLimitToMonitorBounds, Control_ToggleSmoothing, Control_ToggleBackgroundForTransparency,
                 Control_ToggleAlwaysOnTop, Control_PauseAnimation, Control_PrevFrame, Control_NextFrame, Control_OpenConfig, Control_ReloadConfig,
-                Control_ResetImage, Control_OpenAtLocation, Control_Delete, Control_Copy, Control_CopyAsImage, Control_OpenDuplicateImage, Control_RandomImage
+                Control_ResetImage, Control_OpenAtLocation, Control_Delete, Control_Copy, Control_CopyAsImage, Control_OpenDuplicateImage, Control_RandomImage,
+                Control_MoveLeft, Control_MoveRight, Control_MoveUp, Control_MoveDown
             };
 
             Init();
@@ -202,6 +218,8 @@ namespace vimage
                 { "SMOOTHINGMINIMAGESIZE", 65 },
                 { "ZOOMSPEED", 2 },
                 { "ZOOMSPEEDFAST", 10 },
+                { "MOVESPEED", 2 },
+                { "MOVESPEEDFAST", 10 },
                 { "SETTINGSAPPWIDTH", 600 },
                 { "SETTINGSAPPHEIGHT", 550 },
                 { "DEFAULTSORTBY", SortBy.FolderDefault },
@@ -237,6 +255,10 @@ namespace vimage
                 { "COPYASIMAGE", Control_CopyAsImage },
                 { "OPENDUPLICATEIMAGE", Control_OpenDuplicateImage },
                 { "RANDOMIMAGE", Control_RandomImage },
+                { "MOVELEFT", Control_MoveLeft },
+                { "MOVERIGHT", Control_MoveRight },
+                { "MOVEUP", Control_MoveUp },
+                { "MOVEDOWN", Control_MoveDown },
 
                 { "CONTEXTMENU", ContextMenu },
                 { "CONTEXTMENU_ANIMATION", ContextMenu_Animation },
@@ -280,6 +302,10 @@ namespace vimage
             Control_CopyAsImage.Clear();
             Control_OpenDuplicateImage.Clear();
             Control_RandomImage.Clear();
+            Control_MoveLeft.Clear();
+            Control_MoveRight.Clear();
+            Control_MoveUp.Clear();
+            Control_MoveDown.Clear();
 
             SetControls(Control_Drag, "MOUSELEFT");
             SetControls(Control_Close, "ESC", "BACKSPACE");
@@ -311,6 +337,10 @@ namespace vimage
             SetControls(Control_CopyAsImage, "ALT+C");
             SetControls(Control_OpenDuplicateImage, "D");
             SetControls(Control_RandomImage, "M");
+            SetControls(Control_MoveLeft, "CTRL+LEFT");
+            SetControls(Control_MoveRight, "CTRL+RIGHT");
+            SetControls(Control_MoveUp, "CTRL+UP");
+            SetControls(Control_MoveDown, "CTRL+DOWN");
         }
         public void SetDefaultContextMenu()
         {
@@ -604,6 +634,8 @@ namespace vimage
                 "images smaller than this will not have smoothing turned on (if 0, all images with use smoothing)");
             WriteSetting(writer, "ZoomSpeed", Setting_ZoomSpeed);
             WriteSetting(writer, "ZoomSpeedFast", Setting_ZoomSpeedFast);
+            WriteSetting(writer, "MoveSpeed", Setting_MoveSpeed);
+            WriteSetting(writer, "MoveSpeedFast", Setting_MoveSpeedFast);
             WriteSetting(writer, "SettingsAppWidth", Setting_SettingsAppWidth);
             WriteSetting(writer, "SettingsAppHeight", Setting_SettingsAppHeight);
             WriteSetting(writer, "DefaultSortBy", (int)Setting_DefaultSortBy);
@@ -642,6 +674,10 @@ namespace vimage
             WriteControl(writer, "CopyAsImage", Control_CopyAsImage);
             WriteControl(writer, "OpenDuplicateImage", Control_OpenDuplicateImage);
             WriteControl(writer, "RandomImage", Control_RandomImage);
+            WriteControl(writer, "MoveLeft", Control_MoveLeft);
+            WriteControl(writer, "MoveRight", Control_MoveRight);
+            WriteControl(writer, "MoveUp", Control_MoveUp);
+            WriteControl(writer, "MoveDown", Control_MoveDown);
 
             writer.Write(Environment.NewLine);
             writer.Write("// Context Menu" + Environment.NewLine);
@@ -843,13 +879,16 @@ namespace vimage
                 return false;
 
             // not key-combo but Ctrl, Shift or Alt is down?
-            if ((CtrlDown && Control.Contains((int)Keyboard.Key.LControl)) ||
-                (ShiftDown && Control.Contains((int)Keyboard.Key.LShift)) ||
-                (AltDown && Control.Contains((int)Keyboard.Key.LAlt)))
-                return true;
+            if (Control[0] != -2)
+            {
+                if ((CtrlDown && Control.Contains((int)Keyboard.Key.LControl)) ||
+                    (ShiftDown && Control.Contains((int)Keyboard.Key.LShift)) ||
+                    (AltDown && Control.Contains((int)Keyboard.Key.LAlt)))
+                    return true;
 
-            if (Control[0] != -2 && (CtrlDown || ShiftDown || AltDown))
-                return false;
+                if (CtrlDown || ShiftDown || AltDown)
+                    return false;
+            }
 
             foreach (Keyboard.Key key in Control)
             {

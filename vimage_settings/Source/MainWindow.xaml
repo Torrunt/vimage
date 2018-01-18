@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:vimage_settings"
         mc:Ignorable="d"
-        Title="vimage settings" Height="{Binding Setting_SettingsAppHeight, Mode=TwoWay}" Width="{Binding Setting_SettingsAppWidth, Mode=TwoWay}" Icon="../Resources/icon.ico" MinWidth="450" MinHeight="320">
+        Title="vimage settings" Height="{Binding Setting_SettingsAppHeight, Mode=TwoWay}" Width="{Binding Setting_SettingsAppWidth, Mode=TwoWay}" Icon="../Resources/icon.ico" MinWidth="450" MinHeight="300">
     <DockPanel>
         <DockPanel DockPanel.Dock="Bottom" Margin="4">
             <TextBlock VerticalAlignment="Center" Margin="5,0,0,0">
@@ -30,7 +30,9 @@
                 <local:CustomActions x:Name="CustomActions" />
             </TabItem>
             <TabItem Header="About">
-                <local:About />
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <local:About />
+                </ScrollViewer>
             </TabItem>
         </TabControl>
     </DockPanel>

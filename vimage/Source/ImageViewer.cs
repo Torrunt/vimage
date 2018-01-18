@@ -505,6 +505,31 @@ namespace vimage
             if (Config.IsControl(code, Config.Control_FitToMonitorAlt))
                 FitToMonitorAlt = true;
 
+            // Moving
+            if (!Dragging)
+            {
+                if (Config.IsControl(code, Config.Control_MoveLeft))
+                {
+                    NextWindowPos.X -= ZoomFaster ? Config.Setting_MoveSpeedFast : Config.Setting_MoveSpeed;
+                    Window.Position = NextWindowPos;
+                }
+                else if (Config.IsControl(code, Config.Control_MoveRight))
+                {
+                    NextWindowPos.X += ZoomFaster ? Config.Setting_MoveSpeedFast : Config.Setting_MoveSpeed;
+                    Window.Position = NextWindowPos;
+                }
+                if (Config.IsControl(code, Config.Control_MoveUp))
+                {
+                    NextWindowPos.Y -= ZoomFaster ? Config.Setting_MoveSpeedFast : Config.Setting_MoveSpeed;
+                    Window.Position = NextWindowPos;
+                }
+                if (Config.IsControl(code, Config.Control_MoveDown))
+                {
+                    NextWindowPos.Y += ZoomFaster ? Config.Setting_MoveSpeedFast : Config.Setting_MoveSpeed;
+                    Window.Position = NextWindowPos;
+                }
+            }
+
             if ((Keyboard.Key)code == Keyboard.Key.LControl)
                 Config.CtrlDown = true;
             if ((Keyboard.Key)code == Keyboard.Key.LShift)

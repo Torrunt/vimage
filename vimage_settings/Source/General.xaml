@@ -7,7 +7,7 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="vimage_settings.General"
              mc:Ignorable="d" 
-             d:DesignHeight="400" d:DesignWidth="450" Margin="2">
+             d:DesignHeight="420" d:DesignWidth="450" Margin="2">
     <UserControl.Resources>
         <Style TargetType="{x:Type Label}">
             <Setter Property="VerticalAlignment" Value="Center" />
@@ -63,9 +63,17 @@
             <Label Content="Zoom Speed"/>
             <xctk:IntegerUpDown Value="{Binding Setting_ZoomSpeed}" FormatString="0\%" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
-        <DockPanel ToolTip="Zoom speed when holding down SHIFT (default)">
+        <DockPanel ToolTip="Zoom speed when holding down 'Zoom Faster' (SHIFT by default)">
             <Label Content="Zoom Speed Fast"/>
             <xctk:IntegerUpDown Value="{Binding Setting_ZoomSpeedFast}" FormatString="0\%" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+        </DockPanel>
+        <DockPanel ToolTip="Speed at which the image moves when using the movement key binds">
+            <Label Content="Move Speed"/>
+            <xctk:IntegerUpDown Value="{Binding Setting_MoveSpeed}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+        </DockPanel>
+        <DockPanel ToolTip="Move speed when holding down 'Zoom Faster' (SHIFT by default)">
+            <Label Content="Move Speed Fast"/>
+            <xctk:IntegerUpDown Value="{Binding Setting_MoveSpeedFast}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
         <DockPanel ToolTip="Default sorting when stepping through images in a folder.&#x0a;(FOLDER = Sort the same way Windows is sorting the folder)">
             <Label Content="Default Sorting" />
