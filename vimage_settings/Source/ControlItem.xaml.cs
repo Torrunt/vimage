@@ -83,7 +83,8 @@ namespace vimage_settings
 
             // Update Control and Text Box
             int bind = (int)Config.StringToKey(key);
-            if (Controls.IndexOf(bind) == -1)
+            int i = Controls.IndexOf(bind);
+            if (i == -1 || (i > 1 && Controls[i-2] == -2))
             {
                 if (canBeKeyCombo)
                 {
@@ -103,10 +104,14 @@ namespace vimage_settings
                         c = (int)SFML.Window.Keyboard.Key.RAlt;
                     if (c != -1 && c != bind)
                     {
+                        if (i != -1 && Controls.IndexOf(c) != -1)
+                            return;
                         Controls.Add(-2);
                         Controls.Add(c);
                         RecordedKeyCombo = true;
                     }
+                    else if (i != -1)
+                        return;
                 }
                 Controls.Add(bind);
                 UpdateBindings();
