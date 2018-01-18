@@ -464,10 +464,15 @@ namespace vimage
                     DoCustomAction((Config.CustomActions.Where(a => (a as dynamic).name == (Config.CustomActionBindings[i] as dynamic).name).First() as dynamic).func);
             }
 
-            ZoomFaster = false;
-            ZoomAlt = false;
-            FitToMonitorAlt = false;
-            DragLimitToBoundsMod = false;
+            // Zooming - release
+            if (Config.IsControl(code, Config.Control_ZoomFaster))
+                ZoomFaster = false;
+            if (Config.IsControl(code, Config.Control_ZoomAlt))
+                ZoomAlt = false;
+            if (Config.IsControl(code, Config.Control_DragLimitToMonitorBounds))
+                DragLimitToBoundsMod = false;
+            if (Config.IsControl(code, Config.Control_FitToMonitorAlt))
+                FitToMonitorAlt = false;
 
             if ((Keyboard.Key)code == Keyboard.Key.LControl)
                 Config.CtrlDown = false;
@@ -475,6 +480,12 @@ namespace vimage
                 Config.ShiftDown = false;
             if ((Keyboard.Key)code == Keyboard.Key.LAlt)
                 Config.AltDown = false;
+            if ((Keyboard.Key)code == Keyboard.Key.RControl)
+                Config.RCtrlDown = false;
+            if ((Keyboard.Key)code == Keyboard.Key.RShift)
+                Config.RShiftDown = false;
+            if ((Keyboard.Key)code == Keyboard.Key.RAlt)
+                Config.RAltDown = false;
         }
         private void ControlDown(object code)
         {
@@ -497,11 +508,8 @@ namespace vimage
                 ZoomFaster = true;
             if (Config.IsControl(code, Config.Control_ZoomAlt))
                 ZoomAlt = true;
-
             if (Config.IsControl(code, Config.Control_DragLimitToMonitorBounds))
                 DragLimitToBoundsMod = true;
-
-            // Fit To Monitor Height Alternative
             if (Config.IsControl(code, Config.Control_FitToMonitorAlt))
                 FitToMonitorAlt = true;
 
@@ -536,6 +544,12 @@ namespace vimage
                 Config.ShiftDown = true;
             if ((Keyboard.Key)code == Keyboard.Key.LAlt)
                 Config.AltDown = true;
+            if ((Keyboard.Key)code == Keyboard.Key.RControl)
+                Config.RCtrlDown = true;
+            if ((Keyboard.Key)code == Keyboard.Key.RShift)
+                Config.RShiftDown = true;
+            if ((Keyboard.Key)code == Keyboard.Key.RAlt)
+                Config.RAltDown = true;
         }
      
 

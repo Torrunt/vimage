@@ -13,6 +13,9 @@ namespace vimage
         public static bool CtrlDown = false;
         public static bool ShiftDown = false;
         public static bool AltDown = false;
+        public static bool RCtrlDown = false;
+        public static bool RShiftDown = false;
+        public static bool RAltDown = false;
 
         public List<int> Control_Drag = new List<int>();
         public List<int> Control_Close = new List<int>();
@@ -335,12 +338,12 @@ namespace vimage
             SetControls(Control_Delete, "DELETE");
             SetControls(Control_Copy, "CTRL+C");
             SetControls(Control_CopyAsImage, "ALT+C");
-            SetControls(Control_OpenDuplicateImage, "D");
+            SetControls(Control_OpenDuplicateImage, "C");
             SetControls(Control_RandomImage, "M");
-            SetControls(Control_MoveLeft, "CTRL+LEFT");
-            SetControls(Control_MoveRight, "CTRL+RIGHT");
-            SetControls(Control_MoveUp, "CTRL+UP");
-            SetControls(Control_MoveDown, "CTRL+DOWN");
+            SetControls(Control_MoveLeft, "CTRL+LEFT", "RCTRL+LEFT");
+            SetControls(Control_MoveRight, "CTRL+RIGHT", "RCTRL+RIGHT");
+            SetControls(Control_MoveUp, "CTRL+UP", "RCTRL+UP");
+            SetControls(Control_MoveDown, "CTRL+DOWN", "RCTRL+DOWN");
         }
         public void SetDefaultContextMenu()
         {
@@ -871,31 +874,41 @@ namespace vimage
             if (Control.Count == 0)
                 return false;
 
-            // key-combo?
-            if (Control.Count > 2 && Control[0] == -2 && (keyCode == (Keyboard.Key)Control[1] ||
-                ((Keyboard.Key)Control[1] == Keyboard.Key.LControl && !CtrlDown) ||
-                ((Keyboard.Key)Control[1] == Keyboard.Key.LShift && !ShiftDown) ||
-                ((Keyboard.Key)Control[1] == Keyboard.Key.LAlt && !AltDown)))
+            int index = Control.IndexOf((int)keyCode);
+            if (index == -1)
                 return false;
-
-            // not key-combo but Ctrl, Shift or Alt is down?
-            if (Control[0] != -2)
+            int t = 0;
+            bool value = false;
+            do
             {
-                if ((CtrlDown && Control.Contains((int)Keyboard.Key.LControl)) ||
-                    (ShiftDown && Control.Contains((int)Keyboard.Key.LShift)) ||
-                    (AltDown && Control.Contains((int)Keyboard.Key.LAlt)))
-                    return true;
+                // key-combo?
+                if (index >= 1 && Control[index - 1] == -2)
+                    value = false;
+                else if (index > 1 && Control[index - 2] == -2)
+                {
+                    // key-combo
+                    value = (((Keyboard.Key)Control[index - 1] == Keyboard.Key.LControl && CtrlDown) ||
+                        ((Keyboard.Key)Control[index - 1] == Keyboard.Key.LShift && ShiftDown) ||
+                        ((Keyboard.Key)Control[index - 1] == Keyboard.Key.LAlt && AltDown) ||
+                        ((Keyboard.Key)Control[index - 1] == Keyboard.Key.RControl && RCtrlDown) ||
+                        ((Keyboard.Key)Control[index - 1] == Keyboard.Key.RShift && RShiftDown) ||
+                        ((Keyboard.Key)Control[index - 1] == Keyboard.Key.RAlt && RAltDown));
+                }
+                else if (!KeyModifier(keyCode) && (CtrlDown || ShiftDown || AltDown || RCtrlDown || RShiftDown || RAltDown))
+                    value = false; // don't activate non key-combos if key modifier is down
+                else
+                    value = true;
 
-                if (CtrlDown || ShiftDown || AltDown)
-                    return false;
+                // loop if there might be second binding using the same keyCode (eg: CTRL+UP and RCTRL+UP)
+                if (!value)
+                    index = Control.IndexOf((int)keyCode, index + 1);
+                else
+                    index = -1;
+                t++;
             }
+            while (index != -1);
 
-            foreach (Keyboard.Key key in Control)
-            {
-                if (keyCode == key)
-                    return true;
-            }
-            return false;
+            return value;
         }
         /// <summary> Returns true if Mouse.Button is one of Control bindings. </summary>
         public static bool IsControl(Mouse.Button code, List<int> Control)
@@ -1472,6 +1485,11 @@ namespace vimage
             return "";
         }
 
+        public static bool KeyModifier(Keyboard.Key key)
+        {
+            return key == Keyboard.Key.LControl || key == Keyboard.Key.LShift || key == Keyboard.Key.LAlt ||
+                key == Keyboard.Key.RControl || key == Keyboard.Key.RShift || key == Keyboard.Key.RAlt;
+        }
 
         private static string VariableAmountOfStrings(int amount, string s)
         {
