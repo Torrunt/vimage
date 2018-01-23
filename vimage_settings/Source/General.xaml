@@ -12,29 +12,35 @@
         <Style TargetType="{x:Type Label}">
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
+        <Style x:Key="ColourPickerBorder" TargetType="{x:Type Border}">
+            <Setter Property="BorderBrush" Value="#FF707070"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="#FF5593FF" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
     <StackPanel>
         <CheckBox IsChecked="{Binding Setting_OpenAtMousePosition}" Content="Open images at mouse position" ToolTip="When an image is opened it will be centered at the current mouse position (commonly where the image file is)."/>
         <CheckBox IsChecked="{Binding Setting_SmoothingDefault}" Content="Smooth images by default"/>
         <CheckBox IsChecked="{Binding Setting_BackgroundForImagesWithTransparencyDefault}" Content="Show background behind images with transparency" ToolTip="Images with partial transparency will have a background behind them."/>
-        <DockPanel ToolTip="For transparent images (when transparency is turned off)" Height="15" Margin="0,0,0,10">
-            <Border OverridesDefaultStyle="true" Width="14" Height="13" Margin="1,0,5,0" BorderThickness="1">
+        <DockPanel ToolTip="For transparent images (when transparency is turned off)." Height="15" Margin="0,0,0,10">
+            <Border Style="{StaticResource ColourPickerBorder}" OverridesDefaultStyle="true" Width="14" Height="13" Margin="1,0,5,0" BorderThickness="1">
                 <DockPanel Width="13" Height="12" ClipToBounds="true" >
                     <xctk:ColorPicker Width="17" Height="15" ShowTabHeaders="false" ColorMode="ColorCanvas" SelectedColor="{Binding Setting_BackgroundColour}" ShowDropDownButton="False" Padding="0" BorderThickness="0" Margin="-2,-4,0,0" />
                 </DockPanel>
-                <Border.Style>
-                    <Style TargetType="{x:Type Border}">
-                        <Setter Property="BorderBrush" Value="#FF707070"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="BorderBrush" Value="#FF5593FF" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
             </Border>
             <Label Content="Background colour" Padding="-4,0,0,0" Margin="0,-1,0,0"/>
+        </DockPanel>
+        <DockPanel ToolTip="The transparency of the image when you press the 'Transparency Toggle' button." Height="15" Margin="0,0,0,10">
+            <Border Style="{StaticResource ColourPickerBorder}" OverridesDefaultStyle="true" Width="14" Height="13" Margin="1,0,5,0" BorderThickness="1">
+                <DockPanel Width="13" Height="12" ClipToBounds="true" >
+                    <xctk:ColorPicker Width="17" Height="15" ShowTabHeaders="false" ColorMode="ColorCanvas" SelectedColor="{Binding Setting_TransparencyToggleValue}" ShowDropDownButton="False" Padding="0" BorderThickness="0" Margin="-2,-4,0,0" />
+                </DockPanel>
+            </Border>
+            <Label Content="Transparency toggle value" Padding="-4,0,0,0" Margin="0,-1,0,0"/>
         </DockPanel>
         <CheckBox IsChecked="{Binding Setting_PositionLargeWideImagesInCorner}" Content="Position large/wide images in corner (ie: wallpapers/screenshots)" ToolTip="Images that are wider than or the same width as the current monitor will be placed in the top left corner."/>
         <CheckBox IsChecked="{Binding Setting_PreloadNextImage}" Content="Preload next image" ToolTip="When using the next/prev image buttons, the image after the one just loaded will be loaded as well."/>
@@ -59,19 +65,19 @@
             <Label Content="Don't smooth images smaller than"/>
             <xctk:IntegerUpDown Value="{Binding Setting_SmoothingMinImageSize}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
-        <DockPanel>
+        <DockPanel ToolTip="Speed at which image resizes when zooming with Mouse Wheel.&#x0a;Also affects 'Transparency Hold'.">
             <Label Content="Zoom Speed"/>
             <xctk:IntegerUpDown Value="{Binding Setting_ZoomSpeed}" FormatString="0\%" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
-        <DockPanel ToolTip="Zoom speed when holding down 'Zoom Faster' (SHIFT by default)">
+        <DockPanel ToolTip="Zoom speed when holding down 'Zoom Faster' (SHIFT by default).">
             <Label Content="Zoom Speed Fast"/>
             <xctk:IntegerUpDown Value="{Binding Setting_ZoomSpeedFast}" FormatString="0\%" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
-        <DockPanel ToolTip="Speed at which the image moves when using the movement key binds">
+        <DockPanel ToolTip="Speed at which the image moves when using the movement key binds.">
             <Label Content="Move Speed"/>
             <xctk:IntegerUpDown Value="{Binding Setting_MoveSpeed}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
-        <DockPanel ToolTip="Move speed when holding down 'Zoom Faster' (SHIFT by default)">
+        <DockPanel ToolTip="Move speed when holding down 'Zoom Faster' (SHIFT by default).">
             <Label Content="Move Speed Fast"/>
             <xctk:IntegerUpDown Value="{Binding Setting_MoveSpeedFast}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>

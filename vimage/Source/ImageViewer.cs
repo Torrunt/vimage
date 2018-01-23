@@ -32,6 +32,7 @@ namespace vimage
         public List<string> FolderContents = new List<string>();
         public int FolderPosition = 0;
         private ContextMenu ContextMenu;
+        public Color ImageColor = Color.White;
 
         public Config Config;
         private FileSystemWatcher ConfigFileWatcher;
@@ -49,6 +50,7 @@ namespace vimage
         private bool Dragging = false;
         private Vector2i DragPos = new Vector2i();
         private Vector2i MousePos = new Vector2i();
+        private bool TransparencyMod = false;
         private bool DragLimitToBoundsMod = false;
         private bool ZoomAlt = false;
         private bool ZoomFaster = false;
@@ -353,10 +355,22 @@ namespace vimage
         }
         private void OnMouseWheelScrolled(Object sender, MouseWheelScrollEventArgs e)
         {
-            if (e.Delta > 0)
-                Zoom(Math.Min(CurrentZoom + (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MAX), !ZoomAlt);
-            else if (e.Delta < 0)
-                Zoom(Math.Max(CurrentZoom - (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MIN), !ZoomAlt);
+            if (TransparencyMod)
+            {
+                // Change Image Transparency
+                ImageColor = new Color(ImageColor.R, ImageColor.G, ImageColor.B,
+                    (byte)Math.Min(Math.Max(ImageColor.A + ((e.Delta > 0 ? 1 : -1) * (255 * (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)))), 2), 255));
+                Image.Color = ImageColor;
+                Updated = true;
+            }
+            else
+            {
+                // Zooming
+                if (e.Delta > 0)
+                    Zoom(Math.Min(CurrentZoom + (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MAX), !ZoomAlt);
+                else if (e.Delta < 0)
+                    Zoom(Math.Max(CurrentZoom - (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MIN), !ZoomAlt);
+            }
 
             AutomaticallyZoomed = false;
             FitToMonitorHeightForced = false;
@@ -457,6 +471,20 @@ namespace vimage
             if (Config.IsControl(code, Config.Control_RandomImage))
                 RandomImage();
 
+            // Toggle Image Transparency
+            if (Config.IsControl(code, Config.Control_TransparencyToggle))
+            {
+                if (ImageColor == Color.White)
+                {
+                    System.Drawing.Color colour = System.Drawing.ColorTranslator.FromHtml(Config.Setting_TransparencyToggleValue);
+                    ImageColor = new Color(colour.R, colour.G, colour.B, colour.A);
+                }
+                else
+                    ImageColor = Color.White;
+                Image.Color = ImageColor;
+                Updated = true;
+            }
+
             // Custom Actions
             for (int i = 0; i < Config.CustomActionBindings.Count; i++)
             {
@@ -473,6 +501,8 @@ namespace vimage
                 DragLimitToBoundsMod = false;
             if (Config.IsControl(code, Config.Control_FitToMonitorAlt))
                 FitToMonitorAlt = false;
+            if (Config.IsControl(code, Config.Control_TransparencyHold))
+                TransparencyMod = false;
 
             if ((Keyboard.Key)code == Keyboard.Key.LControl)
                 Config.CtrlDown = false;
@@ -512,6 +542,8 @@ namespace vimage
                 DragLimitToBoundsMod = true;
             if (Config.IsControl(code, Config.Control_FitToMonitorAlt))
                 FitToMonitorAlt = true;
+            if (Config.IsControl(code, Config.Control_TransparencyHold))
+                TransparencyMod = true;
 
             // Moving
             if (!Dragging)
@@ -967,6 +999,10 @@ namespace vimage
                 Image.Data.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
             else
                 Image.Texture.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
+
+            // Color
+            if (ImageColor != Color.White)
+                Image.Color = ImageColor;
 
             // Don't keep current zoom value if it wasn't set by user
             if (AutomaticallyZoomed || FitToMonitorHeightForced)

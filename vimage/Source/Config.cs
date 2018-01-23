@@ -51,6 +51,8 @@ namespace vimage
         public List<int> Control_MoveRight = new List<int>();
         public List<int> Control_MoveUp = new List<int>();
         public List<int> Control_MoveDown = new List<int>();
+        public List<int> Control_TransparencyToggle = new List<int>();
+        public List<int> Control_TransparencyHold = new List<int>();
 
         public List<List<int>> Controls;
         public List<string> ControlNames = new List<string>()
@@ -59,7 +61,7 @@ namespace vimage
             "Fit To Monitor Auto", "Fit To Monitor Width", "Fit To Monitor Height", "Fit To Monitor Alt", "Zoom Faster", "Zoom Alt", "Drag Limit to Monitor Bounds",
             "Toggle Smoothing", "Toggle Background For Transparency", "Toggle Always On Top", "Pause Animation", "Prev Frame", "Next Frame",
             "Open Config", "Reload Config", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Random Image",
-            "Move Left", "Move Right", "Move Up", "Move Down"
+            "Move Left", "Move Right", "Move Up", "Move Down", "Transparency Toggle", "Transparency Hold"
         };
 
         public bool Setting_OpenAtMousePosition
@@ -81,7 +83,12 @@ namespace vimage
         {
             get { return (string)Settings["BACKGROUNDCOLOUR"]; }
             set { Settings["BACKGROUNDCOLOUR"] = value; }
-        } 
+        }
+        public string Setting_TransparencyToggleValue
+        {
+            get { return (string)Settings["TRANSPARENCYTOGGLEVALUE"]; }
+            set { Settings["TRANSPARENCYTOGGLEVALUE"] = value; }
+        }
         public int Setting_LimitImagesToMonitor
         {
             get { return (int)Settings["LIMITIMAGESTOMONITOR"]; }
@@ -194,7 +201,7 @@ namespace vimage
                 Control_FitToMonitorAlt, Control_ZoomFaster, Control_ZoomAlt, Control_DragLimitToMonitorBounds, Control_ToggleSmoothing, Control_ToggleBackgroundForTransparency,
                 Control_ToggleAlwaysOnTop, Control_PauseAnimation, Control_PrevFrame, Control_NextFrame, Control_OpenConfig, Control_ReloadConfig,
                 Control_ResetImage, Control_OpenAtLocation, Control_Delete, Control_Copy, Control_CopyAsImage, Control_OpenDuplicateImage, Control_RandomImage,
-                Control_MoveLeft, Control_MoveRight, Control_MoveUp, Control_MoveDown
+                Control_MoveLeft, Control_MoveRight, Control_MoveUp, Control_MoveDown,Control_TransparencyToggle, Control_TransparencyHold
             };
 
             Init();
@@ -212,6 +219,7 @@ namespace vimage
                 { "SMOOTHINGDEFAULT", true },
                 { "BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT", false },
                 { "BACKGROUNDCOLOUR", "#FFE6E6E6" },
+                { "TRANSPARENCYTOGGLEVALUE", "#64FFFFFF" },
                 { "LIMITIMAGESTOMONITOR", AUTO },
                 { "POSITIONLARGEWIDEIMAGESINCORNER", true },
                 { "PRELOADNEXTIMAGE", true },
@@ -262,6 +270,8 @@ namespace vimage
                 { "MOVERIGHT", Control_MoveRight },
                 { "MOVEUP", Control_MoveUp },
                 { "MOVEDOWN", Control_MoveDown },
+                { "TRANSPARENCYTOGGLE", Control_TransparencyToggle },
+                { "TRANSPARENCYHOLD", Control_TransparencyHold },
 
                 { "CONTEXTMENU", ContextMenu },
                 { "CONTEXTMENU_ANIMATION", ContextMenu_Animation },
@@ -309,6 +319,8 @@ namespace vimage
             Control_MoveRight.Clear();
             Control_MoveUp.Clear();
             Control_MoveDown.Clear();
+            Control_TransparencyToggle.Clear();
+            Control_TransparencyHold.Clear();
 
             SetControls(Control_Drag, "MOUSELEFT");
             SetControls(Control_Close, "ESC", "BACKSPACE");
@@ -326,7 +338,7 @@ namespace vimage
             SetControls(Control_ZoomAlt, "RCTRL", "CTRL");
             SetControls(Control_DragLimitToMonitorBounds, "ALT");
             SetControls(Control_ToggleSmoothing, "S");
-            SetControls(Control_ToggleBackgroundForTransparency, "T");
+            SetControls(Control_ToggleBackgroundForTransparency, "B");
             SetControls(Control_ToggleAlwaysOnTop, "L");
             SetControls(Control_PauseAnimation, "SPACE");
             SetControls(Control_PrevFrame, "<");
@@ -344,6 +356,8 @@ namespace vimage
             SetControls(Control_MoveRight, "CTRL+RIGHT", "RCTRL+RIGHT");
             SetControls(Control_MoveUp, "CTRL+UP", "RCTRL+UP");
             SetControls(Control_MoveDown, "CTRL+DOWN", "RCTRL+DOWN");
+            SetControls(Control_TransparencyToggle, "T");
+            SetControls(Control_TransparencyHold, "Y");
         }
         public void SetDefaultContextMenu()
         {
@@ -623,6 +637,7 @@ namespace vimage
             WriteSetting(writer, "SmoothingDefault", Setting_SmoothingDefault);
             WriteSetting(writer, "BackgroundForImagesWithTransparencyDefault", Setting_BackgroundForImagesWithTransparencyDefault);
             WriteSetting(writer, "BackgroundColour", Setting_BackgroundColour);
+            WriteSetting(writer, "TransparencyToggleValue", Setting_TransparencyToggleValue);
             WriteSetting(writer, "LimitImagesToMonitor", Setting_LimitImagesToMonitor, "0=NONE, 1=HEIGHT, 2=WIDTH, 3=AUTO");
             WriteSetting(writer, "PositionLargeWideImagesInCorner", Setting_PositionLargeWideImagesInCorner, 
                 "ie: Desktop Wallpapers and Screenshots");
@@ -681,6 +696,8 @@ namespace vimage
             WriteControl(writer, "MoveRight", Control_MoveRight);
             WriteControl(writer, "MoveUp", Control_MoveUp);
             WriteControl(writer, "MoveDown", Control_MoveDown);
+            WriteControl(writer, "TransparencyToggle", Control_TransparencyToggle);
+            WriteControl(writer, "TransparencyHold", Control_TransparencyHold);
 
             writer.Write(Environment.NewLine);
             writer.Write("// Context Menu" + Environment.NewLine);

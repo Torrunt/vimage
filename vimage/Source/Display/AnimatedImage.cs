@@ -31,6 +31,8 @@ namespace vimage
         public AnimatedImageData Data;
         public Sprite Sprite;
         public new Texture Texture { get { return Sprite.Texture; } private set { } }
+        public Color _Color = Color.White;
+        public Color Color { get { return _Color; } set { _Color = value; if (Sprite != null) Sprite.Color = _Color; } }
 
         public int CurrentFrame;
         public int TotalFrames { get { return Data.Frames.Count; } private set { } }
@@ -50,7 +52,7 @@ namespace vimage
         public AnimatedImage(AnimatedImageData data)
         {
             Data = data;
-
+            
             Sprite = new Sprite(data.Frames[0]);
             AddChild(Sprite);
 
@@ -102,6 +104,8 @@ namespace vimage
             
             RemoveChild(Sprite);
             Sprite = new Sprite(Data.Frames[CurrentFrame]);
+            if (Color != Color.White)
+                Sprite.Color = Color;
             AddChild(Sprite);
 
             CurrentFrameLength = Data.FrameDuration;
