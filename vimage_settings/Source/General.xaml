@@ -23,7 +23,7 @@
     </UserControl.Resources>
 
     <StackPanel>
-        <CheckBox IsChecked="{Binding Setting_OpenAtMousePosition}" Content="Open images at mouse position" ToolTip="When an image is opened it will be centered at the current mouse position (commonly where the image file is)."/>
+        <CheckBox IsChecked="{Binding Setting_OpenAtMousePosition}" Content="Open images at mouse position" ToolTip="When an image is opened it will be centered at the current mouse position (commonly where the image file is).&#x0a;Otherwise it will be centered on the current monitor."/>
         <CheckBox IsChecked="{Binding Setting_SmoothingDefault}" Content="Smooth images by default"/>
         <CheckBox IsChecked="{Binding Setting_BackgroundForImagesWithTransparencyDefault}" Content="Show background behind images with transparency" ToolTip="Images with partial transparency will have a background behind them."/>
         <DockPanel ToolTip="For transparent images (when transparency is turned off)." Height="15" Margin="0,0,0,10">

@@ -43,7 +43,7 @@
 
         <Button Grid.Row="2" Width="24" Height="24" HorizontalAlignment="Left" Margin="5" BorderBrush="#FFACACAC" Click="Add_Click">
             <Button.Content>
-                <Image Source="../Resources/add.png" Width="18" Height="18" />
+                <Image Source="../Resources/add.png" Width="16" Height="16" />
             </Button.Content>
         </Button>
         <Button Grid.Row="2" Width="70" Height="25" HorizontalAlignment="Right" Margin="5" Click="Default_Click">Default</Button>

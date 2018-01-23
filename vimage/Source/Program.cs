@@ -25,7 +25,7 @@ namespace vimage
                     AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
                 }
 
-                ImageViewer imageViewer = new ImageViewer(file);
+                ImageViewer imageViewer = new ImageViewer(file, args);
             }
         }
 

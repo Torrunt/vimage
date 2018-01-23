@@ -80,7 +80,7 @@ namespace vimage
 
         private static readonly Random rnd = new Random();
 
-        public ImageViewer(string file)
+        public ImageViewer(string file, string[] args)
         {
             IL.Initialize();
 
@@ -93,6 +93,7 @@ namespace vimage
 
             // Create Window
             Window = new RenderWindow(new VideoMode(0, 0), File + " - vimage", Styles.None);
+            Window.Position = mousePos;
 
             // Make Window Transparent (can only tell if image being viewed has transparency)
             DWM_BLURBEHIND bb = new DWM_BLURBEHIND();
@@ -126,14 +127,14 @@ namespace vimage
             }
 
             // Position window at mouse position?
-            Vector2i winPos = NextWindowPos;
-            IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position);
-            if (Config.Setting_OpenAtMousePosition &&
-                !(Config.Setting_PositionLargeWideImagesInCorner && CurrentImageSize().X > CurrentImageSize().Y && CurrentImageSize().X * CurrentZoom >= bounds.Width))
+            Vector2i winPos = mousePos;
+            IntRect bounds = ImageViewerUtils.GetCurrentBounds(winPos);
+            if (Config.Setting_PositionLargeWideImagesInCorner && CurrentImageSize().X > CurrentImageSize().Y && CurrentImageSize().X * CurrentZoom >= bounds.Width)
+                winPos = new Vector2i(bounds.Left, bounds.Top);
+            else if (Config.Setting_OpenAtMousePosition)
             {
                 // At Mouse Position
                 winPos = new Vector2i(mousePos.X - (int)(NextWindowSize.X / 2), mousePos.Y - (int)(NextWindowSize.Y / 2));
-
                 if (!FitToMonitorHeightForced)
                 {
                     if (winPos.Y < bounds.Top)
@@ -149,7 +150,13 @@ namespace vimage
                 else if (winPos.X + NextWindowSize.X > bounds.Left + bounds.Width)
                     winPos.X = bounds.Left + bounds.Width - (int)NextWindowSize.X;
             }
+            else
+                winPos = new Vector2i(bounds.Left + (int)((bounds.Width - (Image.Texture.Size.X * CurrentZoom)) / 2), bounds.Top + (int)((bounds.Height - (Image.Texture.Size.Y * CurrentZoom)) / 2));
             NextWindowPos = winPos;
+
+            // Arguments?
+            if (args.Length > 1)
+                ApplyArguments(args, true);
 
             // Display Window
             Window.Size = NextWindowSize;
@@ -467,6 +474,8 @@ namespace vimage
 
             if (Config.IsControl(code, Config.Control_OpenDuplicateImage))
                 OpenDuplicateWindow();
+            if (Config.IsControl(code, Config.Control_OpenFullDuplicateImage))
+                OpenDuplicateWindow(true);
 
             if (Config.IsControl(code, Config.Control_RandomImage))
                 RandomImage();
@@ -625,7 +634,7 @@ namespace vimage
             // Limit zooming to prevent the going past the GPU's max texture size
             if (value > CurrentZoom && (uint)Math.Ceiling(Image.Texture.Size.X * value) >= Texture.MaximumSize)
                 value = CurrentZoom;
-
+            
             IntRect currentBounds = new IntRect();
             if (DragLimitToBoundsMod)
             {
@@ -823,6 +832,13 @@ namespace vimage
             FlippedX = false;
             RotateImage(DefaultRotation);
 
+            // Color
+            if (ImageColor != Color.White)
+            {
+                ImageColor = Color.White;
+                Image.Color = ImageColor;
+            }
+
             // Force Fit To Monitor Height?
             Vector2i imagePos = new Vector2i((int)NextWindowPos.X + ((int)Image.Texture.Size.X / 2), (int)NextWindowPos.Y + ((int)Image.Texture.Size.Y / 2));
             IntRect currentBounds = ImageViewerUtils.GetCurrentBounds(imagePos);
@@ -864,8 +880,8 @@ namespace vimage
             else
                 currentWorkingArea = currentBounds;
 
-            if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X * CurrentZoom > Image.Texture.Size.Y * CurrentZoom && Image.Texture.Size.X * CurrentZoom >= currentWorkingArea.Width)
-                NextWindowPos = new Vector2i(currentWorkingArea.Left, currentWorkingArea.Top);
+            if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X * CurrentZoom > Image.Texture.Size.Y * CurrentZoom && Image.Texture.Size.X * CurrentZoom >= currentBounds.Width)
+                NextWindowPos = new Vector2i(currentBounds.Left, currentBounds.Top);
             else
                 NextWindowPos = new Vector2i(currentWorkingArea.Left + (currentWorkingArea.Width / 2) - ((int)(Image.Texture.Size.X * CurrentZoom) / 2), currentWorkingArea.Top + (currentWorkingArea.Height / 2) - ((int)(Image.Texture.Size.Y * CurrentZoom) / 2));
 
@@ -1344,12 +1360,33 @@ namespace vimage
             Process.Start("explorer.exe", "/select, " + File);
         }
 
-        public void OpenDuplicateWindow()
+        public void OpenDuplicateWindow(bool full = false)
         {
-            Process p = new Process();
-            p.StartInfo.FileName = Application.ExecutablePath;
-            p.StartInfo.Arguments = "\"" + File + "\"";
-            p.Start();
+            ProcessStartInfo startInfo = new ProcessStartInfo(Application.ExecutablePath);
+            startInfo.Arguments = $"\"{File}\"";
+            if (full)
+            {
+                startInfo.Arguments += $" -x {Window.Position.X}";
+                startInfo.Arguments += $" -y {Window.Position.Y}";
+                if (CurrentZoom != 1)
+                    startInfo.Arguments += $" -zoom {CurrentZoom}";
+                if (FlippedX)
+                    startInfo.Arguments += " -flip";
+                if (Image.Rotation != 0)
+                    startInfo.Arguments += $" -rotation {Image.Rotation}";
+                if (AlwaysOnTop)
+                    startInfo.Arguments += " -alwaysOnTop";
+                if (ImageColor != Color.White)
+                {
+                    string colour = "#" + ImageColor.A.ToString("X2", null) + 
+                        ImageColor.R.ToString("X2", null) +
+                        ImageColor.G.ToString("X2", null) +
+                        ImageColor.B.ToString("X2", null);
+                    startInfo.Arguments += $" -colour {colour}";
+                }
+            }
+            Console.WriteLine(startInfo.Arguments);
+            Process.Start(startInfo);
         }
 
         public void OpenConfig()
@@ -1394,17 +1431,97 @@ namespace vimage
 
         public void DoCustomAction(string action)
         {
-            action = action.Replace("%f", "\"" + File + "\"");
-            action = action.Replace("%d", File.Substring(0, File.LastIndexOf('\\') + 1));
+            if (action.IndexOf("-") == 0)
+            {
+                // Apply arguments to current instance of vimage
+                ApplyArguments(action.Split(' '));
+            }
+            else
+            {
+                // Open new process with arguments
+                action = action.Replace("%f", "\"" + File + "\"");
+                action = action.Replace("%d", File.Substring(0, File.LastIndexOf('\\') + 1));
 
-            // Split exe and arguments by the first space (regex to exclude the spaces within the quotes of the exe's path)
-            Regex rgx = new Regex("(?<=^[^\"]*(?:\"[^\"]*\"[^\"]*)*) (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
-            string[] s = rgx.Split(action, 2);
+                // Split exe and arguments by the first space (regex to exclude the spaces within the quotes of the exe's path)
+                Regex rgx = new Regex("(?<=^[^\"]*(?:\"[^\"]*\"[^\"]*)*) (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                string[] s = rgx.Split(action, 2);
 
-            if (s[0].Contains("%"))
-                s[0] = Environment.ExpandEnvironmentVariables(s[0]);
+                if (s[0].Contains("%"))
+                    s[0] = Environment.ExpandEnvironmentVariables(s[0]);
 
-            Process.Start(s[0], s[1]);
+                Process.Start(s[0], s[1]);
+            }
+        }
+
+        public void ApplyArguments(string[] args, bool ignoreFirst = false)
+        {
+            for (int i = ignoreFirst ? 1 : 0; i < args.Length; i++)
+            {
+                int val = -1;
+                switch (args[i])
+                {
+                    case "-x":
+                        val = -1;
+                        if (!int.TryParse(args[i + 1], out val))
+                            val = -1;
+                        if (val != -1)
+                            NextWindowPos.X = val;
+                        i++;
+                        break;
+                    case "-y":
+                        val = -1;
+                        if (!int.TryParse(args[i + 1], out val))
+                            val = -1;
+                        if (val != -1)
+                            NextWindowPos.Y = val;
+                        i++;
+                        break;
+                    case "-zoom":
+                        float z = 0;
+                        if (!float.TryParse(args[i + 1], out z))
+                            z = 0;
+                        if (z != 0)
+                            Zoom(z, true);
+                        i++;
+                        break;
+                    case "-rotation":
+                        val = -1;
+                        if (!int.TryParse(args[i + 1], out val))
+                            val = -1;
+                        if (val != -1 && Image.Rotation != val)
+                            RotateImage(val, false, false);
+                        i++;
+                        break;
+                    case "-colour":
+                        System.Drawing.Color colour = System.Drawing.ColorTranslator.FromHtml(args[i + 1]);
+                        ImageColor = new Color(colour.R, colour.G, colour.B, colour.A);
+                        Image.Color = ImageColor;
+                        Updated = true;
+                        i++;
+                        break;
+                    case "-alwaysOnTop": ForceAlwaysOnTopNextTick = true; break;
+                    case "-flip": FlipImage(); break;
+                    case "-reset": ResetImage(); break;
+                    case "-play": if (Image is AnimatedImage && Image.Playing) Image.Play(); break;
+                    case "-stop": if (Image is AnimatedImage && Image.Playing) Image.Stop(); break;
+                    case "-toggleAnim": ToggleAnimation(); break;
+                    case "-frame":
+                        val = 1;
+                        if (int.TryParse(args[i + 1], out val) && Image is AnimatedImage)
+                        {
+                            (Image as AnimatedImage).SetFrame(val);
+                            Updated = true;
+                        }
+                        i++;
+                        break;
+                    case "-next": NextImage(); break;
+                    case "-prev": PrevImage(); break;
+                    case "-random": RandomImage(); break;
+                    case "-fitToMonitorHeight": ToggleFitToMonitor(Config.HEIGHT); break;
+                    case "-fitToMonitorWidth": ToggleFitToMonitor(Config.WIDTH); break;
+                    case "-fitToMonitorAuto": ToggleFitToMonitor(Config.AUTO); break;
+                }
+            }
         }
 
     }

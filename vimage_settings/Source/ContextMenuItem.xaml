@@ -18,7 +18,7 @@
             <ColumnDefinition Width="24" />
         </Grid.ColumnDefinitions>
         <Border Grid.Column="1" BorderThickness="2,0,0,0" BorderBrush="#FFABADB3" />
-        <Image Source="../Resources/drag.png" Grid.Column="1" Width="16" Height="16" />
+        <Image Source="../Resources/drag.png" Grid.Column="1" Height="16" Margin="6,4,5,4" />
         <TextBox Name="ItemName" Grid.Column="2" Height="25" VerticalContentAlignment="Center" VerticalAlignment="Center" Margin="0" BorderThickness="2,0,1,0" GotKeyboardFocus="ItemName_GotKeyboardFocus" LostKeyboardFocus="ItemName_LostKeyboardFocus" />
         <ComboBox Name="ItemFunction" Grid.Column="3" Height="25" VerticalContentAlignment="Center" VerticalAlignment="Center" Margin="0" BorderThickness="1,0" GotFocus="Item_GotFocus" LostFocus="Item_LostFocus" />
         <Button Name="ButtonDelete" Grid.Column="4" Width="24" Height="25" BorderBrush="#FFACACAC" Click="Delete_Click" BorderThickness="1,0" >

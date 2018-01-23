@@ -46,6 +46,7 @@ namespace vimage
         public List<int> Control_Copy = new List<int>();
         public List<int> Control_CopyAsImage = new List<int>();
         public List<int> Control_OpenDuplicateImage = new List<int>();
+        public List<int> Control_OpenFullDuplicateImage = new List<int>();
         public List<int> Control_RandomImage = new List<int>();
         public List<int> Control_MoveLeft = new List<int>();
         public List<int> Control_MoveRight = new List<int>();
@@ -60,8 +61,8 @@ namespace vimage
             "Drag", "Close", "Open Context Menu", "Prev Image", "Next Image", "Rotate Clockwise", "Rotate Anti-Clockwise", "Flip",
             "Fit To Monitor Auto", "Fit To Monitor Width", "Fit To Monitor Height", "Fit To Monitor Alt", "Zoom Faster", "Zoom Alt", "Drag Limit to Monitor Bounds",
             "Toggle Smoothing", "Toggle Background For Transparency", "Toggle Always On Top", "Pause Animation", "Prev Frame", "Next Frame",
-            "Open Config", "Reload Config", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Random Image",
-            "Move Left", "Move Right", "Move Up", "Move Down", "Transparency Toggle", "Transparency Hold"
+            "Open Config", "Reload Config", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Open Full Duplicate Image",
+            "Random Image", "Move Left", "Move Right", "Move Up", "Move Down", "Transparency Toggle", "Transparency Hold"
         };
 
         public bool Setting_OpenAtMousePosition
@@ -200,8 +201,8 @@ namespace vimage
                 Control_RotateAntiClockwise, Control_Flip, Control_FitToMonitorHeight, Control_FitToMonitorWidth, Control_FitToMonitorAuto,
                 Control_FitToMonitorAlt, Control_ZoomFaster, Control_ZoomAlt, Control_DragLimitToMonitorBounds, Control_ToggleSmoothing, Control_ToggleBackgroundForTransparency,
                 Control_ToggleAlwaysOnTop, Control_PauseAnimation, Control_PrevFrame, Control_NextFrame, Control_OpenConfig, Control_ReloadConfig,
-                Control_ResetImage, Control_OpenAtLocation, Control_Delete, Control_Copy, Control_CopyAsImage, Control_OpenDuplicateImage, Control_RandomImage,
-                Control_MoveLeft, Control_MoveRight, Control_MoveUp, Control_MoveDown,Control_TransparencyToggle, Control_TransparencyHold
+                Control_ResetImage, Control_OpenAtLocation, Control_Delete, Control_Copy, Control_CopyAsImage, Control_OpenDuplicateImage, Control_OpenFullDuplicateImage,
+                Control_RandomImage, Control_MoveLeft, Control_MoveRight, Control_MoveUp, Control_MoveDown,Control_TransparencyToggle, Control_TransparencyHold
             };
 
             Init();
@@ -265,6 +266,7 @@ namespace vimage
                 { "COPY", Control_Copy },
                 { "COPYASIMAGE", Control_CopyAsImage },
                 { "OPENDUPLICATEIMAGE", Control_OpenDuplicateImage },
+                { "OPENFULLDUPLICATEIMAGE", Control_OpenFullDuplicateImage },
                 { "RANDOMIMAGE", Control_RandomImage },
                 { "MOVELEFT", Control_MoveLeft },
                 { "MOVERIGHT", Control_MoveRight },
@@ -314,6 +316,7 @@ namespace vimage
             Control_Copy.Clear();
             Control_CopyAsImage.Clear();
             Control_OpenDuplicateImage.Clear();
+            Control_OpenFullDuplicateImage.Clear();
             Control_RandomImage.Clear();
             Control_MoveLeft.Clear();
             Control_MoveRight.Clear();
@@ -351,6 +354,7 @@ namespace vimage
             SetControls(Control_Copy, "CTRL+C");
             SetControls(Control_CopyAsImage, "ALT+C");
             SetControls(Control_OpenDuplicateImage, "C");
+            SetControls(Control_OpenFullDuplicateImage, "SHIFT+C");
             SetControls(Control_RandomImage, "M");
             SetControls(Control_MoveLeft, "CTRL+LEFT", "RCTRL+LEFT");
             SetControls(Control_MoveRight, "CTRL+RIGHT", "RCTRL+RIGHT");
@@ -585,7 +589,7 @@ namespace vimage
 
                     // trim tabs from name, spaces from map name
                     splitValues[0] = splitValues[0].Replace("\t", "").Trim();
-                    if (splitValues[1].IndexOf('\"') != -1 || splitValues[1].IndexOf('%') != -1)
+                    if (splitValues[1].IndexOf('\"') != -1 || splitValues[1].IndexOf('%') != -1 || splitValues[1].IndexOf('-') != -1)
                         splitValues[1] = splitValues[1].Trim(); // keep spaces if custom action
                     else
                         splitValues[1] = RemoveSpaces(splitValues[1]);
@@ -691,6 +695,7 @@ namespace vimage
             WriteControl(writer, "Copy", Control_Copy);
             WriteControl(writer, "CopyAsImage", Control_CopyAsImage);
             WriteControl(writer, "OpenDuplicateImage", Control_OpenDuplicateImage);
+            WriteControl(writer, "OpenFullDuplicateImage", Control_OpenFullDuplicateImage);
             WriteControl(writer, "RandomImage", Control_RandomImage);
             WriteControl(writer, "MoveLeft", Control_MoveLeft);
             WriteControl(writer, "MoveRight", Control_MoveRight);
