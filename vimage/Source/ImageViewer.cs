@@ -34,6 +34,7 @@ namespace vimage
         private ContextMenu ContextMenu;
         public Color ImageColor = Color.White;
         public Vector2u Size = new Vector2u();
+        public int Rotation = 0;
 
         public Config Config;
         private FileSystemWatcher ConfigFileWatcher;
@@ -68,7 +69,7 @@ namespace vimage
         public Color BackgroundColour = new Color(230, 230, 230);
         private bool Cropping = false;
         private RectangleShape CropRect;
-        private Vector2i CropStartPos = new Vector2i();
+        private Vector2f CropStartPos = new Vector2f();
         public bool AlwaysOnTop = false;
         private bool AlwaysOnTopForced = false;
         /// <summary>
@@ -306,16 +307,17 @@ namespace vimage
                 }
                 else if (Cropping)
                 {
-                    Vector2i m = Mouse.GetPosition(Window);
-                    if (m.X < 0)
-                        m.X = 0;
-                    else if (m.X > Window.Size.X)
-                        m.X = (int)Window.Size.X;
-                    if (m.Y < 0)
-                        m.Y = 0;
-                    else if (m.Y > Window.Size.Y)
-                        m.Y = (int)Window.Size.Y;
-                    CropRect.Size = new Vector2f((m.X * (1 / CurrentZoom)) - CropRect.Position.X, (m.Y * (1 / CurrentZoom)) - CropRect.Position.Y);
+                    MousePos = Mouse.GetPosition(Window);
+                    if (MousePos.X < 0)
+                        MousePos.X = 0;
+                    else if (MousePos.X > Window.Size.X)
+                        MousePos.X = (int)Window.Size.X;
+                    if (MousePos.Y < 0)
+                        MousePos.Y = 0;
+                    else if (MousePos.Y > Window.Size.Y)
+                        MousePos.Y = (int)Window.Size.Y;
+                    Vector2f m = Window.MapPixelToCoords(MousePos);
+                    CropRect.Size = new Vector2f(m.X - CropRect.Position.X, m.Y - CropRect.Position.Y);
                     Redraw();
                 }
 
@@ -431,9 +433,9 @@ namespace vimage
 
             // Rotate Image
             if (Config.IsControl(code, Config.Control_RotateClockwise))
-                RotateImage((int)Image.Rotation + 90);
+                RotateImage(Rotation + 90);
             if (Config.IsControl(code, Config.Control_RotateAntiClockwise))
-                RotateImage((int)Image.Rotation - 90);
+                RotateImage(Rotation - 90);
 
             // Flip Image
             if (Config.IsControl(code, Config.Control_Flip))
@@ -681,7 +683,7 @@ namespace vimage
             if (center)
             {
                 Vector2u newSize;
-                if (Image.Rotation == 0 || Image.Rotation == 180)
+                if (Rotation == 0 || Rotation == 180)
                     newSize = new Vector2u((uint)Math.Ceiling(Size.X * CurrentZoom), (uint)Math.Ceiling(Size.Y * CurrentZoom));
                 else
                     newSize = new Vector2u((uint)Math.Ceiling(Size.Y * CurrentZoom), (uint)Math.Ceiling(Size.X * CurrentZoom));
@@ -691,7 +693,7 @@ namespace vimage
             }
             else
             {
-                if (Image.Rotation == 0 || Image.Rotation == 180)
+                if (Rotation == 0 || Rotation == 180)
                     NextWindowSize = new Vector2u((uint)Math.Ceiling(Size.X * CurrentZoom), (uint)Math.Ceiling(Size.Y * CurrentZoom));
                 else
                     NextWindowSize = new Vector2u((uint)Math.Ceiling(Size.Y * CurrentZoom), (uint)Math.Ceiling(Size.X * CurrentZoom));
@@ -719,7 +721,7 @@ namespace vimage
                         float r = (float)currentBounds.Width / NextWindowSize.X;
                         NextWindowSize = new Vector2u((uint)currentBounds.Width, (uint)(NextWindowSize.Y * r));
                     }
-                    CurrentZoom = (float)NextWindowSize.X / ((Image.Rotation == 0 || Image.Rotation == 180) ? Size.X : Size.Y);
+                    CurrentZoom = (float)NextWindowSize.X / ((Rotation == 0 || Rotation == 180) ? Size.X : Size.Y);
 
                     if (center && CurrentZoom != originalZoom)
                     {
@@ -744,38 +746,32 @@ namespace vimage
             Updated = true;
         }
 
-        public void RotateImage(int Rotation, bool aroundCenter = true, bool updateWindowSize = true)
+        public void RotateImage(int rotation, bool aroundCenter = true, bool updateWindowSize = true)
         {
-            if (Rotation >= 360)
-                Rotation = 0;
-            else if (Rotation < 0)
-                Rotation = 270;
+            if (rotation >= 360)
+                rotation = 0;
+            else if (rotation < 0)
+                rotation = 270;
+            Rotation = rotation;
 
             Vector2f center = new Vector2f(Window.Position.X + (Window.Size.X / 2), Window.Position.Y + (Window.Size.Y / 2));
             Vector2u WindowSize;
 
             UnforceAlwaysOnTop();
 
-            switch (Rotation)
+            SFML.Graphics.View view = Window.GetView();
+            view.Rotation = -Rotation;
+            if (Rotation == 90 || Rotation == 270)
             {
-                case 90:
-                    Image.Scale = new Vector2f((float)Size.Y / (float)Size.X, (float)Size.X / (float)Size.Y);
-                    Image.Position = new Vector2f((Size.X / 2), (Size.Y / 2));
-                    WindowSize = new Vector2u((uint)(Size.Y * CurrentZoom), (uint)(Size.X * CurrentZoom));
-                    break;
-                case 270:
-                    Image.Scale = new Vector2f((float)Size.Y / (float)Size.X, (float)Size.X / (float)Size.Y);
-                    Image.Position = new Vector2f((Size.X / 2), (Size.Y / 2));
-                    WindowSize = new Vector2u((uint)(Size.Y * CurrentZoom), (uint)(Size.X * CurrentZoom));
-                    break;
-                default:
-                    Image.Scale = new Vector2f(1f, 1f);
-                    Image.Position = new Vector2f((Size.X / 2), (Size.Y / 2));
-                    WindowSize = new Vector2u((uint)(Size.X * CurrentZoom), (uint)(Size.Y * CurrentZoom));
-                    break;
+                WindowSize = new Vector2u((uint)(Size.Y * CurrentZoom), (uint)(Size.X * CurrentZoom));
+                view.Size = new Vector2f(Size.Y, Size.X);
             }
-            Image.Scale = new Vector2f(Math.Abs(Image.Scale.X) * (FlippedX ? -1 : 1), Math.Abs(Image.Scale.Y));
-            Image.Rotation = Rotation;
+            else
+            {
+                WindowSize = new Vector2u((uint)(Size.X * CurrentZoom), (uint)(Size.Y * CurrentZoom));
+                view.Size = new Vector2f(Size.X, Size.Y);
+            }
+            Window.SetView(view);
 
             if (updateWindowSize)
                 NextWindowSize = WindowSize;
@@ -787,12 +783,14 @@ namespace vimage
             Updated = true;
         }
 
-        public Vector2u CurrentImageSize() { return (Image.Rotation == 0 || Image.Rotation == 180) ? Size : new Vector2u(Size.Y, Size.X); }
+        public Vector2u CurrentImageSize() { return (Rotation == 0 || Rotation == 180) ? Size : new Vector2u(Size.Y, Size.X); }
 
         public void FlipImage()
         {
             FlippedX = !FlippedX;
-            Image.Scale = new Vector2f(Math.Abs(Image.Scale.X) * (FlippedX ? -1 : 1), Math.Abs(Image.Scale.Y));
+            SFML.Graphics.View view = Window.GetView();
+            view.Size = new Vector2f(view.Size.X * -1, view.Size.Y); // temp - doesn't currently work with rotation
+            Window.SetView(view);
             Redraw();
         }
 
@@ -823,7 +821,7 @@ namespace vimage
                 if (dimension == Config.HEIGHT)
                 {
                     FitToMonitorHeight = true;
-                    if (Image.Rotation == 90 || Image.Rotation == 270)
+                    if (Rotation == 90 || Rotation == 270)
                         Zoom(1 + (((float)bounds.Height - Size.X) / Size.X), true);
                     else
                         Zoom(1 + (((float)bounds.Height - Size.Y) / Size.Y), true);
@@ -832,7 +830,7 @@ namespace vimage
                 else if (dimension == Config.WIDTH)
                 {
                     FitToMonitorWidth = true;
-                    if (Image.Rotation == 90 || Image.Rotation == 270)
+                    if (Rotation == 90 || Rotation == 270)
                         Zoom(1 + (((float)bounds.Width - Size.Y) / Size.Y), true);
                     else
                         Zoom(1 + (((float)bounds.Width - Size.X) / Size.X), true);
@@ -984,9 +982,6 @@ namespace vimage
                 return;
             Cropping = true;
 
-            if (Window.GetView().Size.X != Image.Texture.Size.X || !(Image.Rotation == 0 || Image.Rotation == 180))
-                return; // temp to prevent breaking
-
             if (CropRect == null)
             {
                 CropRect = new RectangleShape();
@@ -996,8 +991,8 @@ namespace vimage
             }
             CropRect.OutlineThickness = 2 * (1 / CurrentZoom);
 
-            CropStartPos = MousePos;
-            CropRect.Position = new Vector2f(MousePos.X * (1 / CurrentZoom), MousePos.Y * (1 / CurrentZoom));
+            CropStartPos = Window.MapPixelToCoords(MousePos);
+            CropRect.Position = new Vector2f(CropStartPos.X, CropStartPos.Y);
         }
         public void CropEnd()
         {
@@ -1012,8 +1007,10 @@ namespace vimage
                 return;
             }
 
+            Vector2i pos = Window.MapCoordsToPixel(new Vector2f(CropStartPos.X + (CropRect.Size.X < 0 ? CropRect.Size.X : 0), CropStartPos.Y + (CropRect.Size.Y < 0 ? CropRect.Size.Y : 0)));
+
             // Apply crop
-            SFML.Graphics.View view = new SFML.Graphics.View(Window.DefaultView);
+            SFML.Graphics.View view = Window.GetView();
             view.Center = new Vector2f(CropRect.Position.X + (CropRect.Size.X / 2f), CropRect.Position.Y + (CropRect.Size.Y / 2f));
             view.Size = new Vector2f(Math.Abs(CropRect.Size.X), Math.Abs(CropRect.Size.Y));
 
@@ -1021,11 +1018,11 @@ namespace vimage
             Window.SetView(view);
             NextWindowSize = Size;
             Window.Size = NextWindowSize;
-            
+
             if (CurrentZoom != 1)
                 Zoom(CurrentZoom);
-            NextWindowPos = new Vector2i((int)((NextWindowPos.X + CropStartPos.X + (CropRect.Size.X < 0 ? CropRect.Size.X * CurrentZoom : 0)) ),
-                (int)(NextWindowPos.Y + CropStartPos.Y + (CropRect.Size.Y < 0 ? CropRect.Size.Y * CurrentZoom : 0)));
+            
+            NextWindowPos = new Vector2i((int)(NextWindowPos.X + pos.X), (int)(NextWindowPos.Y + pos.Y));
 
             CropRect.Size = new Vector2f();
 
@@ -1070,8 +1067,6 @@ namespace vimage
                 return false;
 
             Size = Image.Texture.Size;
-            Image.Origin = new Vector2f(Size.X / 2, Size.Y / 2);
-            Image.Position = new Vector2f(Size.X / 2, Size.Y / 2);
             DefaultRotation = ImageViewerUtils.GetDefaultRotationFromEXIF(fileName);
 
             return true;
@@ -1080,7 +1075,7 @@ namespace vimage
         {
             Dragging = false;
             Vector2u prevSize = Image == null ? new Vector2u() : Size;
-            float prevRotation = Image == null ? 0 : Image.Rotation;
+            float prevRotation = Image == null ? 0 : Rotation;
             int prevDefaultRotation = DefaultRotation;
 
             IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position +
@@ -1467,8 +1462,8 @@ namespace vimage
                     startInfo.Arguments += $" -zoom {CurrentZoom}";
                 if (FlippedX)
                     startInfo.Arguments += " -flip";
-                if (Image.Rotation != 0)
-                    startInfo.Arguments += $" -rotation {Image.Rotation}";
+                if (Rotation != 0)
+                    startInfo.Arguments += $" -rotation {Rotation}";
                 if (AlwaysOnTop)
                     startInfo.Arguments += " -alwaysOnTop";
                 if (ImageColor != Color.White)
@@ -1583,7 +1578,7 @@ namespace vimage
                         val = -1;
                         if (!int.TryParse(args[i + 1], out val))
                             val = -1;
-                        if (val != -1 && Image.Rotation != val)
+                        if (val != -1 && Rotation != val)
                             RotateImage(val, false, false);
                         i++;
                         break;
