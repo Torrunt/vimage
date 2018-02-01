@@ -33,6 +33,7 @@ namespace vimage
         public int FolderPosition = 0;
         private ContextMenu ContextMenu;
         public Color ImageColor = Color.White;
+        public Vector2u Size = new Vector2u();
 
         public Config Config;
         private FileSystemWatcher ConfigFileWatcher;
@@ -65,6 +66,9 @@ namespace vimage
         private bool FitToMonitorAlt = false;
         public bool BackgroundsForImagesWithTransparency = false;
         public Color BackgroundColour = new Color(230, 230, 230);
+        private bool Cropping = false;
+        private RectangleShape CropRect;
+        private Vector2i CropStartPos = new Vector2i();
         public bool AlwaysOnTop = false;
         private bool AlwaysOnTopForced = false;
         /// <summary>
@@ -151,7 +155,7 @@ namespace vimage
                     winPos.X = bounds.Left + bounds.Width - (int)NextWindowSize.X;
             }
             else
-                winPos = new Vector2i(bounds.Left + (int)((bounds.Width - (Image.Texture.Size.X * CurrentZoom)) / 2), bounds.Top + (int)((bounds.Height - (Image.Texture.Size.Y * CurrentZoom)) / 2));
+                winPos = new Vector2i(bounds.Left + (int)((bounds.Width - (Size.X * CurrentZoom)) / 2), bounds.Top + (int)((bounds.Height - (Size.Y * CurrentZoom)) / 2));
             NextWindowPos = winPos;
 
             // Arguments?
@@ -300,6 +304,20 @@ namespace vimage
                     }
                     Window.Position = NextWindowPos;
                 }
+                else if (Cropping)
+                {
+                    Vector2i m = Mouse.GetPosition(Window);
+                    if (m.X < 0)
+                        m.X = 0;
+                    else if (m.X > Window.Size.X)
+                        m.X = (int)Window.Size.X;
+                    if (m.Y < 0)
+                        m.Y = 0;
+                    else if (m.Y > Window.Size.Y)
+                        m.Y = (int)Window.Size.Y;
+                    CropRect.Size = new Vector2f((m.X * (1 / CurrentZoom)) - CropRect.Position.X, (m.Y * (1 / CurrentZoom)) - CropRect.Position.Y);
+                    Redraw();
+                }
 
                 // Update
                 if (Updated)
@@ -331,8 +349,11 @@ namespace vimage
                 Window.Clear(new Color(0, 0, 0, 0));
             else
                 Window.Clear(BackgroundColour);
-            // Display Image
+            // Draw Image
             Window.Draw(Image);
+            // Draw Other
+            if (Cropping)
+                Window.Draw(CropRect);
             // Update the window
             Window.Display();
         }
@@ -370,7 +391,7 @@ namespace vimage
                 Image.Color = ImageColor;
                 Updated = true;
             }
-            else
+            else if (!Cropping)
             {
                 // Zooming
                 if (e.Delta > 0)
@@ -501,6 +522,10 @@ namespace vimage
                     DoCustomAction((Config.CustomActions.Where(a => (a as dynamic).name == (Config.CustomActionBindings[i] as dynamic).name).First() as dynamic).func);
             }
 
+            // Cropping - release
+            if (Cropping && Config.IsControl(code, Config.Control_Crop))
+                CropEnd();
+
             // Zooming - release
             if (Config.IsControl(code, Config.Control_ZoomFaster))
                 ZoomFaster = false;
@@ -541,6 +566,10 @@ namespace vimage
                 NextFrame();
             if (Config.IsControl(code, Config.Control_PrevFrame))
                 PrevFrame();
+
+            // Cropping - release
+            if (!Cropping && Config.IsControl(code, Config.Control_Crop))
+                CropStart();
 
             // Zooming
             if (Config.IsControl(code, Config.Control_ZoomFaster))
@@ -632,7 +661,7 @@ namespace vimage
         private void Zoom(float value, bool center = false)
         {
             // Limit zooming to prevent the going past the GPU's max texture size
-            if (value > CurrentZoom && (uint)Math.Ceiling(Image.Texture.Size.X * value) >= Texture.MaximumSize)
+            if (value > CurrentZoom && (uint)Math.Ceiling(Size.X * value) >= Texture.MaximumSize)
                 value = CurrentZoom;
             
             IntRect currentBounds = new IntRect();
@@ -653,9 +682,9 @@ namespace vimage
             {
                 Vector2u newSize;
                 if (Image.Rotation == 0 || Image.Rotation == 180)
-                    newSize = new Vector2u((uint)Math.Ceiling(Image.Texture.Size.X * CurrentZoom), (uint)Math.Ceiling(Image.Texture.Size.Y * CurrentZoom));
+                    newSize = new Vector2u((uint)Math.Ceiling(Size.X * CurrentZoom), (uint)Math.Ceiling(Size.Y * CurrentZoom));
                 else
-                    newSize = new Vector2u((uint)Math.Ceiling(Image.Texture.Size.Y * CurrentZoom), (uint)Math.Ceiling(Image.Texture.Size.X * CurrentZoom));
+                    newSize = new Vector2u((uint)Math.Ceiling(Size.Y * CurrentZoom), (uint)Math.Ceiling(Size.X * CurrentZoom));
                 Vector2i difference = new Vector2i((int)newSize.X, (int)newSize.Y) - new Vector2i((int)Window.Size.X, (int)Window.Size.Y);
                 NextWindowSize = newSize;
                 NextWindowPos = new Vector2i(Window.Position.X - (difference.X / 2), Window.Position.Y - (difference.Y / 2));
@@ -663,9 +692,9 @@ namespace vimage
             else
             {
                 if (Image.Rotation == 0 || Image.Rotation == 180)
-                    NextWindowSize = new Vector2u((uint)Math.Ceiling(Image.Texture.Size.X * CurrentZoom), (uint)Math.Ceiling(Image.Texture.Size.Y * CurrentZoom));
+                    NextWindowSize = new Vector2u((uint)Math.Ceiling(Size.X * CurrentZoom), (uint)Math.Ceiling(Size.Y * CurrentZoom));
                 else
-                    NextWindowSize = new Vector2u((uint)Math.Ceiling(Image.Texture.Size.Y * CurrentZoom), (uint)Math.Ceiling(Image.Texture.Size.X * CurrentZoom));
+                    NextWindowSize = new Vector2u((uint)Math.Ceiling(Size.Y * CurrentZoom), (uint)Math.Ceiling(Size.X * CurrentZoom));
                 NextWindowPos = Window.Position;
             }
 
@@ -690,7 +719,7 @@ namespace vimage
                         float r = (float)currentBounds.Width / NextWindowSize.X;
                         NextWindowSize = new Vector2u((uint)currentBounds.Width, (uint)(NextWindowSize.Y * r));
                     }
-                    CurrentZoom = (float)NextWindowSize.X / ((Image.Rotation == 0 || Image.Rotation == 180) ? Image.Texture.Size.X : Image.Texture.Size.Y);
+                    CurrentZoom = (float)NextWindowSize.X / ((Image.Rotation == 0 || Image.Rotation == 180) ? Size.X : Size.Y);
 
                     if (center && CurrentZoom != originalZoom)
                     {
@@ -730,19 +759,19 @@ namespace vimage
             switch (Rotation)
             {
                 case 90:
-                    Image.Scale = new Vector2f((float)Image.Texture.Size.Y / (float)Image.Texture.Size.X, (float)Image.Texture.Size.X / (float)Image.Texture.Size.Y);
-                    Image.Position = new Vector2f((Image.Texture.Size.X / 2), (Image.Texture.Size.Y / 2));
-                    WindowSize = new Vector2u((uint)(Image.Texture.Size.Y * CurrentZoom), (uint)(Image.Texture.Size.X * CurrentZoom));
+                    Image.Scale = new Vector2f((float)Size.Y / (float)Size.X, (float)Size.X / (float)Size.Y);
+                    Image.Position = new Vector2f((Size.X / 2), (Size.Y / 2));
+                    WindowSize = new Vector2u((uint)(Size.Y * CurrentZoom), (uint)(Size.X * CurrentZoom));
                     break;
                 case 270:
-                    Image.Scale = new Vector2f((float)Image.Texture.Size.Y / (float)Image.Texture.Size.X, (float)Image.Texture.Size.X / (float)Image.Texture.Size.Y);
-                    Image.Position = new Vector2f((Image.Texture.Size.X / 2), (Image.Texture.Size.Y / 2));
-                    WindowSize = new Vector2u((uint)(Image.Texture.Size.Y * CurrentZoom), (uint)(Image.Texture.Size.X * CurrentZoom));
+                    Image.Scale = new Vector2f((float)Size.Y / (float)Size.X, (float)Size.X / (float)Size.Y);
+                    Image.Position = new Vector2f((Size.X / 2), (Size.Y / 2));
+                    WindowSize = new Vector2u((uint)(Size.Y * CurrentZoom), (uint)(Size.X * CurrentZoom));
                     break;
                 default:
                     Image.Scale = new Vector2f(1f, 1f);
-                    Image.Position = new Vector2f((Image.Texture.Size.X / 2), (Image.Texture.Size.Y / 2));
-                    WindowSize = new Vector2u((uint)(Image.Texture.Size.X * CurrentZoom), (uint)(Image.Texture.Size.Y * CurrentZoom));
+                    Image.Position = new Vector2f((Size.X / 2), (Size.Y / 2));
+                    WindowSize = new Vector2u((uint)(Size.X * CurrentZoom), (uint)(Size.Y * CurrentZoom));
                     break;
             }
             Image.Scale = new Vector2f(Math.Abs(Image.Scale.X) * (FlippedX ? -1 : 1), Math.Abs(Image.Scale.Y));
@@ -758,7 +787,7 @@ namespace vimage
             Updated = true;
         }
 
-        public Vector2u CurrentImageSize() { return (Image.Rotation == 0 || Image.Rotation == 180) ? Image.Texture.Size : new Vector2u(Image.Texture.Size.Y, Image.Texture.Size.X); }
+        public Vector2u CurrentImageSize() { return (Image.Rotation == 0 || Image.Rotation == 180) ? Size : new Vector2u(Size.Y, Size.X); }
 
         public void FlipImage()
         {
@@ -769,6 +798,9 @@ namespace vimage
 
         public void ToggleFitToMonitor(int dimension)
         {
+            if (Cropping)
+                return;
+
             UnforceAlwaysOnTop();
 
             IntRect bounds;
@@ -792,18 +824,18 @@ namespace vimage
                 {
                     FitToMonitorHeight = true;
                     if (Image.Rotation == 90 || Image.Rotation == 270)
-                        Zoom(1 + (((float)bounds.Height - Image.Texture.Size.X) / Image.Texture.Size.X), true);
+                        Zoom(1 + (((float)bounds.Height - Size.X) / Size.X), true);
                     else
-                        Zoom(1 + (((float)bounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
+                        Zoom(1 + (((float)bounds.Height - Size.Y) / Size.Y), true);
                     NextWindowPos = new Vector2i(NextWindowPos.X, bounds.Top);
                 }
                 else if (dimension == Config.WIDTH)
                 {
                     FitToMonitorWidth = true;
                     if (Image.Rotation == 90 || Image.Rotation == 270)
-                        Zoom(1 + (((float)bounds.Width - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
+                        Zoom(1 + (((float)bounds.Width - Size.Y) / Size.Y), true);
                     else
-                        Zoom(1 + (((float)bounds.Width - Image.Texture.Size.X) / Image.Texture.Size.X), true);
+                        Zoom(1 + (((float)bounds.Width - Size.X) / Size.X), true);
                     NextWindowPos = new Vector2i(bounds.Left, NextWindowPos.Y);
                 }
             }
@@ -827,6 +859,14 @@ namespace vimage
 
         public void ResetImage()
         {
+            // Reset size / crops
+            Size = Image.Texture.Size;
+            SFML.Graphics.View view = new SFML.Graphics.View(Window.DefaultView);
+            view.Center = new Vector2f(Size.X / 2f, Size.Y / 2f);
+            view.Size = new Vector2f(Size.X, Size.Y);
+            Window.SetView(view);
+
+            // Zoom, Flip and Rotate
             Zoom(1f);
             AutomaticallyZoomed = false;
             FlippedX = false;
@@ -840,7 +880,7 @@ namespace vimage
             }
 
             // Force Fit To Monitor Height?
-            Vector2i imagePos = new Vector2i((int)NextWindowPos.X + ((int)Image.Texture.Size.X / 2), (int)NextWindowPos.Y + ((int)Image.Texture.Size.Y / 2));
+            Vector2i imagePos = new Vector2i((int)NextWindowPos.X + ((int)Size.X / 2), (int)NextWindowPos.Y + ((int)Size.Y / 2));
             IntRect currentBounds = ImageViewerUtils.GetCurrentBounds(imagePos);
             if (Config.Setting_LimitImagesToMonitor != Config.NONE)
             {
@@ -855,22 +895,22 @@ namespace vimage
                         limit = Config.WIDTH;
                 }
 
-                if (limit == Config.HEIGHT && Image.Texture.Size.Y > currentBounds.Height)
+                if (limit == Config.HEIGHT && Size.Y > currentBounds.Height)
                 {
-                    Zoom(1 + (((float)currentBounds.Height - Image.Texture.Size.Y) / Image.Texture.Size.Y), true);
+                    Zoom(1 + (((float)currentBounds.Height - Size.Y) / Size.Y), true);
                     FitToMonitorHeightForced = true;
                 }
-                else if (limit == Config.WIDTH && Image.Texture.Size.X > currentBounds.Width)
+                else if (limit == Config.WIDTH && Size.X > currentBounds.Width)
                 {
-                    Zoom(1 + (((float)currentBounds.Width - Image.Texture.Size.X) / Image.Texture.Size.X), true);
+                    Zoom(1 + (((float)currentBounds.Width - Size.X) / Size.X), true);
                     AutomaticallyZoomed = true;
                 }
             }
-            if (Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_MinImageSize)
+            if (Math.Min(Size.X, Size.Y) < Config.Setting_MinImageSize)
             {
                 // Reisze images smaller than min size to min size
                 AutomaticallyZoomed = true;
-                Zoom(Config.Setting_MinImageSize / Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y), true);
+                Zoom(Config.Setting_MinImageSize / Math.Min(Size.X, Size.Y), true);
             }
 
             // Center image or place in top-left corner if it's a large/wide image.
@@ -880,13 +920,13 @@ namespace vimage
             else
                 currentWorkingArea = currentBounds;
 
-            if (Config.Setting_PositionLargeWideImagesInCorner && Image.Texture.Size.X * CurrentZoom > Image.Texture.Size.Y * CurrentZoom && Image.Texture.Size.X * CurrentZoom >= currentBounds.Width)
+            if (Config.Setting_PositionLargeWideImagesInCorner && Size.X * CurrentZoom > Size.Y * CurrentZoom && Size.X * CurrentZoom >= currentBounds.Width)
                 NextWindowPos = new Vector2i(currentBounds.Left, currentBounds.Top);
             else
-                NextWindowPos = new Vector2i(currentWorkingArea.Left + (currentWorkingArea.Width / 2) - ((int)(Image.Texture.Size.X * CurrentZoom) / 2), currentWorkingArea.Top + (currentWorkingArea.Height / 2) - ((int)(Image.Texture.Size.Y * CurrentZoom) / 2));
+                NextWindowPos = new Vector2i(currentWorkingArea.Left + (currentWorkingArea.Width / 2) - ((int)(Size.X * CurrentZoom) / 2), currentWorkingArea.Top + (currentWorkingArea.Height / 2) - ((int)(Size.Y * CurrentZoom) / 2));
 
             // Force Always on Top?
-            if (FitToMonitorHeightForced || (Image.Texture.Size.Y >= currentBounds.Height && Image.Texture.Size.X < currentBounds.Width))
+            if (FitToMonitorHeightForced || (Size.Y >= currentBounds.Height && Size.X < currentBounds.Width))
                 ForceAlwaysOnTopNextTick = true;
         }
 
@@ -938,6 +978,60 @@ namespace vimage
             DWM.SetAlwaysOnTop(Window.SystemHandle, false);
         }
 
+        public void CropStart()
+        {
+            if (Cropping)
+                return;
+            Cropping = true;
+
+            if (Window.GetView().Size.X != Image.Texture.Size.X || !(Image.Rotation == 0 || Image.Rotation == 180))
+                return; // temp to prevent breaking
+
+            if (CropRect == null)
+            {
+                CropRect = new RectangleShape();
+                CropRect.FillColor = new Color(255, 255, 255, 120);
+                CropRect.OutlineColor = Color.Black;
+                CropRect.OutlineThickness = 2;
+            }
+            CropRect.OutlineThickness = 2 * (1 / CurrentZoom);
+
+            CropStartPos = MousePos;
+            CropRect.Position = new Vector2f(MousePos.X * (1 / CurrentZoom), MousePos.Y * (1 / CurrentZoom));
+        }
+        public void CropEnd()
+        {
+            if (!Cropping)
+                return;
+            Cropping = false;
+
+            // Too small - cancel
+            if (Math.Abs(CropRect.Size.X) < 10 || Math.Abs(CropRect.Size.Y) < 10)
+            {
+                Redraw();
+                return;
+            }
+
+            // Apply crop
+            SFML.Graphics.View view = new SFML.Graphics.View(Window.DefaultView);
+            view.Center = new Vector2f(CropRect.Position.X + (CropRect.Size.X / 2f), CropRect.Position.Y + (CropRect.Size.Y / 2f));
+            view.Size = new Vector2f(Math.Abs(CropRect.Size.X), Math.Abs(CropRect.Size.Y));
+
+            Size = new Vector2u((uint)Math.Abs(CropRect.Size.X), (uint)Math.Abs(CropRect.Size.Y));
+            Window.SetView(view);
+            NextWindowSize = Size;
+            Window.Size = NextWindowSize;
+            
+            if (CurrentZoom != 1)
+                Zoom(CurrentZoom);
+            NextWindowPos = new Vector2i((int)((NextWindowPos.X + CropStartPos.X + (CropRect.Size.X < 0 ? CropRect.Size.X * CurrentZoom : 0)) ),
+                (int)(NextWindowPos.Y + CropStartPos.Y + (CropRect.Size.Y < 0 ? CropRect.Size.Y * CurrentZoom : 0)));
+
+            CropRect.Size = new Vector2f();
+
+            Updated = true;
+        }
+
         ///////////////////////////
         //     Image Loading     //
         ///////////////////////////
@@ -975,8 +1069,9 @@ namespace vimage
             if (Image?.Texture == null)
                 return false;
 
-            Image.Origin = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
-            Image.Position = new Vector2f(Image.Texture.Size.X / 2, Image.Texture.Size.Y / 2);
+            Size = Image.Texture.Size;
+            Image.Origin = new Vector2f(Size.X / 2, Size.Y / 2);
+            Image.Position = new Vector2f(Size.X / 2, Size.Y / 2);
             DefaultRotation = ImageViewerUtils.GetDefaultRotationFromEXIF(fileName);
 
             return true;
@@ -984,12 +1079,12 @@ namespace vimage
         private bool ChangeImage(string fileName)
         {
             Dragging = false;
-            Vector2u prevSize = Image == null ? new Vector2u() : new Vector2u(Image.Texture.Size.X, Image.Texture.Size.Y);
+            Vector2u prevSize = Image == null ? new Vector2u() : Size;
             float prevRotation = Image == null ? 0 : Image.Rotation;
             int prevDefaultRotation = DefaultRotation;
 
             IntRect bounds = ImageViewerUtils.GetCurrentBounds(Window.Position +
-                (Image == null ? new Vector2i() : new Vector2i((int)(Image.Texture.Size.X * CurrentZoom) / 2, (int)(Image.Texture.Size.Y * CurrentZoom) / 2)));
+                (Image == null ? new Vector2i() : new Vector2i((int)(Size.X * CurrentZoom) / 2, (int)(Size.Y * CurrentZoom) / 2)));
 
             // Dispose of previous image
             if (Image != null)
@@ -1004,17 +1099,17 @@ namespace vimage
                 return false;
 
             SFML.Graphics.View view = new SFML.Graphics.View(Window.DefaultView);
-            view.Center = new Vector2f(Image.Texture.Size.X / 2f, Image.Texture.Size.Y / 2f);
-            view.Size = new Vector2f(Image.Texture.Size.X, Image.Texture.Size.Y);
+            view.Center = new Vector2f(Size.X / 2f, Size.Y / 2f);
+            view.Size = new Vector2f(Size.X, Size.Y);
             Window.SetView(view);
 
             // Rotation
             RotateImage(prevRotation == prevDefaultRotation ? DefaultRotation : (int)prevRotation, false, false);
             // Smoothing
             if (Image is AnimatedImage)
-                Image.Data.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
+                Image.Data.Smooth = Math.Min(Size.X, Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
             else
-                Image.Texture.Smooth = Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
+                Image.Texture.Smooth = Math.Min(Size.X, Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
 
             // Color
             if (ImageColor != Color.White)
@@ -1074,13 +1169,13 @@ namespace vimage
                     Zoom(1, true);
                     FitToMonitorHeightForced = false;
                 }
-                else if (Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) * CurrentZoom < Config.Setting_MinImageSize)
+                else if (Math.Min(Size.X, Size.Y) * CurrentZoom < Config.Setting_MinImageSize)
                 {
                     // Reisze images smaller than min size to min size
-                    if (Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y) < Config.Setting_MinImageSize)
+                    if (Math.Min(Size.X, Size.Y) < Config.Setting_MinImageSize)
                     {
                         AutomaticallyZoomed = true;
-                        Zoom(Config.Setting_MinImageSize / Math.Min(Image.Texture.Size.X, Image.Texture.Size.Y), true);
+                        Zoom(Config.Setting_MinImageSize / Math.Min(Size.X, Size.Y), true);
                     }
                     else
                         Zoom(1, true);
@@ -1090,16 +1185,16 @@ namespace vimage
             }
 
             bounds = ImageViewerUtils.GetCurrentBounds(NextWindowPos +
-                new Vector2i((int)(Image.Texture.Size.X * CurrentZoom) / 2, (int)(Image.Texture.Size.Y * CurrentZoom) / 2));
+                new Vector2i((int)(Size.X * CurrentZoom) / 2, (int)(Size.Y * CurrentZoom) / 2));
 
             // Position Window at top-left if the image is wide (ie: a Desktop Wallpaper / Screenshot)
             // Otherwise, if image is hanging off monitor just center it.
             if (Config.Setting_PositionLargeWideImagesInCorner && CurrentImageSize().X > CurrentImageSize().Y && CurrentImageSize().X * CurrentZoom >= bounds.Width)
                 NextWindowPos = new Vector2i(bounds.Left, bounds.Top);
-            else if (!prevSize.Equals(Image.Texture.Size) && (NextWindowPos.Y <= bounds.Top ||
-                NextWindowPos.X + (Image.Texture.Size.X * CurrentZoom) >= bounds.Left + bounds.Width ||
-                NextWindowPos.Y + (Image.Texture.Size.Y * CurrentZoom) >= bounds.Top + bounds.Height))
-                NextWindowPos = new Vector2i(bounds.Left + (int)((bounds.Width - (Image.Texture.Size.X * CurrentZoom)) / 2), bounds.Top + (int)((bounds.Height - (Image.Texture.Size.Y * CurrentZoom)) / 2));
+            else if (!prevSize.Equals(Size) && (NextWindowPos.Y <= bounds.Top ||
+                NextWindowPos.X + (Size.X * CurrentZoom) >= bounds.Left + bounds.Width ||
+                NextWindowPos.Y + (Size.Y * CurrentZoom) >= bounds.Top + bounds.Height))
+                NextWindowPos = new Vector2i(bounds.Left + (int)((bounds.Width - (Size.X * CurrentZoom)) / 2), bounds.Top + (int)((bounds.Height - (Size.Y * CurrentZoom)) / 2));
 
             // Force Always On Top Mode (so it's above the task bar) - will only happen if height >= window height
             ForceAlwaysOnTopNextTick = true;
