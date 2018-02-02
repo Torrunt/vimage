@@ -224,7 +224,10 @@ namespace vimage
                 case MenuFuncs.COPY: ImageViewer.CopyFile(); return;
                 case MenuFuncs.COPY_AS_IMAGE: ImageViewer.CopyAsImage(); return;
                 case MenuFuncs.OPEN_DUPLICATE: ImageViewer.OpenDuplicateWindow(); return;
+                case MenuFuncs.OPEN_DUPLICATE_FULL: ImageViewer.OpenDuplicateWindow(true); return;
                 case MenuFuncs.RANDOM_IMAGE: ImageViewer.RandomImage(); return;
+                case MenuFuncs.TOGGLE_IMAGE_TRANSPARENCY: ImageViewer.ToggleImageTransparency(); return;
+                case MenuFuncs.UNDO_CROP: ImageViewer.UndoCrop(); return;
 
                 case MenuFuncs.OPEN_SETTINGS: ImageViewer.OpenConfig(); return;
                 case MenuFuncs.RELOAD_SETTINGS: ImageViewer.ReloadConfig(); return;

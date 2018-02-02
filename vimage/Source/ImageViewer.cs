@@ -506,17 +506,7 @@ namespace vimage
 
             // Toggle Image Transparency
             if (Config.IsControl(code, Config.Control_TransparencyToggle))
-            {
-                if (ImageColor == Color.White)
-                {
-                    System.Drawing.Color colour = System.Drawing.ColorTranslator.FromHtml(Config.Setting_TransparencyToggleValue);
-                    ImageColor = new Color(colour.R, colour.G, colour.B, colour.A);
-                }
-                else
-                    ImageColor = Color.White;
-                Image.Color = ImageColor;
-                Updated = true;
-            }
+                ToggleImageTransparency();
 
             // Custom Actions
             for (int i = 0; i < Config.CustomActionBindings.Count; i++)
@@ -955,6 +945,19 @@ namespace vimage
         {
             BackgroundsForImagesWithTransparency = !BackgroundsForImagesWithTransparency;
             Update();
+        }
+
+        public void ToggleImageTransparency()
+        {
+            if (ImageColor == Color.White)
+            {
+                System.Drawing.Color colour = System.Drawing.ColorTranslator.FromHtml(Config.Setting_TransparencyToggleValue);
+                ImageColor = new Color(colour.R, colour.G, colour.B, colour.A);
+            }
+            else
+                ImageColor = Color.White;
+            Image.Color = ImageColor;
+            Updated = true;
         }
 
         public void ToggleAlwaysOnTop()

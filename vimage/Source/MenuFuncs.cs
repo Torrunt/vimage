@@ -36,7 +36,10 @@
         public const string TOGGLE_ANIMATION = "TOGGLEANIMATION";
 
         public const string OPEN_DUPLICATE = "OPENDUPLICATE";
+        public const string OPEN_DUPLICATE_FULL = "OPENDUPLICATEFULL";
         public const string RANDOM_IMAGE = "RANDOMIMAGE";
+        public const string TOGGLE_IMAGE_TRANSPARENCY = "TOGGLEIMAGETRANSPARENCY";
+        public const string UNDO_CROP = "UNDOCROP";
 
         public static readonly string[] FUNCS =
         {
@@ -45,7 +48,7 @@
             ALWAYS_ON_TOP, OPEN_FILE_LOCATION, DELETE, COPY, COPY_AS_IMAGE, OPEN_SETTINGS, RELOAD_SETTINGS,
             VERSION_NAME, SORT_NAME, SORT_DATE, SORT_DATE_MODIFIED, SORT_DATE_CREATED, SORT_SIZE,
             SORT_ASCENDING, SORT_DESCENDING, NEXT_FRAME, PREV_FRAME, TOGGLE_ANIMATION,
-            OPEN_DUPLICATE, RANDOM_IMAGE
+            OPEN_DUPLICATE, OPEN_DUPLICATE_FULL, RANDOM_IMAGE, TOGGLE_IMAGE_TRANSPARENCY, UNDO_CROP
         };
 
         // <summary>Takes a MenuFunc name and adds space between certain words (for ease of reading).</summary>
@@ -55,6 +58,7 @@
             if (func.IndexOf(" ") != -1)
                 return func;
 
+            if (func == TOGGLE_IMAGE_TRANSPARENCY) { func = "TOGGLE IMAGE TRANSPARENCY"; return func; }
             func = func.Replace("SORT", "SORT ");
             func = func.Replace("DATE", "DATE ");
             func = func.Replace("FRAME", " FRAME");
@@ -68,8 +72,9 @@
             func = func.Replace("RELOAD", "RELOAD ");
             func = func.Replace("OPEN", "OPEN ");
             func = func.Replace("FILELOCATION", "FILE LOCATION");
-            func = func.Replace("OPENDUPLICATE", "OPEN DUPLICATE");
+            func = func.Replace("DUPLICATEFULL", "DUPLICATE FULL");
             func = func.Replace("RANDOMIMAGE", "RANDOM IMAGE");
+            func = func.Replace("UNDOCROP", "UNDO CROP");
 
             return func;
         }
