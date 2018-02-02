@@ -995,11 +995,17 @@ namespace vimage
             if (CropRect == null)
             {
                 CropRect = new RectangleShape();
-                CropRect.FillColor = new Color(255, 255, 255, 120);
-                CropRect.OutlineColor = Color.Black;
-                CropRect.OutlineThickness = 2;
+
+                System.Drawing.Color colour = System.Drawing.ColorTranslator.FromHtml(Config.Setting_CropToolFillColour);
+                CropRect.FillColor = new Color(colour.R, colour.G, colour.B, colour.A);
+
+                if (Config.Setting_CropToolOutlineThickness > 0)
+                {
+                    colour = System.Drawing.ColorTranslator.FromHtml(Config.Setting_CropToolOutlineColour);
+                    CropRect.OutlineColor = new Color(colour.R, colour.G, colour.B, colour.A);
+                }
             }
-            CropRect.OutlineThickness = 2 * (1 / CurrentZoom);
+            CropRect.OutlineThickness = Config.Setting_CropToolOutlineThickness * (1 / CurrentZoom);
 
             CropStartPos = Mouse.GetPosition();
             CropRect.Position = Window.MapPixelToCoords(CropStartPos - Window.Position);

@@ -175,6 +175,22 @@ namespace vimage
             set { Settings["DEFAULTSORTDIR"] = value; }
         }
 
+        public string Setting_CropToolFillColour
+        {
+            get { return (string)Settings["CROPTOOLFILLCOLOUR"]; }
+            set { Settings["CROPTOOLFILLCOLOUR"] = value; }
+        }
+        public string Setting_CropToolOutlineColour
+        {
+            get { return (string)Settings["CROPTOOLOUTLINECOLOUR"]; }
+            set { Settings["CROPTOOLOUTLINECOLOUR"] = value; }
+        }
+        public int Setting_CropToolOutlineThickness
+        {
+            get { return (int)Settings["CROPTOOLOUTLINETHICKNESS"]; }
+            set { Settings["CROPTOOLOUTLINETHICKNESS"] = value; }
+        }
+
         public List<object> ContextMenu = new List<object>();
         public List<object> ContextMenu_Animation = new List<object>();
         public int ContextMenu_Animation_InsertAtIndex
@@ -238,6 +254,10 @@ namespace vimage
                 { "SETTINGSAPPHEIGHT", 550 },
                 { "DEFAULTSORTBY", SortBy.FolderDefault },
                 { "DEFAULTSORTDIR", SortDirection.FolderDefault },
+                
+                { "CROPTOOLFILLCOLOUR", "#78FFFFFF" },
+                { "CROPTOOLOUTLINECOLOUR", "#FF000000" },
+                { "CROPTOOLOUTLINETHICKNESS", 2 },
 
                 { "DRAG", Control_Drag },
                 { "CLOSE", Control_Close },
@@ -670,6 +690,12 @@ namespace vimage
             WriteSetting(writer, "SettingsAppHeight", Setting_SettingsAppHeight);
             WriteSetting(writer, "DefaultSortBy", (int)Setting_DefaultSortBy);
             WriteSetting(writer, "DefaultSortDir", (int)Setting_DefaultSortDir);
+
+            writer.Write(Environment.NewLine);
+
+            WriteSetting(writer, "CropToolFillColour", Setting_CropToolFillColour);
+            WriteSetting(writer, "CropToolOutlineColour", Setting_CropToolOutlineColour);
+            WriteSetting(writer, "CropToolOutlineThickness", Setting_CropToolOutlineThickness);
 
             writer.Write(Environment.NewLine);
             writer.Write("// Bindings" + Environment.NewLine);
