@@ -69,7 +69,7 @@ namespace vimage
         public Color BackgroundColour = new Color(230, 230, 230);
         private bool Cropping = false;
         private RectangleShape CropRect;
-        private Vector2f CropStartPos = new Vector2f();
+        private Vector2i CropStartPos = new Vector2i();
         public bool AlwaysOnTop = false;
         private bool AlwaysOnTopForced = false;
         /// <summary>
@@ -764,12 +764,12 @@ namespace vimage
             if (Rotation == 90 || Rotation == 270)
             {
                 WindowSize = new Vector2u((uint)(Size.Y * CurrentZoom), (uint)(Size.X * CurrentZoom));
-                view.Size = new Vector2f(Size.Y, Size.X);
+                view.Size = new Vector2f(Size.Y, Size.X * (FlippedX ? -1 : 1));
             }
             else
             {
                 WindowSize = new Vector2u((uint)(Size.X * CurrentZoom), (uint)(Size.Y * CurrentZoom));
-                view.Size = new Vector2f(Size.X, Size.Y);
+                view.Size = new Vector2f(Size.X * (FlippedX ? -1 : 1), Size.Y);
             }
             Window.SetView(view);
 
@@ -789,7 +789,8 @@ namespace vimage
         {
             FlippedX = !FlippedX;
             SFML.Graphics.View view = Window.GetView();
-            view.Size = new Vector2f(view.Size.X * -1, view.Size.Y); // temp - doesn't currently work with rotation
+            view.Size = new Vector2f(Rotation == 90 || Rotation == 270 ? view.Size.X : Math.Abs(view.Size.X) * (FlippedX ? -1 : 1),
+                Rotation == 90 || Rotation == 270 ? Math.Abs(view.Size.Y) * (FlippedX ? -1 : 1) : view.Size.Y);
             Window.SetView(view);
             Redraw();
         }
@@ -991,8 +992,8 @@ namespace vimage
             }
             CropRect.OutlineThickness = 2 * (1 / CurrentZoom);
 
-            CropStartPos = Window.MapPixelToCoords(MousePos);
-            CropRect.Position = new Vector2f(CropStartPos.X, CropStartPos.Y);
+            CropStartPos = Mouse.GetPosition();
+            CropRect.Position = Window.MapPixelToCoords(CropStartPos - Window.Position);
         }
         public void CropEnd()
         {
@@ -1007,22 +1008,31 @@ namespace vimage
                 return;
             }
 
-            Vector2i pos = Window.MapCoordsToPixel(new Vector2f(CropStartPos.X + (CropRect.Size.X < 0 ? CropRect.Size.X : 0), CropStartPos.Y + (CropRect.Size.Y < 0 ? CropRect.Size.Y : 0)));
-
             // Apply crop
             SFML.Graphics.View view = Window.GetView();
             view.Center = new Vector2f(CropRect.Position.X + (CropRect.Size.X / 2f), CropRect.Position.Y + (CropRect.Size.Y / 2f));
-            view.Size = new Vector2f(Math.Abs(CropRect.Size.X), Math.Abs(CropRect.Size.Y));
-
             Size = new Vector2u((uint)Math.Abs(CropRect.Size.X), (uint)Math.Abs(CropRect.Size.Y));
+            if (Rotation == 90 || Rotation == 270)
+            {
+                NextWindowSize = new Vector2u((uint)(Size.Y * CurrentZoom), (uint)(Size.X * CurrentZoom));
+                view.Size = new Vector2f(Size.Y, Size.X * (FlippedX ? -1 : 1));
+            }
+            else
+            {
+                NextWindowSize = new Vector2u((uint)(Size.X * CurrentZoom), (uint)(Size.Y * CurrentZoom));
+                view.Size = new Vector2f(Size.X * (FlippedX ? -1 : 1), Size.Y);
+            }
             Window.SetView(view);
-            NextWindowSize = Size;
             Window.Size = NextWindowSize;
 
+            // re-apply current zoom
             if (CurrentZoom != 1)
                 Zoom(CurrentZoom);
-            
-            NextWindowPos = new Vector2i((int)(NextWindowPos.X + pos.X), (int)(NextWindowPos.Y + pos.Y));
+
+            // position
+            Vector2i pos = Mouse.GetPosition();
+            NextWindowPos = new Vector2i(pos.X < CropStartPos.X ? pos.X : CropStartPos.X, pos.Y < CropStartPos.Y ? pos.Y : CropStartPos.Y);
+
 
             CropRect.Size = new Vector2f();
 
