@@ -39,6 +39,10 @@
                         -y 0<LineBreak/>
                         -zoom 0.0<LineBreak/>
                         -rotation 0<LineBreak/>
+                        -sizeX 0<LineBreak/>
+                        -sizeY 0<LineBreak/>
+                        -centerX 0.0<LineBreak/>
+                        -centerY 0.0<LineBreak/>
                         -colour #FFFFFFFF<LineBreak/>
                         -alwaysOnTop<LineBreak/>
                         -flip<LineBreak/>

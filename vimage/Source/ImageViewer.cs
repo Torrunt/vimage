@@ -9,7 +9,6 @@ using DevIL.Unmanaged;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace vimage
 {
@@ -759,7 +758,7 @@ namespace vimage
 
             UnforceAlwaysOnTop();
 
-            SFML.Graphics.View view = Window.GetView();
+            View view = Window.GetView();
             view.Rotation = -Rotation;
             if (Rotation == 90 || Rotation == 270)
             {
@@ -788,7 +787,7 @@ namespace vimage
         public void FlipImage()
         {
             FlippedX = !FlippedX;
-            SFML.Graphics.View view = Window.GetView();
+            View view = Window.GetView();
             view.Size = new Vector2f(Rotation == 90 || Rotation == 270 ? view.Size.X : Math.Abs(view.Size.X) * (FlippedX ? -1 : 1),
                 Rotation == 90 || Rotation == 270 ? Math.Abs(view.Size.Y) * (FlippedX ? -1 : 1) : view.Size.Y);
             Window.SetView(view);
@@ -860,7 +859,7 @@ namespace vimage
         {
             // Reset size / crops
             Size = Image.Texture.Size;
-            SFML.Graphics.View view = new SFML.Graphics.View(Window.DefaultView);
+            View view = new View(Window.DefaultView);
             view.Center = new Vector2f(Size.X / 2f, Size.Y / 2f);
             view.Size = new Vector2f(Size.X, Size.Y);
             Window.SetView(view);
@@ -1009,7 +1008,7 @@ namespace vimage
             }
 
             // Apply crop
-            SFML.Graphics.View view = Window.GetView();
+            View view = Window.GetView();
             view.Center = new Vector2f(CropRect.Position.X + (CropRect.Size.X / 2f), CropRect.Position.Y + (CropRect.Size.Y / 2f));
             Size = new Vector2u((uint)Math.Abs(CropRect.Size.X), (uint)Math.Abs(CropRect.Size.Y));
             if (Rotation == 90 || Rotation == 270)
@@ -1103,7 +1102,7 @@ namespace vimage
             if (!LoadImage(fileName))
                 return false;
 
-            SFML.Graphics.View view = new SFML.Graphics.View(Window.DefaultView);
+            View view = Window.DefaultView;
             view.Center = new Vector2f(Size.X / 2f, Size.Y / 2f);
             view.Size = new Vector2f(Size.X, Size.Y);
             Window.SetView(view);
@@ -1426,7 +1425,7 @@ namespace vimage
             {
                 System.Collections.Specialized.StringCollection files = new System.Collections.Specialized.StringCollection();
                 files.Add(File);
-                Clipboard.SetFileDropList(files);
+                System.Windows.Forms.Clipboard.SetFileDropList(files);
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
@@ -1448,7 +1447,7 @@ namespace vimage
                     }
                     else
                         bitmap = new System.Drawing.Bitmap(File);
-                    Clipboard.SetImage(bitmap);
+                    System.Windows.Forms.Clipboard.SetImage(bitmap);
                 }
                 catch (Exception) { }
             });
@@ -1462,12 +1461,15 @@ namespace vimage
 
         public void OpenDuplicateWindow(bool full = false)
         {
-            ProcessStartInfo startInfo = new ProcessStartInfo(Application.ExecutablePath);
+            View view = Window.GetView();
+            ProcessStartInfo startInfo = new ProcessStartInfo(System.Windows.Forms.Application.ExecutablePath);
             startInfo.Arguments = $"\"{File}\"";
             if (full)
             {
-                startInfo.Arguments += $" -x {Window.Position.X}";
-                startInfo.Arguments += $" -y {Window.Position.Y}";
+                startInfo.Arguments += $" -sizeX {Size.X}";
+                startInfo.Arguments += $" -sizeY {Size.Y}";
+                startInfo.Arguments += $" -centerX {view.Center.X}";
+                startInfo.Arguments += $" -centerY {view.Center.Y}";
                 if (CurrentZoom != 1)
                     startInfo.Arguments += $" -zoom {CurrentZoom}";
                 if (FlippedX)
@@ -1484,6 +1486,8 @@ namespace vimage
                         ImageColor.B.ToString("X2", null);
                     startInfo.Arguments += $" -colour {colour}";
                 }
+                startInfo.Arguments += $" -x {Window.Position.X}";
+                startInfo.Arguments += $" -y {Window.Position.Y}";
             }
             Console.WriteLine(startInfo.Arguments);
             Process.Start(startInfo);
@@ -1555,9 +1559,12 @@ namespace vimage
 
         public void ApplyArguments(string[] args, bool ignoreFirst = false)
         {
+            Vector2f viewCenter = new Vector2f(Size.X / 2f, Size.Y / 2f);
+
             for (int i = ignoreFirst ? 1 : 0; i < args.Length; i++)
             {
                 int val = -1;
+                float valf = -1;
                 switch (args[i])
                 {
                     case "-x":
@@ -1576,12 +1583,44 @@ namespace vimage
                             NextWindowPos.Y = val;
                         i++;
                         break;
+                    case "-sizeX":
+                        val = -1;
+                        if (!int.TryParse(args[i + 1], out val))
+                            val = -1;
+                        if (val != -1)
+                            Size.X = (uint)val;
+                        i++;
+                        break;
+                    case "-sizeY":
+                        val = -1;
+                        if (!int.TryParse(args[i + 1], out val))
+                            val = -1;
+                        if (val != -1)
+                            Size.Y = (uint)val;
+                        i++;
+                        break;
+                    case "-centerX":
+                        valf = -1;
+                        if (!float.TryParse(args[i + 1], out valf))
+                            valf = -1;
+                        if (valf != -1)
+                            viewCenter.X = valf;
+                        i++;
+                        break;
+                    case "-centerY":
+                        valf = -1;
+                        if (!float.TryParse(args[i + 1], out valf))
+                            valf = -1;
+                        if (valf != -1)
+                            viewCenter.Y = valf;
+                        i++;
+                        break;
                     case "-zoom":
-                        float z = 0;
-                        if (!float.TryParse(args[i + 1], out z))
-                            z = 0;
-                        if (z != 0)
-                            Zoom(z, true);
+                        valf = 0;
+                        if (!float.TryParse(args[i + 1], out valf))
+                            valf = 0;
+                        if (valf != 0)
+                            Zoom(valf, true);
                         i++;
                         break;
                     case "-rotation":
@@ -1589,7 +1628,7 @@ namespace vimage
                         if (!int.TryParse(args[i + 1], out val))
                             val = -1;
                         if (val != -1 && Rotation != val)
-                            RotateImage(val, false, false);
+                            RotateImage(val);
                         i++;
                         break;
                     case "-colour":
@@ -1622,6 +1661,22 @@ namespace vimage
                     case "-fitToMonitorAuto": ToggleFitToMonitor(Config.AUTO); break;
                 }
             }
+
+            // Update view
+            View view = Window.GetView();
+            view.Center = viewCenter;
+            if (Rotation == 90 || Rotation == 270)
+            {
+                NextWindowSize = new Vector2u((uint)(Size.Y * CurrentZoom), (uint)(Size.X * CurrentZoom));
+                view.Size = new Vector2f(Size.Y, Size.X * (FlippedX ? -1 : 1));
+            }
+            else
+            {
+                NextWindowSize = new Vector2u((uint)(Size.X * CurrentZoom), (uint)(Size.Y * CurrentZoom));
+                view.Size = new Vector2f(Size.X * (FlippedX ? -1 : 1), Size.Y);
+            }
+            Window.SetView(view);
+            Window.Size = NextWindowSize;
         }
 
     }
