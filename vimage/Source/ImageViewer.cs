@@ -1017,6 +1017,17 @@ namespace vimage
             // Record view state
             ViewStateHistory.Add(GetCurrentViewState());
 
+            // Get position
+            Vector2i pos = Mouse.GetPosition();
+            if (pos.X < Window.Position.X)
+                pos.X = Window.Position.X;
+            else if (pos.X > Window.Position.X + Window.Size.X)
+                pos.X = (int)(Window.Position.X + Window.Size.X);
+            if (pos.Y < Window.Position.Y)
+                pos.Y = Window.Position.Y;
+            else if (pos.Y > Window.Position.Y + Window.Size.Y)
+                pos.Y = (int)(Window.Position.Y + Window.Size.Y);
+
             // Apply crop
             View view = Window.GetView();
             view.Center = new Vector2f(CropRect.Position.X + (CropRect.Size.X / 2f), CropRect.Position.Y + (CropRect.Size.Y / 2f));
@@ -1034,12 +1045,11 @@ namespace vimage
             Window.SetView(view);
             Window.Size = NextWindowSize;
 
-            // re-apply current zoom
+            // Re-apply current zoom
             if (CurrentZoom != 1)
                 Zoom(CurrentZoom);
 
-            // position
-            Vector2i pos = Mouse.GetPosition();
+            // Position
             NextWindowPos = new Vector2i(pos.X < CropStartPos.X ? pos.X : CropStartPos.X, pos.Y < CropStartPos.Y ? pos.Y : CropStartPos.Y);
 
             CropRect.Size = new Vector2f();
