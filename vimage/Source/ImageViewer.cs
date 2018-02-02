@@ -34,6 +34,7 @@ namespace vimage
         public Color ImageColor = Color.White;
         public Vector2u Size = new Vector2u();
         public int Rotation = 0;
+        public List<ViewState> ViewStateHistory = new List<ViewState>();
 
         public Config Config;
         private FileSystemWatcher ConfigFileWatcher;
@@ -168,6 +169,7 @@ namespace vimage
             Redraw();
             Updated = false;
             Window.SetActive();
+            ViewStateHistory = new List<ViewState>();
 
             // Get/Set Folder Sorting
             SortImagesBy = Config.Setting_DefaultSortBy;
@@ -526,6 +528,9 @@ namespace vimage
             // Cropping - release
             if (Cropping && Config.IsControl(code, Config.Control_Crop))
                 CropEnd();
+
+            if (Config.IsControl(code, Config.Control_UndoCrop))
+                UndoCrop();
 
             // Zooming - release
             if (Config.IsControl(code, Config.Control_ZoomFaster))
@@ -926,6 +931,8 @@ namespace vimage
             // Force Always on Top?
             if (FitToMonitorHeightForced || (Size.Y >= currentBounds.Height && Size.X < currentBounds.Width))
                 ForceAlwaysOnTopNextTick = true;
+
+            ViewStateHistory = new List<ViewState>();
         }
 
         public void ToggleSmoothing()
@@ -1007,6 +1014,9 @@ namespace vimage
                 return;
             }
 
+            // Record view state
+            ViewStateHistory.Add(GetCurrentViewState());
+
             // Apply crop
             View view = Window.GetView();
             view.Center = new Vector2f(CropRect.Position.X + (CropRect.Size.X / 2f), CropRect.Position.Y + (CropRect.Size.Y / 2f));
@@ -1032,11 +1042,34 @@ namespace vimage
             Vector2i pos = Mouse.GetPosition();
             NextWindowPos = new Vector2i(pos.X < CropStartPos.X ? pos.X : CropStartPos.X, pos.Y < CropStartPos.Y ? pos.Y : CropStartPos.Y);
 
-
             CropRect.Size = new Vector2f();
 
             Updated = true;
         }
+
+        public void UndoCrop()
+        {
+            if (ViewStateHistory.Count == 0)
+                return;
+            
+            ViewState state = ViewStateHistory[ViewStateHistory.Count - 1];
+
+            Size = state.Size;
+            Rotation = state.Rotation;
+            CurrentZoom = state.Zoom;
+            FlippedX = state.FlippedX;
+            if (Rotation == 90 || Rotation == 270)
+                NextWindowSize = new Vector2u((uint)(Size.Y * CurrentZoom), (uint)(Size.X * CurrentZoom));
+            else
+                NextWindowSize = new Vector2u((uint)(Size.X * CurrentZoom), (uint)(Size.Y * CurrentZoom));
+            NextWindowPos = state.Position;
+            Window.SetView(state.View);
+
+            ViewStateHistory.RemoveAt(ViewStateHistory.Count - 1);
+
+            Updated = true;
+        }
+        public ViewState GetCurrentViewState() { return new ViewState(Window.GetView(), Size, NextWindowPos, CurrentZoom, Rotation, FlippedX); }
 
         ///////////////////////////
         //     Image Loading     //
@@ -1205,6 +1238,8 @@ namespace vimage
 
             Window.SetTitle(fileName + " - vimage");
             ContextMenu?.Setup(false);
+
+            ViewStateHistory = new List<ViewState>();
 
             return true;
         }
@@ -1679,5 +1714,25 @@ namespace vimage
             Window.Size = NextWindowSize;
         }
 
+    }
+
+    class ViewState
+    {
+        public View View;
+        public Vector2u Size;
+        public Vector2i Position;
+        public float Zoom;
+        public int Rotation;
+        public bool FlippedX;
+
+        public ViewState(View view, Vector2u size, Vector2i position, float zoom, int rotation, bool flippedX)
+        {
+            View = new View(view);
+            Size = size;
+            Position = position;
+            Zoom = zoom;
+            Rotation = rotation;
+            FlippedX = flippedX;
+        }
     }
 }
