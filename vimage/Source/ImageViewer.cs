@@ -1180,7 +1180,7 @@ namespace vimage
             }
 
             bool wasFitToMonitorDimension = FitToMonitorHeightForced;
-            if (Config.Setting_LimitImagesToMonitor != Config.NONE && prevSize != Size)
+            if (Config.Setting_LimitImagesToMonitor != Config.NONE)
             {
                 // Fit to monitor height/width
                 int limit = Config.Setting_LimitImagesToMonitor;
