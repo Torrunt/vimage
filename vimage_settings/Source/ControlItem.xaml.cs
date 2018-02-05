@@ -13,6 +13,7 @@ namespace vimage_settings
     {
         public List<int> Controls;
         private bool RecordedKeyCombo = false;
+        private bool CanRecordMouseButton = false;
 
         public ControlItem()
         {
@@ -56,6 +57,37 @@ namespace vimage_settings
             if (key == Key.LeftCtrl || key == Key.RightCtrl || key == Key.LeftShift || key == Key.RightShift ||
                 key == Key.LeftAlt || key == Key.RightAlt)
                 RecordKey(key, false);
+        }
+        private void ControlSetting_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!ControlSetting.IsFocused)
+                return;
+            if (!CanRecordMouseButton)
+            {
+                CanRecordMouseButton = true;
+                return;
+            }
+            e.Handled = true;
+
+            // Record Mouse Button Press
+            int button = -1;
+            switch (e.ChangedButton)
+            {
+                case MouseButton.Left: button = (int)SFML.Window.Mouse.Button.Left; break;
+                case MouseButton.Right: button = (int)SFML.Window.Mouse.Button.Right; break;
+                case MouseButton.Middle: button = (int)SFML.Window.Mouse.Button.Middle; break;
+                case MouseButton.XButton1: button = (int)SFML.Window.Mouse.Button.XButton1; break;
+                case MouseButton.XButton2: button = (int)SFML.Window.Mouse.Button.XButton2; break;
+            }
+
+            // Update Control and Text Box
+            int bind = button + Config.MouseCodeOffset;
+            if (Controls.IndexOf(bind) == -1)
+            {
+                Controls.Add(bind);
+                UpdateBindings();
+            }
+            ControlSetting.ReleaseMouseCapture();
         }
         private void RecordKey(Key keyCode, bool canBeKeyCombo = true)
         {
@@ -125,6 +157,8 @@ namespace vimage_settings
                 return;
             window.PreviewKeyDown += OnKeyDown;
             window.PreviewKeyUp += OnKeyUp;
+            ControlSetting.PreviewMouseUp += ControlSetting_MouseUp;
+            CanRecordMouseButton = false;
         }
 
         private void ControlSetting_LostFocus(object sender, RoutedEventArgs e)
@@ -134,6 +168,7 @@ namespace vimage_settings
                 return;
             window.PreviewKeyDown -= OnKeyDown;
             window.PreviewKeyUp -= OnKeyUp;
+            ControlSetting.PreviewMouseUp -= ControlSetting_MouseUp;
         }
     }
 }
