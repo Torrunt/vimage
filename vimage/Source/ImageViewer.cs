@@ -876,8 +876,8 @@ namespace vimage
             }
 
             // Force Fit To Monitor Height?
-            Vector2i imagePos = new Vector2i((int)NextWindowPos.X + ((int)Size.X / 2), (int)NextWindowPos.Y + ((int)Size.Y / 2));
-            IntRect currentBounds = ImageViewerUtils.GetCurrentBounds(imagePos);
+            Vector2i mousePos = Mouse.GetPosition();
+            IntRect currentBounds = ImageViewerUtils.GetCurrentBounds(mousePos);
             if (Config.Setting_LimitImagesToMonitor != Config.NONE)
             {
                 // Fit to monitor height/width
@@ -912,7 +912,7 @@ namespace vimage
             // Center image or place in top-left corner if it's a large/wide image.
             IntRect currentWorkingArea;
             if (!FitToMonitorHeightForced)
-                currentWorkingArea = ImageViewerUtils.GetCurrentWorkingArea(imagePos);
+                currentWorkingArea = ImageViewerUtils.GetCurrentWorkingArea(mousePos);
             else
                 currentWorkingArea = currentBounds;
 
