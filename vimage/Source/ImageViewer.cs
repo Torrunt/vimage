@@ -820,9 +820,9 @@ namespace vimage
                 {
                     FitToMonitorHeight = true;
                     if (Rotation == 90 || Rotation == 270)
-                        Zoom(1 + (((float)bounds.Height - Size.X) / Size.X), true);
+                        Zoom(1 + (((float)bounds.Height - Size.X) / Size.X), Size.Y < bounds.Width);
                     else
-                        Zoom(1 + (((float)bounds.Height - Size.Y) / Size.Y), true);
+                        Zoom(1 + (((float)bounds.Height - Size.Y) / Size.Y), Size.X < bounds.Width);
                     NextWindowPos = new Vector2i(NextWindowPos.X, bounds.Top);
                 }
                 else if (dimension == Config.WIDTH)
@@ -847,6 +847,10 @@ namespace vimage
 
             if (CurrentImageSize().X * CurrentZoom >= bounds.Width)
                 NextWindowPos = new Vector2i(bounds.Left, bounds.Top); // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
+            else if (CurrentImageSize().X > bounds.Width)
+                NextWindowPos = new Vector2i(
+                    bounds.Left + (bounds.Width / 2) - ((int)(Size.X * CurrentZoom) / 2),
+                    bounds.Top + (bounds.Height / 2) - ((int)(Size.Y * CurrentZoom) / 2)); // Position Window at center if originally large
             else if (!FitToMonitorAlt)
                 ForceAlwaysOnTopNextTick = true;
 
