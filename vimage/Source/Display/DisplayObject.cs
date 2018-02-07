@@ -141,6 +141,18 @@ namespace vimage
                     Obj.GetChildAt(i).Texture.Smooth = _Smooth;
             }
         }
+
+        private bool _Mipmap = true;
+        public bool Mipmap
+        {
+            get { return _Mipmap; }
+            set
+            {
+                _Mipmap = value;
+                for (int i = 0; i < Obj.NumChildren; i++)
+                    Obj.GetChildAt(i).Texture.Mipmap = _Mipmap;
+            }
+        }
     }
 
 }

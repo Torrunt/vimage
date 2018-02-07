@@ -25,7 +25,7 @@ namespace vimage
         private static List<DisplayObject> SplitTextures = new List<DisplayObject>();
         private static List<string> SplitTextureFileNames = new List<string>();
 
-        public const uint MAX_TEXTURES = 20;
+        public const uint MAX_TEXTURES = 80;
         public const uint MAX_ANIMATIONS = 6;
         public static int TextureMaxSize = (int)Texture.MaximumSize;
 
