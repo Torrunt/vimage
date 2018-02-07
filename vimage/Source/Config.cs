@@ -158,6 +158,16 @@ namespace vimage
             get { return (int)Settings["MOVESPEEDFAST"]; }
             set { Settings["MOVESPEEDFAST"] = value; }
         }
+        public int Setting_MaxTextures
+        {
+            get { return (int)Settings["MAXTEXTURES"]; }
+            set { Settings["MAXTEXTURES"] = value; }
+        }
+        public int Setting_MaxAnimations
+        {
+            get { return (int)Settings["MAXANIMATIONS"]; }
+            set { Settings["MAXANIMATIONS"] = value; }
+        }
 
         public int Setting_SettingsAppWidth
         {
@@ -257,6 +267,8 @@ namespace vimage
                 { "ZOOMSPEEDFAST", 10 },
                 { "MOVESPEED", 2 },
                 { "MOVESPEEDFAST", 10 },
+                { "MAXTEXTURES", 80 },
+                { "MAXANIMATIONS", 8 },
                 { "SETTINGSAPPWIDTH", 600 },
                 { "SETTINGSAPPHEIGHT", 550 },
                 { "DEFAULTSORTBY", SortBy.FolderDefault },
@@ -697,6 +709,8 @@ namespace vimage
             WriteSetting(writer, "ZoomSpeedFast", Setting_ZoomSpeedFast);
             WriteSetting(writer, "MoveSpeed", Setting_MoveSpeed);
             WriteSetting(writer, "MoveSpeedFast", Setting_MoveSpeedFast);
+            WriteSetting(writer, "MaxTextures", Setting_MaxTextures);
+            WriteSetting(writer, "MaxAnimations", Setting_MaxAnimations);
             WriteSetting(writer, "SettingsAppWidth", Setting_SettingsAppWidth);
             WriteSetting(writer, "SettingsAppHeight", Setting_SettingsAppHeight);
             WriteSetting(writer, "DefaultSortBy", (int)Setting_DefaultSortBy);

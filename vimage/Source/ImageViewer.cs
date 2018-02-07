@@ -80,6 +80,7 @@ namespace vimage
         /// <summary>0=false, 1=next, -1=prev.</summary>
         private int PreloadingNextImage = 0;
         private bool PreloadNextImageStart = false;
+        private bool PreloadingImage = false;
         public SortBy SortImagesBy = SortBy.Name;
         public SortDirection SortImagesByDir = SortDirection.Ascending;
 
@@ -121,6 +122,8 @@ namespace vimage
             BackgroundsForImagesWithTransparency = Config.Setting_BackgroundForImagesWithTransparencyDefault;
             System.Drawing.Color backColour = System.Drawing.ColorTranslator.FromHtml(Config.Setting_BackgroundColour);
             BackgroundColour = new Color(backColour.R, backColour.G, backColour.B, backColour.A);
+            Graphics.MAX_TEXTURES = (uint)Config.Setting_MaxTextures;
+            Graphics.MAX_ANIMATIONS = (uint)Config.Setting_MaxAnimations;
 
             // Get Image
             ChangeImage(file);
@@ -1313,9 +1316,10 @@ namespace vimage
         }
         private void PreloadNextImage()
         {
-            if (PreloadingNextImage == 0 || FolderContents.Count == 0)
+            if (PreloadingImage || PreloadingNextImage == 0 || FolderContents.Count == 0)
                 return;
 
+            PreloadingImage = true;
             PreloadNextImageStart = false;
             
             bool success = false;
@@ -1334,6 +1338,7 @@ namespace vimage
             while (!success);
             
             PreloadingNextImage = 0;
+            PreloadingImage = false;
         }
 
         public void NextImage()

@@ -7,7 +7,7 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="vimage_settings.General"
              mc:Ignorable="d" 
-             d:DesignHeight="472" d:DesignWidth="450" Margin="2">
+             d:DesignHeight="650" d:DesignWidth="450" Margin="2">
     <UserControl.Resources>
         <Style TargetType="{x:Type Label}">
             <Setter Property="VerticalAlignment" Value="Center" />
@@ -102,6 +102,14 @@
         <DockPanel ToolTip="Move speed when holding down 'Zoom Faster' (SHIFT by default).">
             <Label Content="Move Speed Fast"/>
             <xctk:IntegerUpDown Value="{Binding Setting_MoveSpeedFast}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+        </DockPanel>
+        <DockPanel ToolTip="The max amount of textures that vimage will keep in it's memory.">
+            <Label Content="Max Textures in Memory"/>
+            <xctk:IntegerUpDown Value="{Binding Setting_MaxTextures}" Minimum="3" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+        </DockPanel>
+        <DockPanel ToolTip="The max amount of animated gifs that vimage will keep in it's memory.">
+            <Label Content="Max Animations in Memory"/>
+            <xctk:IntegerUpDown Value="{Binding Setting_MaxAnimations}" Minimum="2" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
         <DockPanel ToolTip="Default sorting when stepping through images in a folder.&#x0a;(FOLDER = Sort the same way Windows is sorting the folder)">
             <Label Content="Default Sorting" />

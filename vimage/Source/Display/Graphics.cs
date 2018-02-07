@@ -25,8 +25,8 @@ namespace vimage
         private static List<DisplayObject> SplitTextures = new List<DisplayObject>();
         private static List<string> SplitTextureFileNames = new List<string>();
 
-        public const uint MAX_TEXTURES = 80;
-        public const uint MAX_ANIMATIONS = 6;
+        public static uint MAX_TEXTURES = 80;
+        public static uint MAX_ANIMATIONS = 8;
         public static int TextureMaxSize = (int)Texture.MaximumSize;
 
         public static dynamic GetTexture(string fileName)
@@ -78,13 +78,15 @@ namespace vimage
                     else
                     {
                         texture = GetTextureFromBoundImage();
+                        if (texture == null)
+                            return null;
 
                         Textures.Add(texture);
                         TextureFileNames.Add(fileName);
                     }
 
                     // Limit amount of Textures in Memory
-                    if (Textures.Count > MAX_TEXTURES)
+                    if (Textures.Count >= MAX_TEXTURES)
                     {
                         if (TextureFileNames[0].IndexOf('^') == TextureFileNames[0].Length - 1)
                         {
@@ -99,7 +101,7 @@ namespace vimage
                             }
                             for (int d = 0; d < i; d++)
                             {
-                                Textures[0].Dispose();
+                                Textures[0]?.Dispose();
                                 Textures.RemoveAt(0);
                                 TextureFileNames.RemoveAt(0);
                             }
@@ -113,7 +115,7 @@ namespace vimage
                         }
                         else
                         {
-                            Textures[0].Dispose();
+                            Textures[0]?.Dispose();
                             Textures.RemoveAt(0);
                             TextureFileNames.RemoveAt(0);
                         }
@@ -344,10 +346,10 @@ namespace vimage
                 AnimatedImageDataFileNames.Add(fileName);
 
                 // Limit amount of Animations in Memory
-                if (AnimatedImageDatas.Count > MAX_ANIMATIONS)
+                if (AnimatedImageDatas.Count >= MAX_ANIMATIONS)
                 {
                     for (int i = 0; i < AnimatedImageDatas[0].Frames.Count; i++)
-                        AnimatedImageDatas[0].Frames[i].Dispose();
+                        AnimatedImageDatas[0]?.Frames[i]?.Dispose();
                     
                     AnimatedImageDatas.RemoveAt(0);
                     AnimatedImageDataFileNames.RemoveAt(0);
