@@ -396,8 +396,12 @@ namespace vimage
 
                 stream.Dispose();
 
-                Data.Frames[i].Smooth = true;
+                Data.Frames[i].Smooth = Data.Smooth;
+                Data.Frames[i].Mipmap = Data.Mipmap;
             }
+            Data.FullyLoaded = true;
+            Data.Smooth = Data.Smooth;
+            Data.Mipmap = Data.Mipmap;
         }
     }
 

@@ -10,6 +10,7 @@ namespace vimage
         public List<Texture> Frames = new List<Texture>();
         public int FramesCount = 0;
         public int FrameDuration = 100;
+        public bool FullyLoaded = false;
 
         private bool _Smooth = true;
         public bool Smooth 
@@ -18,8 +19,26 @@ namespace vimage
             set
             {
                 _Smooth = value;
-                foreach (Texture texture in Frames)
-                    texture.Smooth = _Smooth;
+                if (FullyLoaded)
+                {
+                    foreach (Texture texture in Frames)
+                        texture.Smooth = _Smooth;
+                }
+            }
+        }
+
+        private bool _Mipmap = true;
+        public bool Mipmap
+        {
+            get { return _Mipmap; }
+            set
+            {
+                _Mipmap = value;
+                if (FullyLoaded)
+                {
+                    foreach (Texture texture in Frames)
+                        texture.Mipmap = _Mipmap;
+                }
             }
         }
 

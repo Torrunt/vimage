@@ -25,6 +25,7 @@
     <StackPanel>
         <CheckBox IsChecked="{Binding Setting_OpenAtMousePosition}" Content="Open images at mouse position" ToolTip="When an image is opened it will be centered at the current mouse position (commonly where the image file is).&#x0a;Otherwise it will be centered on the current monitor."/>
         <CheckBox IsChecked="{Binding Setting_SmoothingDefault}" Content="Smooth images by default"/>
+        <CheckBox IsChecked="{Binding Setting_Mipmapping}" Content="Mipmapping (smoother images when zoomed out)"/>
         <CheckBox IsChecked="{Binding Setting_PositionLargeWideImagesInCorner}" Content="Position large/wide images in corner (ie: wallpapers/screenshots)" ToolTip="Images that are wider than or the same width as the current monitor will be placed in the top left corner."/>
         <CheckBox IsChecked="{Binding Setting_PreloadNextImage}" Content="Preload next image" ToolTip="When using the next/prev image buttons, the image after the one just loaded will be loaded as well."/>
         <CheckBox IsChecked="{Binding Setting_OpenSettingsEXE}" Content="Use vimage__settings.exe (otherwise will open config.txt directly)" ToolTip="What will open when the 'Open Config' button/shortcut is used."/>

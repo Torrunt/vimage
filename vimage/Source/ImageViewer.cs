@@ -475,6 +475,9 @@ namespace vimage
             if (Config.IsControl(code, Config.Control_ToggleSmoothing))
                 ToggleSmoothing();
 
+            if (Config.IsControl(code, Config.Control_ToggleMipmapping))
+                ToggleMipmap();
+
             if (Config.IsControl(code, Config.Control_ToggleBackgroundForTransparency))
                 ToggleBackground();
 
@@ -931,7 +934,7 @@ namespace vimage
                 Image.Data.Smooth = !Image.Data.Smooth;
             else
                 Image.Texture.Smooth = !Image.Texture.Smooth;
-            Update();
+            Updated = true;
         }
         public bool Smoothing()
         {
@@ -940,11 +943,26 @@ namespace vimage
             else
                 return Image.Texture.Smooth;
         }
+        public void ToggleMipmap()
+        {
+            if (Image is AnimatedImage)
+                Image.Data.Mipmap = !Image.Data.Mipmap;
+            else
+                Image.Texture.Mipmap = !Image.Texture.Mipmap;
+            Updated = true;
+        }
+        public bool Mipmapping()
+        {
+            if (Image is AnimatedImage)
+                return Image.Data.Mipmap;
+            else
+                return Image.Texture.Mipmap;
+        }
 
         public void ToggleBackground()
         {
             BackgroundsForImagesWithTransparency = !BackgroundsForImagesWithTransparency;
-            Update();
+            Updated = true;
         }
 
         public void ToggleImageTransparency()
@@ -1116,10 +1134,7 @@ namespace vimage
                 // Other
                 dynamic texture = Graphics.GetTexture(fileName);
                 if (texture is Texture)
-                {
-                    texture.Smooth = true;
                     Image = new Sprite(texture);
-                }
                 else if (texture is DisplayObject)
                     Image = (DisplayObject)texture;
             }
@@ -1163,9 +1178,15 @@ namespace vimage
             RotateImage(prevRotation == prevDefaultRotation ? DefaultRotation : (int)prevRotation, false, false);
             // Smoothing
             if (Image is AnimatedImage)
+            {
                 Image.Data.Smooth = Math.Min(Size.X, Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
+                Image.Data.Mipmap = Config.Setting_Mipmapping;
+            }
             else
+            {
                 Image.Texture.Smooth = Math.Min(Size.X, Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
+                Image.Texture.Mipmap = Config.Setting_Mipmapping;
+            }
 
             // Color
             if (ImageColor != Color.White)

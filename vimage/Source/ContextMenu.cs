@@ -141,6 +141,9 @@ namespace vimage
 
         public void RefreshItems()
         {
+            if (!ShowImageMargin)
+                return;
+
             ToolStripMenuItem item;
 
             item = GetItemByFunc(MenuFuncs.FLIP);
@@ -151,6 +154,9 @@ namespace vimage
 
             item = GetItemByFunc(MenuFuncs.TOGGLE_SMOOTHING);
             if (item != null) item.Checked = ImageViewer.Smoothing();
+
+            item = GetItemByFunc(MenuFuncs.TOGGLE_MIPMAPPING);
+            if (item != null) item.Checked = ImageViewer.Mipmapping();
 
             item = GetItemByFunc(MenuFuncs.TOGGLE_BACKGROUND);
             if (item != null) item.Checked = ImageViewer.BackgroundsForImagesWithTransparency;
@@ -216,6 +222,7 @@ namespace vimage
                 case MenuFuncs.FIT_TO_AUTO: ImageViewer.ToggleFitToMonitor(Config.AUTO); return;
                 case MenuFuncs.RESET_IMAGE: ImageViewer.ResetImage(); return;
                 case MenuFuncs.TOGGLE_SMOOTHING: ImageViewer.ToggleSmoothing(); return;
+                case MenuFuncs.TOGGLE_MIPMAPPING: ImageViewer.ToggleMipmap(); return;
                 case MenuFuncs.TOGGLE_BACKGROUND: ImageViewer.ToggleBackground(); return;
                 case MenuFuncs.ALWAYS_ON_TOP: ImageViewer.ToggleAlwaysOnTop(); return;
 
