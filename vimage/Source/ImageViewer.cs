@@ -335,13 +335,7 @@ namespace vimage
                 }
 
                 if (ForceAlwaysOnTopNextTick)
-                {
-                    bounds = ImageViewerUtils.GetCurrentBounds(Window.Position);
-                    if (Window.Size.Y >= bounds.Height && Window.Size.X < bounds.Width)
-                        ForceAlwaysOnTop();
-                    else
-                        ForceAlwaysOnTopNextTick = false;
-                }
+                    ForceAlwaysOnTop();
 
                 if (PreloadNextImageStart)
                     PreloadNextImage();
@@ -854,7 +848,7 @@ namespace vimage
                 NextWindowPos = new Vector2i(
                     bounds.Left + (bounds.Width / 2) - ((int)(Size.X * CurrentZoom) / 2),
                     bounds.Top + (bounds.Height / 2) - ((int)(Size.Y * CurrentZoom) / 2)); // Position Window at center if originally large
-            else if (!FitToMonitorAlt)
+            else if (!FitToMonitorAlt && NextWindowSize.Y >= bounds.Height && NextWindowSize.X < bounds.Width && bounds.Height != ImageViewerUtils.GetCurrentWorkingArea(Mouse.GetPosition()).Height)
                 ForceAlwaysOnTopNextTick = true;
 
             AutomaticallyZoomed = false;
@@ -929,7 +923,8 @@ namespace vimage
                 NextWindowPos = new Vector2i(currentWorkingArea.Left + (currentWorkingArea.Width / 2) - ((int)(Size.X * CurrentZoom) / 2), currentWorkingArea.Top + (currentWorkingArea.Height / 2) - ((int)(Size.Y * CurrentZoom) / 2));
 
             // Force Always on Top?
-            if (FitToMonitorHeightForced || (Size.Y >= currentBounds.Height && Size.X < currentBounds.Width))
+            if ((FitToMonitorHeightForced || (Size.Y >= currentBounds.Height && Size.X < currentBounds.Width)) &&
+                    NextWindowSize.Y >= currentBounds.Height && NextWindowSize.X < currentBounds.Width && currentBounds.Height != ImageViewerUtils.GetCurrentWorkingArea(mousePos).Height)
                 ForceAlwaysOnTopNextTick = true;
 
             ViewStateHistory = new List<ViewState>();
@@ -1268,8 +1263,9 @@ namespace vimage
                     Zoom(CurrentZoom, true);
             }
 
-            bounds = ImageViewerUtils.GetCurrentBounds(NextWindowPos +
-                new Vector2i((int)(Size.X * CurrentZoom) / 2, (int)(Size.Y * CurrentZoom) / 2));
+            Vector2i boundsPos = NextWindowPos +
+                new Vector2i((int)(Size.X * CurrentZoom) / 2, (int)(Size.Y * CurrentZoom) / 2);
+            bounds = ImageViewerUtils.GetCurrentBounds(boundsPos);
 
             // Position Window at top-left if the image is wide (ie: a Desktop Wallpaper / Screenshot)
             // Otherwise, if image is hanging off monitor just center it.
@@ -1281,7 +1277,8 @@ namespace vimage
                 NextWindowPos = new Vector2i(bounds.Left + (int)((bounds.Width - (Size.X * CurrentZoom)) / 2), bounds.Top + (int)((bounds.Height - (Size.Y * CurrentZoom)) / 2));
 
             // Force Always On Top Mode (so it's above the task bar) - will only happen if height >= window height
-            ForceAlwaysOnTopNextTick = true;
+            if (NextWindowSize.Y >= bounds.Height && NextWindowSize.X < bounds.Width && bounds.Height != ImageViewerUtils.GetCurrentWorkingArea(boundsPos).Height)
+                ForceAlwaysOnTopNextTick = true;
 
             Window.SetTitle(fileName + " - vimage");
             ContextMenu?.Setup(false);
@@ -1722,7 +1719,7 @@ namespace vimage
                         Updated = true;
                         i++;
                         break;
-                    case "-alwaysOnTop": ForceAlwaysOnTopNextTick = true; break;
+                    case "-alwaysOnTop": ToggleAlwaysOnTop(); break;
                     case "-flip": FlipImage(); break;
                     case "-reset": ResetImage(); break;
                     case "-play": if (Image is AnimatedImage && Image.Playing) Image.Play(); break;
