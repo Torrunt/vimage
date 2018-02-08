@@ -70,6 +70,7 @@ namespace vimage
         private bool Cropping = false;
         private RectangleShape CropRect;
         private Vector2i CropStartPos = new Vector2i();
+        public bool Locked = false;
         public bool AlwaysOnTop = false;
         private bool AlwaysOnTopForced = false;
         /// <summary>
@@ -383,6 +384,8 @@ namespace vimage
         }
         private void OnMouseWheelScrolled(Object sender, MouseWheelScrollEventArgs e)
         {
+            if (Locked)
+                return;
             if (TransparencyMod)
             {
                 // Change Image Transparency
@@ -478,7 +481,9 @@ namespace vimage
             if (Config.IsControl(code, Config.Control_ToggleBackgroundForTransparency))
                 ToggleBackground();
 
-            // Toggle Always On Top
+            if (Config.IsControl(code, Config.Control_ToggleLock))
+                ToggleLock();
+
             if (Config.IsControl(code, Config.Control_ToggleAlwaysOnTop))
                 ToggleAlwaysOnTop();
 
@@ -550,7 +555,7 @@ namespace vimage
         private void ControlDown(object code)
         {
             // Dragging
-            if (Config.IsControl(code, Config.Control_Drag))
+            if (!Locked && Config.IsControl(code, Config.Control_Drag))
             {
                 if (!Dragging)
                     DragPos = MousePos;
@@ -978,6 +983,12 @@ namespace vimage
                 ImageColor = Color.White;
             Image.Color = ImageColor;
             Updated = true;
+        }
+
+        public void ToggleLock()
+        {
+            Locked = !Locked;
+            Dragging = false;
         }
 
         public void ToggleAlwaysOnTop()
