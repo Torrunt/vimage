@@ -802,8 +802,9 @@ namespace vimage
             UnforceAlwaysOnTop();
 
             IntRect bounds;
+            IntRect workingArea = ImageViewerUtils.GetCurrentWorkingArea(Mouse.GetPosition());
             if (FitToMonitorAlt)
-                bounds = ImageViewerUtils.GetCurrentWorkingArea(Mouse.GetPosition());
+                bounds = workingArea;
             else
                 bounds = ImageViewerUtils.GetCurrentBounds(Mouse.GetPosition());
 
@@ -822,18 +823,18 @@ namespace vimage
                 {
                     FitToMonitorHeight = true;
                     if (Rotation == 90 || Rotation == 270)
-                        Zoom(1 + (((float)bounds.Height - Size.X) / Size.X), Size.Y < bounds.Width);
+                        Zoom((float)bounds.Height / Size.X, Size.Y < bounds.Width);
                     else
-                        Zoom(1 + (((float)bounds.Height - Size.Y) / Size.Y), Size.X < bounds.Width);
+                        Zoom((float)bounds.Height / Size.Y, Size.X < bounds.Width);
                     NextWindowPos = new Vector2i(NextWindowPos.X, bounds.Top);
                 }
                 else if (dimension == Config.WIDTH)
                 {
                     FitToMonitorWidth = true;
                     if (Rotation == 90 || Rotation == 270)
-                        Zoom(1 + (((float)bounds.Width - Size.Y) / Size.Y), true);
+                        Zoom((float)bounds.Height / Size.Y, true);
                     else
-                        Zoom(1 + (((float)bounds.Width - Size.X) / Size.X), true);
+                        Zoom((float)bounds.Height / Size.X, true);
                     NextWindowPos = new Vector2i(bounds.Left, NextWindowPos.Y);
                 }
             }
@@ -846,15 +847,17 @@ namespace vimage
                 NextWindowPos = new Vector2i(NextWindowPos.X < 0 ? 0 : NextWindowPos.X, NextWindowPos.Y < 0 ? 0 : NextWindowPos.Y);
             }
 
-
-            if (CurrentImageSize().X * CurrentZoom >= bounds.Width)
+            // Position window
+            if (Config.Setting_PositionLargeWideImagesInCorner && CurrentImageSize().X * CurrentZoom >= bounds.Width)
                 NextWindowPos = new Vector2i(bounds.Left, bounds.Top); // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
-            else if (CurrentImageSize().X > bounds.Width)
+            else if (CurrentImageSize().X >= bounds.Width)
                 NextWindowPos = new Vector2i(
-                    bounds.Left + (bounds.Width / 2) - ((int)(Size.X * CurrentZoom) / 2),
-                    bounds.Top + (bounds.Height / 2) - ((int)(Size.Y * CurrentZoom) / 2)); // Position Window at center if originally large
-            else if (!FitToMonitorAlt && NextWindowSize.Y >= bounds.Height && NextWindowSize.X < bounds.Width && bounds.Height != ImageViewerUtils.GetCurrentWorkingArea(Mouse.GetPosition()).Height)
-                ForceAlwaysOnTopNextTick = true;
+                    NextWindowSize.X >= bounds.Width - 2 ? bounds.Left : bounds.Left + (bounds.Width / 2) - ((int)(CurrentImageSize().X * CurrentZoom) / 2),
+                    NextWindowSize.Y >= bounds.Height - 2 ? bounds.Top : bounds.Top + (bounds.Height / 2) - ((int)(CurrentImageSize().Y * CurrentZoom) / 2)); // Position Window at center if originally large
+            
+            // Temporarily set always on top to bring it infront of the taskbar?
+            if (!FitToMonitorAlt)
+                ForceAlwaysOnTopCheck(bounds, workingArea);
 
             AutomaticallyZoomed = false;
         }
@@ -883,7 +886,7 @@ namespace vimage
 
             // Force Fit To Monitor Height?
             Vector2i mousePos = Mouse.GetPosition();
-            IntRect currentBounds = ImageViewerUtils.GetCurrentBounds(mousePos);
+            IntRect bounds = ImageViewerUtils.GetCurrentBounds(mousePos);
             if (Config.Setting_LimitImagesToMonitor != Config.NONE)
             {
                 // Fit to monitor height/width
@@ -891,20 +894,20 @@ namespace vimage
 
                 if (limit == Config.AUTO)
                 {
-                    if (currentBounds.Height < currentBounds.Width)
+                    if (bounds.Height < bounds.Width)
                         limit = Config.HEIGHT;
                     else
                         limit = Config.WIDTH;
                 }
 
-                if (limit == Config.HEIGHT && Size.Y > currentBounds.Height)
+                if (limit == Config.HEIGHT && Size.Y > bounds.Height)
                 {
-                    Zoom(1 + (((float)currentBounds.Height - Size.Y) / Size.Y), true);
+                    Zoom((float)bounds.Height / Size.Y, true);
                     FitToMonitorHeightForced = true;
                 }
-                else if (limit == Config.WIDTH && Size.X > currentBounds.Width)
+                else if (limit == Config.WIDTH && Size.X > bounds.Width)
                 {
-                    Zoom(1 + (((float)currentBounds.Width - Size.X) / Size.X), true);
+                    Zoom((float)bounds.Width / Size.X, true);
                     AutomaticallyZoomed = true;
                 }
             }
@@ -917,20 +920,21 @@ namespace vimage
 
             // Center image or place in top-left corner if it's a large/wide image.
             IntRect currentWorkingArea;
+            IntRect workingArea = ImageViewerUtils.GetCurrentWorkingArea(mousePos);
             if (!FitToMonitorHeightForced)
-                currentWorkingArea = ImageViewerUtils.GetCurrentWorkingArea(mousePos);
+                currentWorkingArea = workingArea;
             else
-                currentWorkingArea = currentBounds;
+                currentWorkingArea = bounds;
 
-            if (Config.Setting_PositionLargeWideImagesInCorner && Size.X * CurrentZoom > Size.Y * CurrentZoom && Size.X * CurrentZoom >= currentBounds.Width)
-                NextWindowPos = new Vector2i(currentBounds.Left, currentBounds.Top);
+            if (Config.Setting_PositionLargeWideImagesInCorner && Size.X > Size.Y && Size.X * CurrentZoom >= bounds.Width)
+                NextWindowPos = new Vector2i(bounds.Left, bounds.Top); // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
             else
-                NextWindowPos = new Vector2i(currentWorkingArea.Left + (currentWorkingArea.Width / 2) - ((int)(Size.X * CurrentZoom) / 2), currentWorkingArea.Top + (currentWorkingArea.Height / 2) - ((int)(Size.Y * CurrentZoom) / 2));
+                NextWindowPos = new Vector2i(
+                    NextWindowSize.X >= currentWorkingArea.Width - 2 ? currentWorkingArea.Left : currentWorkingArea.Left + (currentWorkingArea.Width / 2) - ((int)(Size.X * CurrentZoom) / 2),
+                    NextWindowSize.Y >= currentWorkingArea.Height - 2 ? currentWorkingArea.Top : currentWorkingArea.Top + (currentWorkingArea.Height / 2) - ((int)(Size.Y * CurrentZoom) / 2)); // Center
 
-            // Force Always on Top?
-            if ((FitToMonitorHeightForced || (Size.Y >= currentBounds.Height && Size.X < currentBounds.Width)) &&
-                    NextWindowSize.Y >= currentBounds.Height && NextWindowSize.X < currentBounds.Width && currentBounds.Height != ImageViewerUtils.GetCurrentWorkingArea(mousePos).Height)
-                ForceAlwaysOnTopNextTick = true;
+            // Temporarily set always on top to bring it infront of the taskbar?
+            ForceAlwaysOnTopCheck(bounds, workingArea);
 
             ViewStateHistory = new List<ViewState>();
         }
@@ -1015,6 +1019,13 @@ namespace vimage
             AlwaysOnTop = false;
             AlwaysOnTopForced = false;
             DWM.SetAlwaysOnTop(Window.SystemHandle, false);
+        }
+        public void ForceAlwaysOnTopCheck(IntRect bounds, IntRect workingArea)
+        {
+            if (NextWindowSize.Y >= bounds.Height && NextWindowSize.X < bounds.Width &&
+                ((bounds.Height != workingArea.Height && (NextWindowPos.Y + NextWindowSize.Y >= workingArea.Top + workingArea.Height || NextWindowPos.Y <= workingArea.Top)) ||
+                (bounds.Width != workingArea.Width && (NextWindowPos.X <= workingArea.Left || NextWindowPos.X + NextWindowSize.X >= workingArea.Left + workingArea.Width))))
+                ForceAlwaysOnTopNextTick = true;
         }
 
         public void CropStart()
@@ -1229,7 +1240,7 @@ namespace vimage
 
                 if (limit == Config.HEIGHT && (FitToMonitorHeight || CurrentImageSize().Y * CurrentZoom > bounds.Height))
                 {
-                    Zoom(1 + (((float)bounds.Height - CurrentImageSize().Y) / CurrentImageSize().Y), true);
+                    Zoom((float)bounds.Height / CurrentImageSize().Y, true);
 
                     bounds = ImageViewerUtils.GetCurrentBounds(NextWindowPos +
                         new Vector2i((int)(CurrentImageSize().X * CurrentZoom) / 2, (int)(CurrentImageSize().Y * CurrentZoom) / 2));
@@ -1242,7 +1253,7 @@ namespace vimage
                 }
                 else if (limit == Config.WIDTH && CurrentImageSize().X * CurrentZoom > bounds.Width)
                 {
-                    Zoom(1 + (((float)bounds.Width - CurrentImageSize().X) / CurrentImageSize().X), true);
+                    Zoom((float)bounds.Width / CurrentImageSize().X, true);
 
                     bounds = ImageViewerUtils.GetCurrentBounds(NextWindowPos +
                         new Vector2i((int)(CurrentImageSize().X * CurrentZoom) / 2, (int)(CurrentImageSize().Y * CurrentZoom) / 2));
@@ -1287,9 +1298,8 @@ namespace vimage
                 NextWindowPos.Y + (Size.Y * CurrentZoom) >= bounds.Top + bounds.Height))
                 NextWindowPos = new Vector2i(bounds.Left + (int)((bounds.Width - (Size.X * CurrentZoom)) / 2), bounds.Top + (int)((bounds.Height - (Size.Y * CurrentZoom)) / 2));
 
-            // Force Always On Top Mode (so it's above the task bar) - will only happen if height >= window height
-            if (NextWindowSize.Y >= bounds.Height && NextWindowSize.X < bounds.Width && bounds.Height != ImageViewerUtils.GetCurrentWorkingArea(boundsPos).Height)
-                ForceAlwaysOnTopNextTick = true;
+            // Temporarily set always on top to bring it infront of the taskbar?
+            ForceAlwaysOnTopCheck(bounds, ImageViewerUtils.GetCurrentWorkingArea(boundsPos));
 
             Window.SetTitle(fileName + " - vimage");
             ContextMenu?.Setup(false);
