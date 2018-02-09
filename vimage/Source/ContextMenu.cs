@@ -161,6 +161,9 @@ namespace vimage
             item = GetItemByFunc(MenuFuncs.TOGGLE_BACKGROUND);
             if (item != null) item.Checked = ImageViewer.BackgroundsForImagesWithTransparency;
 
+            item = GetItemByFunc(MenuFuncs.TOGGLE_LOCK);
+            if (item != null) item.Checked = ImageViewer.Locked;
+
             item = GetItemByFunc(MenuFuncs.ALWAYS_ON_TOP);
             if (item != null) item.Checked = ImageViewer.AlwaysOnTop;
 
@@ -224,6 +227,7 @@ namespace vimage
                 case MenuFuncs.TOGGLE_SMOOTHING: ImageViewer.ToggleSmoothing(); return;
                 case MenuFuncs.TOGGLE_MIPMAPPING: ImageViewer.ToggleMipmap(); return;
                 case MenuFuncs.TOGGLE_BACKGROUND: ImageViewer.ToggleBackground(); return;
+                case MenuFuncs.TOGGLE_LOCK: ImageViewer.ToggleLock(); return;
                 case MenuFuncs.ALWAYS_ON_TOP: ImageViewer.ToggleAlwaysOnTop(); return;
 
                 case MenuFuncs.OPEN_FILE_LOCATION: ImageViewer.OpenFileAtLocation(); return;
@@ -235,6 +239,7 @@ namespace vimage
                 case MenuFuncs.RANDOM_IMAGE: ImageViewer.RandomImage(); return;
                 case MenuFuncs.TOGGLE_IMAGE_TRANSPARENCY: ImageViewer.ToggleImageTransparency(); return;
                 case MenuFuncs.UNDO_CROP: ImageViewer.UndoCrop(); return;
+                case MenuFuncs.EXIT_ALL_INSTANCES: ImageViewer.ExitAllInstances(); return;
 
                 case MenuFuncs.OPEN_SETTINGS: ImageViewer.OpenConfig(); return;
                 case MenuFuncs.RELOAD_SETTINGS: ImageViewer.ReloadConfig(); return;

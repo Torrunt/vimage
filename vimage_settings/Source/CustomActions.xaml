@@ -56,7 +56,11 @@
                         -random<LineBreak/>
                         -fitToMonitorHeight<LineBreak/>
                         -fitToMonitorWidth<LineBreak/>
-                        -fitToMonitorAuto
+                        -fitToMonitorAuto<LineBreak/>
+                        -lock<LineBreak/>
+                        -taskbarHide<LineBreak/>
+                        -taskbarShow<LineBreak/>
+                        -taskbarToggle
                     </TextBlock>
                 </Button.ToolTip>
             </Button>

@@ -1585,6 +1585,17 @@ namespace vimage
             Process.Start(startInfo);
         }
 
+        public void ExitAllInstances()
+        {
+            Process current = Process.GetCurrentProcess();
+            Process.GetProcessesByName(current.ProcessName)
+                .Where(t => t.Id != current.Id)
+                .ToList()
+                .ForEach(t => t.Kill());
+
+            current.Kill();
+        }
+
         public void OpenConfig()
         {
             if (Config.Setting_OpenSettingsEXE)
@@ -1751,6 +1762,11 @@ namespace vimage
                     case "-fitToMonitorHeight": ToggleFitToMonitor(Config.HEIGHT); break;
                     case "-fitToMonitorWidth": ToggleFitToMonitor(Config.WIDTH); break;
                     case "-fitToMonitorAuto": ToggleFitToMonitor(Config.AUTO); break;
+                    case "-lock": ToggleLock(); break;
+                    
+                    case "-taskbarHide": DWM.TaskBarIconSetVisible(Window.SystemHandle, false); break;
+                    case "-taskbarShow": DWM.TaskBarIconSetVisible(Window.SystemHandle, true); break;
+                    case "-taskbarToggle": DWM.TaskBarIconToggle(Window.SystemHandle); break;
                 }
             }
 

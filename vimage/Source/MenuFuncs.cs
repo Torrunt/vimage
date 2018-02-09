@@ -15,6 +15,8 @@
         public const string TOGGLE_SMOOTHING = "TOGGLESMOOTHING";
         public const string TOGGLE_MIPMAPPING = "TOGGLEMIPMAPPING";
         public const string TOGGLE_BACKGROUND = "TOGGLEBACKGROUND";
+        public const string TOGGLE_IMAGE_TRANSPARENCY = "TOGGLEIMAGETRANSPARENCY";
+        public const string TOGGLE_LOCK = "TOGGLELOCK";
         public const string ALWAYS_ON_TOP = "ALWAYSONTOP";
         public const string OPEN_FILE_LOCATION = "OPENFILELOCATION";
         public const string DELETE = "DELETE";
@@ -38,18 +40,18 @@
 
         public const string OPEN_DUPLICATE = "OPENDUPLICATE";
         public const string OPEN_DUPLICATE_FULL = "OPENDUPLICATEFULL";
-        public const string RANDOM_IMAGE = "RANDOMIMAGE";
-        public const string TOGGLE_IMAGE_TRANSPARENCY = "TOGGLEIMAGETRANSPARENCY";
+        public const string RANDOM_IMAGE = "RANDOMIMAGE"; 
         public const string UNDO_CROP = "UNDOCROP";
+        public const string EXIT_ALL_INSTANCES = "EXITALLINSTANCES";
 
         public static readonly string[] FUNCS =
         {
             CLOSE, NEXT_IMAGE, PREV_IMAGE, ROTATE_CLOCKWISE, ROTATE_ANTICLOCKWISE,
             FLIP, FIT_TO_HEIGHT, FIT_TO_WIDTH, FIT_TO_AUTO, RESET_IMAGE, TOGGLE_SMOOTHING, TOGGLE_MIPMAPPING, TOGGLE_BACKGROUND,
-            ALWAYS_ON_TOP, OPEN_FILE_LOCATION, DELETE, COPY, COPY_AS_IMAGE, OPEN_SETTINGS, RELOAD_SETTINGS,
-            VERSION_NAME, SORT_NAME, SORT_DATE, SORT_DATE_MODIFIED, SORT_DATE_CREATED, SORT_SIZE,
+            TOGGLE_IMAGE_TRANSPARENCY, TOGGLE_LOCK, ALWAYS_ON_TOP, OPEN_FILE_LOCATION, DELETE, COPY, COPY_AS_IMAGE,
+            OPEN_SETTINGS, RELOAD_SETTINGS, VERSION_NAME, SORT_NAME, SORT_DATE, SORT_DATE_MODIFIED, SORT_DATE_CREATED, SORT_SIZE,
             SORT_ASCENDING, SORT_DESCENDING, NEXT_FRAME, PREV_FRAME, TOGGLE_ANIMATION,
-            OPEN_DUPLICATE, OPEN_DUPLICATE_FULL, RANDOM_IMAGE, TOGGLE_IMAGE_TRANSPARENCY, UNDO_CROP
+            OPEN_DUPLICATE, OPEN_DUPLICATE_FULL, RANDOM_IMAGE, UNDO_CROP, EXIT_ALL_INSTANCES
         };
 
         // <summary>Takes a MenuFunc name and adds space between certain words (for ease of reading).</summary>
@@ -59,7 +61,15 @@
             if (func.IndexOf(" ") != -1)
                 return func;
 
-            if (func == TOGGLE_IMAGE_TRANSPARENCY) { func = "TOGGLE IMAGE TRANSPARENCY"; return func; }
+            switch (func)
+            {
+                case ALWAYS_ON_TOP: return "ALWAYS ON TOP";
+                case VERSION_NAME: return "VERSION NAME";
+                case TOGGLE_IMAGE_TRANSPARENCY: return "TOGGLE IMAGE TRANSPARENCY";
+                case RANDOM_IMAGE: return "RANDOM IMAGE";
+                case UNDO_CROP: return "UNDO CROP";
+                case EXIT_ALL_INSTANCES: return "EXIT ALL INSTANCES";
+            }
             func = func.Replace("SORT", "SORT ");
             func = func.Replace("DATE", "DATE ");
             func = func.Replace("FRAME", " FRAME");
@@ -68,14 +78,10 @@
             func = func.Replace("ASIMAGE", " ASIMAGE");
             func = func.Replace("IMAGE", " IMAGE");
             func = func.Replace("ROTATE", "ROTATE ");
-            func = func.Replace("ALWAYSONTOP", "ALWAYS ON TOP");
-            func = func.Replace("VERSIONNAME", "VERSION NAME");
             func = func.Replace("RELOAD", "RELOAD ");
             func = func.Replace("OPEN", "OPEN ");
             func = func.Replace("FILELOCATION", "FILE LOCATION");
             func = func.Replace("DUPLICATEFULL", "DUPLICATE FULL");
-            func = func.Replace("RANDOMIMAGE", "RANDOM IMAGE");
-            func = func.Replace("UNDOCROP", "UNDO CROP");
 
             return func;
         }
