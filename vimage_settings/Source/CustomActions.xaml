@@ -47,8 +47,6 @@
                         -alwaysOnTop<LineBreak/>
                         -flip<LineBreak/>
                         -reset<LineBreak/>
-                        -play<LineBreak/>
-                        -stop<LineBreak/>
                         -toggleAnim<LineBreak/>
                         -frame 0<LineBreak/>
                         -next<LineBreak/>
@@ -58,8 +56,6 @@
                         -fitToMonitorWidth<LineBreak/>
                         -fitToMonitorAuto<LineBreak/>
                         -lock<LineBreak/>
-                        -taskbarHide<LineBreak/>
-                        -taskbarShow<LineBreak/>
                         -taskbarToggle
                     </TextBlock>
                 </Button.ToolTip>

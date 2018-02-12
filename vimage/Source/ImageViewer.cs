@@ -245,7 +245,7 @@ namespace vimage
             // Loop
             Stopwatch clock = new Stopwatch();
             clock.Start();
-            
+
             while (Window.IsOpen)
             {
                 // Add in some idle time to not thrash the CPU
@@ -265,7 +265,7 @@ namespace vimage
                     ReloadConfig();
                     ReloadConfigNextTick = false;
                 }
-                
+
                 // Animated Image?
                 if (Image is AnimatedImage)
                 {
@@ -368,7 +368,7 @@ namespace vimage
             Window.Display();
             Window.Position = NextWindowPos;
             Window.Size = NextWindowSize;
-            Redraw();     
+            Redraw();
         }
 
         ////////////////////////
@@ -411,14 +411,20 @@ namespace vimage
 
         private void OnMouseDown(Object sender, MouseButtonEventArgs e) { ControlDown(e.Button); }
         private void OnMouseUp(Object sender, MouseButtonEventArgs e) { ControlUp(e.Button); }
-        private void OnKeyDown(Object sender, SFML.Window.KeyEventArgs e) { ControlDown(e.Code); }
-        private void OnKeyUp(Object sender, SFML.Window.KeyEventArgs e) { ControlUp(e.Code); }
+        private void OnKeyDown(Object sender, KeyEventArgs e) { ControlDown(e.Code); }
+        private void OnKeyUp(Object sender, KeyEventArgs e) { ControlUp(e.Code); }
 
         private void ControlUp(object code)
         {
             // Close
             if (Config.IsControl(code, Config.Control_Close))
                 CloseNextTick = true;
+
+            if (Config.IsControl(code, Config.Control_ExitAll))
+            {
+                ExitAllInstances();
+                return;
+            }
 
             // Dragging
             if (Config.IsControl(code, Config.Control_Drag))
@@ -622,7 +628,7 @@ namespace vimage
             if ((Keyboard.Key)code == Keyboard.Key.RAlt)
                 Config.RAltDown = true;
         }
-     
+
 
         ///////////////////////////
         //      Manipulation     //
@@ -664,7 +670,7 @@ namespace vimage
             // Limit zooming to prevent the going past the GPU's max texture size
             if (value > CurrentZoom && (uint)Math.Ceiling(Size.X * value) >= Texture.MaximumSize)
                 value = CurrentZoom;
-            
+
             IntRect currentBounds = new IntRect();
             if (DragLimitToBoundsMod)
             {
@@ -675,7 +681,7 @@ namespace vimage
 
             float originalZoom = CurrentZoom;
             CurrentZoom = value;
-            
+
             Dragging = false;
             UnforceAlwaysOnTop();
 
@@ -854,7 +860,7 @@ namespace vimage
                 NextWindowPos = new Vector2i(
                     NextWindowSize.X >= bounds.Width - 2 ? bounds.Left : bounds.Left + (bounds.Width / 2) - ((int)(CurrentImageSize().X * CurrentZoom) / 2),
                     NextWindowSize.Y >= bounds.Height - 2 ? bounds.Top : bounds.Top + (bounds.Height / 2) - ((int)(CurrentImageSize().Y * CurrentZoom) / 2)); // Position Window at center if originally large
-            
+
             // Temporarily set always on top to bring it infront of the taskbar?
             if (!FitToMonitorAlt)
                 ForceAlwaysOnTopCheck(bounds, workingArea);
@@ -1112,7 +1118,7 @@ namespace vimage
         {
             if (ViewStateHistory.Count == 0)
                 return;
-            
+
             ViewState state = ViewStateHistory[ViewStateHistory.Count - 1];
 
             Size = state.Size;
@@ -1323,7 +1329,7 @@ namespace vimage
                 if (Graphics.GetSpriteFromIcon(fileName) == null)
                     return false;
             }
-            else 
+            else
             {
                 // Image
                 if (Graphics.GetTexture(fileName) == null)
@@ -1339,7 +1345,7 @@ namespace vimage
 
             PreloadingImage = true;
             PreloadNextImageStart = false;
-            
+
             bool success = false;
             int pos = FolderPosition;
             do
@@ -1354,7 +1360,7 @@ namespace vimage
                 success = PreloadImage(FolderContents[pos]);
             }
             while (!success);
-            
+
             PreloadingNextImage = 0;
             PreloadingImage = false;
         }
@@ -1453,7 +1459,7 @@ namespace vimage
                 return;
 
             string[] contents = Directory.GetFiles(directory);
-            contents = Array.FindAll(contents, delegate(string s) { return ImageViewerUtils.IsValidExtension(s, EXTENSIONS); });
+            contents = Array.FindAll(contents, delegate (string s) { return ImageViewerUtils.IsValidExtension(s, EXTENSIONS); });
 
             switch (SortImagesBy)
             {
@@ -1582,7 +1588,7 @@ namespace vimage
                     startInfo.Arguments += " -alwaysOnTop";
                 if (ImageColor != Color.White)
                 {
-                    string colour = "#" + ImageColor.A.ToString("X2", null) + 
+                    string colour = "#" + ImageColor.A.ToString("X2", null) +
                         ImageColor.R.ToString("X2", null) +
                         ImageColor.G.ToString("X2", null) +
                         ImageColor.B.ToString("X2", null);
@@ -1754,8 +1760,6 @@ namespace vimage
                     case "-alwaysOnTop": ToggleAlwaysOnTop(); break;
                     case "-flip": FlipImage(); break;
                     case "-reset": ResetImage(); break;
-                    case "-play": if (Image is AnimatedImage && Image.Playing) Image.Play(); break;
-                    case "-stop": if (Image is AnimatedImage && Image.Playing) Image.Stop(); break;
                     case "-toggleAnim": ToggleAnimation(); break;
                     case "-frame":
                         val = 1;
@@ -1774,8 +1778,6 @@ namespace vimage
                     case "-fitToMonitorAuto": ToggleFitToMonitor(Config.AUTO); break;
                     case "-lock": ToggleLock(); break;
                     
-                    case "-taskbarHide": DWM.TaskBarIconSetVisible(Window.SystemHandle, false); break;
-                    case "-taskbarShow": DWM.TaskBarIconSetVisible(Window.SystemHandle, true); break;
                     case "-taskbarToggle": DWM.TaskBarIconToggle(Window.SystemHandle); break;
                 }
             }

@@ -58,6 +58,7 @@ namespace vimage
         public List<int> Control_TransparencyHold = new List<int>();
         public List<int> Control_Crop = new List<int>();
         public List<int> Control_UndoCrop = new List<int>();
+        public List<int> Control_ExitAll = new List<int>();
 
         public List<List<int>> Controls;
         public List<string> ControlNames = new List<string>()
@@ -66,7 +67,7 @@ namespace vimage
             "Fit To Monitor Auto", "Fit To Monitor Width", "Fit To Monitor Height", "Fit To Monitor Alt", "Zoom Faster", "Zoom Alt", "Drag Limit to Monitor Bounds",
             "Toggle Smoothing", "Toggle Mipmapping", "Toggle Background For Transparency", "Toggle Lock", "Toggle Always On Top", "Pause Animation", "Prev Frame", "Next Frame",
             "Open Config", "Reload Config", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Open Full Duplicate Image",
-            "Random Image", "Move Left", "Move Right", "Move Up", "Move Down", "Transparency Toggle", "Transparency Hold", "Crop", "Undo Crop"
+            "Random Image", "Move Left", "Move Right", "Move Up", "Move Down", "Transparency Toggle", "Transparency Hold", "Crop", "Undo Crop", "Exit All Instances"
         };
 
         public bool Setting_OpenAtMousePosition
@@ -237,7 +238,7 @@ namespace vimage
                 Control_FitToMonitorAlt, Control_ZoomFaster, Control_ZoomAlt, Control_DragLimitToMonitorBounds, Control_ToggleSmoothing, Control_ToggleMipmapping,
                 Control_ToggleBackgroundForTransparency, Control_ToggleLock, Control_ToggleAlwaysOnTop, Control_PauseAnimation, Control_PrevFrame, Control_NextFrame, Control_OpenConfig, Control_ReloadConfig,
                 Control_ResetImage, Control_OpenAtLocation, Control_Delete, Control_Copy, Control_CopyAsImage, Control_OpenDuplicateImage, Control_OpenFullDuplicateImage,
-                Control_RandomImage, Control_MoveLeft, Control_MoveRight, Control_MoveUp, Control_MoveDown,Control_TransparencyToggle, Control_TransparencyHold, Control_Crop, Control_UndoCrop
+                Control_RandomImage, Control_MoveLeft, Control_MoveRight, Control_MoveUp, Control_MoveDown,Control_TransparencyToggle, Control_TransparencyHold, Control_Crop, Control_UndoCrop, Control_ExitAll
             };
 
             Init();
@@ -320,6 +321,7 @@ namespace vimage
                 { "TRANSPARENCYHOLD", Control_TransparencyHold },
                 { "CROP", Control_Crop },
                 { "UNDOCROP", Control_UndoCrop },
+                { "EXITALL", Control_ExitAll },
 
                 { "CONTEXTMENU", ContextMenu },
                 { "CONTEXTMENU_ANIMATION", ContextMenu_Animation },
@@ -374,6 +376,7 @@ namespace vimage
             Control_TransparencyHold.Clear();
             Control_Crop.Clear();
             Control_UndoCrop.Clear();
+            Control_ExitAll.Clear();
 
             SetControls(Control_Drag, "MOUSELEFT");
             SetControls(Control_Close, "ESC", "BACKSPACE");
@@ -416,6 +419,7 @@ namespace vimage
             SetControls(Control_TransparencyHold, "Y");
             SetControls(Control_Crop, "X");
             SetControls(Control_UndoCrop, "CTRL+Z");
+            SetControls(Control_ExitAll, "SHIFT+ESC");
         }
         public void SetDefaultContextMenu()
         {
@@ -424,8 +428,8 @@ namespace vimage
 
             ContextMenu.Add(new { name = "Close", func = MenuFuncs.CLOSE });
             ContextMenu.Add(new { name = "-", func = "-" });
-            ContextMenu.Add(new { name = "Next Image", func = MenuFuncs.NEXT_IMAGE });
-            ContextMenu.Add(new { name = "Prev Image", func = MenuFuncs.PREV_IMAGE });
+            ContextMenu.Add(new { name = "Next", func = MenuFuncs.NEXT_IMAGE });
+            ContextMenu.Add(new { name = "Prev", func = MenuFuncs.PREV_IMAGE });
             ContextMenu.Add("Sort by");
             List<object> SubMenu_SortBy = new List<object>();
             SubMenu_SortBy.Add(new { name = "Name", func = MenuFuncs.SORT_NAME });
@@ -441,7 +445,8 @@ namespace vimage
             ContextMenu.Add(new { name = "Rotate Clockwise", func = MenuFuncs.ROTATE_CLOCKWISE });
             ContextMenu.Add(new { name = "Rotate Anti-Clockwise", func = MenuFuncs.ROTATE_ANTICLOCKWISE });
             ContextMenu.Add(new { name = "Flip", func = MenuFuncs.FLIP });
-            ContextMenu.Add(new { name = "Fit to monitor", func = MenuFuncs.FIT_TO_AUTO });
+            ContextMenu.Add(new { name = "Fit to height", func = MenuFuncs.FIT_TO_HEIGHT });
+            ContextMenu.Add(new { name = "Fit to width", func = MenuFuncs.FIT_TO_WIDTH });
             ContextMenu.Add(new { name = "Reset Image", func = MenuFuncs.RESET_IMAGE });
             ContextMenu.Add(new { name = "Smoothing", func = MenuFuncs.TOGGLE_SMOOTHING });
             ContextMenu.Add(new { name = "Background", func = MenuFuncs.TOGGLE_BACKGROUND });
@@ -457,7 +462,7 @@ namespace vimage
 
             ContextMenu_Animation.Add(new { name = "Next Frame", func = MenuFuncs.NEXT_FRAME });
             ContextMenu_Animation.Add(new { name = "Prev Frame", func = MenuFuncs.PREV_FRAME });
-            ContextMenu_Animation.Add(new { name = "Pause/Play Animation", func = MenuFuncs.TOGGLE_ANIMATION });
+            ContextMenu_Animation.Add(new { name = "Pause/Play", func = MenuFuncs.TOGGLE_ANIMATION });
             ContextMenu_Animation.Add(new { name = "-", func = "-" });
         }
         public void SetDefaultCustomActions()
@@ -465,8 +470,12 @@ namespace vimage
             CustomActions.Clear();
             CustomActionBindings.Clear();
 
-            CustomActions.Add(new { name = "EDIT", func = @"%windir%\system32\mspaint.exe %f" });
-            CustomActionBindings.Add(new { name = "EDIT", bindings = new List<int>() });
+            CustomActions.Add(new { name = "EDIT_PAINT", func = @"%windir%\system32\mspaint.exe %f" });
+            CustomActionBindings.Add(new { name = "EDIT_PAINT", bindings = new List<int>() });
+            CustomActions.Add(new { name = "EDIT_PAINTDOTNET", func = "\"C:\\Program Files\\Paint.NET\\PaintDotNet.exe\" %f" });
+            CustomActionBindings.Add(new { name = "EDIT_PAINTDOTNET", bindings = new List<int>() });
+            CustomActions.Add(new { name = "TOGGLE_TASKBAR", func = "-toggleTaskbar" });
+            CustomActionBindings.Add(new { name = "TOGGLE_TASKBAR", bindings = new List<int>() });
         }
 
         /// <summary> Loads and parses a config txt file. If it doesn't exist, a default one will be made. </summary>
@@ -766,7 +775,8 @@ namespace vimage
             WriteControl(writer, "TransparencyToggle", Control_TransparencyToggle);
             WriteControl(writer, "TransparencyHold", Control_TransparencyHold);
             WriteControl(writer, "Crop", Control_Crop);
-            WriteControl(writer, "Undo Crop", Control_UndoCrop);
+            WriteControl(writer, "UndoCrop", Control_UndoCrop);
+            WriteControl(writer, "ExitAll", Control_ExitAll);
 
             writer.Write(Environment.NewLine);
             writer.Write("// Context Menu" + Environment.NewLine);
