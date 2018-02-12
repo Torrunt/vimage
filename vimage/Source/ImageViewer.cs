@@ -814,17 +814,17 @@ namespace vimage
             else
                 bounds = ImageViewerUtils.GetCurrentBounds(Mouse.GetPosition());
 
-            if (CurrentZoom == 1)
+            if (dimension == Config.AUTO)
             {
-                // Fit to Monitor Height
-                if (dimension == Config.AUTO)
-                {
-                    if (bounds.Height < bounds.Width)
-                        dimension = Config.HEIGHT;
-                    else
-                        dimension = Config.WIDTH;
-                }
+                if (bounds.Height < bounds.Width)
+                    dimension = Config.HEIGHT;
+                else
+                    dimension = Config.WIDTH;
+            }
 
+            if (CurrentZoom == 1 || (FitToMonitorHeight && dimension != Config.HEIGHT) || (FitToMonitorWidth && dimension != Config.WIDTH))
+            {
+                // Fit to Monitor Height/Width
                 if (dimension == Config.HEIGHT)
                 {
                     FitToMonitorHeight = true;
@@ -838,9 +838,9 @@ namespace vimage
                 {
                     FitToMonitorWidth = true;
                     if (Rotation == 90 || Rotation == 270)
-                        Zoom((float)bounds.Height / Size.Y, true);
+                        Zoom((float)bounds.Width / Size.Y, true);
                     else
-                        Zoom((float)bounds.Height / Size.X, true);
+                        Zoom((float)bounds.Width / Size.X, true);
                     NextWindowPos = new Vector2i(bounds.Left, NextWindowPos.Y);
                 }
             }
