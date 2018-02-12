@@ -4,7 +4,7 @@
 A simplistic image viewer for Windows, inspired by [vjpeg](http://stereopsis.com/vjpeg/).
 
 ![](https://i.imgur.com/XzphWAY.png)
-![](https://i.imgur.com/RjGB4og.png)
+![](https://i.imgur.com/Mpmg1Cn.png)
 
 ### Created by
 Corey Zeke Womack (Torrunt) - [me@torrunt.net](mailto:me@torrunt.net) - [torrunt.net](http://torrunt.net)

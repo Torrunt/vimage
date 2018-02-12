@@ -221,6 +221,11 @@ namespace vimage
             get { return (Boolean)Settings["CONTEXTMENU_SHOWMARGIN"]; }
             set { Settings["CONTEXTMENU_SHOWMARGIN"] = value; }
         }
+        public bool ContextMenuShowMarginSub
+        {
+            get { return (Boolean)Settings["CONTEXTMENU_SHOWMARGINSUB"]; }
+            set { Settings["CONTEXTMENU_SHOWMARGINSUB"] = value; }
+        }
 
         public List<object> CustomActions = new List<object>();
         public List<object> CustomActionBindings = new List<object>();
@@ -327,6 +332,7 @@ namespace vimage
                 { "CONTEXTMENU_ANIMATION", ContextMenu_Animation },
                 { "CONTEXTMENU_ANIMATION_INSERTATINDEX", 2 },
                 { "CONTEXTMENU_SHOWMARGIN", false },
+                { "CONTEXTMENU_SHOWMARGINSUB", true },
 
                 { "CUSTOMACTIONS", CustomActions },
                 { "CUSTOMACTIONBINDINGS", CustomActionBindings }
@@ -429,7 +435,7 @@ namespace vimage
             ContextMenu.Add(new { name = "Close", func = MenuFuncs.CLOSE });
             ContextMenu.Add(new { name = "-", func = "-" });
             ContextMenu.Add(new { name = "Next", func = MenuFuncs.NEXT_IMAGE });
-            ContextMenu.Add(new { name = "Prev", func = MenuFuncs.PREV_IMAGE });
+            ContextMenu.Add(new { name = "Previous", func = MenuFuncs.PREV_IMAGE });
             ContextMenu.Add("Sort by");
             List<object> SubMenu_SortBy = new List<object>();
             SubMenu_SortBy.Add(new { name = "Name", func = MenuFuncs.SORT_NAME });
@@ -442,26 +448,23 @@ namespace vimage
             SubMenu_SortBy.Add(new { name = "Descending", func = MenuFuncs.SORT_DESCENDING });
             ContextMenu.Add(SubMenu_SortBy);
             ContextMenu.Add(new { name = "-", func = "-" });
-            ContextMenu.Add(new { name = "Rotate Clockwise", func = MenuFuncs.ROTATE_CLOCKWISE });
-            ContextMenu.Add(new { name = "Rotate Anti-Clockwise", func = MenuFuncs.ROTATE_ANTICLOCKWISE });
+            ContextMenu.Add(new { name = "Rotate right", func = MenuFuncs.ROTATE_CLOCKWISE });
+            ContextMenu.Add(new { name = "Rotate left", func = MenuFuncs.ROTATE_ANTICLOCKWISE });
             ContextMenu.Add(new { name = "Flip", func = MenuFuncs.FLIP });
             ContextMenu.Add(new { name = "Fit to height", func = MenuFuncs.FIT_TO_HEIGHT });
             ContextMenu.Add(new { name = "Fit to width", func = MenuFuncs.FIT_TO_WIDTH });
-            ContextMenu.Add(new { name = "Reset Image", func = MenuFuncs.RESET_IMAGE });
             ContextMenu.Add(new { name = "Smoothing", func = MenuFuncs.TOGGLE_SMOOTHING });
             ContextMenu.Add(new { name = "Background", func = MenuFuncs.TOGGLE_BACKGROUND });
             ContextMenu.Add(new { name = "Always on top", func = MenuFuncs.ALWAYS_ON_TOP });
+            ContextMenu.Add(new { name = "Reset image", func = MenuFuncs.RESET_IMAGE });
             ContextMenu.Add(new { name = "-", func = "-" });
             ContextMenu.Add(new { name = "Open file location", func = MenuFuncs.OPEN_FILE_LOCATION });
             ContextMenu.Add(new { name = "Copy", func = MenuFuncs.COPY });
-            ContextMenu.Add(new { name = "Copy as image", func = MenuFuncs.COPY_AS_IMAGE });
             ContextMenu.Add(new { name = "Delete", func = MenuFuncs.DELETE });
             ContextMenu.Add(new { name = "-", func = "-" });
             ContextMenu.Add(new { name = "Settings", func = MenuFuncs.OPEN_SETTINGS });
             ContextMenu.Add(new { name = "", func = MenuFuncs.VERSION_NAME });
 
-            ContextMenu_Animation.Add(new { name = "Next Frame", func = MenuFuncs.NEXT_FRAME });
-            ContextMenu_Animation.Add(new { name = "Prev Frame", func = MenuFuncs.PREV_FRAME });
             ContextMenu_Animation.Add(new { name = "Pause/Play", func = MenuFuncs.TOGGLE_ANIMATION });
             ContextMenu_Animation.Add(new { name = "-", func = "-" });
         }
@@ -785,7 +788,8 @@ namespace vimage
             WriteContextMenuSetup(writer, "ContextMenu_Animation", ContextMenu_Animation);
 
             WriteSetting(writer, "ContextMenu_Animation_InsertAtIndex", ContextMenu_Animation_InsertAtIndex);
-            WriteSetting(writer, "ContextMenu_ShowMargin", ContextMenuShowMargin, "shows checkboxes for certain menu items");
+            WriteSetting(writer, "ContextMenu_ShowMargin", ContextMenuShowMargin);
+            WriteSetting(writer, "ContextMenu_ShowMarginSub", ContextMenuShowMarginSub);
 
             writer.Write(Environment.NewLine);
             WriteCustomActions(writer, "CustomActions", CustomActions);

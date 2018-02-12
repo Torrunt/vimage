@@ -15,10 +15,11 @@
         </Grid.RowDefinitions>
 
         <DockPanel Margin="4">
-            <CheckBox IsChecked="{Binding ContextMenuShowMargin}" Grid.Row="0" Content="Show margin/checkboxes" Margin="0" VerticalAlignment="Center" />
-            <DockPanel HorizontalAlignment="Right">
-                <Label Content="Insert animation menu at index"/>
-                <xctk:IntegerUpDown Value="{Binding ContextMenu_Animation_InsertAtIndex}" Minimum="0" Margin="10,0" Width="50" HorizontalAlignment="Right" />
+            <CheckBox IsChecked="{Binding ContextMenuShowMargin}" Grid.Row="0" Content="Checkboxes" ToolTip="Show checkboxes/margin for the main Context Menu." Margin="0" VerticalAlignment="Center" />
+            <CheckBox IsChecked="{Binding ContextMenuShowMarginSub}" Grid.Row="0" Content="Sub Checkboxes" ToolTip="Show checkboxes/margin for submenus in the Context Menu." Margin="10,0,0,0" VerticalAlignment="Center" />
+            <DockPanel HorizontalAlignment="Right" ToolTip="Where the Animation items will be inserted in the Context Menu if an animated gif is opened.">
+                <Label Content="Insert animation menu at"/>
+                <xctk:IntegerUpDown Value="{Binding ContextMenu_Animation_InsertAtIndex}" Minimum="0" Margin="5,0,5,0" Width="45" HorizontalAlignment="Right" />
             </DockPanel>
         </DockPanel>
         

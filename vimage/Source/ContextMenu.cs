@@ -112,6 +112,7 @@ namespace vimage
                 {
                     // sub item
                     ToolStripDropDownItem dropDownItem = Items[Items.Count - 1] as ToolStripDropDownItem;
+                    ((ToolStripDropDownMenu)dropDownItem.DropDown).ShowImageMargin = ImageViewer.Config.ContextMenuShowMarginSub;
                     name = name.Substring(1);
                     while (name.IndexOf(":") == 0)
                     {
@@ -144,7 +145,7 @@ namespace vimage
 
         public void RefreshItems()
         {
-            if (!ShowImageMargin)
+            if (!ImageViewer.Config.ContextMenuShowMargin && !ImageViewer.Config.ContextMenuShowMarginSub)
                 return;
 
             ToolStripMenuItem item;
@@ -154,6 +155,9 @@ namespace vimage
 
             item = GetItemByFunc(MenuFuncs.FIT_TO_HEIGHT);
             if (item != null) item.Checked = ImageViewer.FitToMonitorHeight;
+
+            item = GetItemByFunc(MenuFuncs.FIT_TO_WIDTH);
+            if (item != null) item.Checked = ImageViewer.FitToMonitorWidth;
 
             item = GetItemByFunc(MenuFuncs.TOGGLE_SMOOTHING);
             if (item != null) item.Checked = ImageViewer.Smoothing();
@@ -169,7 +173,6 @@ namespace vimage
 
             item = GetItemByFunc(MenuFuncs.ALWAYS_ON_TOP);
             if (item != null) item.Checked = ImageViewer.AlwaysOnTop;
-
 
             item = GetItemByFunc(MenuFuncs.SORT_NAME);
             if (item != null) item.Checked = ImageViewer.SortImagesBy == SortBy.Name;
