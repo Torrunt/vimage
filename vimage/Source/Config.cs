@@ -394,7 +394,7 @@ namespace vimage
             SetControls(Control_ZoomAlt, "RCTRL", "CTRL");
             SetControls(Control_DragLimitToMonitorBounds, "ALT");
             SetControls(Control_ToggleSmoothing, "S");
-            SetControls(Control_ToggleMipmapping, "");
+            SetControls(Control_ToggleMipmapping, "SHIFT+S");
             SetControls(Control_ToggleBackgroundForTransparency, "B");
             SetControls(Control_ToggleLock, "");
             SetControls(Control_ToggleAlwaysOnTop, "L");

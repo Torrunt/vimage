@@ -24,14 +24,12 @@
 
     <StackPanel>
         <CheckBox IsChecked="{Binding Setting_OpenAtMousePosition}" Content="Open images at mouse position" ToolTip="When an image is opened it will be centered at the current mouse position (commonly where the image file is).&#x0a;Otherwise it will be centered on the current monitor."/>
-        <CheckBox IsChecked="{Binding Setting_SmoothingDefault}" Content="Smooth images by default"/>
+        <CheckBox IsChecked="{Binding Setting_SmoothingDefault}" Content="Smoothing"/>
         <CheckBox IsChecked="{Binding Setting_Mipmapping}" Content="Mipmapping (smoother images when zoomed out)"/>
         <CheckBox IsChecked="{Binding Setting_PositionLargeWideImagesInCorner}" Content="Position large/wide images in corner (ie: wallpapers/screenshots)" ToolTip="Images that are wider than or the same width as the current monitor will be placed in the top left corner."/>
-        <CheckBox IsChecked="{Binding Setting_PreloadNextImage}" Content="Preload next image" ToolTip="When using the next/prev image buttons, the image after the one just loaded will be loaded as well."/>
-        <CheckBox IsChecked="{Binding Setting_OpenSettingsEXE}" Content="Use vimage__settings.exe (otherwise will open config.txt directly)" ToolTip="What will open when the 'Open Config' button/shortcut is used."/>
-        <CheckBox IsChecked="{Binding Setting_ListenForConfigChanges}" Content="Listen for setting changes" ToolTip="If ticked, vimage will reload settings automatically when they are changed." Margin="0,0,0,20"/>
+        <CheckBox IsChecked="{Binding Setting_PreloadNextImage}" Content="Image preloading" ToolTip="When using the next/prev image buttons, the image after the one just loaded will be loaded as well."/>
         
-        <CheckBox IsChecked="{Binding Setting_BackgroundForImagesWithTransparencyDefault}" Content="Show background behind images with transparency" ToolTip="Images with partial transparency will have a background behind them."/>
+        <CheckBox IsChecked="{Binding Setting_BackgroundForImagesWithTransparencyDefault}" Content="Show background behind images with transparency" ToolTip="Images with partial transparency will have a background behind them." Margin="0,10"/>
         <DockPanel ToolTip="For transparent images (when transparency is turned off)." Height="15" Margin="0,0,0,10">
             <Border Style="{StaticResource ColourPickerBorder}" OverridesDefaultStyle="true" Width="14" Height="13" Margin="1,0,5,0" BorderThickness="1">
                 <DockPanel Width="13" Height="12" ClipToBounds="true" >
@@ -54,7 +52,7 @@
                     <xctk:ColorPicker Width="17" Height="15" ShowTabHeaders="false" ColorMode="ColorCanvas" SelectedColor="{Binding Setting_CropToolFillColour}" ShowDropDownButton="False" Padding="0" BorderThickness="0" Margin="-2,-4,0,0" />
                 </DockPanel>
             </Border>
-            <Label Content="Crop Tool Fill Colour" Padding="-4,0,0,0" Margin="0,-1,0,0"/>
+            <Label Content="Crop tool fill colour" Padding="-4,0,0,0" Margin="0,-1,0,0"/>
         </DockPanel>
         <DockPanel Height="15" >
             <Border Style="{StaticResource ColourPickerBorder}" OverridesDefaultStyle="true" Width="14" Height="13" Margin="1,0,5,0" BorderThickness="1">
@@ -62,15 +60,15 @@
                     <xctk:ColorPicker Width="17" Height="15" ShowTabHeaders="false" ColorMode="ColorCanvas" SelectedColor="{Binding Setting_CropToolOutlineColour}" ShowDropDownButton="False" Padding="0" BorderThickness="0" Margin="-2,-4,0,0" />
                 </DockPanel>
             </Border>
-            <Label Content="Crop Tool Outline Colour" Padding="-4,0,0,0" Margin="0,-1,0,0"/>
+            <Label Content="Crop tool outline colour" Padding="-4,0,0,0" Margin="0,-1,0,0"/>
         </DockPanel>
         <DockPanel>
-            <Label Content="Crop Tool Outline Thickness" Margin="15,0,0,0"/>
+            <Label Content="Crop tool outline thickness" Margin="15,0,0,0"/>
             <xctk:IntegerUpDown Value="{Binding Setting_CropToolOutlineThickness}" Minimum="0" Margin="10,0" Width="50" HorizontalAlignment="Right" />
         </DockPanel>
         
         <DockPanel Margin="0,10,0,0">
-            <Label Content="Limit images to monitor"/>
+            <Label Content="Limit images to monitor" ToolTip="Applied when opening or resetting an image."/>
             <ComboBox SelectedIndex="{Binding Setting_LimitImagesToMonitor}" Margin="10,0" Width="100" HorizontalAlignment="Right" >
                 <System:String>NONE</System:String>
                 <System:String>HEIGHT</System:String>
@@ -83,11 +81,11 @@
             <Label Content="(if image is smaller, it will be scaled up)" FontSize="9" />
             <xctk:IntegerUpDown Value="{Binding Setting_MinImageSize}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
-        <DockPanel ToolTip="Smoothing will be turned off by default for images smaller that this.">
+        <DockPanel ToolTip="Smoothing will be turned off by default for images smaller than this.">
             <Label Content="Don't smooth images smaller than"/>
             <xctk:IntegerUpDown Value="{Binding Setting_SmoothingMinImageSize}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
-        <DockPanel ToolTip="Speed at which image resizes when zooming with Mouse Wheel.&#x0a;Also affects 'Transparency Hold'.">
+        <DockPanel ToolTip="Speed at which the image resizes when zooming with Mouse Wheel.&#x0a;Also affects 'Transparency Hold'.">
             <Label Content="Zoom Speed"/>
             <xctk:IntegerUpDown Value="{Binding Setting_ZoomSpeed}" FormatString="0\%" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
