@@ -201,10 +201,10 @@ namespace vimage
             switch (func)
             {
                 case MenuFuncs.CLOSE: ImageViewer.CloseNextTick = true; return;
-
+                
                 case MenuFuncs.NEXT_IMAGE: ImageViewer.NextImage(); return;
                 case MenuFuncs.PREV_IMAGE: ImageViewer.PrevImage(); return;
-
+                
                 case MenuFuncs.SORT_NAME: ImageViewer.ChangeSortBy(SortBy.Name); return;
                 case MenuFuncs.SORT_DATE: ImageViewer.ChangeSortBy(SortBy.Date); return;
                 case MenuFuncs.SORT_DATE_MODIFIED: ImageViewer.ChangeSortBy(SortBy.DateModified); return;
@@ -212,13 +212,13 @@ namespace vimage
                 case MenuFuncs.SORT_SIZE: ImageViewer.ChangeSortBy(SortBy.Size); return;
                 case MenuFuncs.SORT_ASCENDING: ImageViewer.ChangeSortByDirection(SortDirection.Ascending); return;
                 case MenuFuncs.SORT_DESCENDING: ImageViewer.ChangeSortByDirection(SortDirection.Descending); return;
-
+                
                 case MenuFuncs.NEXT_FRAME: ImageViewer.NextFrame(); return;
                 case MenuFuncs.PREV_FRAME: ImageViewer.PrevFrame(); return;
                 case MenuFuncs.TOGGLE_ANIMATION: ImageViewer.ToggleAnimation(); return;
-
-                case MenuFuncs.ROTATE_CLOCKWISE: ImageViewer.RotateImage((int)ImageViewer.Image.Rotation + 90); return;
-                case MenuFuncs.ROTATE_ANTICLOCKWISE: ImageViewer.RotateImage((int)ImageViewer.Image.Rotation - 90); return;
+                
+                case MenuFuncs.ROTATE_CLOCKWISE: ImageViewer.RotateImage(ImageViewer.Rotation + 90); return;
+                case MenuFuncs.ROTATE_ANTICLOCKWISE: ImageViewer.RotateImage(ImageViewer.Rotation - 90); return;
                 case MenuFuncs.FLIP: ImageViewer.FlipImage(); return;
                 case MenuFuncs.FIT_TO_HEIGHT: ImageViewer.ToggleFitToMonitor(Config.HEIGHT); return;
                 case MenuFuncs.FIT_TO_WIDTH: ImageViewer.ToggleFitToMonitor(Config.WIDTH); return;
@@ -229,7 +229,7 @@ namespace vimage
                 case MenuFuncs.TOGGLE_BACKGROUND: ImageViewer.ToggleBackground(); return;
                 case MenuFuncs.TOGGLE_LOCK: ImageViewer.ToggleLock(); return;
                 case MenuFuncs.ALWAYS_ON_TOP: ImageViewer.ToggleAlwaysOnTop(); return;
-
+                
                 case MenuFuncs.OPEN_FILE_LOCATION: ImageViewer.OpenFileAtLocation(); return;
                 case MenuFuncs.DELETE: ImageViewer.DeleteFile(); return;
                 case MenuFuncs.COPY: ImageViewer.CopyFile(); return;
@@ -240,10 +240,10 @@ namespace vimage
                 case MenuFuncs.TOGGLE_IMAGE_TRANSPARENCY: ImageViewer.ToggleImageTransparency(); return;
                 case MenuFuncs.UNDO_CROP: ImageViewer.UndoCrop(); return;
                 case MenuFuncs.EXIT_ALL_INSTANCES: ImageViewer.ExitAllInstances(); return;
-
+                
                 case MenuFuncs.OPEN_SETTINGS: ImageViewer.OpenConfig(); return;
                 case MenuFuncs.RELOAD_SETTINGS: ImageViewer.ReloadConfig(); return;
-
+                
                 case MenuFuncs.VERSION_NAME: Process.Start("http://torrunt.net/vimage"); return;
             }
 
