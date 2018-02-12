@@ -45,6 +45,20 @@ namespace vimage
             return new IntRect(backupScreen.Bounds.X, backupScreen.Bounds.Y, backupScreen.Bounds.Width, backupScreen.Bounds.Height);
         }
 
+        public static Vector2i LimitToBounds(Vector2i pos, Vector2u size, IntRect bounds)
+        {
+            if (pos.X < bounds.Left)
+                pos.X = bounds.Left;
+            else if (pos.X > bounds.Left + bounds.Width - size.X)
+                pos.X = bounds.Left + bounds.Width - (int)size.X;
+
+            if (pos.Y < bounds.Top)
+                pos.Y = bounds.Top;
+            else if (pos.Y > bounds.Top + bounds.Height - size.Y)
+                pos.Y = bounds.Top + bounds.Height - (int)size.Y;
+            return pos;
+        }
+
 
         public static string GetExtension(string fileName) { return fileName.Substring(fileName.LastIndexOf(".") + 1).ToLower(); }
 

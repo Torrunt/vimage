@@ -737,15 +737,7 @@ namespace vimage
                         NextWindowPos = Window.Position;
                 }
 
-                if (NextWindowPos.X < currentBounds.Left)
-                    NextWindowPos.X = currentBounds.Left;
-                else if (NextWindowPos.X > currentBounds.Left + currentBounds.Width - NextWindowSize.X)
-                    NextWindowPos.X = currentBounds.Left + currentBounds.Width - (int)NextWindowSize.X;
-
-                if (NextWindowPos.Y < currentBounds.Top)
-                    NextWindowPos.Y = currentBounds.Top;
-                else if (NextWindowPos.Y > currentBounds.Top + currentBounds.Height - NextWindowSize.Y)
-                    NextWindowPos.Y = currentBounds.Top + currentBounds.Height - (int)NextWindowSize.Y;
+                NextWindowPos = ImageViewerUtils.LimitToBounds(NextWindowPos, NextWindowSize, currentBounds);
             }
 
             Updated = true;
@@ -822,44 +814,57 @@ namespace vimage
                     dimension = Config.WIDTH;
             }
 
+            bool center = false;
             if (CurrentZoom == 1 || (FitToMonitorHeight && dimension != Config.HEIGHT) || (FitToMonitorWidth && dimension != Config.WIDTH))
             {
                 // Fit to Monitor Height/Width
                 if (dimension == Config.HEIGHT)
                 {
+                    FitToMonitorWidth = false;
                     FitToMonitorHeight = true;
                     if (Rotation == 90 || Rotation == 270)
                         Zoom((float)bounds.Height / Size.X, Size.Y < bounds.Width);
                     else
                         Zoom((float)bounds.Height / Size.Y, Size.X < bounds.Width);
-                    NextWindowPos = new Vector2i(NextWindowPos.X, bounds.Top);
+                    if (NextWindowSize.X >= NextWindowSize.Y && bounds.Width > bounds.Height)
+                        NextWindowPos = ImageViewerUtils.LimitToBounds(NextWindowPos, NextWindowSize, bounds);
+                    else
+                        NextWindowPos = new Vector2i(NextWindowPos.X, bounds.Top);
                 }
                 else if (dimension == Config.WIDTH)
                 {
                     FitToMonitorWidth = true;
+                    FitToMonitorHeight = false;
                     if (Rotation == 90 || Rotation == 270)
                         Zoom((float)bounds.Width / Size.Y, true);
                     else
                         Zoom((float)bounds.Width / Size.X, true);
-                    NextWindowPos = new Vector2i(bounds.Left, NextWindowPos.Y);
+                    if (NextWindowSize.Y >= NextWindowSize.X && bounds.Height > bounds.Width)
+                        NextWindowPos = ImageViewerUtils.LimitToBounds(NextWindowPos, NextWindowSize, bounds);
+                    else
+                        NextWindowPos = new Vector2i(bounds.Left, NextWindowPos.Y);
                 }
             }
             else
             {
                 // Full Size
+                Zoom(1, true);
+                if (FitToMonitorWidth && bounds.Width > bounds.Height)
+                    center = true; // center image if returning to normal size after FitToMonitorWidth (landscape monitor only)
+                else
+                    NextWindowPos = ImageViewerUtils.LimitToBounds(NextWindowPos, NextWindowSize, bounds);
+
                 FitToMonitorHeight = false;
                 FitToMonitorWidth = false;
-                Zoom(1, true);
-                NextWindowPos = new Vector2i(NextWindowPos.X < 0 ? 0 : NextWindowPos.X, NextWindowPos.Y < 0 ? 0 : NextWindowPos.Y);
             }
 
             // Position window
-            if (Config.Setting_PositionLargeWideImagesInCorner && CurrentImageSize().X * CurrentZoom >= bounds.Width)
+            if (Config.Setting_PositionLargeWideImagesInCorner && NextWindowSize.X >= bounds.Width && bounds.Width > bounds.Height)
                 NextWindowPos = new Vector2i(bounds.Left, bounds.Top); // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
-            else if (CurrentImageSize().X >= bounds.Width)
+            else if (center || CurrentImageSize().X >= bounds.Width) // Position Window at center if originally large
                 NextWindowPos = new Vector2i(
                     NextWindowSize.X >= bounds.Width - 2 ? bounds.Left : bounds.Left + (bounds.Width / 2) - ((int)(CurrentImageSize().X * CurrentZoom) / 2),
-                    NextWindowSize.Y >= bounds.Height - 2 ? bounds.Top : bounds.Top + (bounds.Height / 2) - ((int)(CurrentImageSize().Y * CurrentZoom) / 2)); // Position Window at center if originally large
+                    NextWindowSize.Y >= bounds.Height - 2 ? bounds.Top : bounds.Top + (bounds.Height / 2) - ((int)(CurrentImageSize().Y * CurrentZoom) / 2));
 
             // Temporarily set always on top to bring it infront of the taskbar?
             if (!FitToMonitorAlt)
