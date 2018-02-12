@@ -59,6 +59,18 @@ namespace vimage
             return pos;
         }
 
+        public static Vector2i LimitToWindow(Vector2i pos, RenderWindow Window)
+        {
+            if (pos.X < Window.Position.X)
+                pos.X = Window.Position.X;
+            else if (pos.X > Window.Position.X + Window.Size.X)
+                pos.X = (int)(Window.Position.X + Window.Size.X);
+            if (pos.Y < Window.Position.Y)
+                pos.Y = Window.Position.Y;
+            else if (pos.Y > Window.Position.Y + Window.Size.Y)
+                pos.Y = (int)(Window.Position.Y + Window.Size.Y);
+            return pos;
+        }
 
         public static string GetExtension(string fileName) { return fileName.Substring(fileName.LastIndexOf(".") + 1).ToLower(); }
 

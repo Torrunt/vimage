@@ -1060,7 +1060,7 @@ namespace vimage
             }
             CropRect.OutlineThickness = Config.Setting_CropToolOutlineThickness * (1 / CurrentZoom);
 
-            CropStartPos = Mouse.GetPosition();
+            CropStartPos = ImageViewerUtils.LimitToWindow(Mouse.GetPosition(), Window);
             CropRect.Position = Window.MapPixelToCoords(CropStartPos - Window.Position);
         }
         public void CropEnd()
@@ -1080,15 +1080,7 @@ namespace vimage
             ViewStateHistory.Add(GetCurrentViewState());
 
             // Get position
-            Vector2i pos = Mouse.GetPosition();
-            if (pos.X < Window.Position.X)
-                pos.X = Window.Position.X;
-            else if (pos.X > Window.Position.X + Window.Size.X)
-                pos.X = (int)(Window.Position.X + Window.Size.X);
-            if (pos.Y < Window.Position.Y)
-                pos.Y = Window.Position.Y;
-            else if (pos.Y > Window.Position.Y + Window.Size.Y)
-                pos.Y = (int)(Window.Position.Y + Window.Size.Y);
+            Vector2i pos = ImageViewerUtils.LimitToWindow(Mouse.GetPosition(), Window);
 
             // Apply crop
             View view = Window.GetView();
