@@ -3,8 +3,8 @@
 
 A simplistic image viewer for Windows, inspired by [vjpeg](http://stereopsis.com/vjpeg/).
 
-![](https://i.imgur.com/XzzKoUm.png)
-![](https://i.imgur.com/4XGDzOY.png)
+![](https://i.imgur.com/XzphWAY.png)
+![](https://i.imgur.com/RjGB4og.png)
 
 ### Created by
 Corey Zeke Womack (Torrunt) - [me@torrunt.net](mailto:me@torrunt.net) - [torrunt.net](http://torrunt.net)
@@ -26,8 +26,10 @@ Corey Zeke Womack (Torrunt) - [me@torrunt.net](mailto:me@torrunt.net) - [torrunt
 - Left/Right Arrows (or Page Up/Down) to go through images in a folder
 - Up/Down Arrows to Rotate
 - F to Flip Horizontally
-- S to Toggle Smoothing
+- S to Toggle Smoothing (SHIFT+S to Toggle Mipmapping)
 - L to Toggle Always On Top mode
+- X (hold) + Move Mouse to crop the view of the image
+- Y (hold) + Scroll Wheel to adjust transparency of the image
 - R to Reset Image
 - Space to pause Animated GIFs
 - ,/. to step through Animated GIF frames
