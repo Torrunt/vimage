@@ -470,12 +470,12 @@ namespace vimage
             CustomActions.Clear();
             CustomActionBindings.Clear();
 
-            CustomActions.Add(new { name = "EDIT_PAINT", func = @"%windir%\system32\mspaint.exe %f" });
-            CustomActionBindings.Add(new { name = "EDIT_PAINT", bindings = new List<int>() });
-            CustomActions.Add(new { name = "EDIT_PAINTDOTNET", func = "\"C:\\Program Files\\Paint.NET\\PaintDotNet.exe\" %f" });
-            CustomActionBindings.Add(new { name = "EDIT_PAINTDOTNET", bindings = new List<int>() });
-            CustomActions.Add(new { name = "TOGGLE_TASKBAR", func = "-toggleTaskbar" });
-            CustomActionBindings.Add(new { name = "TOGGLE_TASKBAR", bindings = new List<int>() });
+            CustomActions.Add(new { name = "EDIT PAINT", func = @"%windir%\system32\mspaint.exe %f" });
+            CustomActionBindings.Add(new { name = "EDIT PAINT", bindings = new List<int>() });
+            CustomActions.Add(new { name = "EDIT PAINTDOTNET", func = "\"C:\\Program Files\\Paint.NET\\PaintDotNet.exe\" %f" });
+            CustomActionBindings.Add(new { name = "EDIT PAINTDOTNET", bindings = new List<int>() });
+            CustomActions.Add(new { name = "TOGGLE TASKBAR", func = "-taskbarToggle" });
+            CustomActionBindings.Add(new { name = "TOGGLE TASKBAR", bindings = new List<int>() });
         }
 
         /// <summary> Loads and parses a config txt file. If it doesn't exist, a default one will be made. </summary>

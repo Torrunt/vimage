@@ -59,10 +59,13 @@ namespace vimage
                     // Item
                     if (((items[i] as dynamic).func as string).Equals(MenuFuncs.VERSION_NAME))
                     {
-                        list.Add(ImageViewer.VERSION_NAME);
-                        FuncByName.Add(ImageViewer.VERSION_NAME, (items[i] as dynamic).func);
+                        if (!FuncByName.ContainsKey(ImageViewer.VERSION_NAME))
+                        {
+                            list.Add(ImageViewer.VERSION_NAME);
+                            FuncByName.Add(ImageViewer.VERSION_NAME, (items[i] as dynamic).func);
+                        }
                     }
-                    else
+                    else if (!FuncByName.ContainsKey((items[i] as dynamic).name))
                     {
                         list.Add(VariableAmountOfStrings(depth, ":") + (items[i] as dynamic).name);
                         if (!((items[i] as dynamic).name as string).Equals("-"))
