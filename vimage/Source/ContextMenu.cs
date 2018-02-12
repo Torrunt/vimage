@@ -98,7 +98,7 @@ namespace vimage
                 string name = items[i];
                 bool itemClickable = true;
 
-                if (name.LastIndexOf(":") == name.Length - 1)
+                if (name.Length > 0 && name.LastIndexOf(":") == name.Length - 1)
                 {
                     // non-clickable item?
                     name = name.Substring(0, name.Length - 1);

@@ -41,9 +41,9 @@ namespace vimage_settings
 
             ItemName.Text = name;
 
-            int fundIndex = ItemFunction.Items.IndexOf(MenuFuncs.WithSpaces(func));
-            if (fundIndex != -1)
-                ItemFunction.SelectedIndex = fundIndex;
+            int funcIndex = ItemFunction.Items.IndexOf(func);
+            if (funcIndex != -1)
+                ItemFunction.SelectedIndex = funcIndex;
         }
 
         public void SetFunctions()
@@ -56,7 +56,7 @@ namespace vimage_settings
 
             ItemFunction.Items.Add("-");
             for (int i = 0; i < MenuFuncs.FUNCS.Length; i++)
-                ItemFunction.Items.Add(MenuFuncs.WithSpaces(MenuFuncs.FUNCS[i]));
+                ItemFunction.Items.Add(MenuFuncs.FUNCS[i]);
             if (App.vimageConfig != null)
             {
                 CustomActionsStartIndex = ItemFunction.Items.Count;

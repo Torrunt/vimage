@@ -61,7 +61,7 @@ namespace vimage_settings
                         currentMenu = prevMenu;
                     }
 
-                    currentMenu.Add(new { name = item.ItemName.Text, func = item.ItemFunction.Text.Replace(" ", "") });
+                    currentMenu.Add(new { name = item.ItemName.Text, func = item.ItemFunction.Text.Trim() });
                 }
                 else
                 {
@@ -72,7 +72,7 @@ namespace vimage_settings
                         currentMenu = contextMenu;
                     }
 
-                    currentMenu.Add(new { name = item.ItemName.Text, func = item.ItemFunction.Text.Replace(" ", "") });
+                    currentMenu.Add(new { name = item.ItemName.Text, func = item.ItemFunction.Text.Trim() });
                 }
             }
         }

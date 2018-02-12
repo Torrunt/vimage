@@ -643,10 +643,7 @@ namespace vimage
 
                     // trim tabs from name, spaces from map name
                     splitValues[0] = splitValues[0].Replace("\t", "").Trim();
-                    if (splitValues[1].IndexOf('\"') != -1 || splitValues[1].IndexOf('%') != -1 || splitValues[1].IndexOf('-') != -1)
-                        splitValues[1] = splitValues[1].Trim(); // keep spaces if custom action
-                    else
-                        splitValues[1] = RemoveSpaces(splitValues[1]);
+                    splitValues[1] = splitValues[1].Trim();
 
                     // assign Values
                     if (sectionName == "CUSTOMACTIONBINDINGS")
@@ -839,7 +836,7 @@ namespace vimage
                 {
                     // Item
                     string itemName = (items[i] as dynamic).name as string;
-                    string itemFunc = MenuFuncs.WithSpaces((items[i] as dynamic).func as string);
+                    string itemFunc = (items[i] as dynamic).func as string;
                     if (itemFunc.Equals("-"))
                         writer.Write("-" + Environment.NewLine);
                     else if (itemName.Equals(""))
