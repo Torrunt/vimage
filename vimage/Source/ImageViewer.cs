@@ -470,12 +470,9 @@ namespace vimage
             if (!Updated && Config.IsControl(code, Config.Control_NextImage))
                 NextImage();
 
-            // Open config.txt
-            if (Config.IsControl(code, Config.Control_OpenConfig))
+            // Open Config
+            if (Config.IsControl(code, Config.Control_OpenSettings))
                 OpenConfig();
-            // Reload Config
-            if (Config.IsControl(code, Config.Control_ReloadConfig))
-                ReloadConfig();
 
             // Toggle Settings
             if (Config.IsControl(code, Config.Control_ToggleSmoothing))

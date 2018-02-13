@@ -40,8 +40,7 @@ namespace vimage
         public List<int> Control_PauseAnimation = new List<int>();
         public List<int> Control_PrevFrame = new List<int>();
         public List<int> Control_NextFrame = new List<int>();
-        public List<int> Control_OpenConfig = new List<int>();
-        public List<int> Control_ReloadConfig = new List<int>();
+        public List<int> Control_OpenSettings = new List<int>();
         public List<int> Control_ResetImage = new List<int>();
         public List<int> Control_OpenAtLocation = new List<int>();
         public List<int> Control_Delete = new List<int>();
@@ -66,7 +65,7 @@ namespace vimage
             "Drag", "Close", "Open Context Menu", "Prev Image", "Next Image", "Rotate Clockwise", "Rotate Anti-Clockwise", "Flip",
             "Fit To Monitor Auto", "Fit To Monitor Width", "Fit To Monitor Height", "Fit To Monitor Alt", "Zoom Faster", "Zoom Alt", "Drag Limit to Monitor Bounds",
             "Toggle Smoothing", "Toggle Mipmapping", "Toggle Background For Transparency", "Toggle Lock", "Toggle Always On Top", "Pause Animation", "Prev Frame", "Next Frame",
-            "Open Config", "Reload Config", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Open Full Duplicate Image",
+            "Open Settings", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Open Full Duplicate Image",
             "Random Image", "Move Left", "Move Right", "Move Up", "Move Down", "Transparency Toggle", "Transparency Hold", "Crop", "Undo Crop", "Exit All Instances"
         };
 
@@ -241,7 +240,7 @@ namespace vimage
                 Control_Drag, Control_Close, Control_OpenContextMenu, Control_PrevImage, Control_NextImage, Control_RotateClockwise,
                 Control_RotateAntiClockwise, Control_Flip, Control_FitToMonitorHeight, Control_FitToMonitorWidth, Control_FitToMonitorAuto,
                 Control_FitToMonitorAlt, Control_ZoomFaster, Control_ZoomAlt, Control_DragLimitToMonitorBounds, Control_ToggleSmoothing, Control_ToggleMipmapping,
-                Control_ToggleBackgroundForTransparency, Control_ToggleLock, Control_ToggleAlwaysOnTop, Control_PauseAnimation, Control_PrevFrame, Control_NextFrame, Control_OpenConfig, Control_ReloadConfig,
+                Control_ToggleBackgroundForTransparency, Control_ToggleLock, Control_ToggleAlwaysOnTop, Control_PauseAnimation, Control_PrevFrame, Control_NextFrame, Control_OpenSettings,
                 Control_ResetImage, Control_OpenAtLocation, Control_Delete, Control_Copy, Control_CopyAsImage, Control_OpenDuplicateImage, Control_OpenFullDuplicateImage,
                 Control_RandomImage, Control_MoveLeft, Control_MoveRight, Control_MoveUp, Control_MoveDown,Control_TransparencyToggle, Control_TransparencyHold, Control_Crop, Control_UndoCrop, Control_ExitAll
             };
@@ -308,8 +307,7 @@ namespace vimage
                 { "PAUSEANIMATION", Control_PauseAnimation },
                 { "PREVFRAME", Control_PrevFrame },
                 { "NEXTFRAME", Control_NextFrame },
-                { "OPENCONFIG", Control_OpenConfig },
-                { "RELOADCONFIG", Control_ReloadConfig },
+                { "OPENSETTINGS", Control_OpenSettings },
 				{ "RESETIMAGE", Control_ResetImage },
                 { "OPENATLOCATION", Control_OpenAtLocation },
                 { "DELETE", Control_Delete },
@@ -364,8 +362,7 @@ namespace vimage
             Control_PauseAnimation.Clear();
             Control_PrevFrame.Clear();
             Control_NextFrame.Clear();
-            Control_OpenConfig.Clear();
-            Control_ReloadConfig.Clear();
+            Control_OpenSettings.Clear();
             Control_ResetImage.Clear();
             Control_OpenAtLocation.Clear();
             Control_Delete.Clear();
@@ -407,8 +404,7 @@ namespace vimage
             SetControls(Control_PauseAnimation, "SPACE");
             SetControls(Control_PrevFrame, "<");
             SetControls(Control_NextFrame, ">");
-            SetControls(Control_OpenConfig, "");
-            SetControls(Control_ReloadConfig, "");
+            SetControls(Control_OpenSettings, "");
             SetControls(Control_ResetImage, "R");
             SetControls(Control_OpenAtLocation, "O");
             SetControls(Control_Delete, "DELETE");
@@ -761,8 +757,7 @@ namespace vimage
             WriteControl(writer, "PauseAnimation", Control_PauseAnimation);
             WriteControl(writer, "PrevFrame", Control_PrevFrame);
             WriteControl(writer, "NextFrame", Control_NextFrame);
-            WriteControl(writer, "OpenConfig", Control_OpenConfig);
-            WriteControl(writer, "ReloadConfig", Control_ReloadConfig);
+            WriteControl(writer, "OpenSettings", Control_OpenSettings);
             WriteControl(writer, "ResetImage", Control_ResetImage);
             WriteControl(writer, "OpenAtLocation", Control_OpenAtLocation);
             WriteControl(writer, "Delete", Control_Delete);
