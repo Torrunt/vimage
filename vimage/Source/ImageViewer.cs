@@ -386,6 +386,9 @@ namespace vimage
         {
             if (Locked)
                 return;
+
+            int dir = e.Delta > 0 ? Config.MOUSE_SCROLL_UP : Config.MOUSE_SCROLL_DOWN;
+
             if (TransparencyMod)
             {
                 // Change Image Transparency
@@ -397,11 +400,17 @@ namespace vimage
             else if (!Cropping)
             {
                 // Zooming
-                if (e.Delta > 0)
+                if (Config.Control_ZoomIn.Contains(dir))
                     Zoom(Math.Min(CurrentZoom + (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MAX), !ZoomAlt);
-                else if (e.Delta < 0)
+                else if (Config.Control_ZoomOut.Contains(dir))
                     Zoom(Math.Max(CurrentZoom - (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MIN), !ZoomAlt);
             }
+
+            // Next/Prev Image in Folder
+            if (Config.Control_PrevImage.Contains(dir))
+                PrevImage();
+            if (Config.Control_NextImage.Contains(dir))
+                NextImage();
 
             AutomaticallyZoomed = false;
             FitToMonitorHeightForced = false;
@@ -586,6 +595,11 @@ namespace vimage
                 FitToMonitorAlt = true;
             if (Config.IsControl(code, Config.Control_TransparencyHold))
                 TransparencyMod = true;
+
+            if (Config.IsControl(code, Config.Control_ZoomIn, true))
+                Zoom(Math.Min(CurrentZoom + (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MAX), !ZoomAlt);
+            else if (Config.IsControl(code, Config.Control_ZoomOut, true))
+                Zoom(Math.Max(CurrentZoom - (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MIN), !ZoomAlt);
 
             // Moving
             if (!Dragging)

@@ -29,6 +29,8 @@ namespace vimage
         public List<int> Control_FitToMonitorWidth = new List<int>();
         public List<int> Control_FitToMonitorAuto = new List<int>();
         public List<int> Control_FitToMonitorAlt = new List<int>();
+        public List<int> Control_ZoomIn = new List<int>();
+        public List<int> Control_ZoomOut = new List<int>();
         public List<int> Control_ZoomFaster = new List<int>();
         public List<int> Control_ZoomAlt = new List<int>();
         public List<int> Control_DragLimitToMonitorBounds = new List<int>();
@@ -63,7 +65,7 @@ namespace vimage
         public List<string> ControlNames = new List<string>()
         {
             "Drag", "Close", "Open Context Menu", "Prev Image", "Next Image", "Rotate Clockwise", "Rotate Anti-Clockwise", "Flip",
-            "Fit To Monitor Auto", "Fit To Monitor Width", "Fit To Monitor Height", "Fit To Monitor Alt", "Zoom Faster", "Zoom Alt", "Drag Limit to Monitor Bounds",
+            "Fit To Monitor Auto", "Fit To Monitor Width", "Fit To Monitor Height", "Fit To Monitor Alt", "Zoom In", "Zoom Out", "Zoom Faster", "Zoom Alt", "Drag Limit to Monitor Bounds",
             "Toggle Smoothing", "Toggle Mipmapping", "Toggle Background For Transparency", "Toggle Lock", "Toggle Always On Top", "Pause Animation", "Prev Frame", "Next Frame",
             "Open Settings", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Open Full Duplicate Image",
             "Random Image", "Move Left", "Move Right", "Move Up", "Move Down", "Transparency Toggle", "Transparency Hold", "Crop", "Undo Crop", "Exit All Instances"
@@ -232,6 +234,8 @@ namespace vimage
         private Dictionary<string, object> Settings;
 
         public const int MouseCodeOffset = 150;
+        public const int MOUSE_SCROLL_UP = 155;
+        public const int MOUSE_SCROLL_DOWN = 156;
 
         public Config()
         {
@@ -239,7 +243,7 @@ namespace vimage
             {
                 Control_Drag, Control_Close, Control_OpenContextMenu, Control_PrevImage, Control_NextImage, Control_RotateClockwise,
                 Control_RotateAntiClockwise, Control_Flip, Control_FitToMonitorHeight, Control_FitToMonitorWidth, Control_FitToMonitorAuto,
-                Control_FitToMonitorAlt, Control_ZoomFaster, Control_ZoomAlt, Control_DragLimitToMonitorBounds, Control_ToggleSmoothing, Control_ToggleMipmapping,
+                Control_FitToMonitorAlt, Control_ZoomIn, Control_ZoomOut, Control_ZoomFaster, Control_ZoomAlt, Control_DragLimitToMonitorBounds, Control_ToggleSmoothing, Control_ToggleMipmapping,
                 Control_ToggleBackgroundForTransparency, Control_ToggleLock, Control_ToggleAlwaysOnTop, Control_PauseAnimation, Control_PrevFrame, Control_NextFrame, Control_OpenSettings,
                 Control_ResetImage, Control_OpenAtLocation, Control_Delete, Control_Copy, Control_CopyAsImage, Control_OpenDuplicateImage, Control_OpenFullDuplicateImage,
                 Control_RandomImage, Control_MoveLeft, Control_MoveRight, Control_MoveUp, Control_MoveDown,Control_TransparencyToggle, Control_TransparencyHold, Control_Crop, Control_UndoCrop, Control_ExitAll
@@ -296,6 +300,8 @@ namespace vimage
                 { "FITTOMONITORWIDTH", Control_FitToMonitorWidth },
                 { "FITTOMONITORAUTO", Control_FitToMonitorAuto },
                 { "FITTOMONITORALT", Control_FitToMonitorAlt },
+                { "ZOOMIN", Control_ZoomIn },
+                { "ZOOMOUT", Control_ZoomOut },
                 { "ZOOMFASTER", Control_ZoomFaster },
                 { "ZOOMALT", Control_ZoomAlt },
                 { "DRAGLIMITTOMONITORBOUNDS", Control_DragLimitToMonitorBounds },
@@ -351,6 +357,8 @@ namespace vimage
             Control_FitToMonitorWidth.Clear();
             Control_FitToMonitorAuto.Clear();
             Control_FitToMonitorAlt.Clear();
+            Control_ZoomIn.Clear();
+            Control_ZoomOut.Clear();
             Control_ZoomFaster.Clear();
             Control_ZoomAlt.Clear();
             Control_DragLimitToMonitorBounds.Clear();
@@ -393,6 +401,8 @@ namespace vimage
             SetControls(Control_FitToMonitorWidth, "");
             SetControls(Control_FitToMonitorAuto, "MOUSEMIDDLE");
             SetControls(Control_FitToMonitorAlt, "RSHIFT", "LSHIFT");
+            SetControls(Control_ZoomIn, "SCROLLUP");
+            SetControls(Control_ZoomOut, "SCROLLDOWN");
             SetControls(Control_ZoomFaster, "RSHIFT", "LSHIFT");
             SetControls(Control_ZoomAlt, "RCTRL", "CTRL");
             SetControls(Control_DragLimitToMonitorBounds, "ALT");
@@ -553,7 +563,7 @@ namespace vimage
                     List<int> list = (List<int>)Settings[name];
                     for (int i = 0; i < values.Length; i++)
                     {
-                        if (values[i].ToUpper().StartsWith("MOUSE"))
+                        if (values[i].ToUpper().StartsWith("MOUSE") || (values[i].ToUpper() == "SCROLLUP" || values[i].ToUpper() == "SCROLLDOWN"))
                         {
                             // Mouse Button
                             int btn = StringToMouseButton(values[i].ToUpper());
@@ -746,6 +756,8 @@ namespace vimage
             WriteControl(writer, "FitToMonitorWidth", Control_FitToMonitorWidth);
             WriteControl(writer, "FitToMonitorAuto", Control_FitToMonitorAuto);
             WriteControl(writer, "FitToMonitorAlt", Control_FitToMonitorAlt);
+            WriteControl(writer, "ZoomIn", Control_ZoomIn);
+            WriteControl(writer, "ZoomOut", Control_ZoomOut);
             WriteControl(writer, "ZoomFaster", Control_ZoomFaster);
             WriteControl(writer, "ZoomAlt", Control_ZoomAlt);
             WriteControl(writer, "DragLimitToMonitorBounds", Control_DragLimitToMonitorBounds);
@@ -953,17 +965,17 @@ namespace vimage
 
 
         /// <summary> Returns true if code is one of Control bindings. </summary>
-        public static bool IsControl(object code, List<int> Control)
+        public static bool IsControl(object code, List<int> Control, bool allowModifiers = false)
         {
             if (code is Keyboard.Key)
-                return IsControl((Keyboard.Key)code, Control);
+                return IsControl((Keyboard.Key)code, Control, allowModifiers);
             else if (code is Mouse.Button)
                 return IsControl((Mouse.Button)code, Control);
 
             return false;
         }
         /// <summary> Returns true if Keyboard.Key is one of Control bindings. </summary>
-        public static bool IsControl(Keyboard.Key keyCode, List<int> Control)
+        public static bool IsControl(Keyboard.Key keyCode, List<int> Control, bool allowModifiers = false)
         {
             // Keyboard key?
             if (Control.Count == 0)
@@ -989,7 +1001,7 @@ namespace vimage
                         ((Keyboard.Key)Control[index - 1] == Keyboard.Key.RShift && RShiftDown) ||
                         ((Keyboard.Key)Control[index - 1] == Keyboard.Key.RAlt && RAltDown));
                 }
-                else if (!KeyModifier(keyCode) && (CtrlDown || ShiftDown || AltDown || RCtrlDown || RShiftDown || RAltDown))
+                else if (!allowModifiers && !KeyModifier(keyCode) && (CtrlDown || ShiftDown || AltDown || RCtrlDown || RShiftDown || RAltDown))
                     value = false; // don't activate non key-combos if key modifier is down
                 else
                     value = true;
@@ -1038,7 +1050,7 @@ namespace vimage
                         controls.Add((int)key2);
 
                 }
-                else if (str.StartsWith("MOUSE"))
+                else if (str.StartsWith("MOUSE") || str == "SCROLLUP" || str == "SCROLLDOWN")
                     controls.Add(StringToMouseButton(str));
                 else
                     controls.Add((int)StringToKey(str.Replace(" ", "")));
@@ -1083,19 +1095,25 @@ namespace vimage
                 case "MOUSEXBUTTON2":
                 case "MOUSE5":
                     return (int)Mouse.Button.XButton2 + MouseCodeOffset;
+                case "SCROLLUP":
+                    return MOUSE_SCROLL_UP;
+                case "SCROLLDOWN":
+                    return MOUSE_SCROLL_DOWN;
             }
 
             return -1;
         }
         public static string MouseButtonToString(int code)
         {
-            switch ((Mouse.Button)(code - MouseCodeOffset))
+            switch (code - MouseCodeOffset)
             {
-                case Mouse.Button.Left: return "MOUSELEFT";
-                case Mouse.Button.Right: return "MOUSERIGHT";
-                case Mouse.Button.Middle: return "MOUSEMIDDLE";
-                case Mouse.Button.XButton1: return "MOUSE4";
-                case Mouse.Button.XButton2: return "MOUSE5";
+                case 0: return "MOUSELEFT";
+                case 1: return "MOUSERIGHT";
+                case 2: return "MOUSEMIDDLE";
+                case 3: return "MOUSE4";
+                case 4: return "MOUSE5";
+                case 5: return "SCROLLUP";
+                case 6: return "SCROLLDOWN";
             }
 
             return "";

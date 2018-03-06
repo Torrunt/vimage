@@ -89,6 +89,26 @@ namespace vimage_settings
             }
             ControlSetting.ReleaseMouseCapture();
         }
+        private void ControlSetting_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (!ControlSetting.IsFocused)
+                return;
+            e.Handled = true;
+
+            // Record Mouse Wheel Direction
+            int bind = -1;
+            if (e.Delta > 0)
+                bind = Config.MOUSE_SCROLL_UP;
+            else if (e.Delta < 0)
+                bind = Config.MOUSE_SCROLL_DOWN;
+
+            // Update Control and Text Box
+            if (Controls.IndexOf(bind) == -1)
+            {
+                Controls.Add(bind);
+                UpdateBindings();
+            }
+        }
         private void RecordKey(Key keyCode, bool canBeKeyCombo = true)
         {
             string key = keyCode.ToString().ToUpper();
@@ -158,6 +178,7 @@ namespace vimage_settings
             window.PreviewKeyDown += OnKeyDown;
             window.PreviewKeyUp += OnKeyUp;
             ControlSetting.PreviewMouseUp += ControlSetting_MouseUp;
+            ControlSetting.PreviewMouseWheel += ControlSetting_MouseWheel;
             CanRecordMouseButton = false;
         }
 
@@ -169,6 +190,7 @@ namespace vimage_settings
             window.PreviewKeyDown -= OnKeyDown;
             window.PreviewKeyUp -= OnKeyUp;
             ControlSetting.PreviewMouseUp -= ControlSetting_MouseUp;
+            ControlSetting.PreviewMouseWheel -= ControlSetting_MouseWheel;
         }
     }
 }
