@@ -1379,6 +1379,9 @@ namespace vimage
             if (FolderContents.Count() <= 1)
                 return;
 
+            if (!Config.Setting_LoopImageNavigation && FolderPosition == FolderContents.Count() - 1)
+                return;
+
             bool success = false;
             do
             {
@@ -1400,6 +1403,9 @@ namespace vimage
         {
             GetFolderContents();
             if (FolderContents.Count() <= 1)
+                return;
+
+            if (!Config.Setting_LoopImageNavigation && FolderPosition == 0)
                 return;
 
             bool success = false;

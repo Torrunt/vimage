@@ -116,6 +116,11 @@ namespace vimage
             get { return (Boolean)Settings["POSITIONLARGEWIDEIMAGESINCORNER"]; }
             set { Settings["POSITIONLARGEWIDEIMAGESINCORNER"] = value; }
         }
+        public bool Setting_LoopImageNavigation
+        {
+            get { return (Boolean)Settings["LOOPIMAGENAVIGATION"]; }
+            set { Settings["LOOPIMAGENAVIGATION"] = value; }
+        }
         public bool Setting_PreloadNextImage
         {
             get { return (Boolean)Settings["PRELOADNEXTIMAGE"]; }
@@ -268,6 +273,7 @@ namespace vimage
                 { "TRANSPARENCYTOGGLEVALUE", "#64FFFFFF" },
                 { "LIMITIMAGESTOMONITOR", AUTO },
                 { "POSITIONLARGEWIDEIMAGESINCORNER", true },
+                { "LOOPIMAGENAVIGATION", true },
                 { "PRELOADNEXTIMAGE", true },
                 { "OPENSETTINGSEXE", true },
                 { "LISTENFORCONFIGCHANGES", true },
@@ -715,6 +721,7 @@ namespace vimage
             WriteSetting(writer, "LimitImagesToMonitor", Setting_LimitImagesToMonitor, "0=NONE, 1=HEIGHT, 2=WIDTH, 3=AUTO");
             WriteSetting(writer, "PositionLargeWideImagesInCorner", Setting_PositionLargeWideImagesInCorner, 
                 "ie: Desktop Wallpapers and Screenshots");
+            WriteSetting(writer, "LoopImageNavigation", Setting_LoopImageNavigation);
             WriteSetting(writer, "PreloadNextImage", Setting_PreloadNextImage, 
                 "when using the next/prev image buttons, the image after the one just loaded will be loaded as well");
             WriteSetting(writer, "OpenSettingsEXE", Setting_OpenSettingsEXE, "if false, will open config.txt instead");
