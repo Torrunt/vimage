@@ -401,9 +401,9 @@ namespace vimage
             {
                 // Zooming
                 if (Config.Control_ZoomIn.Contains(dir))
-                    Zoom(Math.Min(CurrentZoom + (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MAX), !ZoomAlt);
+                    Zoom(Math.Min(CurrentZoom + (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MAX), !ZoomAlt, true);
                 else if (Config.Control_ZoomOut.Contains(dir))
-                    Zoom(Math.Max(CurrentZoom - (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MIN), !ZoomAlt);
+                    Zoom(Math.Max(CurrentZoom - (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MIN), !ZoomAlt, true);
             }
 
             // Next/Prev Image in Folder
@@ -411,11 +411,6 @@ namespace vimage
                 PrevImage();
             if (Config.Control_NextImage.Contains(dir))
                 NextImage();
-
-            AutomaticallyZoomed = false;
-            FitToMonitorHeightForced = false;
-            FitToMonitorHeight = false;
-            FitToMonitorWidth = false;
         }
 
         private void OnMouseDown(Object sender, MouseButtonEventArgs e) { ControlDown(e.Button); }
@@ -597,9 +592,9 @@ namespace vimage
                 TransparencyMod = true;
 
             if (Config.IsControl(code, Config.Control_ZoomIn, true))
-                Zoom(Math.Min(CurrentZoom + (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MAX), !ZoomAlt);
+                Zoom(Math.Min(CurrentZoom + (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MAX), !ZoomAlt, true);
             else if (Config.IsControl(code, Config.Control_ZoomOut, true))
-                Zoom(Math.Max(CurrentZoom - (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MIN), !ZoomAlt);
+                Zoom(Math.Max(CurrentZoom - (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MIN), !ZoomAlt, true);
 
             // Moving
             if (!Dragging)
@@ -676,7 +671,7 @@ namespace vimage
             }
         }
 
-        private void Zoom(float value, bool center = false)
+        private void Zoom(float value, bool center = false, bool manualZoom = false)
         {
             // Limit zooming to prevent the going past the GPU's max texture size
             if (value > CurrentZoom && (uint)Math.Ceiling(Size.X * value) >= Texture.MaximumSize)
@@ -749,6 +744,14 @@ namespace vimage
                 }
 
                 NextWindowPos = ImageViewerUtils.LimitToBounds(NextWindowPos, NextWindowSize, currentBounds);
+            }
+
+            if (manualZoom)
+            {
+                AutomaticallyZoomed = false;
+                FitToMonitorHeightForced = false;
+                FitToMonitorHeight = false;
+                FitToMonitorWidth = false;
             }
 
             Updated = true;
