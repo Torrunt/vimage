@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using SFML.Graphics;
 
 namespace vimage
@@ -11,6 +10,7 @@ namespace vimage
         public int FramesCount = 0;
         public int FrameDuration = 100;
         public bool FullyLoaded = false;
+        public bool CancelLoading = false;
 
         private bool _Smooth = true;
         public bool Smooth 

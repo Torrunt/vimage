@@ -86,7 +86,7 @@ namespace vimage
                     }
 
                     // Limit amount of Textures in Memory
-                    if (Textures.Count >= MAX_TEXTURES)
+                    if (Textures.Count > MAX_TEXTURES)
                     {
                         if (TextureFileNames[0].IndexOf('^') == TextureFileNames[0].Length - 1)
                         {
@@ -306,64 +306,68 @@ namespace vimage
         /// <param name="filename">Animated Image (ie: animated gif).</param>
         public static AnimatedImageData GetAnimatedImageData(string fileName)
         {
-            int index = AnimatedImageDataFileNames.IndexOf(fileName);
-
-            if (index >= 0)
+            lock (AnimatedImageDatas)
             {
-                // AnimatedImageData Already Exists
-                // move it to the end of the array and return it
-                AnimatedImageData data = AnimatedImageDatas[index];
-                string name = AnimatedImageDataFileNames[index];
+                int index = AnimatedImageDataFileNames.IndexOf(fileName);
 
-                AnimatedImageDatas.RemoveAt(index);
-                AnimatedImageDataFileNames.RemoveAt(index);
-                AnimatedImageDatas.Add(data);
-                AnimatedImageDataFileNames.Add(name);
-
-                return AnimatedImageDatas[AnimatedImageDatas.Count-1];
-            }
-            else
-            {
-                // New AnimatedImageData
-                System.Drawing.Image image = System.Drawing.Image.FromFile(fileName);
-                AnimatedImageData data = new AnimatedImageData();
-
-                //// Get Frame Duration
-                int frameDuration = 0;
-                try
+                if (index >= 0)
                 {
-                    System.Drawing.Imaging.PropertyItem frameDelay = image.GetPropertyItem(0x5100);
-                    frameDuration = (frameDelay.Value[0] + frameDelay.Value[1] * 256) * 10;
+                    // AnimatedImageData Already Exists
+                    // move it to the end of the array and return it
+                    AnimatedImageData data = AnimatedImageDatas[index];
+                    string name = AnimatedImageDataFileNames[index];
+
+                    AnimatedImageDatas.RemoveAt(index);
+                    AnimatedImageDataFileNames.RemoveAt(index);
+                    AnimatedImageDatas.Add(data);
+                    AnimatedImageDataFileNames.Add(name);
+
+                    return AnimatedImageDatas[AnimatedImageDatas.Count - 1];
                 }
-                catch { }
-                if (frameDuration > 10)
-                    data.FrameDuration = frameDuration;
                 else
-                    data.FrameDuration = AnimatedImage.DEFAULT_FRAME_DURATION;
-                
-                //// Store AnimatedImageData
-                AnimatedImageDatas.Add(data);
-                AnimatedImageDataFileNames.Add(fileName);
-
-                // Limit amount of Animations in Memory
-                if (AnimatedImageDatas.Count >= MAX_ANIMATIONS)
                 {
-                    for (int i = 0; i < AnimatedImageDatas[0].Frames.Count; i++)
-                        AnimatedImageDatas[0]?.Frames[i]?.Dispose();
-                    
-                    AnimatedImageDatas.RemoveAt(0);
-                    AnimatedImageDataFileNames.RemoveAt(0);
+                    // New AnimatedImageData
+                    System.Drawing.Image image = System.Drawing.Image.FromFile(fileName);
+                    AnimatedImageData data = new AnimatedImageData();
+
+                    //// Get Frame Duration
+                    int frameDuration = 0;
+                    try
+                    {
+                        System.Drawing.Imaging.PropertyItem frameDelay = image.GetPropertyItem(0x5100);
+                        frameDuration = (frameDelay.Value[0] + frameDelay.Value[1] * 256) * 10;
+                    }
+                    catch { }
+                    if (frameDuration > 10)
+                        data.FrameDuration = frameDuration;
+                    else
+                        data.FrameDuration = AnimatedImage.DEFAULT_FRAME_DURATION;
+
+                    //// Store AnimatedImageData
+                    AnimatedImageDatas.Add(data);
+                    AnimatedImageDataFileNames.Add(fileName);
+
+                    // Limit amount of Animations in Memory
+                    if (AnimatedImageDatas.Count > MAX_ANIMATIONS)
+                    {
+                        AnimatedImageDatas[0].CancelLoading = true;
+                        for (int i = 0; i < AnimatedImageDatas[0].Frames.Count; i++)
+                            AnimatedImageDatas[0]?.Frames[i]?.Dispose(); 
+                        AnimatedImageDatas.RemoveAt(0);
+                        AnimatedImageDataFileNames.RemoveAt(0);
+                    }
+
+                    //// Get Frames
+                    LoadingAnimatedImage loadingAnimatedImage = new LoadingAnimatedImage(image, data);
+                    Thread loadFramesThread = new Thread(new ThreadStart(loadingAnimatedImage.LoadFrames));
+                    loadFramesThread.Name = "AnimationLoadThread - " + fileName;
+                    loadFramesThread.IsBackground = true;
+                    loadFramesThread.Start();
+
+                    while (data.Frames.Count <= 0) ; // wait for at least one frame to be loaded
+
+                    return data;
                 }
-
-                //// Get Frames
-                LoadingAnimatedImage loadingAnimatedImage = new LoadingAnimatedImage(image, data);
-                Thread loadFramesThread = new Thread(new ThreadStart(loadingAnimatedImage.LoadFrames));
-                loadFramesThread.IsBackground = true;
-                loadFramesThread.Start();
-
-                while (data.Frames.Count <= 0); // wait for at least one frame to be loaded
-                
-                return data;
             }
         }
 
@@ -386,8 +390,11 @@ namespace vimage
             System.Drawing.Imaging.FrameDimension frameDimension = new System.Drawing.Imaging.FrameDimension(Image.FrameDimensionsList[0]);
             Data.FramesCount = Image.GetFrameCount(frameDimension);
 
-            for (int i = 0; i < Image.GetFrameCount(frameDimension); i++)
+            for (int i = 0; i < Data.FramesCount; i++)
             {
+                if (Data.CancelLoading)
+                    return;
+
                 Image.SelectActiveFrame(frameDimension, i);
                 Quantizer = new ImageManipulation.OctreeQuantizer(255, 8);
 
@@ -398,12 +405,13 @@ namespace vimage
 
                 stream.Dispose();
 
+                if (Data.CancelLoading)
+                    return;
+
                 Data.Frames[i].Smooth = Data.Smooth;
                 Data.Frames[i].Mipmap = Data.Mipmap;
             }
             Data.FullyLoaded = true;
-            Data.Smooth = Data.Smooth;
-            Data.Mipmap = Data.Mipmap;
         }
     }
 
