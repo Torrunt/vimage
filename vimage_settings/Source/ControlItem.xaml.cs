@@ -80,13 +80,7 @@ namespace vimage_settings
                 case MouseButton.XButton2: button = (int)SFML.Window.Mouse.Button.XButton2; break;
             }
 
-            // Update Control and Text Box
-            int bind = button + Config.MouseCodeOffset;
-            if (Controls.IndexOf(bind) == -1)
-            {
-                Controls.Add(bind);
-                UpdateBindings();
-            }
+            RecordControl(button + Config.MouseCodeOffset);
             ControlSetting.ReleaseMouseCapture();
         }
         private void ControlSetting_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -101,13 +95,8 @@ namespace vimage_settings
                 bind = Config.MOUSE_SCROLL_UP;
             else if (e.Delta < 0)
                 bind = Config.MOUSE_SCROLL_DOWN;
-
-            // Update Control and Text Box
-            if (Controls.IndexOf(bind) == -1)
-            {
-                Controls.Add(bind);
-                UpdateBindings();
-            }
+            
+            RecordControl(bind);
         }
         private void RecordKey(Key keyCode, bool canBeKeyCombo = true)
         {
@@ -130,44 +119,47 @@ namespace vimage_settings
                 case "OEM7": key = "'"; break;
             }
 
+            // fix number keys (remove D from D#)
             if (key.Length == 2 && key[0] == 'D')
                 key = key.Remove(0, 1);
 
-            // Update Control and Text Box
-            int bind = (int)Config.StringToKey(key);
+            RecordControl((int)Config.StringToKey(key));
+        }
+        private void RecordControl(int bind, bool canBeKeyCombo = true)
+        {
             int i = Controls.IndexOf(bind);
-            if (i == -1 || (i > 1 && Controls[i-2] == -2))
+            if (!(i == -1 || (i > 1 && Controls[i - 2] == -2)))
+                return;
+
+            if (canBeKeyCombo)
             {
-                if (canBeKeyCombo)
+                // Key Combo? (eg: CTRL+C)
+                int c = -1;
+                if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                    c = (int)SFML.Window.Keyboard.Key.LControl;
+                else if (Keyboard.IsKeyDown(Key.RightCtrl))
+                    c = (int)SFML.Window.Keyboard.Key.RControl;
+                else if (Keyboard.IsKeyDown(Key.LeftShift))
+                    c = (int)SFML.Window.Keyboard.Key.LShift;
+                else if (Keyboard.IsKeyDown(Key.RightShift))
+                    c = (int)SFML.Window.Keyboard.Key.RShift;
+                else if (Keyboard.IsKeyDown(Key.LeftAlt))
+                    c = (int)SFML.Window.Keyboard.Key.LAlt;
+                else if (Keyboard.IsKeyDown(Key.RightAlt))
+                    c = (int)SFML.Window.Keyboard.Key.RAlt;
+                if (c != -1 && c != bind)
                 {
-                    // Key Combo? (eg: CTRL+C)
-                    int c = -1;
-                    if (Keyboard.IsKeyDown(Key.LeftCtrl))
-                        c = (int)SFML.Window.Keyboard.Key.LControl;
-                    else if (Keyboard.IsKeyDown(Key.RightCtrl))
-                        c = (int)SFML.Window.Keyboard.Key.RControl;
-                    else if (Keyboard.IsKeyDown(Key.LeftShift))
-                        c = (int)SFML.Window.Keyboard.Key.LShift;
-                    else if (Keyboard.IsKeyDown(Key.RightShift))
-                        c = (int)SFML.Window.Keyboard.Key.RShift;
-                    else if (Keyboard.IsKeyDown(Key.LeftAlt))
-                        c = (int)SFML.Window.Keyboard.Key.LAlt;
-                    else if (Keyboard.IsKeyDown(Key.RightAlt))
-                        c = (int)SFML.Window.Keyboard.Key.RAlt;
-                    if (c != -1 && c != bind)
-                    {
-                        if (i != -1 && Controls.IndexOf(c) != -1)
-                            return;
-                        Controls.Add(-2);
-                        Controls.Add(c);
-                        RecordedKeyCombo = true;
-                    }
-                    else if (i != -1)
+                    if (i != -1 && Controls.IndexOf(c) != -1)
                         return;
+                    Controls.Add(-2);
+                    Controls.Add(c);
+                    RecordedKeyCombo = true;
                 }
-                Controls.Add(bind);
-                UpdateBindings();
+                else if (i != -1)
+                    return;
             }
+            Controls.Add(bind);
+            UpdateBindings();
         }
 
         private void ControlSetting_GotFocus(object sender, RoutedEventArgs e)

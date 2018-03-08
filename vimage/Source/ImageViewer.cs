@@ -397,20 +397,19 @@ namespace vimage
                 Image.Color = ImageColor;
                 Updated = true;
             }
+            // Next/Prev Image in Folder
+            else if (Config.IsControl(dir, Config.Control_PrevImage))
+                PrevImage();
+            else if (Config.IsControl(dir, Config.Control_NextImage))
+                NextImage();
             else if (!Cropping)
             {
                 // Zooming
-                if (Config.Control_ZoomIn.Contains(dir))
+                if (Config.IsControl(dir, Config.Control_ZoomIn, true))
                     Zoom(Math.Min(CurrentZoom + (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MAX), !ZoomAlt, true);
-                else if (Config.Control_ZoomOut.Contains(dir))
+                else if (Config.IsControl(dir, Config.Control_ZoomOut, true))
                     Zoom(Math.Max(CurrentZoom - (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MIN), !ZoomAlt, true);
             }
-
-            // Next/Prev Image in Folder
-            if (Config.Control_PrevImage.Contains(dir))
-                PrevImage();
-            if (Config.Control_NextImage.Contains(dir))
-                NextImage();
         }
 
         private void OnMouseDown(Object sender, MouseButtonEventArgs e) { ControlDown(e.Button); }

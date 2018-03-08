@@ -566,38 +566,7 @@ namespace vimage
                 if (Settings[name] is List<int>)
                 {
                     // Control
-                    List<int> list = (List<int>)Settings[name];
-                    for (int i = 0; i < values.Length; i++)
-                    {
-                        if (values[i].ToUpper().StartsWith("MOUSE") || (values[i].ToUpper() == "SCROLLUP" || values[i].ToUpper() == "SCROLLDOWN"))
-                        {
-                            // Mouse Button
-                            int btn = StringToMouseButton(values[i].ToUpper());
-                            if (btn != -1)
-                                list.Add(btn);
-                        }
-                        else if (values[i].Contains("+"))
-                        {
-                            // Keboard Combo
-                            list.Add(-2); // denote that it's a key combo
-
-                            string[] v = values[i].Split('+');
-
-                            Keyboard.Key key1 = StringToKey(v[0].ToUpper());
-                            if (key1 != Keyboard.Key.Unknown)
-                                list.Add((int)key1);
-                            Keyboard.Key key2 = StringToKey(v[1].ToUpper());
-                            if (key2 != Keyboard.Key.Unknown)
-                                list.Add((int)key2);
-                        }
-                        else
-                        {
-                            // Keyboard Key
-                            Keyboard.Key key = StringToKey(values[i].ToUpper());
-                            if (key != Keyboard.Key.Unknown)
-                                list.Add((int)key);
-                        }
-                    }
+                    StringToControls(values, (List<int>)Settings[name]);
                 }
                 else if (Settings[name] is int || Settings[name] is Enum)
                 {
@@ -671,7 +640,7 @@ namespace vimage
 
                     // assign Values
                     if (sectionName == "CUSTOMACTIONBINDINGS")
-                        setting.Add(new { name = splitValues[0], bindings = StringToControls(splitValues[1]) });
+                        setting.Add(new { name = splitValues[0], bindings = StringToControls(splitValues[1].Split(',')) });
                     else
                         setting.Add(new { name = splitValues[0], func = splitValues[1] });
 
@@ -927,43 +896,32 @@ namespace vimage
                 return KeyToString((Keyboard.Key)code);
         }
 
-        public static List<int> StringToControls(string str)
+        public static List<int> StringToControls(string[] values, List<int> list = null)
         {
-            List<int> list = new List<int>();
-
-            // split values by commas
-            string[] values = str.Split(',');
-
+            if (list == null)
+                list = new List<int>();
             // Control
             for (int i = 0; i < values.Length; i++)
             {
-                if (values[i].ToUpper().StartsWith("MOUSE"))
+                if (values[i].Contains("+"))
                 {
-                    // Mouse Button
-                    int btn = StringToMouseButton(values[i].ToUpper());
-                    if (btn != -1)
-                        list.Add(btn);
-                }
-                else if (values[i].Contains("+"))
-                {
-                    // Keboard Combo
+                    // Combo
                     list.Add(-2); // denote that it's a key combo
 
                     string[] v = values[i].Split('+');
 
-                    Keyboard.Key key1 = StringToKey(v[0].ToUpper());
-                    if (key1 != Keyboard.Key.Unknown)
-                        list.Add((int)key1);
-                    Keyboard.Key key2 = StringToKey(v[1].ToUpper());
-                    if (key2 != Keyboard.Key.Unknown)
-                        list.Add((int)key2);
+                    Keyboard.Key modifier = StringToKey(v[0].ToUpper());
+                    if (modifier != Keyboard.Key.Unknown)
+                        list.Add((int)modifier);
+                    int control = StringToControl(v[1].ToUpper());
+                    if (control != -1)
+                        list.Add(control);
                 }
                 else
                 {
-                    // Keyboard Key
-                    Keyboard.Key key = StringToKey(values[i].ToUpper());
-                    if (key != Keyboard.Key.Unknown)
-                        list.Add((int)key);
+                    int control = StringToControl(values[i].ToUpper());
+                    if (control != -1)
+                        list.Add(control);
                 }
             }
 
@@ -974,24 +932,18 @@ namespace vimage
         /// <summary> Returns true if code is one of Control bindings. </summary>
         public static bool IsControl(object code, List<int> Control, bool allowModifiers = false)
         {
-            if (code is Keyboard.Key)
-                return IsControl((Keyboard.Key)code, Control, allowModifiers);
-            else if (code is Mouse.Button)
-                return IsControl((Mouse.Button)code, Control);
-
-            return false;
-        }
-        /// <summary> Returns true if Keyboard.Key is one of Control bindings. </summary>
-        public static bool IsControl(Keyboard.Key keyCode, List<int> Control, bool allowModifiers = false)
-        {
-            // Keyboard key?
             if (Control.Count == 0)
                 return false;
 
-            int index = Control.IndexOf((int)keyCode);
+            int codeID = -1;
+            if (code is Mouse.Button)
+                codeID = (int)code + MouseCodeOffset;
+            else
+                codeID = (int)code;
+
+            int index = Control.IndexOf(codeID);
             if (index == -1)
                 return false;
-            int t = 0;
             bool value = false;
             do
             {
@@ -1008,32 +960,20 @@ namespace vimage
                         ((Keyboard.Key)Control[index - 1] == Keyboard.Key.RShift && RShiftDown) ||
                         ((Keyboard.Key)Control[index - 1] == Keyboard.Key.RAlt && RAltDown));
                 }
-                else if (!allowModifiers && !KeyModifier(keyCode) && (CtrlDown || ShiftDown || AltDown || RCtrlDown || RShiftDown || RAltDown))
+                else if (!allowModifiers && (codeID >= MouseCodeOffset || !KeyModifier((Keyboard.Key)code)) && (CtrlDown || ShiftDown || AltDown || RCtrlDown || RShiftDown || RAltDown))
                     value = false; // don't activate non key-combos if key modifier is down
                 else
                     value = true;
 
                 // loop if there might be second binding using the same keyCode (eg: CTRL+UP and RCTRL+UP)
                 if (!value)
-                    index = Control.IndexOf((int)keyCode, index + 1);
+                    index = Control.IndexOf(codeID, index + 1);
                 else
                     index = -1;
-                t++;
             }
             while (index != -1);
 
             return value;
-        }
-        /// <summary> Returns true if Mouse.Button is one of Control bindings. </summary>
-        public static bool IsControl(Mouse.Button code, List<int> Control)
-        {
-            // Mouse key?
-            foreach (Mouse.Button key in Control)
-            {
-                if (code == (Mouse.Button)(key - MouseCodeOffset))
-                    return true;
-            }
-            return false;
         }
 
         public static void SetControls(List<int> controls, params string[] bindings)
@@ -1045,22 +985,24 @@ namespace vimage
 
                 if (str.Contains("+"))
                 {
+                    // Combo
                     controls.Add(-2); // denote that it's a key combo
 
                     string[] v = str.Split('+');
 
-                    Keyboard.Key key1 = StringToKey(v[0].ToUpper());
-                    if (key1 != Keyboard.Key.Unknown)
-                        controls.Add((int)key1);
-                    Keyboard.Key key2 = StringToKey(v[1].ToUpper());
-                    if (key2 != Keyboard.Key.Unknown)
-                        controls.Add((int)key2);
-
+                    Keyboard.Key modifier = StringToKey(v[0].ToUpper());
+                    if (modifier != Keyboard.Key.Unknown)
+                        controls.Add((int)modifier);
+                    int control = StringToControl(v[1].ToUpper());
+                    if (control != -1)
+                        controls.Add(control);
                 }
-                else if (str.StartsWith("MOUSE") || str == "SCROLLUP" || str == "SCROLLDOWN")
-                    controls.Add(StringToMouseButton(str));
                 else
-                    controls.Add((int)StringToKey(str.Replace(" ", "")));
+                {
+                    int control = StringToControl(str.ToUpper());
+                    if (control != -1)
+                        controls.Add(control);
+                }
             }
         }
 
@@ -1603,6 +1545,14 @@ namespace vimage
             }
 
             return "";
+        }
+
+        public static int StringToControl(string str)
+        {
+            if (str.StartsWith("MOUSE") || (str == "SCROLLUP" || str == "SCROLLDOWN"))
+                return StringToMouseButton(str);
+            else
+                return (int)StringToKey(str);
         }
 
         public static bool KeyModifier(Keyboard.Key key)
