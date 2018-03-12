@@ -62,11 +62,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\vimage\Source\Actions.cs">
+      <Link>Source\Actions.cs</Link>
+    </Compile>
     <Compile Include="..\vimage\Source\Config.cs">
       <Link>Source\Config.cs</Link>
-    </Compile>
-    <Compile Include="..\vimage\Source\MenuFuncs.cs">
-      <Link>Source\MenuFuncs.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\About.xaml.cs">

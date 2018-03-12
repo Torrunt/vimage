@@ -14,6 +14,7 @@ namespace vimage_settings
         public List<int> Controls;
         private bool RecordedKeyCombo = false;
         private bool CanRecordMouseButton = false;
+        private List<int> KeysHeld = new List<int>();
 
         public ControlItem()
         {
@@ -41,22 +42,23 @@ namespace vimage_settings
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
             e.Handled = true;
-            Key key = e.Key == Key.System ? e.SystemKey : e.Key;
-            if (key == Key.System || key == Key.LeftShift || key == Key.RightShift || key == Key.LeftCtrl || key == Key.RightCtrl ||
-                key == Key.LeftAlt || key == Key.RightAlt || key == Key.LWin || key == Key.RWin)
-                return;
-            RecordKey(e.Key == Key.System ? e.SystemKey : e.Key);
+
+            int key = ConvertWindowsKey(e.Key == Key.System ? e.SystemKey : e.Key);
+            if (KeysHeld.Count == 0 || KeysHeld[KeysHeld.Count-1] != key)
+            {
+                KeysHeld.Add(key);
+                if (KeysHeld.Count > 2)
+                    KeysHeld.RemoveAt(0);
+            }
         }
         private void OnKeyUp(object sender, KeyEventArgs e)
         {
             e.Handled = true;
-            if (RecordedKeyCombo)
-                return;
-            Key key = e.Key == Key.System ? e.SystemKey : e.Key;
-            // Only record CTRL, SHIFT and ALT as single keys on key up (in case they are part of a key combo)
-            if (key == Key.LeftCtrl || key == Key.RightCtrl || key == Key.LeftShift || key == Key.RightShift ||
-                key == Key.LeftAlt || key == Key.RightAlt)
-                RecordKey(key, false);
+
+            int key = ConvertWindowsKey(e.Key == Key.System ? e.SystemKey : e.Key);
+            KeysHeld.Remove(key);
+
+            RecordControl(key);
         }
         private void ControlSetting_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -98,7 +100,7 @@ namespace vimage_settings
             
             RecordControl(bind);
         }
-        private void RecordKey(Key keyCode, bool canBeKeyCombo = true)
+        private int ConvertWindowsKey(Key keyCode)
         {
             string key = keyCode.ToString().ToUpper();
 
@@ -106,8 +108,8 @@ namespace vimage_settings
             // Record Key Press
             if (key.Equals("SCROLL") || key.Equals("NUMLOCK") || key.Equals("CAPITAL") ||
                 key.Equals("LWIN") || key.Equals("RWIN"))
-                return;
-
+                return -1;
+            
             // fix up some weird names KeyEventArgs gives
             switch (key)
             {
@@ -117,16 +119,20 @@ namespace vimage_settings
                 case "OEM5": key = "\\"; break;
                 case "OEM1": key = ";"; break;
                 case "OEM7": key = "'"; break;
+                case "OEMMINUS": key = "MINUS"; break;
+                case "OEMPLUS": key = "PLUS"; break;
             }
 
             // fix number keys (remove D from D#)
             if (key.Length == 2 && key[0] == 'D')
                 key = key.Remove(0, 1);
 
-            RecordControl((int)Config.StringToKey(key));
+            return (int)Config.StringToKey(key);
         }
         private void RecordControl(int bind, bool canBeKeyCombo = true)
         {
+            if (bind == -1)
+                return;
             int i = Controls.IndexOf(bind);
             if (!(i == -1 || (i > 1 && Controls[i - 2] == -2)))
                 return;
@@ -135,20 +141,10 @@ namespace vimage_settings
             {
                 // Key Combo? (eg: CTRL+C)
                 int c = -1;
-                if (Keyboard.IsKeyDown(Key.LeftCtrl))
-                    c = (int)SFML.Window.Keyboard.Key.LControl;
-                else if (Keyboard.IsKeyDown(Key.RightCtrl))
-                    c = (int)SFML.Window.Keyboard.Key.RControl;
-                else if (Keyboard.IsKeyDown(Key.LeftShift))
-                    c = (int)SFML.Window.Keyboard.Key.LShift;
-                else if (Keyboard.IsKeyDown(Key.RightShift))
-                    c = (int)SFML.Window.Keyboard.Key.RShift;
-                else if (Keyboard.IsKeyDown(Key.LeftAlt))
-                    c = (int)SFML.Window.Keyboard.Key.LAlt;
-                else if (Keyboard.IsKeyDown(Key.RightAlt))
-                    c = (int)SFML.Window.Keyboard.Key.RAlt;
-                if (c != -1 && c != bind)
+                if (KeysHeld.Count > 0 && KeysHeld[KeysHeld.Count-1] != bind)
                 {
+                    c = KeysHeld[KeysHeld.Count - 1];
+
                     if (i != -1 && Controls.IndexOf(c) != -1)
                         return;
                     Controls.Add(-2);

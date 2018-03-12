@@ -10,13 +10,6 @@ namespace vimage
 
     public class Config
     {
-        public static bool CtrlDown = false;
-        public static bool ShiftDown = false;
-        public static bool AltDown = false;
-        public static bool RCtrlDown = false;
-        public static bool RShiftDown = false;
-        public static bool RAltDown = false;
-
         public List<int> Control_Drag = new List<int>();
         public List<int> Control_Close = new List<int>();
         public List<int> Control_OpenContextMenu = new List<int>();
@@ -36,7 +29,7 @@ namespace vimage
         public List<int> Control_DragLimitToMonitorBounds = new List<int>();
         public List<int> Control_ToggleSmoothing = new List<int>();
         public List<int> Control_ToggleMipmapping = new List<int>();
-        public List<int> Control_ToggleBackgroundForTransparency = new List<int>();
+        public List<int> Control_ToggleBackground = new List<int>();
         public List<int> Control_ToggleLock = new List<int>();
         public List<int> Control_ToggleAlwaysOnTop = new List<int>();
         public List<int> Control_PauseAnimation = new List<int>();
@@ -56,7 +49,8 @@ namespace vimage
         public List<int> Control_MoveUp = new List<int>();
         public List<int> Control_MoveDown = new List<int>();
         public List<int> Control_TransparencyToggle = new List<int>();
-        public List<int> Control_TransparencyHold = new List<int>();
+        public List<int> Control_TransparencyInc = new List<int>();
+        public List<int> Control_TransparencyDec = new List<int>();
         public List<int> Control_Crop = new List<int>();
         public List<int> Control_UndoCrop = new List<int>();
         public List<int> Control_ExitAll = new List<int>();
@@ -68,7 +62,7 @@ namespace vimage
             "Fit To Monitor Auto", "Fit To Monitor Width", "Fit To Monitor Height", "Fit To Monitor Alt", "Zoom In", "Zoom Out", "Zoom Faster", "Zoom Alt", "Drag Limit to Monitor Bounds",
             "Toggle Smoothing", "Toggle Mipmapping", "Toggle Background For Transparency", "Toggle Lock", "Toggle Always On Top", "Pause Animation", "Prev Frame", "Next Frame",
             "Open Settings", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Open Full Duplicate Image",
-            "Random Image", "Move Left", "Move Right", "Move Up", "Move Down", "Transparency Toggle", "Transparency Hold", "Crop", "Undo Crop", "Exit All Instances"
+            "Random Image", "Move Left", "Move Right", "Move Up", "Move Down", "Transparency Toggle", "Transparency Increase", "Transparency Decrease", "Crop", "Undo Crop", "Exit All Instances"
         };
 
         public bool Setting_OpenAtMousePosition
@@ -249,9 +243,10 @@ namespace vimage
                 Control_Drag, Control_Close, Control_OpenContextMenu, Control_PrevImage, Control_NextImage, Control_RotateClockwise,
                 Control_RotateAntiClockwise, Control_Flip, Control_FitToMonitorHeight, Control_FitToMonitorWidth, Control_FitToMonitorAuto,
                 Control_FitToMonitorAlt, Control_ZoomIn, Control_ZoomOut, Control_ZoomFaster, Control_ZoomAlt, Control_DragLimitToMonitorBounds, Control_ToggleSmoothing, Control_ToggleMipmapping,
-                Control_ToggleBackgroundForTransparency, Control_ToggleLock, Control_ToggleAlwaysOnTop, Control_PauseAnimation, Control_PrevFrame, Control_NextFrame, Control_OpenSettings,
+                Control_ToggleBackground, Control_ToggleLock, Control_ToggleAlwaysOnTop, Control_PauseAnimation, Control_PrevFrame, Control_NextFrame, Control_OpenSettings,
                 Control_ResetImage, Control_OpenAtLocation, Control_Delete, Control_Copy, Control_CopyAsImage, Control_OpenDuplicateImage, Control_OpenFullDuplicateImage,
-                Control_RandomImage, Control_MoveLeft, Control_MoveRight, Control_MoveUp, Control_MoveDown,Control_TransparencyToggle, Control_TransparencyHold, Control_Crop, Control_UndoCrop, Control_ExitAll
+                Control_RandomImage, Control_MoveLeft, Control_MoveRight, Control_MoveUp, Control_MoveDown,
+                Control_TransparencyToggle, Control_TransparencyInc, Control_TransparencyDec, Control_Crop, Control_UndoCrop, Control_ExitAll
             };
 
             Init();
@@ -313,7 +308,7 @@ namespace vimage
                 { "DRAGLIMITTOMONITORBOUNDS", Control_DragLimitToMonitorBounds },
                 { "TOGGLESMOOTHING", Control_ToggleSmoothing },
                 { "TOGGLEMIPMAPPING", Control_ToggleMipmapping },
-                { "TOGGLEBACKGROUNDFORTRANSPARENCY", Control_ToggleBackgroundForTransparency },
+                { "TOGGLEBACKGROUNDFORTRANSPARENCY", Control_ToggleBackground },
                 { "TOGGLELOCK", Control_ToggleLock },
                 { "TOGGLEALWAYSONTOP", Control_ToggleAlwaysOnTop },
                 { "PAUSEANIMATION", Control_PauseAnimation },
@@ -333,7 +328,8 @@ namespace vimage
                 { "MOVEUP", Control_MoveUp },
                 { "MOVEDOWN", Control_MoveDown },
                 { "TRANSPARENCYTOGGLE", Control_TransparencyToggle },
-                { "TRANSPARENCYHOLD", Control_TransparencyHold },
+                { "TRANSPARENCYINC", Control_TransparencyInc },
+                { "TRANSPARENCYDEC", Control_TransparencyDec },
                 { "CROP", Control_Crop },
                 { "UNDOCROP", Control_UndoCrop },
                 { "EXITALL", Control_ExitAll },
@@ -370,7 +366,7 @@ namespace vimage
             Control_DragLimitToMonitorBounds.Clear();
             Control_ToggleSmoothing.Clear();
             Control_ToggleMipmapping.Clear();
-            Control_ToggleBackgroundForTransparency.Clear();
+            Control_ToggleBackground.Clear();
             Control_ToggleLock.Clear();
             Control_ToggleAlwaysOnTop.Clear();
             Control_PauseAnimation.Clear();
@@ -390,7 +386,8 @@ namespace vimage
             Control_MoveUp.Clear();
             Control_MoveDown.Clear();
             Control_TransparencyToggle.Clear();
-            Control_TransparencyHold.Clear();
+            Control_TransparencyInc.Clear();
+            Control_TransparencyDec.Clear();
             Control_Crop.Clear();
             Control_UndoCrop.Clear();
             Control_ExitAll.Clear();
@@ -414,7 +411,7 @@ namespace vimage
             SetControls(Control_DragLimitToMonitorBounds, "ALT");
             SetControls(Control_ToggleSmoothing, "S");
             SetControls(Control_ToggleMipmapping, "SHIFT+S");
-            SetControls(Control_ToggleBackgroundForTransparency, "B");
+            SetControls(Control_ToggleBackground, "B");
             SetControls(Control_ToggleLock, "");
             SetControls(Control_ToggleAlwaysOnTop, "L");
             SetControls(Control_PauseAnimation, "SPACE");
@@ -434,7 +431,8 @@ namespace vimage
             SetControls(Control_MoveUp, "CTRL+UP", "RCTRL+UP");
             SetControls(Control_MoveDown, "CTRL+DOWN", "RCTRL+DOWN");
             SetControls(Control_TransparencyToggle, "T");
-            SetControls(Control_TransparencyHold, "Y");
+            SetControls(Control_TransparencyInc, "Y+SCROLLDOWN");
+            SetControls(Control_TransparencyDec, "Y+SCROLLUP");
             SetControls(Control_Crop, "X");
             SetControls(Control_UndoCrop, "CTRL+Z");
             SetControls(Control_ExitAll, "SHIFT+ESC");
@@ -444,41 +442,42 @@ namespace vimage
             ContextMenu.Clear();
             ContextMenu_Animation.Clear();
 
-            ContextMenu.Add(new { name = "Close", func = MenuFuncs.CLOSE });
-            ContextMenu.Add(new { name = "-", func = "-" });
-            ContextMenu.Add(new { name = "Next", func = MenuFuncs.NEXT_IMAGE });
-            ContextMenu.Add(new { name = "Previous", func = MenuFuncs.PREV_IMAGE });
+            ContextMenu.Add(new { name = "Close", func = Action.Close });
+            ContextMenu.Add(new { name = "-", func = Action.None });
+            ContextMenu.Add(new { name = "Next", func = Action.NextImage });
+            ContextMenu.Add(new { name = "Previous", func = Action.PrevImage });
             ContextMenu.Add("Sort by");
             List<object> SubMenu_SortBy = new List<object>();
-            SubMenu_SortBy.Add(new { name = "Name", func = MenuFuncs.SORT_NAME });
-            SubMenu_SortBy.Add(new { name = "Date", func = MenuFuncs.SORT_DATE });
-            SubMenu_SortBy.Add(new { name = "Date modified", func = MenuFuncs.SORT_DATE_MODIFIED });
-            SubMenu_SortBy.Add(new { name = "Date created", func = MenuFuncs.SORT_DATE_CREATED });
-            SubMenu_SortBy.Add(new { name = "Size", func = MenuFuncs.SORT_SIZE });
-            SubMenu_SortBy.Add(new { name = "-", func = "-" });
-            SubMenu_SortBy.Add(new { name = "Ascending", func = MenuFuncs.SORT_ASCENDING });
-            SubMenu_SortBy.Add(new { name = "Descending", func = MenuFuncs.SORT_DESCENDING });
+            SubMenu_SortBy.Add(new { name = "Name", func = Action.SortName });
+            SubMenu_SortBy.Add(new { name = "Date", func = Action.SortDate });
+            SubMenu_SortBy.Add(new { name = "Date modified", func = Action.SortDateModified });
+            SubMenu_SortBy.Add(new { name = "Date created", func = Action.SortDateCreated });
+            SubMenu_SortBy.Add(new { name = "Size", func = Action.SortSize });
+            SubMenu_SortBy.Add(new { name = "-", func = Action.None });
+            SubMenu_SortBy.Add(new { name = "Ascending", func = Action.SortAscending });
+            SubMenu_SortBy.Add(new { name = "Descending", func = Action.SortDescending });
             ContextMenu.Add(SubMenu_SortBy);
-            ContextMenu.Add(new { name = "-", func = "-" });
-            ContextMenu.Add(new { name = "Rotate right", func = MenuFuncs.ROTATE_CLOCKWISE });
-            ContextMenu.Add(new { name = "Rotate left", func = MenuFuncs.ROTATE_ANTICLOCKWISE });
-            ContextMenu.Add(new { name = "Flip", func = MenuFuncs.FLIP });
-            ContextMenu.Add(new { name = "Fit to height", func = MenuFuncs.FIT_TO_HEIGHT });
-            ContextMenu.Add(new { name = "Fit to width", func = MenuFuncs.FIT_TO_WIDTH });
-            ContextMenu.Add(new { name = "Smoothing", func = MenuFuncs.TOGGLE_SMOOTHING });
-            ContextMenu.Add(new { name = "Background", func = MenuFuncs.TOGGLE_BACKGROUND });
-            ContextMenu.Add(new { name = "Always on top", func = MenuFuncs.ALWAYS_ON_TOP });
-            ContextMenu.Add(new { name = "Reset image", func = MenuFuncs.RESET_IMAGE });
-            ContextMenu.Add(new { name = "-", func = "-" });
-            ContextMenu.Add(new { name = "Open file location", func = MenuFuncs.OPEN_FILE_LOCATION });
-            ContextMenu.Add(new { name = "Copy", func = MenuFuncs.COPY });
-            ContextMenu.Add(new { name = "Delete", func = MenuFuncs.DELETE });
-            ContextMenu.Add(new { name = "-", func = "-" });
-            ContextMenu.Add(new { name = "Settings", func = MenuFuncs.OPEN_SETTINGS });
-            ContextMenu.Add(new { name = "", func = MenuFuncs.VERSION_NAME });
+            ContextMenu.Add(new { name = "-", func = Action.None });
+            ContextMenu.Add(new { name = "Rotate right", func = Action.RotateClockwise });
+            ContextMenu.Add(new { name = "Rotate left", func = Action.RotateAntiClockwise });
+            ContextMenu.Add(new { name = "Flip", func = Action.Flip });
+            ContextMenu.Add(new { name = "Fit to height", func = Action.FitToMonitorHeight });
+            ContextMenu.Add(new { name = "Fit to width", func = Action.FitToMonitorWidth });
+            ContextMenu.Add(new { name = "Smoothing", func = Action.ToggleSmoothing });
+            ContextMenu.Add(new { name = "Mipmapping", func = Action.ToggleMipmapping });
+            ContextMenu.Add(new { name = "Background", func = Action.ToggleBackground });
+            ContextMenu.Add(new { name = "Always on top", func = Action.ToggleAlwaysOnTop });
+            ContextMenu.Add(new { name = "Reset image", func = Action.ResetImage });
+            ContextMenu.Add(new { name = "-", func = Action.None });
+            ContextMenu.Add(new { name = "Open file location", func = Action.OpenAtLocation });
+            ContextMenu.Add(new { name = "Copy", func = Action.Copy });
+            ContextMenu.Add(new { name = "Delete", func = Action.Delete });
+            ContextMenu.Add(new { name = "-", func = Action.None });
+            ContextMenu.Add(new { name = "Settings", func = Action.OpenSettings });
+            ContextMenu.Add(new { name = "", func = Action.VersionName });
 
-            ContextMenu_Animation.Add(new { name = "Pause/Play", func = MenuFuncs.TOGGLE_ANIMATION });
-            ContextMenu_Animation.Add(new { name = "-", func = "-" });
+            ContextMenu_Animation.Add(new { name = "Pause/Play", func = Action.TransparencyToggle });
+            ContextMenu_Animation.Add(new { name = "-", func = Action.None });
         }
         public void SetDefaultCustomActions()
         {
@@ -623,7 +622,7 @@ namespace vimage
                     List<object> subSetting = new List<object>();
                     setting.Add(subSetting);
 
-                    line = ReadSection(reader, subSetting);
+                    line = ReadSection(reader, subSetting, sectionName);
                     trimedLine = line;
                 }
                 else
@@ -641,6 +640,11 @@ namespace vimage
                     // assign Values
                     if (sectionName == "CUSTOMACTIONBINDINGS")
                         setting.Add(new { name = splitValues[0], bindings = StringToControls(splitValues[1].Split(',')) });
+                    else if (sectionName.IndexOf("CONTEXTMENU") != -1)
+                    {
+                        Action action = Actions.StringToAction(splitValues[1]);
+                        setting.Add(new { name = splitValues[0], func = action <= 0 ? (object)splitValues[1] : action });
+                    }
                     else
                         setting.Add(new { name = splitValues[0], func = splitValues[1] });
 
@@ -739,7 +743,7 @@ namespace vimage
             WriteControl(writer, "DragLimitToMonitorBounds", Control_DragLimitToMonitorBounds);
             WriteControl(writer, "ToggleSmoothing", Control_ToggleSmoothing);
             WriteControl(writer, "ToggleMipmapping", Control_ToggleMipmapping);
-            WriteControl(writer, "ToggleBackgroundForTransparency", Control_ToggleBackgroundForTransparency);
+            WriteControl(writer, "ToggleBackgroundForTransparency", Control_ToggleBackground);
             WriteControl(writer, "ToggleLock", Control_ToggleLock);
             WriteControl(writer, "ToggleAlwaysOnTop", Control_ToggleAlwaysOnTop);
             WriteControl(writer, "PauseAnimation", Control_PauseAnimation);
@@ -759,7 +763,8 @@ namespace vimage
             WriteControl(writer, "MoveUp", Control_MoveUp);
             WriteControl(writer, "MoveDown", Control_MoveDown);
             WriteControl(writer, "TransparencyToggle", Control_TransparencyToggle);
-            WriteControl(writer, "TransparencyHold", Control_TransparencyHold);
+            WriteControl(writer, "TransparencyInc", Control_TransparencyInc);
+            WriteControl(writer, "TransparencyDec", Control_TransparencyDec);
             WriteControl(writer, "Crop", Control_Crop);
             WriteControl(writer, "UndoCrop", Control_UndoCrop);
             WriteControl(writer, "ExitAll", Control_ExitAll);
@@ -930,7 +935,7 @@ namespace vimage
 
 
         /// <summary> Returns true if code is one of Control bindings. </summary>
-        public static bool IsControl(object code, List<int> Control, bool allowModifiers = false)
+        public static bool IsControl(object code, List<int> Control, bool onlyIfKeyCombo = false)
         {
             if (Control.Count == 0)
                 return false;
@@ -951,17 +956,9 @@ namespace vimage
                 if (index >= 1 && Control[index - 1] == -2)
                     value = false;
                 else if (index > 1 && Control[index - 2] == -2)
-                {
-                    // key-combo
-                    value = (((Keyboard.Key)Control[index - 1] == Keyboard.Key.LControl && CtrlDown) ||
-                        ((Keyboard.Key)Control[index - 1] == Keyboard.Key.LShift && ShiftDown) ||
-                        ((Keyboard.Key)Control[index - 1] == Keyboard.Key.LAlt && AltDown) ||
-                        ((Keyboard.Key)Control[index - 1] == Keyboard.Key.RControl && RCtrlDown) ||
-                        ((Keyboard.Key)Control[index - 1] == Keyboard.Key.RShift && RShiftDown) ||
-                        ((Keyboard.Key)Control[index - 1] == Keyboard.Key.RAlt && RAltDown));
-                }
-                else if (!allowModifiers && (codeID >= MouseCodeOffset || !KeyModifier((Keyboard.Key)code)) && (CtrlDown || ShiftDown || AltDown || RCtrlDown || RShiftDown || RAltDown))
-                    value = false; // don't activate non key-combos if key modifier is down
+                    value = Keyboard.IsKeyPressed((Keyboard.Key)Control[index - 1]);
+                else if (onlyIfKeyCombo)
+                    value = false;
                 else
                     value = true;
 
@@ -1451,9 +1448,9 @@ namespace vimage
                 case Keyboard.Key.Tilde:
 	                return "~";
                 case Keyboard.Key.Equal:
-	                return "=";
+	                return "EQUAL";
                 case Keyboard.Key.Dash:
-	                return "-";
+	                return "DASH";
                 case Keyboard.Key.Space:
 	                return "SPACE";
                 case Keyboard.Key.Return:

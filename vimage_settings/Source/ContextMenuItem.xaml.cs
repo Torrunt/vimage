@@ -28,7 +28,7 @@ namespace vimage_settings
             InitializeComponent();
             SetFunctions();
         }
-        public ContextMenuItem(string name, string func, ContextMenu contextMenu, Panel parentPanel, ContextMenuEditorCanvas canvas, ScrollViewer scroll, int indent = 0)
+        public ContextMenuItem(string name, dynamic func, ContextMenu contextMenu, Panel parentPanel, ContextMenuEditorCanvas canvas, ScrollViewer scroll, int indent = 0)
         {
             InitializeComponent();
 
@@ -41,7 +41,7 @@ namespace vimage_settings
 
             ItemName.Text = name;
 
-            int funcIndex = ItemFunction.Items.IndexOf(func);
+            int funcIndex = ItemFunction.Items.IndexOf((string)(func is vimage.Action ? ((vimage.Action)func).ToNameString() : func));
             if (funcIndex != -1)
                 ItemFunction.SelectedIndex = funcIndex;
         }
@@ -55,8 +55,8 @@ namespace vimage_settings
             ItemFunction.Items.Clear();
 
             ItemFunction.Items.Add("-");
-            for (int i = 0; i < MenuFuncs.FUNCS.Length; i++)
-                ItemFunction.Items.Add(MenuFuncs.FUNCS[i]);
+            for (int i = 0; i < Actions.MenuActions.Length; i++)
+                ItemFunction.Items.Add(Actions.MenuActions[i].ToNameString());
             if (App.vimageConfig != null)
             {
                 CustomActionsStartIndex = ItemFunction.Items.Count;
@@ -226,8 +226,8 @@ namespace vimage_settings
             }
         }
 
-        private Boolean _Dragging = false;
-        public Boolean Dragging
+        private bool _Dragging = false;
+        public bool Dragging
         {
             get { return _Dragging; }
             set
@@ -281,7 +281,7 @@ namespace vimage_settings
                     ParentCanvas.MovingItem = null;
                     ParentCanvas.InsertAtIndex = -1;
 
-                    Width = Double.NaN;
+                    Width = double.NaN;
 
                     Opacity = 1;
                     UnselectItem();
