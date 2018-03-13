@@ -400,8 +400,8 @@ namespace vimage
             SetControls(Control_RotateClockwise, "UP");
             SetControls(Control_RotateAntiClockwise, "DOWN");
             SetControls(Control_Flip, "F");
-            SetControls(Control_FitToMonitorHeight, "");
-            SetControls(Control_FitToMonitorWidth, "");
+            SetControls(Control_FitToMonitorHeight, "CTRL+MOUSEMIDDLE");
+            SetControls(Control_FitToMonitorWidth, "SHIFT+MOUSEMIDDLE");
             SetControls(Control_FitToMonitorAuto, "MOUSEMIDDLE");
             SetControls(Control_FitToMonitorAlt, "RSHIFT", "LSHIFT");
             SetControls(Control_ZoomIn, "SCROLLUP");
@@ -497,7 +497,10 @@ namespace vimage
         {
             // If config file doesn't exist, make one
             if (!File.Exists(configFile))
+            {
                 Save(configFile);
+                return;
+            }
             // Clear default controls and context menu before they are loaded back in
             foreach (var list in Settings)
             {
@@ -838,8 +841,8 @@ namespace vimage
                 {
                     // Item
                     string itemName = (items[i] as dynamic).name as string;
-                    string itemFunc = (items[i] as dynamic).func as string;
-                    if (itemFunc.Equals("-"))
+                    string itemFunc = (string)((items[i] as dynamic).func is Action ? ((Action)(items[i] as dynamic).func).ToNameString() : (items[i] as dynamic).func);
+                    if (itemName.Equals("-"))
                         writer.Write("-" + Environment.NewLine);
                     else if (itemName.Equals(""))
                         writer.Write(": " + itemFunc + Environment.NewLine);
