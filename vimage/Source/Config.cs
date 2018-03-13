@@ -431,8 +431,8 @@ namespace vimage
             SetControls(Control_MoveUp, "CTRL+UP", "RCTRL+UP");
             SetControls(Control_MoveDown, "CTRL+DOWN", "RCTRL+DOWN");
             SetControls(Control_TransparencyToggle, "T");
-            SetControls(Control_TransparencyInc, "Y+SCROLLDOWN");
-            SetControls(Control_TransparencyDec, "Y+SCROLLUP");
+            SetControls(Control_TransparencyInc, "T+SCROLLDOWN");
+            SetControls(Control_TransparencyDec, "T+SCROLLUP");
             SetControls(Control_Crop, "X");
             SetControls(Control_UndoCrop, "CTRL+Z");
             SetControls(Control_ExitAll, "SHIFT+ESC");

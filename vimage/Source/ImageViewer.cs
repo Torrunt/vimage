@@ -84,6 +84,8 @@ namespace vimage
         private bool PreloadingImage = false;
         public SortBy SortImagesBy = SortBy.Name;
         public SortDirection SortImagesByDir = SortDirection.Ascending;
+        private bool ImageTransparencyHold = false;
+        private bool ImageTransparencyTweaked = false;
 
         private static readonly Random rnd = new Random();
 
@@ -488,14 +490,14 @@ namespace vimage
         private void ControlUp(object code)
         {
             // Close
-            if (Config.IsControl(code, Config.Control_Close))
-            {
-                CloseNextTick = true;
-                return;
-            }
             if (Config.IsControl(code, Config.Control_ExitAll))
             {
                 ExitAllInstances();
+                return;
+            }
+            if (Config.IsControl(code, Config.Control_Close))
+            {
+                CloseNextTick = true;
                 return;
             }
 
@@ -587,7 +589,7 @@ namespace vimage
 
             // Toggle Image Transparency
             if (Config.IsControl(code, Config.Control_TransparencyToggle, CurrentAction != Action.None))
-                CurrentAction =  Action.TransparencyToggle;
+                CurrentAction =  Action.TransparencyToggle; // todo: Control_TransparencyToggle + Inc/Dec on same button
 
             // Cropping - release
             if (Cropping && Config.IsControl(code, Config.Control_Crop, CurrentAction != Action.None))
@@ -653,6 +655,9 @@ namespace vimage
                 CurrentAction = Action.TransparencyInc;
             if (Config.IsControl(code, Config.Control_TransparencyDec, CurrentAction != Action.None))
                 CurrentAction = Action.TransparencyDec;
+
+            if (!ImageTransparencyHold && Config.IsControl(code, Config.Control_TransparencyToggle, CurrentAction != Action.None))
+                ImageTransparencyHold = true;
 
             // Zooming
             if (Config.IsControl(code, Config.Control_ZoomIn, CurrentAction != Action.None))
@@ -1049,6 +1054,12 @@ namespace vimage
 
         public void ToggleImageTransparency()
         {
+            if (ImageTransparencyHold && ImageTransparencyTweaked)
+            {
+                ImageTransparencyHold = false;
+                ImageTransparencyTweaked = false;
+                return;
+            }
             if (ImageColor == Color.White)
             {
                 System.Drawing.Color colour = System.Drawing.ColorTranslator.FromHtml(Config.Setting_TransparencyToggleValue);
@@ -1061,6 +1072,8 @@ namespace vimage
         }
         public void AdjustImageTransparency(int amount = 1)
         {
+            if (ImageTransparencyHold)
+                ImageTransparencyTweaked = true;
             ImageColor = new Color(ImageColor.R, ImageColor.G, ImageColor.B,
                 (byte)Math.Min(Math.Max(ImageColor.A + (amount * (255 * (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)))), 2), 255));
             Image.Color = ImageColor;
