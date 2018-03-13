@@ -589,7 +589,7 @@ namespace vimage
 
             // Toggle Image Transparency
             if (Config.IsControl(code, Config.Control_TransparencyToggle, CurrentAction != Action.None))
-                CurrentAction =  Action.TransparencyToggle; // todo: Control_TransparencyToggle + Inc/Dec on same button
+                CurrentAction =  Action.TransparencyToggle;
 
             // Cropping - release
             if (Cropping && Config.IsControl(code, Config.Control_Crop, CurrentAction != Action.None))
