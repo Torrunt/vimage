@@ -196,8 +196,8 @@ namespace vimage
 
                     Shell32.ShellFolderView view = (Shell32.ShellFolderView)shellWindow.Document;
 
-                    string sort = view.SortColumns;
-                    sort = sort.Substring(5, sort.Length - 5);
+                    string sort = view.SortColumns; // can be sorted by multiple columns (eg: date then name) - we will just look at the first one
+                    sort = sort.Substring(5, sort.IndexOf(';') - 5);
 
                     // Direction
                     if (sort[0] == '-')
@@ -215,10 +215,10 @@ namespace vimage
                     {
                         switch (sort)
                         {
-                            case "System.ItemDate;": SortImagesBy = SortBy.Date; break;
-                            case "System.DateModified;": SortImagesBy = SortBy.DateModified; break;
-                            case "System.DateCreated;": SortImagesBy = SortBy.DateCreated; break;
-                            case "System.Size;": SortImagesBy = SortBy.Size; break;
+                            case "System.ItemDate": SortImagesBy = SortBy.Date; break;
+                            case "System.DateModified": SortImagesBy = SortBy.DateModified; break;
+                            case "System.DateCreated": SortImagesBy = SortBy.DateCreated; break;
+                            case "System.Size": SortImagesBy = SortBy.Size; break;
                             default: SortImagesBy = SortBy.Name; break;
                         }
                     }
