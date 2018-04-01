@@ -1501,7 +1501,11 @@ namespace vimage
                 return;
 
             bool success = false;
-            do { success = ChangeImage(FolderContents[rnd.Next(0, FolderContents.Count)]); }
+            do
+            {
+                FolderPosition = rnd.Next(0, FolderContents.Count);
+                success = ChangeImage(FolderContents[FolderPosition]);
+            }
             while (!success);
         }
 
