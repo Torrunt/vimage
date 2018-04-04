@@ -15,6 +15,8 @@ namespace vimage
 
         private Dictionary<string, dynamic> FuncByName;
 
+        public int FileNameItem = -1;
+
         public ContextMenu(ImageViewer ImageViewer)
             : base()
         {
@@ -67,6 +69,8 @@ namespace vimage
                     }
                     else if (!FuncByName.ContainsKey((items[i] as dynamic).name))
                     {
+                        if ((items[i] as dynamic).name.Contains("[filename]"))
+                            FileNameItem = list.Count;
                         list.Add(VariableAmountOfStrings(depth, ":") + (items[i] as dynamic).name);
                         if (!((items[i] as dynamic).name as string).Equals("-"))
                             FuncByName.Add((items[i] as dynamic).name, (items[i] as dynamic).func);
@@ -145,6 +149,9 @@ namespace vimage
 
         public void RefreshItems()
         {
+            if (FileNameItem != -1)
+                Items[Items_General[FileNameItem]].Text = Items_General[FileNameItem].Replace("[filename]", ImageViewer.File.Substring(ImageViewer.File.LastIndexOf('\\') + 1));
+
             if (!ImageViewer.Config.ContextMenuShowMargin && !ImageViewer.Config.ContextMenuShowMarginSub)
                 return;
 
