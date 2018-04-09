@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using SFML.System;
 
 namespace vimage
 {
@@ -33,6 +34,51 @@ namespace vimage
                 SetWindowLong(hWnd, GWL_EX_STYLE, (GetWindowLong(hWnd, GWL_EX_STYLE) | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW);
         }
         public static void TaskBarIconToggle(IntPtr hWnd) { TaskBarIconSetVisible(hWnd, !TaskbarIconVisible); }
+
+        // Window/Client Rect/Pos - used for Title Bar support
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT { public int Left; public int Top; public int Right; public int Bottom; }
+        public struct Point { public int x; public int y; }
+
+        [DllImport("user32.dll")]
+        private static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
+        public static RECT GetClientRect(IntPtr hWnd)
+        {
+            RECT result;
+            GetClientRect(hWnd, out result);
+            return result;
+        }
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+        public static RECT GetWindowRect(IntPtr hWnd)
+        {
+            RECT result;
+            GetWindowRect(hWnd, out result);
+            return result;
+        }
+
+        [DllImport("user32.dll")]
+        private static extern bool ClientToScreen(IntPtr hWnd, ref Point lpPoint);
+        public static Vector2i ClientToScreen(IntPtr hWnd, int x, int y)
+        {
+            Point result = new Point() { x = x, y = y };
+            ClientToScreen(hWnd, ref result);
+            return new Vector2i(result.x, result.y);
+        }
+
+        public static Vector2i GetWindowClientPos(IntPtr hWnd)
+        {
+            RECT rect = GetClientRect(hWnd);
+            return ClientToScreen(hWnd, rect.Left, rect.Top);
+        }
+        public static Vector2i GetTitleBarDifference(IntPtr hWnd)
+        {
+            RECT rect = GetWindowRect(hWnd);
+            Vector2i cp = GetWindowClientPos(hWnd);
+            return new Vector2i(cp.X - rect.Left, cp.Y - rect.Top);
+        }
 
         // Make Window Always On Top
         [DllImport("user32.dll")]

@@ -29,7 +29,7 @@
         <CheckBox IsChecked="{Binding Setting_PositionLargeWideImagesInCorner}" Content="Position large/wide images in corner (ie: wallpapers/screenshots)" ToolTip="Images that are wider than or the same width as the current monitor will be placed in the top left corner."/>
         <CheckBox IsChecked="{Binding Setting_LoopImageNavigation}" Content="Loop image navigation" ToolTip="Whether or not looping will occur when reaching the last/first image in the directory when using the next/prev image buttons."/>
         <CheckBox IsChecked="{Binding Setting_PreloadNextImage}" Content="Image preloading" ToolTip="When using the next/prev image buttons, the image after the one just loaded will be loaded as well."/>
-        
+        <CheckBox IsChecked="{Binding Setting_ShowTitleBar}" Content="Show Title Bar"/>
         <CheckBox IsChecked="{Binding Setting_BackgroundForImagesWithTransparencyDefault}" Content="Show background behind images with transparency" ToolTip="Images with partial transparency will have a background behind them." Margin="0,10"/>
         <DockPanel ToolTip="For transparent images (when transparency is turned off)." Height="15" Margin="0,0,0,10">
             <Border Style="{StaticResource ColourPickerBorder}" OverridesDefaultStyle="true" Width="14" Height="13" Margin="1,0,5,0" BorderThickness="1">

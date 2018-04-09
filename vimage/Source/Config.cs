@@ -120,6 +120,11 @@ namespace vimage
             get { return (Boolean)Settings["PRELOADNEXTIMAGE"]; }
             set { Settings["PRELOADNEXTIMAGE"] = value; }
         }
+        public bool Setting_ShowTitleBar
+        {
+            get { return (Boolean)Settings["SHOWTITLEBAR"]; }
+            set { Settings["SHOWTITLEBAR"] = value; }
+        }
         public bool Setting_OpenSettingsEXE
         {
             get { return (Boolean)Settings["OPENSETTINGSEXE"]; }
@@ -270,6 +275,7 @@ namespace vimage
                 { "POSITIONLARGEWIDEIMAGESINCORNER", true },
                 { "LOOPIMAGENAVIGATION", true },
                 { "PRELOADNEXTIMAGE", true },
+                { "SHOWTITLEBAR", false },
                 { "OPENSETTINGSEXE", true },
                 { "LISTENFORCONFIGCHANGES", true },
                 { "MINIMAGESIZE", 64 },
@@ -700,6 +706,7 @@ namespace vimage
             WriteSetting(writer, "LoopImageNavigation", Setting_LoopImageNavigation);
             WriteSetting(writer, "PreloadNextImage", Setting_PreloadNextImage, 
                 "when using the next/prev image buttons, the image after the one just loaded will be loaded as well");
+            WriteSetting(writer, "ShowTitleBar", Setting_ShowTitleBar);
             WriteSetting(writer, "OpenSettingsEXE", Setting_OpenSettingsEXE, "if false, will open config.txt instead");
             WriteSetting(writer, "ListenForConfigChanges", Setting_ListenForConfigChanges,
                 "vimage will reload settings automatically when they are changed.");

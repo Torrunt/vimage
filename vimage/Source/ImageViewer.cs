@@ -100,17 +100,6 @@ namespace vimage
             // Save Mouse Position -> will open image at this position
             Vector2i mousePos = Mouse.GetPosition();
 
-            // Create Window
-            Window = new RenderWindow(new VideoMode(0, 0), File + " - vimage", Styles.None);
-            Window.Position = mousePos;
-
-            // Make Window Transparent (can only tell if image being viewed has transparency)
-            DWM_BLURBEHIND bb = new DWM_BLURBEHIND();
-            bb.dwFlags = DWM_BB.Enable | DWM_BB.BlurRegion;
-            bb.fEnable = true;
-            bb.hRgnBlur = DWM.CreateRectRgn(0, 0, -1, -1);
-            DWM.DwmEnableBlurBehindWindow(Window.SystemHandle, ref bb);
-
             // Load Config File
             Config = new Config();
             Config.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
@@ -127,6 +116,20 @@ namespace vimage
             BackgroundColour = new Color(backColour.R, backColour.G, backColour.B, backColour.A);
             Graphics.MAX_TEXTURES = (uint)Config.Setting_MaxTextures;
             Graphics.MAX_ANIMATIONS = (uint)Config.Setting_MaxAnimations;
+
+            // Create Window
+            Window = new RenderWindow(new VideoMode(0, 0), File + " - vimage", Config.Setting_ShowTitleBar ? Styles.Close : Styles.None);
+            Window.Position = mousePos;
+            
+            // Make Window Transparent (can only tell if image being viewed has transparency)
+            if (!Config.Setting_ShowTitleBar)
+            {
+                DWM_BLURBEHIND bb = new DWM_BLURBEHIND();
+                bb.dwFlags = DWM_BB.Enable | DWM_BB.BlurRegion;
+                bb.fEnable = true;
+                bb.hRgnBlur = DWM.CreateRectRgn(0, 0, -1, -1);
+                DWM.DwmEnableBlurBehindWindow(Window.SystemHandle, ref bb);
+            }
 
             // Get Image
             ChangeImage(file);
@@ -310,7 +313,10 @@ namespace vimage
                         else if (NextWindowPos.Y > currentBounds.Top + currentBounds.Height - Window.Size.Y)
                             NextWindowPos.Y = currentBounds.Top + currentBounds.Height - (int)Window.Size.Y;
                     }
-                    Window.Position = NextWindowPos;
+                    if (Config.Setting_ShowTitleBar)
+                        Window.Position = NextWindowPos - DWM.GetTitleBarDifference(Window.SystemHandle);
+                    else
+                        Window.Position = NextWindowPos;
                 }
                 else if (Cropping)
                 {
@@ -348,7 +354,7 @@ namespace vimage
         private void Redraw()
         {
             // Clear screen
-            if (!BackgroundsForImagesWithTransparency)
+            if (!BackgroundsForImagesWithTransparency && !Config.Setting_ShowTitleBar)
                 Window.Clear(new Color(0, 0, 0, 0));
             else
                 Window.Clear(BackgroundColour);
@@ -931,6 +937,9 @@ namespace vimage
                     NextWindowSize.X >= bounds.Width - 2 ? bounds.Left : bounds.Left + (bounds.Width / 2) - ((int)(CurrentImageSize().X * CurrentZoom) / 2),
                     NextWindowSize.Y >= bounds.Height - 2 ? bounds.Top : bounds.Top + (bounds.Height / 2) - ((int)(CurrentImageSize().Y * CurrentZoom) / 2));
 
+            if (Config.Setting_ShowTitleBar)
+                NextWindowPos -= DWM.GetTitleBarDifference(Window.SystemHandle);
+
             // Temporarily set always on top to bring it infront of the taskbar?
             if (!FitToMonitorAlt)
                 ForceAlwaysOnTopCheck(bounds, workingArea);
@@ -1141,7 +1150,7 @@ namespace vimage
             CropRect.OutlineThickness = Config.Setting_CropToolOutlineThickness * (1 / CurrentZoom);
 
             CropStartPos = ImageViewerUtils.LimitToWindow(Mouse.GetPosition(), Window);
-            CropRect.Position = Window.MapPixelToCoords(CropStartPos - Window.Position);
+            CropRect.Position = Window.MapPixelToCoords(CropStartPos - (Config.Setting_ShowTitleBar ? DWM.GetWindowClientPos(Window.SystemHandle) : Window.Position));
         }
         public void CropEnd()
         {
@@ -1185,6 +1194,8 @@ namespace vimage
 
             // Position
             NextWindowPos = new Vector2i(pos.X < CropStartPos.X ? pos.X : CropStartPos.X, pos.Y < CropStartPos.Y ? pos.Y : CropStartPos.Y);
+            if (Config.Setting_ShowTitleBar)
+                NextWindowPos -= DWM.GetTitleBarDifference(Window.SystemHandle);
 
             CropRect.Size = new Vector2f();
 
@@ -1384,7 +1395,7 @@ namespace vimage
             // Temporarily set always on top to bring it infront of the taskbar?
             ForceAlwaysOnTopCheck(bounds, ImageViewerUtils.GetCurrentWorkingArea(boundsPos));
 
-            Window.SetTitle(fileName + " - vimage");
+            Window.SetTitle(fileName.Substring(fileName.LastIndexOf('\\') + 1) + " - vimage");
             ContextMenu?.Setup(false);
 
             ViewStateHistory = new List<ViewState>();
@@ -1742,7 +1753,7 @@ namespace vimage
         public void OpenContextMenu()
         {
             ContextMenu.RefreshItems();
-            ContextMenu.Show(Window.Position.X + MousePos.X - 1, Window.Position.Y + MousePos.Y - 1);
+            ContextMenu.Show(Mouse.GetPosition().X, Mouse.GetPosition().Y);
             ContextMenu.Capture = true;
         }
 
