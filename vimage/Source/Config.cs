@@ -32,6 +32,7 @@ namespace vimage
         public List<int> Control_ToggleBackground = new List<int>();
         public List<int> Control_ToggleLock = new List<int>();
         public List<int> Control_ToggleAlwaysOnTop = new List<int>();
+        public List<int> Control_ToggleTitleBar = new List<int>();
         public List<int> Control_PauseAnimation = new List<int>();
         public List<int> Control_PrevFrame = new List<int>();
         public List<int> Control_NextFrame = new List<int>();
@@ -60,7 +61,7 @@ namespace vimage
         {
             "Drag", "Close", "Open Context Menu", "Prev Image", "Next Image", "Rotate Clockwise", "Rotate Anti-Clockwise", "Flip",
             "Fit To Monitor Auto", "Fit To Monitor Width", "Fit To Monitor Height", "Fit To Monitor Alt", "Zoom In", "Zoom Out", "Zoom Faster", "Zoom Alt", "Drag Limit to Monitor Bounds",
-            "Toggle Smoothing", "Toggle Mipmapping", "Toggle Background For Transparency", "Toggle Lock", "Toggle Always On Top", "Pause Animation", "Prev Frame", "Next Frame",
+            "Toggle Smoothing", "Toggle Mipmapping", "Toggle Background For Transparency", "Toggle Lock", "Toggle Always On Top", "Toggle Title Bar", "Pause Animation", "Prev Frame", "Next Frame",
             "Open Settings", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Open Full Duplicate Image",
             "Random Image", "Move Left", "Move Right", "Move Up", "Move Down", "Transparency Toggle", "Transparency Increase", "Transparency Decrease", "Crop", "Undo Crop", "Exit All Instances"
         };
@@ -248,7 +249,7 @@ namespace vimage
                 Control_Drag, Control_Close, Control_OpenContextMenu, Control_PrevImage, Control_NextImage, Control_RotateClockwise,
                 Control_RotateAntiClockwise, Control_Flip, Control_FitToMonitorHeight, Control_FitToMonitorWidth, Control_FitToMonitorAuto,
                 Control_FitToMonitorAlt, Control_ZoomIn, Control_ZoomOut, Control_ZoomFaster, Control_ZoomAlt, Control_DragLimitToMonitorBounds, Control_ToggleSmoothing, Control_ToggleMipmapping,
-                Control_ToggleBackground, Control_ToggleLock, Control_ToggleAlwaysOnTop, Control_PauseAnimation, Control_PrevFrame, Control_NextFrame, Control_OpenSettings,
+                Control_ToggleBackground, Control_ToggleLock, Control_ToggleAlwaysOnTop, Control_ToggleTitleBar, Control_PauseAnimation, Control_PrevFrame, Control_NextFrame, Control_OpenSettings,
                 Control_ResetImage, Control_OpenAtLocation, Control_Delete, Control_Copy, Control_CopyAsImage, Control_OpenDuplicateImage, Control_OpenFullDuplicateImage,
                 Control_RandomImage, Control_MoveLeft, Control_MoveRight, Control_MoveUp, Control_MoveDown,
                 Control_TransparencyToggle, Control_TransparencyInc, Control_TransparencyDec, Control_Crop, Control_UndoCrop, Control_ExitAll
@@ -317,6 +318,7 @@ namespace vimage
                 { "TOGGLEBACKGROUNDFORTRANSPARENCY", Control_ToggleBackground },
                 { "TOGGLELOCK", Control_ToggleLock },
                 { "TOGGLEALWAYSONTOP", Control_ToggleAlwaysOnTop },
+                { "TOGGLETITLEBAR", Control_ToggleTitleBar },
                 { "PAUSEANIMATION", Control_PauseAnimation },
                 { "PREVFRAME", Control_PrevFrame },
                 { "NEXTFRAME", Control_NextFrame },
@@ -375,6 +377,7 @@ namespace vimage
             Control_ToggleBackground.Clear();
             Control_ToggleLock.Clear();
             Control_ToggleAlwaysOnTop.Clear();
+            Control_ToggleTitleBar.Clear();
             Control_PauseAnimation.Clear();
             Control_PrevFrame.Clear();
             Control_NextFrame.Clear();
@@ -420,6 +423,7 @@ namespace vimage
             SetControls(Control_ToggleBackground, "B");
             SetControls(Control_ToggleLock, "");
             SetControls(Control_ToggleAlwaysOnTop, "L");
+            SetControls(Control_ToggleTitleBar, "");
             SetControls(Control_PauseAnimation, "SPACE");
             SetControls(Control_PrevFrame, "<");
             SetControls(Control_NextFrame, ">");
@@ -756,6 +760,7 @@ namespace vimage
             WriteControl(writer, "ToggleBackgroundForTransparency", Control_ToggleBackground);
             WriteControl(writer, "ToggleLock", Control_ToggleLock);
             WriteControl(writer, "ToggleAlwaysOnTop", Control_ToggleAlwaysOnTop);
+            WriteControl(writer, "ToggleTitleBar", Control_ToggleTitleBar);
             WriteControl(writer, "PauseAnimation", Control_PauseAnimation);
             WriteControl(writer, "PrevFrame", Control_PrevFrame);
             WriteControl(writer, "NextFrame", Control_NextFrame);

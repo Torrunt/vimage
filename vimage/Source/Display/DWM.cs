@@ -52,17 +52,17 @@ namespace vimage
             else
                 SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) & ~WS_SYSMENU);
 
-            SetWindowPos(window.SystemHandle, new IntPtr(-1), window.Position.X, window.Position.Y, (int)window.Size.X, (int)window.Size.Y, SWP_FRAMECHANGED);
+            SetWindowPos(window.SystemHandle, new IntPtr(0), window.Position.X, window.Position.Y, (int)window.Size.X, (int)window.Size.Y, SWP_FRAMECHANGED);
         }
 
         public static void TitleBarSetVisible(RenderWindow window, bool visible)
         {
             if (visible)
-                SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) | WS_CAPTION);
+                SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) | WS_CAPTION | WS_SYSMENU);
             else
                 SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) & ~WS_CAPTION);
 
-            SetWindowPos(window.SystemHandle, new IntPtr(-1), window.Position.X, window.Position.Y, (int)window.Size.X, (int)window.Size.Y, SWP_FRAMECHANGED);
+            SetWindowPos(window.SystemHandle, new IntPtr(0), window.Position.X, window.Position.Y, (int)window.Size.X, (int)window.Size.Y, SWP_FRAMECHANGED);
         }
 
         // Window/Client Rect/Pos - used for Title Bar support

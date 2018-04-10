@@ -181,6 +181,9 @@ namespace vimage
             item = GetItemByFunc(Action.ToggleAlwaysOnTop);
             if (item != null) item.Checked = ImageViewer.AlwaysOnTop;
 
+            item = GetItemByFunc(Action.ToggleTitleBar);
+            if (item != null) item.Checked = ImageViewer.Config.Setting_ShowTitleBar;
+
             item = GetItemByFunc(Action.SortName);
             if (item != null) item.Checked = ImageViewer.SortImagesBy == SortBy.Name;
 

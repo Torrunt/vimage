@@ -78,6 +78,7 @@ namespace vimage
         /// If the window is wider and taller than the monitor it will automatically be above the task bar anyway.
         /// </summary>
         private bool ForceAlwaysOnTopNextTick = false;
+        private bool ShowTitleBar = false;
         /// <summary>0=false, 1=next, -1=prev.</summary>
         private int PreloadingNextImage = 0;
         private bool PreloadNextImageStart = false;
@@ -100,6 +101,17 @@ namespace vimage
             // Save Mouse Position -> will open image at this position
             Vector2i mousePos = Mouse.GetPosition();
 
+            // Create Window
+            Window = new RenderWindow(new VideoMode(0, 0), File + " - vimage", Styles.None);
+            Window.Position = mousePos;
+            
+            // Make Window Transparent (can only tell if image being viewed has transparency)
+            DWM_BLURBEHIND bb = new DWM_BLURBEHIND();
+            bb.dwFlags = DWM_BB.Enable | DWM_BB.BlurRegion;
+            bb.fEnable = true;
+            bb.hRgnBlur = DWM.CreateRectRgn(0, 0, -1, -1);
+            DWM.DwmEnableBlurBehindWindow(Window.SystemHandle, ref bb);
+
             // Load Config File
             Config = new Config();
             Config.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
@@ -116,17 +128,9 @@ namespace vimage
             BackgroundColour = new Color(backColour.R, backColour.G, backColour.B, backColour.A);
             Graphics.MAX_TEXTURES = (uint)Config.Setting_MaxTextures;
             Graphics.MAX_ANIMATIONS = (uint)Config.Setting_MaxAnimations;
-
-            // Create Window
-            Window = new RenderWindow(new VideoMode(0, 0), File + " - vimage", Config.Setting_ShowTitleBar ? Styles.Close : Styles.None);
-            Window.Position = mousePos;
-            
-            // Make Window Transparent (can only tell if image being viewed has transparency)
-            DWM_BLURBEHIND bb = new DWM_BLURBEHIND();
-            bb.dwFlags = DWM_BB.Enable | DWM_BB.BlurRegion;
-            bb.fEnable = true;
-            bb.hRgnBlur = DWM.CreateRectRgn(0, 0, -1, -1);
-            DWM.DwmEnableBlurBehindWindow(Window.SystemHandle, ref bb);
+            ShowTitleBar = Config.Setting_ShowTitleBar;
+            if (ShowTitleBar)
+                DWM.TitleBarSetVisible(Window, true);
 
             // Get Image
             ChangeImage(file);
@@ -310,7 +314,7 @@ namespace vimage
                         else if (NextWindowPos.Y > currentBounds.Top + currentBounds.Height - Window.Size.Y)
                             NextWindowPos.Y = currentBounds.Top + currentBounds.Height - (int)Window.Size.Y;
                     }
-                    if (Config.Setting_ShowTitleBar)
+                    if (ShowTitleBar)
                         Window.Position = NextWindowPos - DWM.GetTitleBarDifference(Window.SystemHandle);
                     else
                         Window.Position = NextWindowPos;
@@ -351,7 +355,7 @@ namespace vimage
         private void Redraw()
         {
             // Clear screen
-            if (!BackgroundsForImagesWithTransparency && !Config.Setting_ShowTitleBar)
+            if (!BackgroundsForImagesWithTransparency && !ShowTitleBar)
                 Window.Clear(new Color(0, 0, 0, 0));
             else
                 Window.Clear(BackgroundColour);
@@ -404,6 +408,7 @@ namespace vimage
                 case Action.TransparencyToggle: ToggleImageTransparency(); return;
                 case Action.ToggleLock: ToggleLock(); return;
                 case Action.ToggleAlwaysOnTop: ToggleAlwaysOnTop(); return;
+                case Action.ToggleTitleBar: ToggleTitleBar(); return;
                 
                 case Action.NextFrame: NextFrame(); return;
                 case Action.PrevFrame: PrevFrame(); return;
@@ -565,6 +570,9 @@ namespace vimage
 
             if (Config.IsControl(code, Config.Control_ToggleAlwaysOnTop, CurrentAction != Action.None))
                 CurrentAction =  Action.ToggleAlwaysOnTop;
+
+            if (Config.IsControl(code, Config.Control_ToggleTitleBar, CurrentAction != Action.None))
+                CurrentAction = Action.ToggleTitleBar;
 
             // Open File At Location
             if (Config.IsControl(code, Config.Control_OpenAtLocation, CurrentAction != Action.None))
@@ -745,7 +753,7 @@ namespace vimage
             Dragging = false;
             UnforceAlwaysOnTop();
 
-            if (Config.Setting_ShowTitleBar && CurrentZoom <= originalZoom && CurrentImageSize().X * CurrentZoom < 130)
+            if (ShowTitleBar && CurrentZoom <= originalZoom && CurrentImageSize().X * CurrentZoom < 130)
                 CurrentZoom = Math.Max(130f / CurrentImageSize().X, CurrentZoom); // limit zoom if title bar is on
 
             if (center)
@@ -811,15 +819,6 @@ namespace vimage
                 FitToMonitorWidth = false;
             }
 
-            if (Config.Setting_ShowTitleBar)
-            {
-                // hide system buttons if title bar is on and window is small/thin
-                if (NextWindowSize.X < 180)
-                    DWM.SysMenuSetVisible(Window, false);
-                else
-                    DWM.SysMenuSetVisible(Window, true);
-            }
-
             Updated = true;
         }
 
@@ -857,7 +856,7 @@ namespace vimage
             else
                 NextWindowPos = Window.Position;
 
-            if (Config.Setting_ShowTitleBar)
+            if (ShowTitleBar)
                 Zoom(CurrentZoom, true); // make sure image is not too thin if title bar is on
 
             Updated = true;
@@ -949,7 +948,7 @@ namespace vimage
                     NextWindowSize.X >= bounds.Width - 2 ? bounds.Left : bounds.Left + (bounds.Width / 2) - ((int)(CurrentImageSize().X * CurrentZoom) / 2),
                     NextWindowSize.Y >= bounds.Height - 2 ? bounds.Top : bounds.Top + (bounds.Height / 2) - ((int)(CurrentImageSize().Y * CurrentZoom) / 2));
 
-            if (Config.Setting_ShowTitleBar)
+            if (ShowTitleBar)
                 NextWindowPos -= DWM.GetTitleBarDifference(Window.SystemHandle);
 
             // Temporarily set always on top to bring it infront of the taskbar?
@@ -1140,6 +1139,24 @@ namespace vimage
                 ForceAlwaysOnTopNextTick = true;
         }
 
+        public void ToggleTitleBar()
+        {
+            Vector2i diff = ShowTitleBar ? DWM.GetTitleBarDifference(Window.SystemHandle) : new Vector2i();
+
+            ShowTitleBar = !ShowTitleBar;
+            DWM.TitleBarSetVisible(Window, ShowTitleBar);
+            if (ShowTitleBar)
+            {
+                Window.Position -= DWM.GetTitleBarDifference(Window.SystemHandle);
+                Zoom(CurrentZoom, true);
+            }
+            else
+            {
+                NextWindowPos = Window.Position + diff;
+                Updated = true;
+            }
+        }
+
         public void CropStart()
         {
             if (Cropping)
@@ -1162,7 +1179,7 @@ namespace vimage
             CropRect.OutlineThickness = Config.Setting_CropToolOutlineThickness * (1 / CurrentZoom);
 
             CropStartPos = ImageViewerUtils.LimitToWindow(Mouse.GetPosition(), Window);
-            CropRect.Position = Window.MapPixelToCoords(CropStartPos - (Config.Setting_ShowTitleBar ? DWM.GetWindowClientPos(Window.SystemHandle) : Window.Position));
+            CropRect.Position = Window.MapPixelToCoords(CropStartPos - (ShowTitleBar ? DWM.GetWindowClientPos(Window.SystemHandle) : Window.Position));
         }
         public void CropEnd()
         {
@@ -1201,12 +1218,12 @@ namespace vimage
             Window.Size = NextWindowSize;
 
             // Re-apply current zoom
-            if (CurrentZoom != 1 || Config.Setting_ShowTitleBar)
+            if (CurrentZoom != 1 || ShowTitleBar)
                 Zoom(CurrentZoom);
 
             // Position
             NextWindowPos = new Vector2i(pos.X < CropStartPos.X ? pos.X : CropStartPos.X, pos.Y < CropStartPos.Y ? pos.Y : CropStartPos.Y);
-            if (Config.Setting_ShowTitleBar)
+            if (ShowTitleBar)
                 NextWindowPos -= DWM.GetTitleBarDifference(Window.SystemHandle);
 
             CropRect.Size = new Vector2f();
@@ -1754,6 +1771,9 @@ namespace vimage
                 if (BackgroundsForImagesWithTransparency)
                     Update();
             }
+
+            if (ShowTitleBar != Config.Setting_ShowTitleBar)
+                ToggleTitleBar();
         }
         private void OnConfigChanged(object source, FileSystemEventArgs e)
         {

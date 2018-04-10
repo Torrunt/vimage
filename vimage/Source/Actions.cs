@@ -30,6 +30,7 @@ namespace vimage
         ToggleBackground,
         ToggleLock,
         ToggleAlwaysOnTop,
+        ToggleTitleBar,
 
         PauseAnimation,
         PrevFrame,
@@ -98,6 +99,7 @@ namespace vimage
             "TOGGLE BACKGROUND",
             "TOGGLE LOCK",
             "ALWAYS ON TOP",
+            "TOGGLE TITLE BAR",
 
             "TOGGLE ANIMATION",
             "PREV FRAME",
@@ -144,7 +146,7 @@ namespace vimage
         {
             Action.Close, Action.NextImage, Action.PrevImage, Action.RotateClockwise, Action.RotateAntiClockwise,
             Action.Flip, Action.FitToMonitorHeight, Action.FitToMonitorWidth, Action.FitToMonitorAuto, Action.ResetImage,
-            Action.ToggleSmoothing, Action.ToggleMipmapping, Action.ToggleBackground, Action.TransparencyToggle, Action.ToggleLock, Action.ToggleAlwaysOnTop,
+            Action.ToggleSmoothing, Action.ToggleMipmapping, Action.ToggleBackground, Action.TransparencyToggle, Action.ToggleLock, Action.ToggleAlwaysOnTop, Action.ToggleTitleBar,
             Action.OpenAtLocation, Action.Delete, Action.Copy, Action.CopyAsImage,
             Action.OpenDuplicateImage, Action.OpenFullDuplicateImage, Action.RandomImage, Action.UndoCrop, Action.ExitAll,
             Action.PauseAnimation, Action.NextFrame, Action.PrevFrame,
