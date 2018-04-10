@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using SFML.System;
+using SFML.Graphics;
 
 namespace vimage
 {
@@ -18,10 +19,10 @@ namespace vimage
 
         // Show/Hide in Taskbar
         [DllImport("user32.dll", SetLastError = true)]
-        static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
         [DllImport("user32.dll")]
-        static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-        private const int GWL_EX_STYLE = -20;
+        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+        private const int GWL_EX_STYLE = -20;  
         private const int WS_EX_APPWINDOW = 0x00040000, WS_EX_TOOLWINDOW = 0x00000080;
         private static bool TaskbarIconVisible = true;
 
@@ -34,6 +35,35 @@ namespace vimage
                 SetWindowLong(hWnd, GWL_EX_STYLE, (GetWindowLong(hWnd, GWL_EX_STYLE) | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW);
         }
         public static void TaskBarIconToggle(IntPtr hWnd) { TaskBarIconSetVisible(hWnd, !TaskbarIconVisible); }
+
+        // Toggle Borderless / Title bar
+        private const int GWL_STYLE = -16;
+        public const int WS_CAPTION = 0x00C00000, WS_SYSMENU = 0x00080000;
+        private const UInt32 SWP_FRAMECHANGED = 0x0020;
+        private static bool SysMenuVisible = true;
+
+        public static void SysMenuSetVisible(RenderWindow window, bool visible)
+        {
+            if (SysMenuVisible == visible)
+                return;
+            SysMenuVisible = visible;
+            if (SysMenuVisible)
+                SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) | WS_SYSMENU);
+            else
+                SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) & ~WS_SYSMENU);
+
+            SetWindowPos(window.SystemHandle, new IntPtr(-1), window.Position.X, window.Position.Y, (int)window.Size.X, (int)window.Size.Y, SWP_FRAMECHANGED);
+        }
+
+        public static void TitleBarSetVisible(RenderWindow window, bool visible)
+        {
+            if (visible)
+                SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) | WS_CAPTION);
+            else
+                SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) & ~WS_CAPTION);
+
+            SetWindowPos(window.SystemHandle, new IntPtr(-1), window.Position.X, window.Position.Y, (int)window.Size.X, (int)window.Size.Y, SWP_FRAMECHANGED);
+        }
 
         // Window/Client Rect/Pos - used for Title Bar support
         [StructLayout(LayoutKind.Sequential)]
@@ -84,9 +114,9 @@ namespace vimage
         [DllImport("user32.dll")]
         static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
-        const UInt32 SWP_NOSIZE = 0x0001;
-        const UInt32 SWP_NOMOVE = 0x0002;
-        const UInt32 TOPMOST_FLAGS = SWP_NOMOVE | SWP_NOSIZE;
+        private const UInt32 SWP_NOSIZE = 0x0001;
+        private const UInt32 SWP_NOMOVE = 0x0002;
+        private const UInt32 TOPMOST_FLAGS = SWP_NOMOVE | SWP_NOSIZE;
 
         public static void SetAlwaysOnTop(IntPtr hWnd, bool alwaysOnTop = true)
         {

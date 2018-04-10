@@ -122,14 +122,11 @@ namespace vimage
             Window.Position = mousePos;
             
             // Make Window Transparent (can only tell if image being viewed has transparency)
-            if (!Config.Setting_ShowTitleBar)
-            {
-                DWM_BLURBEHIND bb = new DWM_BLURBEHIND();
-                bb.dwFlags = DWM_BB.Enable | DWM_BB.BlurRegion;
-                bb.fEnable = true;
-                bb.hRgnBlur = DWM.CreateRectRgn(0, 0, -1, -1);
-                DWM.DwmEnableBlurBehindWindow(Window.SystemHandle, ref bb);
-            }
+            DWM_BLURBEHIND bb = new DWM_BLURBEHIND();
+            bb.dwFlags = DWM_BB.Enable | DWM_BB.BlurRegion;
+            bb.fEnable = true;
+            bb.hRgnBlur = DWM.CreateRectRgn(0, 0, -1, -1);
+            DWM.DwmEnableBlurBehindWindow(Window.SystemHandle, ref bb);
 
             // Get Image
             ChangeImage(file);
@@ -748,6 +745,9 @@ namespace vimage
             Dragging = false;
             UnforceAlwaysOnTop();
 
+            if (Config.Setting_ShowTitleBar && CurrentZoom <= originalZoom && CurrentImageSize().X * CurrentZoom < 130)
+                CurrentZoom = Math.Max(130f / CurrentImageSize().X, CurrentZoom); // limit zoom if title bar is on
+
             if (center)
             {
                 Vector2u newSize;
@@ -811,6 +811,15 @@ namespace vimage
                 FitToMonitorWidth = false;
             }
 
+            if (Config.Setting_ShowTitleBar)
+            {
+                // hide system buttons if title bar is on and window is small/thin
+                if (NextWindowSize.X < 180)
+                    DWM.SysMenuSetVisible(Window, false);
+                else
+                    DWM.SysMenuSetVisible(Window, true);
+            }
+
             Updated = true;
         }
 
@@ -847,6 +856,9 @@ namespace vimage
                 NextWindowPos = new Vector2i((int)center.X - (int)(WindowSize.X / 2), (int)center.Y - (int)(WindowSize.Y / 2));
             else
                 NextWindowPos = Window.Position;
+
+            if (Config.Setting_ShowTitleBar)
+                Zoom(CurrentZoom, true); // make sure image is not too thin if title bar is on
 
             Updated = true;
         }
@@ -1189,7 +1201,7 @@ namespace vimage
             Window.Size = NextWindowSize;
 
             // Re-apply current zoom
-            if (CurrentZoom != 1)
+            if (CurrentZoom != 1 || Config.Setting_ShowTitleBar)
                 Zoom(CurrentZoom);
 
             // Position
