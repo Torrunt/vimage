@@ -14,7 +14,7 @@ namespace vimage
 {
     class ImageViewer
     {
-        public const string VERSION_NAME = "vimage version #";
+        public const string VERSION_NO = "#";
 
         public readonly string[] EXTENSIONS =
         {
@@ -435,7 +435,7 @@ namespace vimage
                 case Action.UndoCrop: UndoCrop(); return;
                 case Action.ExitAll: ExitAllInstances(); return;
                 
-                case Action.VersionName: Process.Start("http://torrunt.net/vimage"); return;
+                case Action.VisitWebsite: Process.Start("http://torrunt.net/vimage"); return;
                 
                 case Action.SortName: ChangeSortBy(SortBy.Name); return;
                 case Action.SortDate: ChangeSortBy(SortBy.Date); return;

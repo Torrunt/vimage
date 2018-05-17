@@ -59,21 +59,17 @@ namespace vimage
                 else
                 {
                     // Item
-                    if ((items[i] as dynamic).func is Action && (items[i] as dynamic).func == Action.VersionName)
+                    if (!FuncByName.ContainsKey((items[i] as dynamic).name))
                     {
-                        if (!FuncByName.ContainsKey(ImageViewer.VERSION_NAME))
-                        {
-                            list.Add(ImageViewer.VERSION_NAME);
-                            FuncByName.Add(ImageViewer.VERSION_NAME, (items[i] as dynamic).func);
-                        }
-                    }
-                    else if (!FuncByName.ContainsKey((items[i] as dynamic).name))
-                    {
-                        if ((items[i] as dynamic).name.Contains("[filename]"))
+                        string itemName = (items[i] as dynamic).name;
+                        if (itemName.Contains("[filename]"))
                             FileNameItem = list.Count;
-                        list.Add(VariableAmountOfStrings(depth, ":") + (items[i] as dynamic).name);
-                        if (!((items[i] as dynamic).name as string).Equals("-"))
-                            FuncByName.Add((items[i] as dynamic).name, (items[i] as dynamic).func);
+                        if (itemName.Contains("[version]"))
+                            itemName = itemName.Replace("[version]", ImageViewer.VERSION_NO);
+
+                        list.Add(VariableAmountOfStrings(depth, ":") + itemName);
+                        if (!itemName.Equals("-"))
+                            FuncByName.Add(itemName, (items[i] as dynamic).func);
                     }
                 }
             }
@@ -141,8 +137,9 @@ namespace vimage
                 item.Name = name;
             }
 
-            if (Items.ContainsKey(ImageViewer.VERSION_NAME))
-                ((ToolStripMenuItem)Items[ImageViewer.VERSION_NAME]).BackColor = System.Drawing.Color.CornflowerBlue;
+            ToolStripMenuItem websiteItem = GetItemByFunc(Action.VisitWebsite);
+            if (websiteItem != null)
+                websiteItem.BackColor = System.Drawing.Color.CornflowerBlue;
 
             RefreshItems();
         }
@@ -240,6 +237,7 @@ namespace vimage
         {
             for (int i = 0; i < collection.Count; i++)
             {
+                int a = 0;
                 for (int c = 0; c < list.Count; c++)
                 {
                     if (list[c] is string)
@@ -252,7 +250,10 @@ namespace vimage
                             return item;
                     }
                     else if ((list[c] as dynamic).func is Action && (list[c] as dynamic).func == func)
-                        return collection[(list[c] as dynamic).name] as ToolStripMenuItem;
+                        return collection[a] as ToolStripMenuItem;
+
+                    if (!(list[c] is string))
+                        a++;
                 }
             }
 

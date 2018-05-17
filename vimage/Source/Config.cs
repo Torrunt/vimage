@@ -484,7 +484,7 @@ namespace vimage
             ContextMenu.Add(new { name = "Delete", func = Action.Delete });
             ContextMenu.Add(new { name = "-", func = Action.None });
             ContextMenu.Add(new { name = "Settings", func = Action.OpenSettings });
-            ContextMenu.Add(new { name = "", func = Action.VersionName });
+            ContextMenu.Add(new { name = "vimage [version]", func = Action.VisitWebsite });
 
             ContextMenu_Animation.Add(new { name = "Pause/Play", func = Action.TransparencyToggle });
             ContextMenu_Animation.Add(new { name = "-", func = Action.None });

@@ -58,7 +58,7 @@ namespace vimage
         UndoCrop,
         ExitAll,
 
-        VersionName,
+        VisitWebsite,
 
         SortName,
         SortDate,
@@ -127,7 +127,7 @@ namespace vimage
             "UNDO CROP",
             "EXIT ALL INSTANCES",
 
-            "VERSION NAME",
+            "VISIT WEBSITE",
 
             "SORT NAME",
             "SORT DATE",
@@ -150,7 +150,7 @@ namespace vimage
             Action.OpenAtLocation, Action.Delete, Action.Copy, Action.CopyAsImage,
             Action.OpenDuplicateImage, Action.OpenFullDuplicateImage, Action.RandomImage, Action.UndoCrop, Action.ExitAll,
             Action.PauseAnimation, Action.NextFrame, Action.PrevFrame,
-            Action.OpenSettings, Action.VersionName,
+            Action.OpenSettings, Action.VisitWebsite,
             Action.SortName, Action.SortDate, Action.SortDateModified, Action.SortDateCreated, Action.SortSize,
             Action.SortAscending, Action.SortDescending,
         };
