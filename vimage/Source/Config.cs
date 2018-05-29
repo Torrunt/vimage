@@ -7,6 +7,7 @@ namespace vimage
 {
     public enum SortBy { FolderDefault, Name, Date, DateModified, DateCreated, Size }
     public enum SortDirection { FolderDefault, Ascending, Descending }
+    public enum SizingOption { FitWidth, FitHeight, FitAuto, KeepZoom, FullSize }
 
     public class Config
     {
@@ -95,6 +96,11 @@ namespace vimage
         {
             get { return (string)Settings["TRANSPARENCYTOGGLEVALUE"]; }
             set { Settings["TRANSPARENCYTOGGLEVALUE"] = value; }
+        }
+        public SizingOption Setting_ImageSizing
+        {
+            get { return (SizingOption)Settings["IMAGESIZING"]; }
+            set { Settings["IMAGESIZING"] = value; }
         }
         public int Setting_LimitImagesToMonitor
         {
@@ -272,6 +278,7 @@ namespace vimage
                 { "BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT", false },
                 { "BACKGROUNDCOLOUR", "#FFE6E6E6" },
                 { "TRANSPARENCYTOGGLEVALUE", "#64FFFFFF" },
+                { "IMAGESIZING", SizingOption.FitWidth },
                 { "LIMITIMAGESTOMONITOR", AUTO },
                 { "POSITIONLARGEWIDEIMAGESINCORNER", true },
                 { "LOOPIMAGENAVIGATION", true },
@@ -706,6 +713,7 @@ namespace vimage
                 WriteSetting(writer, "BackgroundForImagesWithTransparencyDefault", Setting_BackgroundForImagesWithTransparencyDefault);
                 WriteSetting(writer, "BackgroundColour", Setting_BackgroundColour);
                 WriteSetting(writer, "TransparencyToggleValue", Setting_TransparencyToggleValue);
+                WriteSetting(writer, "ImageSizing", (int)Setting_ImageSizing);
                 WriteSetting(writer, "LimitImagesToMonitor", Setting_LimitImagesToMonitor, "0=NONE, 1=HEIGHT, 2=WIDTH, 3=AUTO");
                 WriteSetting(writer, "PositionLargeWideImagesInCorner", Setting_PositionLargeWideImagesInCorner,
                     "ie: Desktop Wallpapers and Screenshots");

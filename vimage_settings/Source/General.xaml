@@ -69,6 +69,16 @@
         </DockPanel>
         
         <DockPanel Margin="0,10,0,0">
+            <Label Content="Next/Prev Image Sizing" ToolTip="How the image will be sized when using the next/prev image buttons."/>
+            <ComboBox SelectedIndex="{Binding Setting_ImageSizing, Converter={StaticResource EnumConverter}}" Margin="10,0" Width="100" HorizontalAlignment="Right" >
+                <System:String>Fit Width</System:String>
+                <System:String>Fit Height</System:String>
+                <System:String>Fit Auto</System:String>
+                <System:String>Keep Zoom</System:String>
+                <System:String>Full Size</System:String>
+            </ComboBox>
+        </DockPanel>
+        <DockPanel>
             <Label Content="Limit images to monitor" ToolTip="Applied when opening or resetting an image."/>
             <ComboBox SelectedIndex="{Binding Setting_LimitImagesToMonitor}" Margin="10,0" Width="100" HorizontalAlignment="Right" >
                 <System:String>NONE</System:String>

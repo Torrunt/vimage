@@ -1340,11 +1340,17 @@ namespace vimage
                 Image.Color = ImageColor;
 
             // Don't keep current zoom value if it wasn't set by user
-            if (AutomaticallyZoomed || FitToMonitorHeightForced)
+            if (AutomaticallyZoomed || FitToMonitorHeightForced || Config.Setting_ImageSizing == SizingOption.FullSize)
             {
                 AutomaticallyZoomed = false;
                 FitToMonitorHeightForced = false;
                 CurrentZoom = 1;
+            }
+            else if (CurrentZoom != 1 && Config.Setting_ImageSizing != SizingOption.KeepZoom)
+            {
+                // Resize Image to be similar size to previous image
+                CurrentZoom = Config.Setting_ImageSizing == SizingOption.FitHeight || (Config.Setting_ImageSizing == SizingOption.FitAuto && prevSize.Y < prevSize.X) ?
+                    (prevSize.Y * CurrentZoom) / Size.Y : (prevSize.X * CurrentZoom) / Size.X;
             }
 
             bool wasFitToMonitorDimension = FitToMonitorHeightForced;
