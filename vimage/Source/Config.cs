@@ -182,6 +182,11 @@ namespace vimage
             get { return (int)Settings["MAXANIMATIONS"]; }
             set { Settings["MAXANIMATIONS"] = value; }
         }
+        public int Setting_MaxTextureSize
+        {
+            get { return (int)Settings["MAXTEXTURESIZE"]; }
+            set { Settings["MAXTEXTURESIZE"] = value; }
+        }
 
         public int Setting_SettingsAppWidth
         {
@@ -294,6 +299,7 @@ namespace vimage
                 { "MOVESPEEDFAST", 10 },
                 { "MAXTEXTURES", 80 },
                 { "MAXANIMATIONS", 8 },
+                { "MAXTEXTURESIZE", 10000 },
                 { "SETTINGSAPPWIDTH", 600 },
                 { "SETTINGSAPPHEIGHT", 550 },
                 { "DEFAULTSORTBY", SortBy.FolderDefault },
@@ -734,6 +740,7 @@ namespace vimage
                 WriteSetting(writer, "MoveSpeedFast", Setting_MoveSpeedFast);
                 WriteSetting(writer, "MaxTextures", Setting_MaxTextures);
                 WriteSetting(writer, "MaxAnimations", Setting_MaxAnimations);
+                WriteSetting(writer, "MaxTextureSize", Setting_MaxTextureSize, "will cut up images into multiple textures if they are larger than this value");
                 WriteSetting(writer, "SettingsAppWidth", Setting_SettingsAppWidth);
                 WriteSetting(writer, "SettingsAppHeight", Setting_SettingsAppHeight);
                 WriteSetting(writer, "DefaultSortBy", (int)Setting_DefaultSortBy);

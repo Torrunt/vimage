@@ -128,6 +128,7 @@ namespace vimage
             BackgroundColour = new Color(backColour.R, backColour.G, backColour.B, backColour.A);
             Graphics.MAX_TEXTURES = (uint)Config.Setting_MaxTextures;
             Graphics.MAX_ANIMATIONS = (uint)Config.Setting_MaxAnimations;
+            Graphics.TextureMaxSize = (int)Math.Min(Graphics.TextureMaxSize, 10000);
             ShowTitleBar = Config.Setting_ShowTitleBar;
             if (ShowTitleBar)
                 DWM.TitleBarSetVisible(Window, true);
