@@ -857,7 +857,7 @@ namespace vimage
             else
                 NextWindowPos = Window.Position;
 
-            if (ShowTitleBar)
+            if (ShowTitleBar && updateWindowSize)
                 Zoom(CurrentZoom, true); // make sure image is not too thin if title bar is on
 
             Updated = true;
