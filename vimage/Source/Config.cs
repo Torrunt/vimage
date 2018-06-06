@@ -490,11 +490,13 @@ namespace vimage
             ContextMenu.Add(new { name = "Mipmapping", func = Action.ToggleMipmapping });
             ContextMenu.Add(new { name = "Background", func = Action.ToggleBackground });
             ContextMenu.Add(new { name = "Always on top", func = Action.ToggleAlwaysOnTop });
-            ContextMenu.Add(new { name = "Reset image", func = Action.ResetImage });
+            ContextMenu.Add(new { name = "Reset", func = Action.ResetImage });
             ContextMenu.Add(new { name = "-", func = Action.None });
-            ContextMenu.Add(new { name = "Open file location", func = Action.OpenAtLocation });
+            ContextMenu.Add(new { name = "Edit", func = "EDIT PAINT" });
             ContextMenu.Add(new { name = "Copy", func = Action.Copy });
             ContextMenu.Add(new { name = "Delete", func = Action.Delete });
+            ContextMenu.Add(new { name = "-", func = Action.None });
+            ContextMenu.Add(new { name = "[filename.14]", func = Action.OpenAtLocation });
             ContextMenu.Add(new { name = "-", func = Action.None });
             ContextMenu.Add(new { name = "Settings", func = Action.OpenSettings });
             ContextMenu.Add(new { name = "vimage [version]", func = Action.VisitWebsite });

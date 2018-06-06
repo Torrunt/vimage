@@ -1775,6 +1775,7 @@ namespace vimage
             Config.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
 
             // Update ContextMenu
+            ContextMenu.FileNameCurrent = "";
             ContextMenu.LoadItems(Config.ContextMenu, Config.ContextMenu_Animation, Config.ContextMenu_Animation_InsertAtIndex);
             ContextMenu.Setup(true);
 

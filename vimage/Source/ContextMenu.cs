@@ -16,6 +16,7 @@ namespace vimage
         private Dictionary<string, dynamic> FuncByName;
 
         public int FileNameItem = -1;
+        public string FileNameCurrent = "";
 
         public ContextMenu(ImageViewer ImageViewer)
             : base()
@@ -62,7 +63,7 @@ namespace vimage
                     if (!FuncByName.ContainsKey((items[i] as dynamic).name))
                     {
                         string itemName = (items[i] as dynamic).name;
-                        if (itemName.Contains("[filename]"))
+                        if (itemName.IndexOf("[filename") == 0)
                             FileNameItem = list.Count;
                         if (itemName.Contains("[version]"))
                             itemName = itemName.Replace("[version]", ImageViewer.VERSION_NO);
@@ -146,8 +147,32 @@ namespace vimage
 
         public void RefreshItems()
         {
-            if (FileNameItem != -1)
-                Items[Items_General[FileNameItem]].Text = Items_General[FileNameItem].Replace("[filename]", ImageViewer.File.Substring(ImageViewer.File.LastIndexOf('\\') + 1));
+            if (FileNameItem != -1 && FileNameCurrent != ImageViewer.File)
+            {
+                FileNameCurrent = ImageViewer.File;
+                if (Items_General[FileNameItem].Contains("[filename]"))
+                {
+                    // File Name
+                    Items[Items_General[FileNameItem]].Text = Items_General[FileNameItem].Replace("[filename]", ImageViewer.File.Substring(ImageViewer.File.LastIndexOf('\\') + 1));
+                }
+                else if (Items_General[FileNameItem].Contains("[filename"))
+                {
+                    // File Name (trimmed)
+                    int a = Items_General[FileNameItem].IndexOf("[filename.") + 10;
+                    int b = Items_General[FileNameItem].IndexOf("]");
+                    if (int.TryParse(Items_General[FileNameItem].Substring(a, b - a), out int nameLength))
+                    {
+                        string fileName = ImageViewer.File.Substring(ImageViewer.File.LastIndexOf('\\') + 1);
+                        string extension = fileName.Substring(fileName.LastIndexOf("."));
+                        if (fileName.LastIndexOf(".") <= nameLength)
+                            nameLength = fileName.Length;
+                        Items[Items_General[FileNameItem]].Text = (a > 10 ? Items_General[FileNameItem].Substring(0, a - 10) : "") +
+                            (fileName.Length > nameLength ? fileName.Substring(0, nameLength) + ".." + extension : fileName) +
+                            (b < Items_General[FileNameItem].Length - 1 ? Items_General[FileNameItem].Substring(b + 1) : "");
+                        Items[Items_General[FileNameItem]].ToolTipText = fileName.Length > nameLength ? fileName : "";
+                    }
+                }
+            }
 
             if (!ImageViewer.Config.ContextMenuShowMargin && !ImageViewer.Config.ContextMenuShowMarginSub)
                 return;
