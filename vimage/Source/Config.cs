@@ -501,7 +501,7 @@ namespace vimage
             ContextMenu.Add(new { name = "Settings", func = Action.OpenSettings });
             ContextMenu.Add(new { name = "vimage [version]", func = Action.VisitWebsite });
 
-            ContextMenu_Animation.Add(new { name = "Pause/Play", func = Action.TransparencyToggle });
+            ContextMenu_Animation.Add(new { name = "Pause/Play", func = Action.PauseAnimation });
             ContextMenu_Animation.Add(new { name = "-", func = Action.None });
         }
         public void SetDefaultCustomActions()

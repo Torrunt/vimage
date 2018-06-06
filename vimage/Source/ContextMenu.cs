@@ -251,37 +251,25 @@ namespace vimage
         /// <summary>returns the ToolStripMenuItem based on the name of the function.</summary>
         public ToolStripMenuItem GetItemByFunc(Action func)
         {
-            ToolStripMenuItem item = null;
-            item = GetItemByFuncFrom(func, ImageViewer.Config.ContextMenu, Items);
-            if (item == null)
-                item = GetItemByFuncFrom(func, ImageViewer.Config.ContextMenu_Animation, Items);
-
-            return item;
+            return GetItemByFuncFrom(func, Items);
         }
-        private ToolStripMenuItem GetItemByFuncFrom(Action func, List<object> list, ToolStripItemCollection collection)
+        private ToolStripMenuItem GetItemByFuncFrom(Action func, ToolStripItemCollection collection)
         {
             for (int i = 0; i < collection.Count; i++)
             {
-                int a = 0;
-                for (int c = 0; c < list.Count; c++)
-                {
-                    if (list[c] is string)
-                    {
-                        // Submenu
-                        ToolStripDropDownItem submenu = (collection[(list[c] as string)] as ToolStripDropDownItem);
-                        c++;
-                        ToolStripMenuItem item = GetItemByFuncFrom(func, (list[c] as List<object>), submenu.DropDownItems);
-                        if (item != null)
-                            return item;
-                    }
-                    else if ((list[c] as dynamic).func is Action && (list[c] as dynamic).func == func)
-                        return collection[a] as ToolStripMenuItem;
+                if (collection[i].Name == "")
+                    continue;
+                object currentFunc = FuncByName[collection[i].Name];
+                if (currentFunc is Action && (Action)currentFunc == func)
+                    return collection[i] as ToolStripMenuItem;
 
-                    if (!(list[c] is string))
-                        a++;
+                if (collection[i] is ToolStripDropDownItem && (collection[i] as ToolStripDropDownItem).DropDownItems.Count > 0)
+                {
+                    ToolStripMenuItem item = GetItemByFuncFrom(func, (collection[i] as ToolStripDropDownItem).DropDownItems);
+                    if (item != null)
+                        return item;
                 }
             }
-
             return null;
         }
 
