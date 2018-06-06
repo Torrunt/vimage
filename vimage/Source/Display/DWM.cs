@@ -19,11 +19,11 @@ namespace vimage
 
         // Show/Hide in Taskbar
         [DllImport("user32.dll", SetLastError = true)]
-        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+        private static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
         [DllImport("user32.dll")]
-        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
         private const int GWL_EX_STYLE = -20;  
-        private const int WS_EX_APPWINDOW = 0x00040000, WS_EX_TOOLWINDOW = 0x00000080;
+        private const uint WS_EX_APPWINDOW = 0x00040000, WS_EX_TOOLWINDOW = 0x00000080;
         private static bool TaskbarIconVisible = true;
 
         public static void TaskBarIconSetVisible(IntPtr hWnd, bool visible)
@@ -38,7 +38,7 @@ namespace vimage
 
         // Toggle Borderless / Title bar
         private const int GWL_STYLE = -16;
-        public const int WS_CAPTION = 0x00C00000, WS_SYSMENU = 0x00080000;
+        public const uint WS_CAPTION = 0x00C00000, WS_SYSMENU = 0x00080000, WS_POPUP = 0x80000000;
         private const UInt32 SWP_FRAMECHANGED = 0x0020;
         private static bool SysMenuVisible = true;
 
@@ -63,6 +63,11 @@ namespace vimage
                 SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) & ~WS_CAPTION);
 
             SetWindowPos(window.SystemHandle, new IntPtr(0), window.Position.X, window.Position.Y, (int)window.Size.X, (int)window.Size.Y, SWP_FRAMECHANGED);
+        }
+
+        public static void PreventExlusiveFullscreen(RenderWindow window)
+        {
+            SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) & ~WS_POPUP);
         }
 
         // Window/Client Rect/Pos - used for Title Bar support

@@ -1440,6 +1440,9 @@ namespace vimage
             Window.SetTitle(fileName.Substring(fileName.LastIndexOf('\\') + 1) + " - vimage");
             ContextMenu?.Setup(false);
 
+            if (NextWindowSize.X == bounds.Width && NextWindowSize.Y == bounds.Height)
+                DWM.PreventExlusiveFullscreen(Window); // prevent exlusive fullscreen when image is the same size as current screen
+
             ViewStateHistory = new List<ViewState>();
 
             return true;
