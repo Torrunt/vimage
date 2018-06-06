@@ -1417,7 +1417,12 @@ namespace vimage
 
             Vector2i boundsPos = NextWindowPos +
                 new Vector2i((int)(Size.X * CurrentZoom) / 2, (int)(Size.Y * CurrentZoom) / 2);
-            bounds = ImageViewerUtils.GetCurrentBounds(boundsPos);
+            bounds = ImageViewerUtils.GetCurrentBounds(boundsPos, false);
+            if (bounds == default(IntRect))
+            {
+                boundsPos = Mouse.GetPosition();
+                bounds = ImageViewerUtils.GetCurrentBounds(boundsPos);
+            }
 
             // Position Window at top-left if the image is wide (ie: a Desktop Wallpaper / Screenshot)
             // Otherwise, if image is hanging off monitor just center it.

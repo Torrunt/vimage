@@ -23,7 +23,7 @@ namespace vimage
             return new IntRect(firstScreen.WorkingArea.X, firstScreen.WorkingArea.Y, firstScreen.WorkingArea.Width, firstScreen.WorkingArea.Height);
         }
         /// <summary> Returns the bounds IntRect of the monitor the position is located on.</summary>
-        public static IntRect GetCurrentBounds(Vector2i pos)
+        public static IntRect GetCurrentBounds(Vector2i pos, bool returnBackupScreen = true)
         {
             System.Windows.Forms.Screen backupScreen = System.Windows.Forms.Screen.AllScreens.ElementAt(0);
 
@@ -42,7 +42,7 @@ namespace vimage
                 return new IntRect(screen.Bounds.X, screen.Bounds.Y, screen.Bounds.Width, screen.Bounds.Height);
             }
 
-            return new IntRect(backupScreen.Bounds.X, backupScreen.Bounds.Y, backupScreen.Bounds.Width, backupScreen.Bounds.Height);
+            return returnBackupScreen ? new IntRect(backupScreen.Bounds.X, backupScreen.Bounds.Y, backupScreen.Bounds.Width, backupScreen.Bounds.Height) : new IntRect();
         }
 
         public static Vector2i LimitToBounds(Vector2i pos, Vector2u size, IntRect bounds)
