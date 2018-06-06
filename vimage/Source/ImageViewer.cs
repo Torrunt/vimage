@@ -1350,8 +1350,9 @@ namespace vimage
             else if (CurrentZoom != 1 && Config.Setting_ImageSizing != SizingOption.KeepZoom)
             {
                 // Resize Image to be similar size to previous image
-                CurrentZoom = Config.Setting_ImageSizing == SizingOption.FitHeight || (Config.Setting_ImageSizing == SizingOption.FitAuto && prevSize.Y < prevSize.X) ?
-                    (prevSize.Y * CurrentZoom) / Size.Y : (prevSize.X * CurrentZoom) / Size.X;
+                Vector2u actualPrevSize = (Rotation == 0 || Rotation == 180) ? prevSize : new Vector2u(prevSize.Y, prevSize.X);
+                CurrentZoom = Config.Setting_ImageSizing == SizingOption.FitHeight || (Config.Setting_ImageSizing == SizingOption.FitAuto && actualPrevSize.Y < actualPrevSize.X) ?
+                    (actualPrevSize.Y * CurrentZoom) / CurrentImageSize().Y : (actualPrevSize.X * CurrentZoom) / CurrentImageSize().X;
             }
 
             bool wasFitToMonitorDimension = FitToMonitorHeightForced;
@@ -1416,7 +1417,7 @@ namespace vimage
             }
 
             Vector2i boundsPos = NextWindowPos +
-                new Vector2i((int)(Size.X * CurrentZoom) / 2, (int)(Size.Y * CurrentZoom) / 2);
+                new Vector2i((int)(CurrentImageSize().X * CurrentZoom) / 2, (int)(CurrentImageSize().Y * CurrentZoom) / 2);
             bounds = ImageViewerUtils.GetCurrentBounds(boundsPos, false);
             if (bounds == default(IntRect))
             {
@@ -1429,9 +1430,9 @@ namespace vimage
             if (Config.Setting_PositionLargeWideImagesInCorner && CurrentImageSize().X > CurrentImageSize().Y && CurrentImageSize().X * CurrentZoom >= bounds.Width)
                 NextWindowPos = new Vector2i(bounds.Left, bounds.Top);
             else if (!prevSize.Equals(Size) && (NextWindowPos.Y <= bounds.Top ||
-                NextWindowPos.X + (Size.X * CurrentZoom) >= bounds.Left + bounds.Width ||
-                NextWindowPos.Y + (Size.Y * CurrentZoom) >= bounds.Top + bounds.Height))
-                NextWindowPos = new Vector2i(bounds.Left + (int)((bounds.Width - (Size.X * CurrentZoom)) / 2), bounds.Top + (int)((bounds.Height - (Size.Y * CurrentZoom)) / 2));
+                NextWindowPos.X + (CurrentImageSize().X * CurrentZoom) >= bounds.Left + bounds.Width ||
+                NextWindowPos.Y + (CurrentImageSize().Y * CurrentZoom) >= bounds.Top + bounds.Height))
+                NextWindowPos = new Vector2i(bounds.Left + (int)((bounds.Width - (CurrentImageSize().X * CurrentZoom)) / 2), bounds.Top + (int)((bounds.Height - (CurrentImageSize().Y * CurrentZoom)) / 2));
 
             // Temporarily set always on top to bring it infront of the taskbar?
             ForceAlwaysOnTopCheck(bounds, ImageViewerUtils.GetCurrentWorkingArea(boundsPos));
