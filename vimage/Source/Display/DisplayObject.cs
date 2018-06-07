@@ -121,6 +121,18 @@ namespace vimage
                 Rotation += amount;
         }
 
+        public Color _Color = Color.White;
+        public Color Color
+        {
+            get { return _Color; }
+            set
+            {
+                _Color = value;
+                for (int i = 0; i < Children.Count; i++)
+                    Children[i].Color = _Color;
+            }
+        }
+
     }
 
     class TextureInfo
