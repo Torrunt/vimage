@@ -18,10 +18,14 @@ namespace vimage
         public int FileNameItem = -1;
         public string FileNameCurrent = "";
 
+        private ToolTip ToolTip;
+
         public ContextMenu(ImageViewer ImageViewer)
             : base()
         {
             this.ImageViewer = ImageViewer;
+
+            SetupToolTip();
         }
 
         public void LoadItems(List<object> General, List<object> Animation, int AnimationInsertAtIndex)
@@ -164,12 +168,14 @@ namespace vimage
                     {
                         string fileName = ImageViewer.File.Substring(ImageViewer.File.LastIndexOf('\\') + 1);
                         string extension = fileName.Substring(fileName.LastIndexOf("."));
-                        if (fileName.LastIndexOf(".") <= nameLength)
+                        if (nameLength >= fileName.Length - 6 || fileName.LastIndexOf(".") <= nameLength)
                             nameLength = fileName.Length;
                         Items[Items_General[FileNameItem]].Text = (a > 10 ? Items_General[FileNameItem].Substring(0, a - 10) : "") +
                             (fileName.Length > nameLength ? fileName.Substring(0, nameLength) + ".." + extension : fileName) +
                             (b < Items_General[FileNameItem].Length - 1 ? Items_General[FileNameItem].Substring(b + 1) : "");
                         Items[Items_General[FileNameItem]].ToolTipText = fileName.Length > nameLength ? fileName : "";
+                        Items[Items_General[FileNameItem]].MouseEnter += ItemMouseEnter;
+                        Items[Items_General[FileNameItem]].MouseLeave += ItemMouseLeave;
                     }
                 }
             }
@@ -282,6 +288,36 @@ namespace vimage
             for (int i = 0; i < amount; i++)
                 str += s;
             return str;
+        }
+
+        private void SetupToolTip()
+        {
+            ShowItemToolTips = false;
+            ToolTip = new ToolTip();
+            ToolTip.UseAnimation = true;
+            ToolTip.UseFading = true;
+            ToolTip.BackColor = System.Drawing.Color.FromArgb(196, 225, 255);
+            ToolTip.OwnerDraw = true;
+            ToolTip.Draw += new DrawToolTipEventHandler(ToolTipDraw);
+        }
+        private void ToolTipDraw(object sender, DrawToolTipEventArgs e)
+        {
+            System.Drawing.Rectangle bounds = e.Bounds;
+            bounds.Height -= 1;
+            DrawToolTipEventArgs newArgs = new DrawToolTipEventArgs(e.Graphics, e.AssociatedWindow, e.AssociatedControl, bounds, e.ToolTipText,
+                ToolTip.BackColor, ToolTip.ForeColor, e.Font);
+            newArgs.DrawBackground();
+            newArgs.DrawText(TextFormatFlags.VerticalCenter);
+        }
+        private void ItemMouseEnter(object sender, EventArgs e)
+        {
+            ToolStripMenuItem item = (sender as ToolStripMenuItem);
+            ToolTip.Show(item.ToolTipText, item.Owner, item.Bounds.Location.X + 8, item.Bounds.Location.Y + 1);
+        }
+        private void ItemMouseLeave(object sender, EventArgs e)
+        {
+            ToolStripMenuItem item = (sender as ToolStripMenuItem);
+            ToolTip.Hide(item.Owner);
         }
 
     }
