@@ -488,7 +488,6 @@ namespace vimage
             ContextMenu.Add(new { name = "Fit to width", func = Action.FitToMonitorWidth });
             ContextMenu.Add(new { name = "Smoothing", func = Action.ToggleSmoothing });
             ContextMenu.Add(new { name = "Mipmapping", func = Action.ToggleMipmapping });
-            ContextMenu.Add(new { name = "Background", func = Action.ToggleBackground });
             ContextMenu.Add(new { name = "Always on top", func = Action.ToggleAlwaysOnTop });
             ContextMenu.Add(new { name = "Reset", func = Action.ResetImage });
             ContextMenu.Add(new { name = "-", func = Action.None });

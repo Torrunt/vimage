@@ -67,9 +67,9 @@
             <Label Content="Crop tool outline thickness" Margin="15,0,0,0"/>
             <xctk:IntegerUpDown Value="{Binding Setting_CropToolOutlineThickness}" Minimum="0" Margin="10,0" Width="50" HorizontalAlignment="Right" />
         </DockPanel>
-        
-        <DockPanel Margin="0,10,0,0">
-            <Label Content="Next/Prev Image Sizing" ToolTip="How the image will be sized when using the next/prev image buttons."/>
+
+        <DockPanel Margin="0,10,0,0" ToolTip="How the image will be sized when using the next/prev image buttons.">
+            <Label Content="Next/Prev Image Sizing"/>
             <ComboBox SelectedIndex="{Binding Setting_ImageSizing, Converter={StaticResource EnumConverter}}" Margin="10,0" Width="100" HorizontalAlignment="Right" >
                 <System:String>Fit Width</System:String>
                 <System:String>Fit Height</System:String>
@@ -78,8 +78,8 @@
                 <System:String>Full Size</System:String>
             </ComboBox>
         </DockPanel>
-        <DockPanel>
-            <Label Content="Limit images to monitor" ToolTip="Applied when opening or resetting an image."/>
+        <DockPanel ToolTip="Applied when opening or resetting an image.">
+            <Label Content="Limit images to monitor"/>
             <ComboBox SelectedIndex="{Binding Setting_LimitImagesToMonitor}" Margin="10,0" Width="100" HorizontalAlignment="Right" >
                 <System:String>NONE</System:String>
                 <System:String>HEIGHT</System:String>
@@ -87,9 +87,8 @@
                 <System:String>AUTO</System:String>
             </ComboBox>
         </DockPanel>
-        <DockPanel>
+        <DockPanel ToolTip="Images smaller than this (in width or height) will automatically be scaled up to this size.">
             <Label Content="Min image size"/>
-            <Label Content="(if image is smaller, it will be scaled up)" FontSize="9" />
             <xctk:IntegerUpDown Value="{Binding Setting_MinImageSize}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
         <DockPanel ToolTip="Smoothing will be turned off by default for images smaller than this.">
@@ -101,7 +100,7 @@
             <xctk:IntegerUpDown Value="{Binding Setting_ZoomSpeed}" FormatString="0\%" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
         <DockPanel ToolTip="Zoom speed when holding down 'Zoom Faster' (SHIFT by default).">
-            <Label Content="Zoom Speed Fast"/>
+            <Label Content="Zoom Speed (Fast)"/>
             <xctk:IntegerUpDown Value="{Binding Setting_ZoomSpeedFast}" FormatString="0\%" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
         <DockPanel ToolTip="Speed at which the image moves when using the movement key binds.">
@@ -109,7 +108,7 @@
             <xctk:IntegerUpDown Value="{Binding Setting_MoveSpeed}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
         <DockPanel ToolTip="Move speed when holding down 'Zoom Faster' (SHIFT by default).">
-            <Label Content="Move Speed Fast"/>
+            <Label Content="Move Speed (Fast)"/>
             <xctk:IntegerUpDown Value="{Binding Setting_MoveSpeedFast}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
         <DockPanel ToolTip="The max amount of textures that vimage will keep in it's memory.">
