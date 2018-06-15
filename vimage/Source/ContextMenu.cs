@@ -296,7 +296,13 @@ namespace vimage
             ToolTip = new ToolTip();
             ToolTip.UseAnimation = true;
             ToolTip.UseFading = true;
-            ToolTip.BackColor = System.Drawing.Color.FromArgb(196, 225, 255);
+            if (SystemInformation.HighContrast)
+            {
+                ToolTip.BackColor = System.Drawing.Color.FromArgb(26, 255, 255);
+                ToolTip.ForeColor = System.Drawing.Color.Black;
+            }
+            else
+                ToolTip.BackColor = System.Drawing.Color.FromArgb(196, 225, 255);
             ToolTip.OwnerDraw = true;
             ToolTip.Draw += new DrawToolTipEventHandler(ToolTipDraw);
         }
