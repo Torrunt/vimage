@@ -193,41 +193,45 @@ namespace vimage
                 parentFolder = parentFolder.Substring(parentFolder.LastIndexOf('\\') + 1, parentFolder.Length - parentFolder.LastIndexOf('\\') - 1);
 
                 // Get sort column info from window with corresponding name
-                SHDocVw.ShellWindows shellWindows = new SHDocVw.ShellWindows();
-                foreach (SHDocVw.ShellBrowserWindow shellWindow in shellWindows)
+                try
                 {
-                    if (shellWindow.LocationName != parentFolder)
-                        continue;
-
-                    Shell32.ShellFolderView view = (Shell32.ShellFolderView)shellWindow.Document;
-
-                    string sort = view.SortColumns; // can be sorted by multiple columns (eg: date then name) - we will just look at the first one
-                    sort = sort.Substring(5, sort.IndexOf(';') - 5);
-
-                    // Direction
-                    if (sort[0] == '-')
+                    SHDocVw.ShellWindows shellWindows = new SHDocVw.ShellWindows();
+                    foreach (SHDocVw.ShellBrowserWindow shellWindow in shellWindows)
                     {
-                        sort = sort.Substring(1, sort.Length - 1);
+                        if (shellWindow.LocationName != parentFolder)
+                            continue;
 
-                        if (SortImagesByDir == SortDirection.FolderDefault)
-                            SortImagesByDir = SortDirection.Descending;
-                    }
-                    else if (SortImagesByDir == SortDirection.FolderDefault)
-                        SortImagesByDir = SortDirection.Ascending;
+                        Shell32.ShellFolderView view = (Shell32.ShellFolderView)shellWindow.Document;
 
-                    // By
-                    if (SortImagesBy == SortBy.FolderDefault)
-                    {
-                        switch (sort)
+                        string sort = view.SortColumns; // can be sorted by multiple columns (eg: date then name) - we will just look at the first one
+                        sort = sort.Substring(5, sort.IndexOf(';') - 5);
+
+                        // Direction
+                        if (sort[0] == '-')
                         {
-                            case "System.ItemDate": SortImagesBy = SortBy.Date; break;
-                            case "System.DateModified": SortImagesBy = SortBy.DateModified; break;
-                            case "System.DateCreated": SortImagesBy = SortBy.DateCreated; break;
-                            case "System.Size": SortImagesBy = SortBy.Size; break;
-                            default: SortImagesBy = SortBy.Name; break;
+                            sort = sort.Substring(1, sort.Length - 1);
+
+                            if (SortImagesByDir == SortDirection.FolderDefault)
+                                SortImagesByDir = SortDirection.Descending;
+                        }
+                        else if (SortImagesByDir == SortDirection.FolderDefault)
+                            SortImagesByDir = SortDirection.Ascending;
+
+                        // By
+                        if (SortImagesBy == SortBy.FolderDefault)
+                        {
+                            switch (sort)
+                            {
+                                case "System.ItemDate": SortImagesBy = SortBy.Date; break;
+                                case "System.DateModified": SortImagesBy = SortBy.DateModified; break;
+                                case "System.DateCreated": SortImagesBy = SortBy.DateCreated; break;
+                                case "System.Size": SortImagesBy = SortBy.Size; break;
+                                default: SortImagesBy = SortBy.Name; break;
+                            }
                         }
                     }
                 }
+                catch (Exception) { }
             }
             // Default sorting if folder was closed
             if (SortImagesBy == SortBy.FolderDefault)

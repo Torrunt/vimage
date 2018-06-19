@@ -124,7 +124,7 @@ namespace vimage_settings
                 Items.Insert(Items.IndexOf(CurrentItemSelection) + 1, item);
             }
 
-            CurrentItemSelection.UnselectItem();
+            CurrentItemSelection?.UnselectItem();
             item.SelectItem(true);
         }
 
