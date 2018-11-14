@@ -11,22 +11,21 @@ namespace vimage
     {
         static void Main(string[] args)
         {
-            string file;
-            if (args.Length == 0)
-                return;
-            else
-                file = args[0];
-
-            if (System.IO.File.Exists(file))
+            string file = "";
+            if (args.Length > 0)
             {
-                if (!System.Diagnostics.Debugger.IsAttached)
-                {
-                    System.Windows.Forms.Application.ThreadException += ApplicationThreadException;
-                    AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
-                }
-
-                ImageViewer imageViewer = new ImageViewer(file, args);
+                file = args[0];
+                if (System.IO.File.Exists(file))
+                    return;
             }
+
+            if (!System.Diagnostics.Debugger.IsAttached)
+            {
+                System.Windows.Forms.Application.ThreadException += ApplicationThreadException;
+                AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
+            }
+
+            ImageViewer imageViewer = new ImageViewer(file, args);
         }
 
         private static void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)

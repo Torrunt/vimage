@@ -74,7 +74,7 @@ namespace vimage
         public bool AlwaysOnTop = false;
         private bool AlwaysOnTopForced = false;
         /// <summary>
-        /// If true will turn AlwaysOnTop mode on next update if the window height >= monitor height and window width < monitor width.
+        /// If true will turn AlwaysOnTop mode on next update if the window height >= monitor height and window width is less than monitor width.
         /// If the window is wider and taller than the monitor it will automatically be above the task bar anyway.
         /// </summary>
         private bool ForceAlwaysOnTopNextTick = false;
@@ -87,6 +87,8 @@ namespace vimage
         public SortDirection SortImagesByDir = SortDirection.Ascending;
         private bool ImageTransparencyHold = false;
         private bool ImageTransparencyTweaked = false;
+        /// <summary>Bitmap of image loaded in via Clipboard (used to copy it back into clipboard).</summary>
+        private System.Drawing.Bitmap ClipboardBitmap;
 
         private static readonly Random rnd = new Random();
 
@@ -95,7 +97,7 @@ namespace vimage
             IL.Initialize();
 
             // Extension supported?
-            if (!ImageViewerUtils.IsValidExtension(file, EXTENSIONS))
+            if (file != "" && !ImageViewerUtils.IsValidExtension(file, EXTENSIONS))
                 return;
 
             // Save Mouse Position -> will open image at this position
@@ -186,7 +188,7 @@ namespace vimage
             SortImagesBy = Config.Setting_DefaultSortBy;
             SortImagesByDir = Config.Setting_DefaultSortDir;
 
-            if (SortImagesBy == SortBy.FolderDefault || SortImagesByDir == SortDirection.FolderDefault)
+            if (file != "" && (SortImagesBy == SortBy.FolderDefault || SortImagesByDir == SortDirection.FolderDefault))
             {
                 // Get parent folder name
                 string parentFolder = file.Substring(0, file.LastIndexOf('\\'));
@@ -1299,6 +1301,51 @@ namespace vimage
 
             return true;
         }
+        private bool LoadedClipboardImage = false;
+        private bool LoadImageFromClipboard()
+        {
+            File = "";
+            LoadedClipboardImage = false;
+
+            Thread thread = new Thread(() =>
+            {
+                if (!System.Windows.Forms.Clipboard.ContainsImage())
+                {
+                    LoadedClipboardImage = false;
+                    return;
+                }
+
+                System.Drawing.Image image = System.Windows.Forms.Clipboard.GetImage();
+                if (image == null)
+                {
+                    LoadedClipboardImage = false;
+                    return;
+                }
+
+                MemoryStream stream = new MemoryStream();
+                try { image.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp); }
+                catch { LoadedClipboardImage = false; return; }
+
+                ClipboardBitmap = new System.Drawing.Bitmap(image);
+                Image = new Sprite(new Texture(stream));
+
+                if (Image?.Texture == null)
+                {
+                    LoadedClipboardImage = false;
+                    return;
+                }
+
+                Size = Image.Texture.Size;
+                DefaultRotation = 0;
+
+                LoadedClipboardImage = true;
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            thread.Join(); // wait for thread to finish
+
+            return LoadedClipboardImage;
+        }
         private bool ChangeImage(string fileName)
         {
             Dragging = false;
@@ -1318,7 +1365,9 @@ namespace vimage
             }
 
             // Load new image
-            if (!LoadImage(fileName))
+            if (fileName != "" && !LoadImage(fileName))
+                return false;
+            else if (fileName == "" && !LoadImageFromClipboard())
                 return false;
 
             View view = Window.DefaultView;
@@ -1441,7 +1490,7 @@ namespace vimage
             // Temporarily set always on top to bring it infront of the taskbar?
             ForceAlwaysOnTopCheck(bounds, ImageViewerUtils.GetCurrentWorkingArea(boundsPos));
 
-            Window.SetTitle(fileName.Substring(fileName.LastIndexOf('\\') + 1) + " - vimage");
+            Window.SetTitle(fileName == "" ? "vimage" : fileName.Substring(fileName.LastIndexOf('\\') + 1) + " - vimage");
             ContextMenu?.Setup(false);
 
             if (NextWindowSize.X == bounds.Width && NextWindowSize.Y == bounds.Height)
@@ -1601,6 +1650,13 @@ namespace vimage
         {
             if (FolderContents != null && FolderContents.Count() > 0)
                 return;
+
+            if (File == "")
+            {
+                FolderContents = new List<string>();
+                return;
+            }
+
             string directory = File.Substring(0, File.LastIndexOf("\\"));
             if (!Directory.Exists(directory))
                 return;
@@ -1657,6 +1713,9 @@ namespace vimage
 
         public void DeleteFile()
         {
+            if (File == "")
+                return;
+
             string fileName = File;
 
             GetFolderContents();
@@ -1676,11 +1735,16 @@ namespace vimage
         }
         public void CopyFile()
         {
+            if (File == "")
+            {
+                // No file (viewing clipboard image?) - copy as image instead
+                CopyAsImage();
+                return;
+            }
+
             Thread thread = new Thread(() =>
             {
-                System.Collections.Specialized.StringCollection files = new System.Collections.Specialized.StringCollection();
-                files.Add(File);
-                System.Windows.Forms.Clipboard.SetFileDropList(files);
+                System.Windows.Forms.Clipboard.SetFileDropList(new System.Collections.Specialized.StringCollection { File });
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
@@ -1692,7 +1756,14 @@ namespace vimage
                 try
                 {
                     System.Drawing.Bitmap bitmap;
-                    if (File.IndexOf(".ico") == File.Length - 4)
+                    if (File == "")
+                    {
+                        // No File (viewing clipboard image?)
+                        if (ClipboardBitmap == null)
+                            return;
+                        bitmap = ClipboardBitmap;
+                    }
+                    else if (File.IndexOf(".ico") == File.Length - 4)
                     {
                         // If .ico - copy largest version
                         System.Drawing.Icon icon = new System.Drawing.Icon(File, 256, 256);
@@ -1711,7 +1782,8 @@ namespace vimage
         }
         public void OpenFileAtLocation()
         {
-            Process.Start("explorer.exe", "/select, " + File);
+            if (File != "")
+                Process.Start("explorer.exe", "/select, " + File);
         }
 
         public void OpenDuplicateWindow(bool full = false)
@@ -1820,6 +1892,9 @@ namespace vimage
             else
             {
                 // Open new process with arguments
+                if (File == "" && (action.Contains("%f") || action.Contains("%d")))
+                    return; // don't do the action if it requires the Filename but there isn't one
+
                 action = action.Replace("%f", "\"" + File + "\"");
                 action = action.Replace("%d", File.Substring(0, File.LastIndexOf('\\') + 1));
 

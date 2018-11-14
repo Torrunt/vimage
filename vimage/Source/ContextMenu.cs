@@ -16,7 +16,7 @@ namespace vimage
         private Dictionary<string, dynamic> FuncByName;
 
         public int FileNameItem = -1;
-        public string FileNameCurrent = "";
+        public string FileNameCurrent = ".";
 
         private ToolTip ToolTip;
 
@@ -52,6 +52,33 @@ namespace vimage
         {
             for (int i = 0; i < items.Count; i++)
             {
+                if (ImageViewer.File == "")
+                {
+                    // Remove certain items if there is no file (looking at clipboard image)
+                    if (items[i] is string)
+                    {
+                        // remove Sort By submenu
+                        if ((items[i] as string).IndexOf("Sort") == 0)
+                        {
+                            i++;
+                            if (i < items.Count - 1 && (items[i + 1] as dynamic).name == "-")
+                                i++;
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        // remove navigation and delete
+                        switch ((items[i] as dynamic).func)
+                        {
+                            case Action.NextImage:
+                            case Action.PrevImage:
+                            case Action.Delete:
+                                continue;
+                        }
+                    }
+                }
+
                 if (items[i] is string)
                 {
                     // Submenu
@@ -157,7 +184,7 @@ namespace vimage
                 if (Items_General[FileNameItem].Contains("[filename]"))
                 {
                     // File Name
-                    Items[Items_General[FileNameItem]].Text = Items_General[FileNameItem].Replace("[filename]", ImageViewer.File.Substring(ImageViewer.File.LastIndexOf('\\') + 1));
+                    Items[Items_General[FileNameItem]].Text = Items_General[FileNameItem].Replace("[filename]", ImageViewer.File == "" ? "Clipboard Image" : ImageViewer.File.Substring(ImageViewer.File.LastIndexOf('\\') + 1));
                 }
                 else if (Items_General[FileNameItem].Contains("[filename"))
                 {
@@ -166,8 +193,8 @@ namespace vimage
                     int b = Items_General[FileNameItem].IndexOf("]");
                     if (int.TryParse(Items_General[FileNameItem].Substring(a, b - a), out int nameLength))
                     {
-                        string fileName = ImageViewer.File.Substring(ImageViewer.File.LastIndexOf('\\') + 1);
-                        string extension = fileName.Substring(fileName.LastIndexOf("."));
+                        string fileName = ImageViewer.File == "" ? "Clipboard Image" : ImageViewer.File.Substring(ImageViewer.File.LastIndexOf('\\') + 1);
+                        string extension = ImageViewer.File == "" ? "" : fileName.Substring(fileName.LastIndexOf("."));
                         if (nameLength >= fileName.Length - 6 || fileName.LastIndexOf(".") <= nameLength)
                             nameLength = fileName.Length;
                         Items[Items_General[FileNameItem]].Text = (a > 10 ? Items_General[FileNameItem].Substring(0, a - 10) : "") +
