@@ -1040,6 +1040,9 @@ namespace vimage
             ForceAlwaysOnTopCheck(bounds, workingArea);
 
             ViewStateHistory = new List<ViewState>();
+
+            if (Config.Setting_ClearMemoryOnResetImage)
+                Graphics.ClearMemory(Image, File);
         }
 
         public void ToggleSmoothing()
@@ -1993,6 +1996,7 @@ namespace vimage
                     case "-alwaysOnTop": ToggleAlwaysOnTop(); break;
                     case "-flip": FlipImage(); break;
                     case "-reset": ResetImage(); break;
+                    case "-clearMemory": Graphics.ClearMemory(Image, File); break;
                     case "-toggleAnim": ToggleAnimation(); break;
                     case "-frame":
                         val = 1;

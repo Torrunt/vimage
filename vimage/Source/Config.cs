@@ -127,6 +127,11 @@ namespace vimage
             get { return (Boolean)Settings["PRELOADNEXTIMAGE"]; }
             set { Settings["PRELOADNEXTIMAGE"] = value; }
         }
+        public bool Setting_ClearMemoryOnResetImage
+        {
+            get { return (Boolean)Settings["CLEARMEMORYONRESETIMAGE"]; }
+            set { Settings["CLEARMEMORYONRESETIMAGE"] = value; }
+        }
         public bool Setting_ShowTitleBar
         {
             get { return (Boolean)Settings["SHOWTITLEBAR"]; }
@@ -288,6 +293,7 @@ namespace vimage
                 { "POSITIONLARGEWIDEIMAGESINCORNER", true },
                 { "LOOPIMAGENAVIGATION", true },
                 { "PRELOADNEXTIMAGE", true },
+                { "CLEARMEMORYONRESETIMAGE", true },
                 { "SHOWTITLEBAR", false },
                 { "OPENSETTINGSEXE", true },
                 { "LISTENFORCONFIGCHANGES", true },
@@ -727,6 +733,8 @@ namespace vimage
                 WriteSetting(writer, "LoopImageNavigation", Setting_LoopImageNavigation);
                 WriteSetting(writer, "PreloadNextImage", Setting_PreloadNextImage,
                     "when using the next/prev image buttons, the image after the one just loaded will be loaded as well");
+                WriteSetting(writer, "ClearMemoryOnResetImage", Setting_ClearMemoryOnResetImage,
+                    "when the Reset Image action is used, all textures/animations will be cleared from memory (except ones used for current image)");
                 WriteSetting(writer, "ShowTitleBar", Setting_ShowTitleBar);
                 WriteSetting(writer, "OpenSettingsEXE", Setting_OpenSettingsEXE, "if false, will open config.txt instead");
                 WriteSetting(writer, "ListenForConfigChanges", Setting_ListenForConfigChanges,

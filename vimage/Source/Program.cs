@@ -15,7 +15,7 @@ namespace vimage
             if (args.Length > 0)
             {
                 file = args[0];
-                if (System.IO.File.Exists(file))
+                if (!System.IO.File.Exists(file))
                     return;
             }
 
