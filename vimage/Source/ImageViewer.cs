@@ -19,7 +19,7 @@ namespace vimage
         public readonly string[] EXTENSIONS =
         {
             "bmp", "cut", "dds", "doom", "exr", "hdr", "gif", "ico", "jp2", "jpg", "jpeg", "lbm", "mdl", "mng",
-            "pal", "pbm", "pcd", "pcx", "pgm", "pic", "png", "ppm", "psd", "psp", "raw", "sgi", "tga", "tif", "svg"
+            "pal", "pbm", "pcd", "pcx", "pgm", "pic", "png", "ppm", "psd", "psp", "raw", "sgi", "tga", "tif", "tiff", "svg"
         };
 
         public readonly float ZOOM_MIN = 0.05f;
