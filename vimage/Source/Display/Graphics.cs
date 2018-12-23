@@ -266,6 +266,50 @@ namespace vimage
             return bmpPngExtracted;
         }
 
+        public static Sprite GetSpriteFromSVG(string fileName)
+        {
+            int index = TextureFileNames.IndexOf(fileName);
+
+            if (index >= 0)
+            {
+                // Texture Already Exists
+                // move it to the end of the array and return it
+                Texture texture = Textures[index];
+                string name = TextureFileNames[index];
+
+                Textures.RemoveAt(index);
+                TextureFileNames.RemoveAt(index);
+                Textures.Add(texture);
+                TextureFileNames.Add(name);
+
+                return new Sprite(Textures[Textures.Count - 1]);
+            }
+            else
+            {
+                // New Texture (from .svg)
+                try
+                {
+                    Svg.SvgDocument svg = Svg.SvgDocument.Open(fileName);
+                    System.Drawing.Bitmap bitmap = svg.Draw();
+                    Sprite svgSprite;
+                    using (MemoryStream iconStream = new MemoryStream())
+                    {
+                        bitmap.Save(iconStream, System.Drawing.Imaging.ImageFormat.Png);
+                        Texture texture = new Texture(iconStream);
+                        Textures.Add(texture);
+                        TextureFileNames.Add(fileName);
+
+                        svgSprite = new Sprite(new Texture(texture));
+                    }
+
+                    return svgSprite;
+                }
+                catch (Exception) { }
+            }
+
+            return null;
+        }
+
         /// <param name="filename">Animated Image (ie: animated gif).</param>
         public static AnimatedImage GetAnimatedImage(string fileName)
         {

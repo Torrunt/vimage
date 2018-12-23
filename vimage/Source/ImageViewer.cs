@@ -19,7 +19,7 @@ namespace vimage
         public readonly string[] EXTENSIONS =
         {
             "bmp", "cut", "dds", "doom", "exr", "hdr", "gif", "ico", "jp2", "jpg", "jpeg", "lbm", "mdl", "mng",
-            "pal", "pbm", "pcd", "pcx", "pgm", "pic", "png", "ppm", "psd", "psp", "raw", "sgi", "tga", "tif"
+            "pal", "pbm", "pcd", "pcx", "pgm", "pic", "png", "ppm", "psd", "psp", "raw", "sgi", "tga", "tif", "svg"
         };
 
         public readonly float ZOOM_MIN = 0.05f;
@@ -1276,7 +1276,12 @@ namespace vimage
             string extension = ImageViewerUtils.GetExtension(fileName);
 
             // Image
-            if (extension.Equals("gif"))
+            if (extension.Equals("svg"))
+            {
+                // SVG
+                Image = Graphics.GetSpriteFromSVG(fileName);
+            }
+            else if (extension.Equals("gif"))
             {
                 // Animated GIF
                 Image = Graphics.GetAnimatedImage(fileName);

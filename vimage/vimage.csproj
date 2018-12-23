@@ -80,12 +80,16 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\sfmlnet-window-2.dll</HintPath>
     </Reference>
+    <Reference Include="Svg">
+      <HintPath>.\Svg.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
     <Reference Include="Tao.OpenGl, Version=2.1.0.12, Culture=neutral, PublicKeyToken=1ca010269a4501ef, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\Tao.OpenGl.dll</HintPath>
