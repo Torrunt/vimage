@@ -56,7 +56,8 @@
                         -fitToMonitorWidth<LineBreak/>
                         -fitToMonitorAuto<LineBreak/>
                         -lock<LineBreak/>
-                        -taskbarToggle
+                        -taskbarToggle<LineBreak/>
+                        -rerenderSVG
                     </TextBlock>
                 </Button.ToolTip>
             </Button>

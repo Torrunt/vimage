@@ -441,7 +441,8 @@ namespace vimage
                 
                 case Action.UndoCrop: UndoCrop(); return;
                 case Action.ExitAll: ExitAllInstances(); return;
-                
+                case Action.RerenderSVG: RenderSVGAtCurrentZoom(); return;
+
                 case Action.VisitWebsite: Process.Start("http://torrunt.net/vimage"); return;
                 
                 case Action.SortName: ChangeSortBy(SortBy.Name); return;
@@ -603,7 +604,7 @@ namespace vimage
 
             // Random Image
             if (Config.IsControl(code, Config.Control_RandomImage, CurrentAction != Action.None))
-                CurrentAction =  Action.RandomImage;
+                CurrentAction = Action.RandomImage;
 
             // Toggle Image Transparency
             if (Config.IsControl(code, Config.Control_TransparencyToggle, CurrentAction != Action.None))
@@ -615,6 +616,10 @@ namespace vimage
 
             if (Config.IsControl(code, Config.Control_UndoCrop, CurrentAction != Action.None))
                 CurrentAction = Action.UndoCrop;
+
+            // Re-render SVG
+            if (Config.IsControl(code, Config.Control_RerenderSVG, CurrentAction != Action.None))
+                CurrentAction = Action.RerenderSVG;
 
             // Custom Actions
             for (int i = 0; i < Config.CustomActionBindings.Count; i++)
@@ -969,10 +974,11 @@ namespace vimage
         {
             // Reset size / crops
             Size = Image.Texture.Size;
-            View view = new View(Window.DefaultView);
-            view.Center = new Vector2f(Size.X / 2f, Size.Y / 2f);
-            view.Size = new Vector2f(Size.X, Size.Y);
-            Window.SetView(view);
+            Window.SetView(new View(Window.DefaultView)
+            {
+                Center = new Vector2f(Size.X / 2f, Size.Y / 2f),
+                Size = new Vector2f(Size.X, Size.Y)
+            });
 
             // Zoom, Flip and Rotate
             Zoom(1f);
@@ -1264,6 +1270,47 @@ namespace vimage
             Updated = true;
         }
         public ViewState GetCurrentViewState() { return new ViewState(Window.GetView(), Size, NextWindowPos, CurrentZoom, Rotation, FlippedX); }
+
+        public void RenderSVGAtCurrentZoom()
+        {
+            if (CurrentZoom == 1 || ImageViewerUtils.GetExtension(File) != "svg")
+                return;
+            try
+            {
+                Svg.SvgDocument svg = Svg.SvgDocument.Open(File);
+
+                float zoom = (Size.X * CurrentZoom) / svg.Width;
+
+                svg.Width *= zoom;
+                svg.Height *= zoom;
+                if (svg.ViewBox == default(Svg.SvgViewBox))
+                    svg.ViewBox = new Svg.SvgViewBox(0, 0, svg.Width / zoom, svg.Height / zoom);
+
+                System.Drawing.Bitmap bitmap = svg.Draw();
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                    Sprite sprite = new Sprite(new Texture(new Texture(stream)));
+                    if (sprite?.Texture == null)
+                        return;
+
+                    Image = sprite;
+                    Size = Image.Texture.Size;
+                    Window.SetView(new View(Window.DefaultView)
+                    {
+                        Center = new Vector2f(Size.X / 2f, Size.Y / 2f),
+                        Size = new Vector2f(Size.X, Size.Y)
+                    });
+
+                    // Zoom, Flip and Rotate
+                    Zoom(1f);
+                    AutomaticallyZoomed = false;
+                    FlippedX = false;
+                    RotateImage(DefaultRotation);
+                }
+            }
+            catch (Exception) { }
+        }
 
         ///////////////////////////
         //     Image Loading     //
@@ -2021,6 +2068,8 @@ namespace vimage
                     case "-lock": ToggleLock(); break;
                     
                     case "-taskbarToggle": DWM.TaskBarIconToggle(Window.SystemHandle); break;
+
+                    case "-rerenderSVG": RenderSVGAtCurrentZoom(); break;
                 }
             }
 

@@ -57,6 +57,7 @@ namespace vimage
         Crop,
         UndoCrop,
         ExitAll,
+        RerenderSVG,
 
         VisitWebsite,
 
@@ -126,6 +127,7 @@ namespace vimage
             "CROP",
             "UNDO CROP",
             "EXIT ALL INSTANCES",
+            "RERENDER SVG",
 
             "VISIT WEBSITE",
 

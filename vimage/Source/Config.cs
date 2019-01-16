@@ -56,6 +56,7 @@ namespace vimage
         public List<int> Control_Crop = new List<int>();
         public List<int> Control_UndoCrop = new List<int>();
         public List<int> Control_ExitAll = new List<int>();
+        public List<int> Control_RerenderSVG = new List<int>();
 
         public List<List<int>> Controls;
         public List<string> ControlNames = new List<string>()
@@ -63,8 +64,8 @@ namespace vimage
             "Drag", "Close", "Open Context Menu", "Prev Image", "Next Image", "Rotate Clockwise", "Rotate Anti-Clockwise", "Flip",
             "Fit To Monitor Auto", "Fit To Monitor Width", "Fit To Monitor Height", "Fit To Monitor Alt", "Zoom In", "Zoom Out", "Zoom Faster", "Zoom Alt", "Drag Limit to Monitor Bounds",
             "Toggle Smoothing", "Toggle Mipmapping", "Toggle Background For Transparency", "Toggle Lock", "Toggle Always On Top", "Toggle Title Bar", "Pause Animation", "Prev Frame", "Next Frame",
-            "Open Settings", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Open Full Duplicate Image",
-            "Random Image", "Move Left", "Move Right", "Move Up", "Move Down", "Transparency Toggle", "Transparency Increase", "Transparency Decrease", "Crop", "Undo Crop", "Exit All Instances"
+            "Open Settings", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Open Full Duplicate Image", "Random Image",
+            "Move Left", "Move Right", "Move Up", "Move Down", "Transparency Toggle", "Transparency Increase", "Transparency Decrease", "Crop", "Undo Crop", "Exit All Instances", "Re-render SVG"
         };
 
         public bool Setting_OpenAtMousePosition
@@ -268,7 +269,7 @@ namespace vimage
                 Control_ToggleBackground, Control_ToggleLock, Control_ToggleAlwaysOnTop, Control_ToggleTitleBar, Control_PauseAnimation, Control_PrevFrame, Control_NextFrame, Control_OpenSettings,
                 Control_ResetImage, Control_OpenAtLocation, Control_Delete, Control_Copy, Control_CopyAsImage, Control_OpenDuplicateImage, Control_OpenFullDuplicateImage,
                 Control_RandomImage, Control_MoveLeft, Control_MoveRight, Control_MoveUp, Control_MoveDown,
-                Control_TransparencyToggle, Control_TransparencyInc, Control_TransparencyDec, Control_Crop, Control_UndoCrop, Control_ExitAll
+                Control_TransparencyToggle, Control_TransparencyInc, Control_TransparencyDec, Control_Crop, Control_UndoCrop, Control_ExitAll, Control_RerenderSVG
             };
 
             Init();
@@ -360,6 +361,7 @@ namespace vimage
                 { "CROP", Control_Crop },
                 { "UNDOCROP", Control_UndoCrop },
                 { "EXITALL", Control_ExitAll },
+                { "RERENDERSVG", Control_RerenderSVG},
 
                 { "CONTEXTMENU", ContextMenu },
                 { "CONTEXTMENU_ANIMATION", ContextMenu_Animation },
@@ -419,6 +421,7 @@ namespace vimage
             Control_Crop.Clear();
             Control_UndoCrop.Clear();
             Control_ExitAll.Clear();
+            Control_RerenderSVG.Clear();
 
             SetControls(Control_Drag, "MOUSELEFT");
             SetControls(Control_Close, "ESC", "BACKSPACE");
@@ -465,6 +468,7 @@ namespace vimage
             SetControls(Control_Crop, "X");
             SetControls(Control_UndoCrop, "CTRL+Z");
             SetControls(Control_ExitAll, "SHIFT+ESC");
+            SetControls(Control_RerenderSVG, "SHIFT+R");
         }
         public void SetDefaultContextMenu()
         {
@@ -809,6 +813,7 @@ namespace vimage
                 WriteControl(writer, "Crop", Control_Crop);
                 WriteControl(writer, "UndoCrop", Control_UndoCrop);
                 WriteControl(writer, "ExitAll", Control_ExitAll);
+                WriteControl(writer, "RerenderSVG", Control_RerenderSVG);
 
                 writer.Write(Environment.NewLine);
                 writer.Write("// Context Menu" + Environment.NewLine);

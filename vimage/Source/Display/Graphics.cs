@@ -291,18 +291,15 @@ namespace vimage
                 {
                     Svg.SvgDocument svg = Svg.SvgDocument.Open(fileName);
                     System.Drawing.Bitmap bitmap = svg.Draw();
-                    Sprite svgSprite;
-                    using (MemoryStream iconStream = new MemoryStream())
+                    using (MemoryStream stream = new MemoryStream())
                     {
-                        bitmap.Save(iconStream, System.Drawing.Imaging.ImageFormat.Png);
-                        Texture texture = new Texture(iconStream);
+                        bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                        Texture texture = new Texture(stream);
                         Textures.Add(texture);
                         TextureFileNames.Add(fileName);
 
-                        svgSprite = new Sprite(new Texture(texture));
+                        return new Sprite(new Texture(texture));
                     }
-
-                    return svgSprite;
                 }
                 catch (Exception) { }
             }
