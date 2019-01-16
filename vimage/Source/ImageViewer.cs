@@ -365,7 +365,7 @@ namespace vimage
             if (!BackgroundsForImagesWithTransparency && !ShowTitleBar)
                 Window.Clear(new Color(0, 0, 0, 0));
             else
-                Window.Clear(BackgroundColour);
+                Window.Clear(ShowTitleBar ? new Color(BackgroundColour.R, BackgroundColour.G, BackgroundColour.B) : BackgroundColour);
             // Draw Image
             Window.Draw(Image);
             // Draw Other
