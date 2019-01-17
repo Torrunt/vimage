@@ -49,5 +49,9 @@ namespace vimage_settings
             (Application.Current.MainWindow as MainWindow).ContextMenuEditor.UpdateCustomActions();
         }
 
+        private void CommandList_Click(object sender, RoutedEventArgs e)
+        {
+            new CommandsList().Show();
+        }
     }
 }

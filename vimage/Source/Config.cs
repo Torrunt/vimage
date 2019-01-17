@@ -287,8 +287,8 @@ namespace vimage
                 { "SMOOTHINGDEFAULT", true },
                 { "MIPMAPPING", true },
                 { "BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT", false },
-                { "BACKGROUNDCOLOUR", "#FFE6E6E6" },
-                { "TRANSPARENCYTOGGLEVALUE", "#64FFFFFF" },
+                { "BACKGROUNDCOLOUR", "#4D000000" },
+                { "TRANSPARENCYTOGGLEVALUE", "#BEFFFFFF" },
                 { "IMAGESIZING", SizingOption.FitWidth },
                 { "LIMITIMAGESTOMONITOR", AUTO },
                 { "POSITIONLARGEWIDEIMAGESINCORNER", true },
@@ -497,7 +497,6 @@ namespace vimage
             ContextMenu.Add(new { name = "Fit to height", func = Action.FitToMonitorHeight });
             ContextMenu.Add(new { name = "Fit to width", func = Action.FitToMonitorWidth });
             ContextMenu.Add(new { name = "Smoothing", func = Action.ToggleSmoothing });
-            ContextMenu.Add(new { name = "Mipmapping", func = Action.ToggleMipmapping });
             ContextMenu.Add(new { name = "Always on top", func = Action.ToggleAlwaysOnTop });
             ContextMenu.Add(new { name = "Reset", func = Action.ResetImage });
             ContextMenu.Add(new { name = "-", func = Action.None });
@@ -518,6 +517,8 @@ namespace vimage
             CustomActions.Clear();
             CustomActionBindings.Clear();
 
+            CustomActions.Add(new { name = "TOGGLE OVERLAY MODE", func = "-alwaysOnTop -clickThrough -toggleTransparency" });
+            CustomActionBindings.Add(new { name = "TOGGLE OVERLAY MODE", bindings = new List<int>() { -2, 38, 11 } });
             CustomActions.Add(new { name = "EDIT PAINT", func = @"%windir%\system32\mspaint.exe %f" });
             CustomActionBindings.Add(new { name = "EDIT PAINT", bindings = new List<int>() });
             CustomActions.Add(new { name = "EDIT PAINTDOTNET", func = "\"C:\\Program Files\\Paint.NET\\PaintDotNet.exe\" %f" });

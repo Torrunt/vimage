@@ -27,39 +27,10 @@
                     <Image Source="../Resources/add.png" Width="16" Height="16" />
                 </Button.Content>
             </Button>
-            <Button Grid.Column="1" HorizontalAlignment="Left" Width="24" Height="24" Margin="5" BorderBrush="#FFACACAC">
+            <Button Grid.Column="1" HorizontalAlignment="Left" Width="24" Height="24" Margin="5" BorderBrush="#FFACACAC" Click="CommandList_Click" ToolTip="commands list">
                 <Button.Content>
                     <Image Source="../Resources/information.png" Width="16" Height="16" />
                 </Button.Content>
-                <Button.ToolTip>
-                    <TextBlock>
-                        vimage commands<LineBreak/>
-                        <LineBreak/>
-                        -x 0<LineBreak/>
-                        -y 0<LineBreak/>
-                        -zoom 0.0<LineBreak/>
-                        -rotation 0<LineBreak/>
-                        -sizeX 0<LineBreak/>
-                        -sizeY 0<LineBreak/>
-                        -centerX 0.0<LineBreak/>
-                        -centerY 0.0<LineBreak/>
-                        -colour #FFFFFFFF<LineBreak/>
-                        -alwaysOnTop<LineBreak/>
-                        -flip<LineBreak/>
-                        -reset<LineBreak/>
-                        -toggleAnim<LineBreak/>
-                        -frame 0<LineBreak/>
-                        -next<LineBreak/>
-                        -prev<LineBreak/>
-                        -random<LineBreak/>
-                        -fitToMonitorHeight<LineBreak/>
-                        -fitToMonitorWidth<LineBreak/>
-                        -fitToMonitorAuto<LineBreak/>
-                        -lock<LineBreak/>
-                        -taskbarToggle<LineBreak/>
-                        -rerenderSVG
-                    </TextBlock>
-                </Button.ToolTip>
             </Button>
             <TextBlock Grid.Column="2" HorizontalAlignment="Right" Margin="0,0,5,0">
                 %f = current file (with quotes)<LineBreak/>

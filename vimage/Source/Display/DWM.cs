@@ -39,7 +39,7 @@ namespace vimage
         // Toggle Borderless / Title bar
         private const int GWL_STYLE = -16;
         public const uint WS_CAPTION = 0x00C00000, WS_SYSMENU = 0x00080000, WS_POPUP = 0x80000000;
-        private const UInt32 SWP_FRAMECHANGED = 0x0020;
+        private const uint SWP_FRAMECHANGED = 0x0020;
         private static bool SysMenuVisible = true;
 
         public static void SysMenuSetVisible(RenderWindow window, bool visible)
@@ -119,9 +119,9 @@ namespace vimage
         [DllImport("user32.dll")]
         static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
-        private const UInt32 SWP_NOSIZE = 0x0001;
-        private const UInt32 SWP_NOMOVE = 0x0002;
-        private const UInt32 TOPMOST_FLAGS = SWP_NOMOVE | SWP_NOSIZE;
+        private const uint SWP_NOSIZE = 0x0001;
+        private const uint SWP_NOMOVE = 0x0002;
+        private const uint TOPMOST_FLAGS = SWP_NOMOVE | SWP_NOSIZE;
 
         public static void SetAlwaysOnTop(IntPtr hWnd, bool alwaysOnTop = true)
         {
@@ -136,6 +136,16 @@ namespace vimage
             }
         }
 
+        // Make Window Click-through-able
+        private const uint WS_EX_TRANSPARENT = 0x00000020, WS_EX_LAYERED = 0x00080000;
+
+        public static void SetClickThroughAble(IntPtr hWnd, bool canClickThrough = true)
+        {
+            if (canClickThrough)
+                SetWindowLong(hWnd, GWL_EX_STYLE, (GetWindowLong(hWnd, GWL_EX_STYLE)) | WS_EX_LAYERED | WS_EX_TRANSPARENT);
+            else
+                SetWindowLong(hWnd, GWL_EX_STYLE, (GetWindowLong(hWnd, GWL_EX_STYLE)) & ~WS_EX_LAYERED & ~WS_EX_TRANSPARENT);
+        }
     }
 
     [Flags]

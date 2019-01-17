@@ -68,6 +68,9 @@
     <Compile Include="..\vimage\Source\Config.cs">
       <Link>Source\Config.cs</Link>
     </Compile>
+    <Compile Include="Source\CommandsList.xaml.cs">
+      <DependentUpon>CommandsList.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
@@ -129,6 +132,10 @@
     <Resource Include="Resources\add.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Source\CommandsList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Source\About.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

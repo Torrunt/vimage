@@ -1,0 +1,44 @@
+﻿<Window x:Class="vimage_settings.CommandsList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:vimage_settings"
+             mc:Ignorable="d" 
+             Title="vimage commands"
+             WindowStartupLocation="CenterScreen"
+             Icon="../Resources/icon.ico" Height="360" Width="295" MaxWidth="295" MinWidth="230">
+    <ScrollViewer >
+        <StackPanel>
+            <Label Content="vimage commands" FontWeight="SemiBold" FontSize="20" />
+            <TextBlock VerticalAlignment="Center" Margin="5,0,0,0" LineHeight="16">
+            -x 0<LineBreak />
+            -y 0<LineBreak />
+            -zoom 0.0<LineBreak />
+            -rotation 0<LineBreak />
+            -sizeX 0<LineBreak />
+            -sizeY 0<LineBreak />
+            -centerX 0.0<LineBreak />
+            -centerY 0.0<LineBreak />
+            -colour #FFFFFFFF<LineBreak />
+            -alpha 255<LineBreak />
+            -toggleTransparency<LineBreak />
+            -alwaysOnTop<LineBreak />
+            -flip<LineBreak />
+            -reset<LineBreak />
+            -toggleAnim<LineBreak />
+            -frame 0<LineBreak />
+            -next<LineBreak />
+            -prev<LineBreak />
+            -random<LineBreak />
+            -fitToMonitorHeight<LineBreak />
+            -fitToMonitorWidth<LineBreak />
+            -fitToMonitorAuto<LineBreak />
+            -lock<LineBreak />
+            -clickThrough<LineBreak />
+            -taskbarToggle<LineBreak />
+            -rerenderSVG<LineBreak />
+            </TextBlock>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

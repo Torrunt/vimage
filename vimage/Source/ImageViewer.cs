@@ -78,6 +78,7 @@ namespace vimage
         /// If the window is wider and taller than the monitor it will automatically be above the task bar anyway.
         /// </summary>
         private bool ForceAlwaysOnTopNextTick = false;
+        private bool ClickThroughAble = false;
         private bool ShowTitleBar = false;
         /// <summary>0=false, 1=next, -1=prev.</summary>
         private int PreloadingNextImage = 0;
@@ -624,11 +625,14 @@ namespace vimage
             // Custom Actions
             for (int i = 0; i < Config.CustomActionBindings.Count; i++)
             {
-                if (Config.IsControl(code, ((Config.CustomActionBindings[i] as dynamic).bindings as List<int>)))
+                if (Config.IsControl(code, ((Config.CustomActionBindings[i] as dynamic).bindings as List<int>), CurrentAction != Action.None))
+                {
                     DoCustomAction((Config.CustomActions.Where(a => (a as dynamic).name == (Config.CustomActionBindings[i] as dynamic).name).First() as dynamic).func);
+                    CurrentAction = Action.Custom;
+                }
             }
 
-            if (CurrentAction != Action.None && CurrentAction != DownAction &&
+            if (CurrentAction != Action.None && CurrentAction != Action.Custom && CurrentAction != DownAction &&
                 (!Locked || CurrentAction == Action.ToggleLock || CurrentAction == Action.OpenContextMenu))
                 DoAction(CurrentAction);
 
@@ -993,6 +997,10 @@ namespace vimage
                 Image.Color = ImageColor;
             }
 
+            // Click-Through-Able?
+            if (ClickThroughAble)
+                ToggleClickThroughAble();
+
             // Force Fit To Monitor Height?
             Vector2i mousePos = Mouse.GetPosition();
             IntRect bounds = ImageViewerUtils.GetCurrentBounds(mousePos);
@@ -1115,6 +1123,12 @@ namespace vimage
             Image.Color = ImageColor;
             Updated = true;
         }
+        public void SetImageTransparency(byte alpha = 255)
+        {
+            ImageColor = new Color(ImageColor.R, ImageColor.G, ImageColor.B, alpha);
+            Image.Color = ImageColor;
+            Updated = true;
+        }
 
         public void ToggleLock()
         {
@@ -1126,7 +1140,7 @@ namespace vimage
         {
             AlwaysOnTop = !AlwaysOnTop;
             AlwaysOnTopForced = false;
-            DWM.SetAlwaysOnTop(Window.SystemHandle, AlwaysOnTop);
+            DWM.SetAlwaysOnTop(Window.SystemHandle, AlwaysOnTop); 
         }
         public void ForceAlwaysOnTop()
         {
@@ -1153,6 +1167,12 @@ namespace vimage
                 ((bounds.Height != workingArea.Height && (NextWindowPos.Y + NextWindowSize.Y >= workingArea.Top + workingArea.Height || NextWindowPos.Y <= workingArea.Top)) ||
                 (bounds.Width != workingArea.Width && (NextWindowPos.X <= workingArea.Left || NextWindowPos.X + NextWindowSize.X >= workingArea.Left + workingArea.Width))))
                 ForceAlwaysOnTopNextTick = true;
+        }
+
+        public void ToggleClickThroughAble()
+        {
+            ClickThroughAble = !ClickThroughAble;
+            DWM.SetClickThroughAble(Window.SystemHandle, ClickThroughAble);
         }
 
         public void ToggleTitleBar()
@@ -2045,6 +2065,15 @@ namespace vimage
                         Updated = true;
                         i++;
                         break;
+                    case "-alpha":
+                        val = -1;
+                        if (!int.TryParse(args[i + 1], out val))
+                            val = -1;
+                        if (val >= 0 && val <= 255)
+                            SetImageTransparency((byte)val);
+                        i++;
+                        break;
+                    case "-toggleTransparency": ToggleImageTransparency(); break;
                     case "-alwaysOnTop": ToggleAlwaysOnTop(); break;
                     case "-flip": FlipImage(); break;
                     case "-reset": ResetImage(); break;
@@ -2066,6 +2095,7 @@ namespace vimage
                     case "-fitToMonitorWidth": ToggleFitToMonitor(Config.WIDTH); break;
                     case "-fitToMonitorAuto": ToggleFitToMonitor(Config.AUTO); break;
                     case "-lock": ToggleLock(); break;
+                    case "-clickThrough": ToggleClickThroughAble(); break;
                     
                     case "-taskbarToggle": DWM.TaskBarIconToggle(Window.SystemHandle); break;
 
