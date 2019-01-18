@@ -24,7 +24,7 @@ namespace vimage
         private static extern int SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
         private const int GWL_EX_STYLE = -20;  
         private const uint WS_EX_APPWINDOW = 0x00040000, WS_EX_TOOLWINDOW = 0x00000080;
-        private static bool TaskbarIconVisible = true;
+        public static bool TaskbarIconVisible = true;
 
         public static void TaskBarIconSetVisible(IntPtr hWnd, bool visible)
         {
@@ -34,7 +34,6 @@ namespace vimage
             else
                 SetWindowLong(hWnd, GWL_EX_STYLE, (GetWindowLong(hWnd, GWL_EX_STYLE) | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW);
         }
-        public static void TaskBarIconToggle(IntPtr hWnd) { TaskBarIconSetVisible(hWnd, !TaskbarIconVisible); }
 
         // Toggle Borderless / Title bar
         private const int GWL_STYLE = -16;

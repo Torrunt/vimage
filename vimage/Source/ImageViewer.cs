@@ -738,15 +738,19 @@ namespace vimage
                 Update();
             }
         }
-        public void ToggleAnimation()
+        public bool ToggleAnimation(int val = -1)
         {
             if (Image is AnimatedImage)
             {
-                if (Image.Playing)
+                if ((val == -1 && Image.Playing) || val == 0)
                     Image.Stop();
-                else
+                else if (val != 0)
                     Image.Play();
+
+                return Image.Playing;
             }
+
+            return false;
         }
 
         private void Zoom(float value, bool center = false, bool manualZoom = false)
@@ -880,14 +884,19 @@ namespace vimage
 
         public Vector2u CurrentImageSize() { return (Rotation == 0 || Rotation == 180) ? Size : new Vector2u(Size.Y, Size.X); }
 
-        public void FlipImage()
+        public bool FlipImage(int val = -1)
         {
-            FlippedX = !FlippedX;
+            if (val == -1)
+                FlippedX = !FlippedX;
+            else
+                FlippedX = val == 1;
             View view = Window.GetView();
             view.Size = new Vector2f(Rotation == 90 || Rotation == 270 ? view.Size.X : Math.Abs(view.Size.X) * (FlippedX ? -1 : 1),
                 Rotation == 90 || Rotation == 270 ? Math.Abs(view.Size.Y) * (FlippedX ? -1 : 1) : view.Size.Y);
             Window.SetView(view);
             Redraw();
+
+            return FlippedX;
         }
 
         public void ToggleFitToMonitor(int dimension)
@@ -1059,13 +1068,15 @@ namespace vimage
                 Graphics.ClearMemory(Image, File);
         }
 
-        public void ToggleSmoothing()
+        public bool ToggleSmoothing(int val = -1)
         {
             if (Image is AnimatedImage)
-                Image.Data.Smooth = !Image.Data.Smooth;
+                Image.Data.Smooth = val == -1 ? !Image.Data.Smooth : (val == 1);
             else
-                Image.Texture.Smooth = !Image.Texture.Smooth;
+                Image.Texture.Smooth = val == -1 ? !Image.Texture.Smooth : (val == 1);
             Updated = true;
+
+            return Smoothing();
         }
         public bool Smoothing()
         {
@@ -1074,13 +1085,15 @@ namespace vimage
             else
                 return Image.Texture.Smooth;
         }
-        public void ToggleMipmap()
+        public bool ToggleMipmap(int val = -1)
         {
             if (Image is AnimatedImage)
-                Image.Data.Mipmap = !Image.Data.Mipmap;
+                Image.Data.Mipmap = val == -1 ? !Image.Data.Mipmap : (val == 1);
             else
-                Image.Texture.Mipmap = !Image.Texture.Mipmap;
+                Image.Texture.Mipmap = val == -1 ? !Image.Texture.Mipmap : (val == 1);
             Updated = true;
+
+            return Mipmapping();
         }
         public bool Mipmapping()
         {
@@ -1090,21 +1103,26 @@ namespace vimage
                 return Image.Texture.Mipmap;
         }
 
-        public void ToggleBackground()
+        public bool ToggleBackground(int val = -1)
         {
-            BackgroundsForImagesWithTransparency = !BackgroundsForImagesWithTransparency;
+            if (val == -1)
+                BackgroundsForImagesWithTransparency = !BackgroundsForImagesWithTransparency;
+            else
+                BackgroundsForImagesWithTransparency = val == 1;
             Updated = true;
+
+            return BackgroundsForImagesWithTransparency;
         }
 
-        public void ToggleImageTransparency()
+        public bool ToggleImageTransparency(int val = -1)
         {
             if (ImageTransparencyHold && ImageTransparencyTweaked)
             {
                 ImageTransparencyHold = false;
                 ImageTransparencyTweaked = false;
-                return;
+                return false;
             }
-            if (ImageColor == Color.White)
+            if ((val == -1 && ImageColor == Color.White) || val == 1)
             {
                 System.Drawing.Color colour = System.Drawing.ColorTranslator.FromHtml(Config.Setting_TransparencyToggleValue);
                 ImageColor = new Color(colour.R, colour.G, colour.B, colour.A);
@@ -1113,6 +1131,8 @@ namespace vimage
                 ImageColor = Color.White;
             Image.Color = ImageColor;
             Updated = true;
+
+            return true;
         }
         public void AdjustImageTransparency(int amount = 1)
         {
@@ -1130,17 +1150,30 @@ namespace vimage
             Updated = true;
         }
 
-        public void ToggleLock()
+        public bool ToggleLock(int val = -1)
         {
-            Locked = !Locked;
+            if (val == -1)
+                Locked = !Locked;
+            else
+                Locked = val == 1;
             Dragging = false;
+
+            return Locked;
         }
 
-        public void ToggleAlwaysOnTop()
+        public bool ToggleAlwaysOnTop(int val = -1)
         {
-            AlwaysOnTop = !AlwaysOnTop;
+            if (val != -1 && AlwaysOnTop == (val == 1))
+                return AlwaysOnTop;
+
+            if (val == -1)
+                AlwaysOnTop = !AlwaysOnTop;
+            else
+                AlwaysOnTop = val == 1;
             AlwaysOnTopForced = false;
-            DWM.SetAlwaysOnTop(Window.SystemHandle, AlwaysOnTop); 
+            DWM.SetAlwaysOnTop(Window.SystemHandle, AlwaysOnTop);
+
+            return AlwaysOnTop;
         }
         public void ForceAlwaysOnTop()
         {
@@ -1169,17 +1202,32 @@ namespace vimage
                 ForceAlwaysOnTopNextTick = true;
         }
 
-        public void ToggleClickThroughAble()
+        public bool ToggleClickThroughAble(int val = -1)
         {
-            ClickThroughAble = !ClickThroughAble;
+            if (val != -1 && ClickThroughAble == (val == 1))
+                return ClickThroughAble;
+
+            if (val == -1)
+                ClickThroughAble = !ClickThroughAble;
+            else
+                ClickThroughAble = val == 1;
             DWM.SetClickThroughAble(Window.SystemHandle, ClickThroughAble);
+
+            return ClickThroughAble;
         }
 
-        public void ToggleTitleBar()
+        public bool ToggleTitleBar(int val = -1)
         {
+            if (val != -1 && ShowTitleBar == (val == 1))
+                return ShowTitleBar;
+
             Vector2i diff = ShowTitleBar ? DWM.GetTitleBarDifference(Window.SystemHandle) : new Vector2i();
 
-            ShowTitleBar = !ShowTitleBar;
+            if (val == -1)
+                ShowTitleBar = !ShowTitleBar;
+            else
+                ShowTitleBar = val == -1;
+
             DWM.TitleBarSetVisible(Window, ShowTitleBar);
             if (ShowTitleBar)
             {
@@ -1191,6 +1239,17 @@ namespace vimage
                 NextWindowPos = Window.Position + diff;
                 Updated = true;
             }
+
+            return ShowTitleBar;
+        }
+
+        public bool ToggleTaskBarIconVisible(int val = -1)
+        {
+            bool visible = val == -1 ? !DWM.TaskbarIconVisible : (val == 1);
+            if (val != -1 && DWM.TaskbarIconVisible == visible)
+                return visible;
+            DWM.TaskBarIconSetVisible(Window.SystemHandle, visible);
+            return visible;
         }
 
         public void CropStart()
@@ -1988,43 +2047,47 @@ namespace vimage
         {
             Vector2f viewCenter = new Vector2f(Size.X / 2f, Size.Y / 2f);
 
+            int toggleSync = -1;
+            int toggleSyncVal = -1;
+            bool t = false;
+
             for (int i = ignoreFirst ? 1 : 0; i < args.Length; i++)
             {
                 int val = -1;
                 float valf = -1;
+
+                if (i < args.Length - 1 && !int.TryParse(args[i + 1], out val))
+                    val = -1;
+
                 switch (args[i])
                 {
                     case "-x":
-                        val = -1;
-                        if (!int.TryParse(args[i + 1], out val))
-                            val = -1;
                         if (val != -1)
+                        {
                             NextWindowPos.X = val;
-                        i++;
+                            i++;
+                        }
                         break;
                     case "-y":
-                        val = -1;
-                        if (!int.TryParse(args[i + 1], out val))
-                            val = -1;
                         if (val != -1)
+                        {
                             NextWindowPos.Y = val;
-                        i++;
+                            i++;
+                        }
                         break;
                     case "-sizeX":
-                        val = -1;
-                        if (!int.TryParse(args[i + 1], out val))
-                            val = -1;
                         if (val != -1)
+                        {
                             Size.X = (uint)val;
-                        i++;
+                            i++;
+                        }
                         break;
                     case "-sizeY":
-                        val = -1;
-                        if (!int.TryParse(args[i + 1], out val))
-                            val = -1;
                         if (val != -1)
+                        {
                             Size.Y = (uint)val;
-                        i++;
+                            i++;
+                        }
                         break;
                     case "-centerX":
                         valf = -1;
@@ -2051,12 +2114,12 @@ namespace vimage
                         i++;
                         break;
                     case "-rotation":
-                        val = -1;
-                        if (!int.TryParse(args[i + 1], out val))
-                            val = -1;
-                        if (val != -1 && Rotation != val)
-                            RotateImage(val);
-                        i++;
+                        if (val != -1)
+                        {
+                            if (Rotation != val)
+                                RotateImage(val);
+                            i++;
+                        }
                         break;
                     case "-colour":
                         System.Drawing.Color colour = System.Drawing.ColorTranslator.FromHtml(args[i + 1]);
@@ -2066,40 +2129,146 @@ namespace vimage
                         i++;
                         break;
                     case "-alpha":
-                        val = -1;
-                        if (!int.TryParse(args[i + 1], out val))
-                            val = -1;
-                        if (val >= 0 && val <= 255)
-                            SetImageTransparency((byte)val);
-                        i++;
-                        break;
-                    case "-toggleTransparency": ToggleImageTransparency(); break;
-                    case "-alwaysOnTop": ToggleAlwaysOnTop(); break;
-                    case "-flip": FlipImage(); break;
-                    case "-reset": ResetImage(); break;
-                    case "-clearMemory": Graphics.ClearMemory(Image, File); break;
-                    case "-toggleAnim": ToggleAnimation(); break;
-                    case "-frame":
-                        val = 1;
-                        if (int.TryParse(args[i + 1], out val) && Image is AnimatedImage)
+                        if (val != -1)
                         {
-                            (Image as AnimatedImage).SetFrame(val);
-                            Updated = true;
+                            if (val >= 0 && val <= 255)
+                                SetImageTransparency((byte)val);
+                            i++;
                         }
-                        i++;
+                        break;
+
+                    case "-frame":
+                        if (val != -1)
+                        {
+                            if (Image is AnimatedImage)
+                            {
+                                (Image as AnimatedImage).SetFrame(val);
+                                Updated = true;
+                            }
+
+                            i++;
+                        }
                         break;
                     case "-next": NextImage(); break;
                     case "-prev": PrevImage(); break;
                     case "-random": RandomImage(); break;
+                    case "-reset": ResetImage(); break;
+                    case "-clearMemory": Graphics.ClearMemory(Image, File); break;
+                    case "-rerenderSVG": RenderSVGAtCurrentZoom(); break;
+
                     case "-fitToMonitorHeight": ToggleFitToMonitor(Config.HEIGHT); break;
                     case "-fitToMonitorWidth": ToggleFitToMonitor(Config.WIDTH); break;
                     case "-fitToMonitorAuto": ToggleFitToMonitor(Config.AUTO); break;
-                    case "-lock": ToggleLock(); break;
-                    case "-clickThrough": ToggleClickThroughAble(); break;
-                    
-                    case "-taskbarToggle": DWM.TaskBarIconToggle(Window.SystemHandle); break;
 
-                    case "-rerenderSVG": RenderSVGAtCurrentZoom(); break;
+                    case "-toggleSync": toggleSync = 0; break;
+
+                    case "-flip":
+                        if (val == 0 || val == 1)
+                        {
+                            FlipImage(val);
+                            i++;
+                        }
+                        else
+                            t = FlipImage(toggleSyncVal);
+                        break;
+                    case "-smoothing":
+                        if (val == 0 || val == 1)
+                        {
+                            ToggleSmoothing(val);
+                            i++;
+                        }
+                        else
+                            t = ToggleSmoothing(toggleSyncVal);
+                        break;
+                    case "-mipmap":
+                        if (val == 0 || val == 1)
+                        {
+                            ToggleMipmap(val);
+                            i++;
+                        }
+                        else
+                            t = ToggleMipmap(toggleSyncVal);
+                        break;
+                    case "-background":
+                        if (val == 0 || val == 1)
+                        {
+                            ToggleBackground(val);
+                            i++;
+                        }
+                        else
+                            t = ToggleBackground(toggleSyncVal);
+                        break;
+                    case "-lock":
+                        if (val == 0 || val == 1)
+                        {
+                            ToggleLock(val);
+                            i++;
+                        }
+                        else
+                            t = ToggleLock(toggleSyncVal);
+                        break;
+                    case "-alwaysOnTop":
+                        if (val == 0 || val == 1)
+                        {
+                            ToggleAlwaysOnTop(val);
+                            i++;
+                        }
+                        else
+                            t = ToggleAlwaysOnTop(toggleSyncVal);
+                        break;
+                    case "-clickThrough":
+                        if (val == 0 || val == 1)
+                        {
+                            ToggleClickThroughAble(val);
+                            i++;
+                        }
+                        else
+                            t = ToggleClickThroughAble(toggleSyncVal);
+                        break;
+                    case "-titleBar":
+                        if (val == 0 || val == 1)
+                        {
+                            ToggleTitleBar(val);
+                            i++;
+                        }
+                        else
+                            t = ToggleTitleBar(toggleSyncVal);
+                        break;
+                    case "-taskbarToggle":
+                        if (val == 0 || val == 1)
+                        {
+                            ToggleTaskBarIconVisible(val);
+                            i++;
+                        }
+                        else
+                            t = ToggleTaskBarIconVisible(toggleSyncVal);
+                        break;
+                    case "-animation":
+                        if (val == 0 || val == 1)
+                        {
+                            ToggleAnimation(val);
+                            i++;
+                        }
+                        else
+                            t = ToggleAnimation(toggleSyncVal);
+                        break;
+                    case "-defaultTransparency":
+                        if (val == 0 || val == 1)
+                        {
+                            ToggleImageTransparency(val);
+                            i++;
+                        }
+                        else
+                            t = ToggleImageTransparency(toggleSyncVal);
+                        break;
+                }
+
+                if (toggleSyncVal == -1)
+                {
+                    if (toggleSync == 0)
+                        toggleSync = 1;
+                    else if (toggleSync == 1)
+                        toggleSyncVal = t ? 1 : 0;
                 }
             }
 

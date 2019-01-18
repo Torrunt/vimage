@@ -517,7 +517,7 @@ namespace vimage
             CustomActions.Clear();
             CustomActionBindings.Clear();
 
-            CustomActions.Add(new { name = "TOGGLE OVERLAY MODE", func = "-alwaysOnTop -clickThrough -toggleTransparency" });
+            CustomActions.Add(new { name = "TOGGLE OVERLAY MODE", func = "-toggleSync -clickThrough -alwaysOnTop -defaultTransparency" });
             CustomActionBindings.Add(new { name = "TOGGLE OVERLAY MODE", bindings = new List<int>() { -2, 38, 11 } });
             CustomActions.Add(new { name = "EDIT PAINT", func = @"%windir%\system32\mspaint.exe %f" });
             CustomActionBindings.Add(new { name = "EDIT PAINT", bindings = new List<int>() });
