@@ -2094,16 +2094,22 @@ namespace vimage
                         if (!float.TryParse(args[i + 1], out valf))
                             valf = -1;
                         if (valf != -1)
+                        {
                             viewCenter.X = valf;
-                        i++;
+                            Updated = true;
+                            i++;
+                        }
                         break;
                     case "-centerY":
                         valf = -1;
                         if (!float.TryParse(args[i + 1], out valf))
                             valf = -1;
                         if (valf != -1)
+                        {
                             viewCenter.Y = valf;
-                        i++;
+                            Updated = true;
+                            i++;
+                        }
                         break;
                     case "-zoom":
                         valf = 0;
@@ -2121,6 +2127,7 @@ namespace vimage
                             i++;
                         }
                         break;
+                    case "-color":
                     case "-colour":
                         System.Drawing.Color colour = System.Drawing.ColorTranslator.FromHtml(args[i + 1]);
                         ImageColor = new Color(colour.R, colour.G, colour.B, colour.A);
@@ -2234,7 +2241,7 @@ namespace vimage
                         else
                             t = ToggleTitleBar(toggleSyncVal);
                         break;
-                    case "-taskbarToggle":
+                    case "-taskbarIcon":
                         if (val == 0 || val == 1)
                         {
                             ToggleTaskBarIconVisible(val);

@@ -7,38 +7,101 @@
              mc:Ignorable="d" 
              Title="vimage commands"
              WindowStartupLocation="CenterScreen"
-             Icon="../Resources/icon.ico" Height="360" Width="295" MaxWidth="295" MinWidth="230">
+             Icon="../Resources/icon.ico"
+             Height="420" Width="550"
+             MinHeight="200" MinWidth="550" MaxWidth="550">
     <ScrollViewer >
         <StackPanel>
-            <Label Content="vimage commands" FontWeight="SemiBold" FontSize="20" />
-            <TextBlock VerticalAlignment="Center" Margin="5,0,0,0" LineHeight="16">
-            -x 0<LineBreak />
-            -y 0<LineBreak />
-            -zoom 0.0<LineBreak />
-            -rotation 0<LineBreak />
-            -sizeX 0<LineBreak />
-            -sizeY 0<LineBreak />
-            -centerX 0.0<LineBreak />
-            -centerY 0.0<LineBreak />
-            -colour #FFFFFFFF<LineBreak />
-            -alpha 255<LineBreak />
-            -toggleTransparency<LineBreak />
-            -alwaysOnTop<LineBreak />
-            -flip<LineBreak />
-            -reset<LineBreak />
-            -toggleAnim<LineBreak />
-            -frame 0<LineBreak />
-            -next<LineBreak />
-            -prev<LineBreak />
-            -random<LineBreak />
-            -fitToMonitorHeight<LineBreak />
-            -fitToMonitorWidth<LineBreak />
-            -fitToMonitorAuto<LineBreak />
-            -lock<LineBreak />
-            -clickThrough<LineBreak />
-            -taskbarToggle<LineBreak />
-            -rerenderSVG<LineBreak />
-            </TextBlock>
+            <Label Content="vimage commands" Margin="5,0,0,0" FontWeight="SemiBold" FontSize="20"/>
+            <TextBlock Margin="10,-8,0,5" FontSize="10">For custom actions and command line arguments.</TextBlock>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock TextAlignment="Right" Padding="0,0,5,0" Grid.Column="0" LineHeight="16" Background="WhiteSmoke">
+                    -x 0<LineBreak />
+                    -y 0<LineBreak />
+                    -zoom 0.0<LineBreak />
+                    -rotation 0<LineBreak />
+                    -sizeX 0<LineBreak />
+                    -sizeY 0<LineBreak />
+                    -centerX 0.0<LineBreak />
+                    -centerY 0.0<LineBreak />
+                    -colour #FFFFFFFF<LineBreak />
+                    -alpha 0<LineBreak />
+                    <LineBreak />
+                    -frame 0<LineBreak />
+                    -next<LineBreak />
+                    -prev<LineBreak />
+                    -random<LineBreak />
+                    -reset<LineBreak />
+                    -clearMemory<LineBreak />
+                    -rerenderSVG<LineBreak />
+                    <LineBreak />
+                    -fitToMonitorHeight<LineBreak />
+                    -fitToMonitorWidth<LineBreak />
+                    -fitToMonitorAuto<LineBreak />
+                    <LineBreak />
+                    <LineBreak />
+                    -toggleSync<LineBreak />
+                    <LineBreak />
+                    <LineBreak />
+                    <LineBreak />
+                    -flip<LineBreak />
+                    -smoothing<LineBreak />
+                    -mipmap<LineBreak />
+                    -background<LineBreak />
+                    -lock<LineBreak />
+                    -alwaysOnTop<LineBreak />
+                    -clickThrough<LineBreak />
+                    -titleBar<LineBreak />
+                    -taskbarIcon<LineBreak />
+                    -animation<LineBreak />
+                    -defaultTransparency<LineBreak />
+                </TextBlock>
+                <TextBlock Grid.Column="1" Padding="5,0,0,0" LineHeight="16" Background="#FFE0E0E0">
+                    position of the window<LineBreak />
+                    <LineBreak />
+                    zoom level (1 = full size)<LineBreak />
+                    rotation of the image (0, 90, 180, 270)<LineBreak />
+                    size of the window<LineBreak />
+                    <LineBreak />
+                    position of the view center (use with sizeX/sizeY to crop view)<LineBreak />
+                    <LineBreak />
+                    image tint (white = no tint)<LineBreak />
+                    the transparency of the image (0-255)<LineBreak />
+                    <LineBreak />
+                    set the current frame of the animated gif<LineBreak />
+                    go to the next image<LineBreak />
+                    go to the previous image<LineBreak />
+                    go to a random image in the folder<LineBreak />
+                    reset all transformations (position, zoom, colour, rotation, etc) <LineBreak />
+                    remove all current images/animations from vimage's memory<LineBreak />
+                    Re-render image (if vector graphic) at the current zoom<LineBreak />
+                    <LineBreak />
+                    Resizes image to the height of the current monitor<LineBreak />
+                    Resizes image to the width of the current monitor<LineBreak />
+                    Resizes image to the width or height of the current monitor<LineBreak />
+                    based on it's orientation<LineBreak />
+                    <LineBreak />
+                    all following toggle commands will sync to the same value<LineBreak />
+                    <LineBreak />
+                    put 0/1 after a toggle command to set directly:<LineBreak />
+                    <LineBreak />
+                    flips image left/right <LineBreak />
+                    toggles smoothing<LineBreak />
+                    toggles mipmapping<LineBreak />
+                    toggles backgroud<LineBreak />
+                    toggles image lock<LineBreak />
+                    toggles Always On Top mode<LineBreak />
+                    toggles Click-Through-Able mode<LineBreak />
+                    toggles window Title Bar<LineBreak />
+                    hides/shows window in the task bar<LineBreak />
+                    pauses/plays animation<LineBreak />
+                    toggles default image transparency<LineBreak />
+                </TextBlock>
+            </Grid>
         </StackPanel>
     </ScrollViewer>
 </Window>
