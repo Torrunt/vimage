@@ -8,9 +8,9 @@
              Title="vimage commands"
              WindowStartupLocation="CenterScreen"
              Icon="../Resources/icon.ico"
-             Height="420" Width="550"
-             MinHeight="200" MinWidth="550" MaxWidth="550">
-    <ScrollViewer >
+             SizeToContent="Height" Width="550"
+             MinHeight="100" MinWidth="500">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel>
             <Label Content="vimage commands" Margin="5,0,0,0" FontWeight="SemiBold" FontSize="20"/>
             <TextBlock Margin="10,-8,0,5" FontSize="10">For custom actions and command line arguments.</TextBlock>
