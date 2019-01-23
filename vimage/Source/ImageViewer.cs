@@ -18,9 +18,9 @@ namespace vimage
 
         public readonly string[] EXTENSIONS =
         {
-            "bmp", "cut", "dds", "doom", "exr", "hdr", "gif", "ico", "jp2", "jpg", "jpeg", "lbm", "mdl", "mng",
-            "pal", "pbm", "pcd", "pcx", "pgm", "pic", "png", "ppm", "psd", "psp", "raw", "sgi", "tga", "tif", "tiff", "svg",
-            "jpe", "jif", "jiff", "jfif", "jfi"
+            ".bmp", ".cut", ".dds", ".doom", ".exr", ".hdr", ".gif", ".ico", ".jp2", ".jpg", ".jpeg", ".lbm", ".mdl", ".mng",
+            ".pal", ".pbm", ".pcd", ".pcx", ".pgm", ".pic", ".png", ".ppm", ".psd", ".psp", ".raw", ".sgi", ".tga", ".tif", ".tiff", ".svg",
+            ".jpe", ".jif", ".jiff", ".jfif", ".jfi"
         };
 
         public readonly float ZOOM_MIN = 0.05f;
@@ -193,8 +193,7 @@ namespace vimage
             if (file != "" && (SortImagesBy == SortBy.FolderDefault || SortImagesByDir == SortDirection.FolderDefault))
             {
                 // Get parent folder name
-                string parentFolder = file.Substring(0, file.LastIndexOf('\\'));
-                parentFolder = parentFolder.Substring(parentFolder.LastIndexOf('\\') + 1, parentFolder.Length - parentFolder.LastIndexOf('\\') - 1);
+                string parentFolder = Path.GetFileName(Path.GetDirectoryName(file));
 
                 // Get sort column info from window with corresponding name
                 try
@@ -1353,7 +1352,7 @@ namespace vimage
 
         public void RenderSVGAtCurrentZoom()
         {
-            if (CurrentZoom == 1 || ImageViewerUtils.GetExtension(File) != "svg")
+            if (CurrentZoom == 1 || Path.GetExtension(File) != ".svg")
                 return;
             try
             {
@@ -1400,20 +1399,20 @@ namespace vimage
         {
             File = fileName;
 
-            string extension = ImageViewerUtils.GetExtension(fileName);
+            string extension = Path.GetExtension(fileName);
 
             // Image
-            if (extension.Equals("svg"))
+            if (extension.Equals(".svg"))
             {
                 // SVG
                 Image = Graphics.GetSpriteFromSVG(fileName);
             }
-            else if (extension.Equals("gif"))
+            else if (extension.Equals(".gif"))
             {
                 // Animated GIF
                 Image = Graphics.GetAnimatedImage(fileName);
             }
-            else if (extension.Equals("ico"))
+            else if (extension.Equals(".ico"))
             {
                 // Icon
                 Image = Graphics.GetSpriteFromIcon(fileName);
@@ -1625,7 +1624,7 @@ namespace vimage
             // Temporarily set always on top to bring it infront of the taskbar?
             ForceAlwaysOnTopCheck(bounds, ImageViewerUtils.GetCurrentWorkingArea(boundsPos));
 
-            Window.SetTitle(fileName == "" ? "vimage" : fileName.Substring(fileName.LastIndexOf('\\') + 1) + " - vimage");
+            Window.SetTitle(fileName == "" ? "vimage" : Path.GetFileName(fileName) + " - vimage");
             ContextMenu?.Setup(false);
 
             if (NextWindowSize.X == bounds.Width && NextWindowSize.Y == bounds.Height)
@@ -1639,12 +1638,12 @@ namespace vimage
         /// <summary>Loads an image into memory but doesn't set it as the displayed image.</summary>
         private bool PreloadImage(string fileName)
         {
-            if (ImageViewerUtils.GetExtension(fileName).Equals("gif"))
+            if (Path.GetExtension(fileName).Equals(".gif"))
             {
                 // Animated Image
                 Graphics.GetAnimatedImageData(fileName);
             }
-            else if (ImageViewerUtils.GetExtension(fileName).Equals("ico"))
+            else if (Path.GetExtension(fileName).Equals(".ico"))
             {
                 // Icon
                 if (Graphics.GetSpriteFromIcon(fileName) == null)
@@ -1792,7 +1791,7 @@ namespace vimage
                 return;
             }
 
-            string directory = File.Substring(0, File.LastIndexOf("\\"));
+            string directory = Path.GetDirectoryName(File);
             if (!Directory.Exists(directory))
                 return;
 
@@ -1898,7 +1897,7 @@ namespace vimage
                             return;
                         bitmap = ClipboardBitmap;
                     }
-                    else if (File.IndexOf(".ico") == File.Length - 4)
+                    else if (Path.GetExtension(File) == ".ico")
                     {
                         // If .ico - copy largest version
                         System.Drawing.Icon icon = new System.Drawing.Icon(File, 256, 256);
@@ -2031,7 +2030,7 @@ namespace vimage
                     return; // don't do the action if it requires the Filename but there isn't one
 
                 action = action.Replace("%f", "\"" + File + "\"");
-                action = action.Replace("%d", File.Substring(0, File.LastIndexOf('\\') + 1));
+                action = action.Replace("%d", Path.GetDirectoryName(File) + "\\");
 
                 // Split exe and arguments by the first space (regex to exclude the spaces within the quotes of the exe's path)
                 Regex rgx = new Regex("(?<=^[^\"]*(?:\"[^\"]*\"[^\"]*)*) (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
@@ -2040,7 +2039,8 @@ namespace vimage
                 if (s[0].Contains("%"))
                     s[0] = Environment.ExpandEnvironmentVariables(s[0]);
 
-                Process.Start(s[0], s[1]);
+                try { Process.Start(s[0], s[1]); }
+                catch (Exception) { }
             }
         }
 

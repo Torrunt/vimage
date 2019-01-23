@@ -72,12 +72,11 @@ namespace vimage
             return pos;
         }
 
-        public static string GetExtension(string fileName) { return fileName.Substring(fileName.LastIndexOf(".") + 1).ToLower(); }
-
         /// <summary>Returns Orientation from the EXIF data of a jpg.</summary>
         public static int GetDefaultRotationFromEXIF(string fileName)
         {
-            if (!(GetExtension(fileName).Equals("jpg") || GetExtension(fileName).Equals("jpeg")))
+            string extension = System.IO.Path.GetExtension(fileName);
+            if (!(extension == ".jpg" || extension == ".jpeg" || extension == ".jpe"))
                 return 0;
             ushort orientation = 0;
             try
@@ -119,7 +118,7 @@ namespace vimage
 
         public static bool IsValidExtension(string fileName, string[] extensions)
         {
-            string extension = GetExtension(fileName);
+            string extension = System.IO.Path.GetExtension(fileName);
             return Array.Exists(extensions, delegate(string s) { return s == extension; });
         }
 
