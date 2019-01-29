@@ -1352,7 +1352,7 @@ namespace vimage
 
         public void RenderSVGAtCurrentZoom()
         {
-            if (CurrentZoom == 1 || Path.GetExtension(File) != ".svg")
+            if (CurrentZoom == 1 || File.EndsWith(".svg", StringComparison.OrdinalIgnoreCase))
                 return;
             try
             {
@@ -1399,7 +1399,7 @@ namespace vimage
         {
             File = fileName;
 
-            string extension = Path.GetExtension(fileName);
+            string extension = Path.GetExtension(fileName).ToLowerInvariant();
 
             // Image
             if (extension.Equals(".svg"))
@@ -1638,12 +1638,12 @@ namespace vimage
         /// <summary>Loads an image into memory but doesn't set it as the displayed image.</summary>
         private bool PreloadImage(string fileName)
         {
-            if (Path.GetExtension(fileName).Equals(".gif"))
+            if (File.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
             {
                 // Animated Image
                 Graphics.GetAnimatedImageData(fileName);
             }
-            else if (Path.GetExtension(fileName).Equals(".ico"))
+            else if (File.EndsWith(".ico", StringComparison.OrdinalIgnoreCase))
             {
                 // Icon
                 if (Graphics.GetSpriteFromIcon(fileName) == null)
@@ -1795,8 +1795,7 @@ namespace vimage
             if (!Directory.Exists(directory))
                 return;
 
-            string[] contents = Directory.GetFiles(directory);
-            contents = Array.FindAll(contents, delegate (string s) { return ImageViewerUtils.IsValidExtension(s, EXTENSIONS); });
+            var contents = Directory.GetFiles(directory, "*.*", SearchOption.TopDirectoryOnly).Where(s => ImageViewerUtils.IsValidExtension(s, EXTENSIONS));
 
             switch (SortImagesBy)
             {
@@ -1897,7 +1896,7 @@ namespace vimage
                             return;
                         bitmap = ClipboardBitmap;
                     }
-                    else if (Path.GetExtension(File) == ".ico")
+                    else if (File.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
                     {
                         // If .ico - copy largest version
                         System.Drawing.Icon icon = new System.Drawing.Icon(File, 256, 256);

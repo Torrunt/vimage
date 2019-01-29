@@ -75,7 +75,7 @@ namespace vimage
         /// <summary>Returns Orientation from the EXIF data of a jpg.</summary>
         public static int GetDefaultRotationFromEXIF(string fileName)
         {
-            string extension = System.IO.Path.GetExtension(fileName);
+            string extension = System.IO.Path.GetExtension(fileName).ToLowerInvariant();
             if (!(extension == ".jpg" || extension == ".jpeg" || extension == ".jpe"))
                 return 0;
             ushort orientation = 0;
@@ -106,8 +106,7 @@ namespace vimage
             {
                 using (ExifReader reader = new ExifReader(fileName))
                 {
-                    DateTime date;
-                    if (reader.GetTagValue(ExifTags.DateTime, out date))
+                    if (reader.GetTagValue(ExifTags.DateTime, out DateTime date))
                         return date;
                 }
             }
@@ -118,8 +117,7 @@ namespace vimage
 
         public static bool IsValidExtension(string fileName, string[] extensions)
         {
-            string extension = System.IO.Path.GetExtension(fileName);
-            return Array.Exists(extensions, delegate(string s) { return s == extension; });
+            return extensions.Contains(System.IO.Path.GetExtension(fileName).ToLowerInvariant());
         }
 
     }
