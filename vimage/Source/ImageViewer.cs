@@ -1352,7 +1352,7 @@ namespace vimage
 
         public void RenderSVGAtCurrentZoom()
         {
-            if (CurrentZoom == 1 || File.EndsWith(".svg", StringComparison.OrdinalIgnoreCase))
+            if (CurrentZoom == 1 || !File.EndsWith(".svg", StringComparison.OrdinalIgnoreCase))
                 return;
             try
             {
@@ -1896,7 +1896,7 @@ namespace vimage
                             return;
                         bitmap = ClipboardBitmap;
                     }
-                    else if (File.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
+                    else if (File.EndsWith(".ico", StringComparison.OrdinalIgnoreCase))
                     {
                         // If .ico - copy largest version
                         System.Drawing.Icon icon = new System.Drawing.Icon(File, 256, 256);
