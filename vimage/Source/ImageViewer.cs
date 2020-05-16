@@ -260,6 +260,8 @@ namespace vimage
             Stopwatch clock = new Stopwatch();
             clock.Start();
 
+            bool doRedraw;
+
             while (Window.IsOpen)
             {
                 // Add in some idle time to not thrash the CPU
@@ -280,12 +282,14 @@ namespace vimage
                     ReloadConfigNextTick = false;
                 }
 
+                doRedraw = false;
+
                 // Animated Image?
                 if (Image is AnimatedImage)
                 {
                     bool imageUpdated = Image.Update((float)clock.Elapsed.TotalMilliseconds);
                     if (!Updated && imageUpdated)
-                        Redraw();
+                        doRedraw = true;
                 }
                 clock.Restart();
 
@@ -326,6 +330,8 @@ namespace vimage
                         Window.Position = NextWindowPos - DWM.GetTitleBarDifference(Window.SystemHandle);
                     else
                         Window.Position = NextWindowPos;
+
+                    doRedraw = true;
                 }
                 else if (Cropping)
                 {
@@ -340,7 +346,8 @@ namespace vimage
                         MousePos.Y = (int)Window.Size.Y;
                     Vector2f m = Window.MapPixelToCoords(MousePos);
                     CropRect.Size = new Vector2f(m.X - CropRect.Position.X, m.Y - CropRect.Position.Y);
-                    Redraw();
+
+                    doRedraw = true;
                 }
 
                 // Update
@@ -348,9 +355,12 @@ namespace vimage
                 {
                     Updated = false;
                     Window.Size = NextWindowSize;
-                    Redraw();
                     Window.Position = NextWindowPos;
+                    doRedraw = true;
                 }
+
+                // Redraw
+                if (doRedraw) Redraw();
 
                 if (ForceAlwaysOnTopNextTick)
                     ForceAlwaysOnTop();
