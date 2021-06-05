@@ -1,7 +1,6 @@
 ﻿using SFML.Graphics;
 using SFML.System;
 using System.Collections.Generic;
-using System;
 
 namespace vimage
 {

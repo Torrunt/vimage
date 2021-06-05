@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using SFML.Graphics;
+﻿using SFML.Graphics;
+using System;
 
 namespace vimage
 {
     class AnimatedImageData
     {
-        public List<Texture> Frames = new List<Texture>();
-        public int FramesCount = 0;
-        public int FrameDuration = 100;
+        public Texture[] Frames;
+        public int[] FrameDelays;
+        public int FrameCount = 0;
         public bool FullyLoaded = false;
         public bool CancelLoading = false;
 
         private bool _Smooth = true;
-        public bool Smooth 
+        public bool Smooth
         {
             get { return _Smooth; }
             set
@@ -52,7 +51,7 @@ namespace vimage
         public new Texture Texture { get { return Sprite.Texture; } private set { } }
 
         public int CurrentFrame;
-        public int TotalFrames { get { return Data.Frames.Count; } private set { } }
+        public int TotalFrames { get { return Data.Frames.Length; } private set { } }
 
         public bool Playing = true;
         private bool _Looping = true;
@@ -61,20 +60,20 @@ namespace vimage
 
         /// <summary> Keeps track of when to change frame. Resets on frame change. </summary>
         public float CurrentTime;
-        private float CurrentFrameLength;
+        private float CurrentFrameDelay;
 
-        /// <summary>Default Frame Duration for animated image that don't define it.</summary>
-        public static readonly int DEFAULT_FRAME_DURATION = 100;
+        /// <summary>Default Frame Delay for animated images that don't define it.</summary>
+        public static readonly int DEFAULT_FRAME_DELAY = 100;
 
         public AnimatedImage(AnimatedImageData data)
         {
             Data = data;
-            
+
             Sprite = new Sprite(data.Frames[0]);
             AddChild(Sprite);
 
             CurrentTime = 0;
-            CurrentFrameLength = data.FrameDuration;
+            CurrentFrameDelay = data.FrameDelays[0];
         }
 
         public bool Update(float dt)
@@ -84,12 +83,8 @@ namespace vimage
 
             CurrentTime += dt;
 
-            while (CurrentTime > CurrentFrameLength)
+            while (CurrentTime > CurrentFrameDelay)
             {
-                // If next frame is yet to be loaded in - don't loop or continue animation until it is
-                if (TotalFrames != Data.FramesCount && Looping && CurrentFrame == TotalFrames - 1 && CurrentFrame < Data.FramesCount - 1)
-                    continue;
-
                 if (Looping || CurrentFrame < TotalFrames - 1)
                 {
                     if (CurrentFrame == TotalFrames - 1)
@@ -99,11 +94,11 @@ namespace vimage
                 }
                 else
                     Finished = true;
-                
-                if (CurrentFrameLength == 0)
+
+                if (CurrentFrameDelay == 0)
                     CurrentTime = 0;
                 else
-                    CurrentTime -= CurrentFrameLength;
+                    CurrentTime -= CurrentFrameDelay;
 
                 return true;
             }
@@ -116,17 +111,20 @@ namespace vimage
             if (number >= TotalFrames)
                 return false;
 
+            if (!Data.FullyLoaded && Data.Frames[number] == null)
+                return false; // Hang if next frame hasn't loaded yet
+
             CurrentFrame = number;
             Finished = CurrentFrame == TotalFrames - 1;
-            
+
             RemoveChild(Sprite);
             Sprite = new Sprite(Data.Frames[CurrentFrame]);
             if (Color != Color.White)
                 Sprite.Color = Color;
             AddChild(Sprite);
 
-            CurrentFrameLength = Data.FrameDuration;
-            
+            CurrentFrameDelay = Data.FrameDelays[CurrentFrame];
+
             return true;
         }
 

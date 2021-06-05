@@ -1,12 +1,12 @@
-﻿using SFML.Graphics;
+﻿using DevIL.Unmanaged;
+using SFML.Graphics;
 using SFML.System;
-using System.Collections.Generic;
 using System;
-using DevIL.Unmanaged;
-using Tao.OpenGl;
+using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Runtime.InteropServices;
+using System.Threading;
+using Tao.OpenGl;
 
 namespace vimage
 {
@@ -100,7 +100,7 @@ namespace vimage
         private static Texture GetTextureFromBoundImage()
         {
             bool success = IL.ConvertImage(DevIL.DataFormat.RGBA, DevIL.DataType.UnsignedByte);
-            
+
             if (!success)
                 return null;
 
@@ -339,20 +339,7 @@ namespace vimage
                     System.Drawing.Image image = System.Drawing.Image.FromFile(fileName);
                     AnimatedImageData data = new AnimatedImageData();
 
-                    //// Get Frame Duration
-                    int frameDuration = 0;
-                    try
-                    {
-                        System.Drawing.Imaging.PropertyItem frameDelay = image.GetPropertyItem(0x5100);
-                        frameDuration = (frameDelay.Value[0] + frameDelay.Value[1] * 256) * 10;
-                    }
-                    catch { }
-                    if (frameDuration > 10)
-                        data.FrameDuration = frameDuration;
-                    else
-                        data.FrameDuration = AnimatedImage.DEFAULT_FRAME_DURATION;
-
-                    //// Store AnimatedImageData
+                    // Store AnimatedImageData
                     AnimatedImageDatas.Add(data);
                     AnimatedImageDataFileNames.Add(fileName);
 
@@ -360,14 +347,20 @@ namespace vimage
                     if (AnimatedImageDatas.Count > MAX_ANIMATIONS)
                         RemoveAnimatedImage();
 
-                    //// Get Frames
+                    // Get Frames
                     LoadingAnimatedImage loadingAnimatedImage = new LoadingAnimatedImage(image, data);
-                    Thread loadFramesThread = new Thread(new ThreadStart(loadingAnimatedImage.LoadFrames));
-                    loadFramesThread.Name = "AnimationLoadThread - " + fileName;
-                    loadFramesThread.IsBackground = true;
+                    Thread loadFramesThread = new Thread(new ThreadStart(loadingAnimatedImage.LoadFrames))
+                    {
+                        Name = "AnimationLoadThread - " + fileName,
+                        IsBackground = true
+                    };
                     loadFramesThread.Start();
 
-                    while (data.Frames.Count <= 0) ; // wait for at least one frame to be loaded
+                    // Wait for at least one frame to be loaded
+                    while (data.Frames == null || data.Frames.Length <= 0 || data.Frames[0] == null)
+                    {
+                        Thread.Sleep(1);
+                    }
 
                     return data;
                 }
@@ -465,7 +458,7 @@ namespace vimage
         public static void RemoveAnimatedImage(int a = 0)
         {
             AnimatedImageDatas[a].CancelLoading = true;
-            for (int i = 0; i < AnimatedImageDatas[a].Frames.Count; i++)
+            for (int i = 0; i < AnimatedImageDatas[a].Frames.Length; i++)
                 AnimatedImageDatas[a]?.Frames[i]?.Dispose();
             AnimatedImageDatas.RemoveAt(a);
             AnimatedImageDataFileNames.RemoveAt(a);
@@ -487,10 +480,24 @@ namespace vimage
 
         public void LoadFrames()
         {
+            // Get Frame Count
             System.Drawing.Imaging.FrameDimension frameDimension = new System.Drawing.Imaging.FrameDimension(Image.FrameDimensionsList[0]);
-            Data.FramesCount = Image.GetFrameCount(frameDimension);
+            Data.FrameCount = Image.GetFrameCount(frameDimension);
+            Data.Frames = new Texture[Data.FrameCount];
+            Data.FrameDelays = new int[Data.FrameCount];
 
-            for (int i = 0; i < Data.FramesCount; i++)
+            // Get Frame Delays
+            byte[] frameDelays = null;
+            try
+            {
+                System.Drawing.Imaging.PropertyItem frameDelaysItem = Image.GetPropertyItem(0x5100);
+                frameDelays = frameDelaysItem.Value;
+            }
+            catch { }
+            var defaultFrameDelay = AnimatedImage.DEFAULT_FRAME_DELAY;
+            if (frameDelays != null && frameDelays.Length > 1) defaultFrameDelay = (frameDelays[0] + frameDelays[1] * 256) * 10;
+
+            for (int i = 0; i < Data.FrameCount; i++)
             {
                 if (Data.CancelLoading)
                     return;
@@ -501,7 +508,7 @@ namespace vimage
                 System.Drawing.Bitmap quantized = Quantizer.Quantize(Image);
                 MemoryStream stream = new MemoryStream();
                 quantized.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                Data.Frames.Add(new Texture(stream));
+                Data.Frames[i] = new Texture(stream);
 
                 stream.Dispose();
 
@@ -510,6 +517,12 @@ namespace vimage
 
                 Data.Frames[i].Smooth = Data.Smooth;
                 Data.Frames[i].Mipmap = Data.Mipmap;
+
+                var fd = i * 4;
+                if (frameDelays != null && frameDelays.Length > fd)
+                    Data.FrameDelays[i] = (frameDelays[fd] + frameDelays[fd + 1] * 256) * 10;
+                else
+                    Data.FrameDelays[i] = defaultFrameDelay;
             }
             Data.FullyLoaded = true;
         }
