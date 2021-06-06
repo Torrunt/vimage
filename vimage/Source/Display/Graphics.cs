@@ -307,6 +307,47 @@ namespace vimage
             return null;
         }
 
+        public static Sprite GetSpriteFromWebP(string fileName)
+        {
+            int index = TextureFileNames.IndexOf(fileName);
+
+            if (index >= 0)
+            {
+                // Texture Already Exists
+                // move it to the end of the array and return it
+                Texture texture = Textures[index];
+                string name = TextureFileNames[index];
+
+                Textures.RemoveAt(index);
+                TextureFileNames.RemoveAt(index);
+                Textures.Add(texture);
+                TextureFileNames.Add(name);
+
+                return new Sprite(Textures[Textures.Count - 1]);
+            }
+            else
+            {
+                // New Texture (from .webp)
+                try
+                {
+                    var fileBytes = File.ReadAllBytes(fileName);
+                    System.Drawing.Bitmap bitmap = new Imazen.WebP.SimpleDecoder().DecodeFromBytes(fileBytes, fileBytes.Length);
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                        Texture texture = new Texture(stream);
+                        Textures.Add(texture);
+                        TextureFileNames.Add(fileName);
+
+                        return new Sprite(new Texture(texture));
+                    }
+                }
+                catch (Exception) { }
+            }
+
+            return null;
+        }
+
         /// <param name="filename">Animated Image (ie: animated gif).</param>
         public static AnimatedImage GetAnimatedImage(string fileName)
         {

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using SFML.Window;
+﻿using DevIL.Unmanaged;
 using SFML.Graphics;
 using SFML.System;
-using DevIL.Unmanaged;
+using SFML.Window;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 
@@ -19,7 +19,7 @@ namespace vimage
         public readonly string[] EXTENSIONS =
         {
             ".bmp", ".cut", ".dds", ".doom", ".exr", ".hdr", ".gif", ".ico", ".jp2", ".jpg", ".jpeg", ".lbm", ".mdl", ".mng",
-            ".pal", ".pbm", ".pcd", ".pcx", ".pgm", ".pic", ".png", ".ppm", ".psd", ".psp", ".raw", ".sgi", ".tga", ".tif", ".tiff", ".svg",
+            ".pal", ".pbm", ".pcd", ".pcx", ".pgm", ".pic", ".png", ".ppm", ".psd", ".psp", ".raw", ".sgi", ".tga", ".tif", ".tiff", ".svg", ".webp",
             ".jpe", ".jif", ".jiff", ".jfif", ".jfi"
         };
 
@@ -108,7 +108,7 @@ namespace vimage
             // Create Window
             Window = new RenderWindow(new VideoMode(0, 0), File + " - vimage", Styles.None);
             Window.Position = mousePos;
-            
+
             // Make Window Transparent (can only tell if image being viewed has transparency)
             DWM_BLURBEHIND bb = new DWM_BLURBEHIND();
             bb.dwFlags = DWM_BB.Enable | DWM_BB.BlurRegion;
@@ -410,7 +410,7 @@ namespace vimage
                 case Action.OpenContextMenu: OpenContextMenu(); return;
                 case Action.PrevImage: PrevImage(); return;
                 case Action.NextImage: NextImage(); return;
-                
+
                 case Action.RotateClockwise: RotateImage(Rotation + 90); return;
                 case Action.RotateAntiClockwise: RotateImage(Rotation - 90); return;
                 case Action.Flip: FlipImage(); return;
@@ -427,11 +427,11 @@ namespace vimage
                 case Action.ToggleLock: ToggleLock(); return;
                 case Action.ToggleAlwaysOnTop: ToggleAlwaysOnTop(); return;
                 case Action.ToggleTitleBar: ToggleTitleBar(); return;
-                
+
                 case Action.NextFrame: NextFrame(); return;
                 case Action.PrevFrame: PrevFrame(); return;
                 case Action.PauseAnimation: ToggleAnimation(); return;
-                
+
                 case Action.OpenSettings: OpenConfig(); return;
                 case Action.ResetImage: ResetImage(); return;
                 case Action.OpenAtLocation: OpenFileAtLocation(); return;
@@ -441,21 +441,21 @@ namespace vimage
                 case Action.OpenDuplicateImage: OpenDuplicateWindow(); return;
                 case Action.OpenFullDuplicateImage: OpenDuplicateWindow(true); return;
                 case Action.RandomImage: RandomImage(); return;
-                
+
                 case Action.MoveLeft: NextWindowPos.X -= ZoomFaster ? Config.Setting_MoveSpeedFast : Config.Setting_MoveSpeed; Window.Position = NextWindowPos; return;
                 case Action.MoveRight: NextWindowPos.X += ZoomFaster ? Config.Setting_MoveSpeedFast : Config.Setting_MoveSpeed; Window.Position = NextWindowPos; return;
                 case Action.MoveUp: NextWindowPos.Y -= ZoomFaster ? Config.Setting_MoveSpeedFast : Config.Setting_MoveSpeed; Window.Position = NextWindowPos; return;
                 case Action.MoveDown: NextWindowPos.Y += ZoomFaster ? Config.Setting_MoveSpeedFast : Config.Setting_MoveSpeed; Window.Position = NextWindowPos; return;
-                
+
                 case Action.TransparencyInc: AdjustImageTransparency(-1); return;
                 case Action.TransparencyDec: AdjustImageTransparency(1); return;
-                
+
                 case Action.UndoCrop: UndoCrop(); return;
                 case Action.ExitAll: ExitAllInstances(); return;
                 case Action.RerenderSVG: RenderSVGAtCurrentZoom(); return;
 
                 case Action.VisitWebsite: Process.Start("http://torrunt.net/vimage"); return;
-                
+
                 case Action.SortName: ChangeSortBy(SortBy.Name); return;
                 case Action.SortDate: ChangeSortBy(SortBy.Date); return;
                 case Action.SortDateModified: ChangeSortBy(SortBy.DateModified); return;
@@ -536,82 +536,82 @@ namespace vimage
 
             // Open Context Menu
             if (Config.IsControl(code, Config.Control_OpenContextMenu, CurrentAction != Action.None))
-                CurrentAction =  Action.OpenContextMenu;
+                CurrentAction = Action.OpenContextMenu;
 
             // Rotate Image
             if (Config.IsControl(code, Config.Control_RotateClockwise, CurrentAction != Action.None))
-                CurrentAction =  Action.RotateClockwise;
+                CurrentAction = Action.RotateClockwise;
             if (Config.IsControl(code, Config.Control_RotateAntiClockwise, CurrentAction != Action.None))
-                CurrentAction =  Action.RotateAntiClockwise;
+                CurrentAction = Action.RotateAntiClockwise;
 
             // Flip Image
             if (Config.IsControl(code, Config.Control_Flip, CurrentAction != Action.None))
-                CurrentAction =  Action.Flip;
+                CurrentAction = Action.Flip;
 
             // Reset Image
             if (Config.IsControl(code, Config.Control_ResetImage, CurrentAction != Action.None))
-                CurrentAction =  Action.ResetImage;
+                CurrentAction = Action.ResetImage;
 
             // Fit To Monitor Height/Width
             if (Config.IsControl(code, Config.Control_FitToMonitorHeight, CurrentAction != Action.None))
-                CurrentAction =  Action.FitToMonitorHeight;
+                CurrentAction = Action.FitToMonitorHeight;
             if (Config.IsControl(code, Config.Control_FitToMonitorWidth, CurrentAction != Action.None))
-                CurrentAction =  Action.FitToMonitorWidth;
+                CurrentAction = Action.FitToMonitorWidth;
             if (Config.IsControl(code, Config.Control_FitToMonitorAuto, CurrentAction != Action.None))
-                CurrentAction =  Action.FitToMonitorAuto;
+                CurrentAction = Action.FitToMonitorAuto;
 
             // Animated Image - Pause/Play
             if (Config.IsControl(code, Config.Control_PauseAnimation, CurrentAction != Action.None))
-                CurrentAction =  Action.PauseAnimation;
+                CurrentAction = Action.PauseAnimation;
 
             // Next/Prev Image in Folder
             if (Config.IsControl(code, Config.Control_PrevImage, CurrentAction != Action.None))
-                CurrentAction =  Action.PrevImage;
+                CurrentAction = Action.PrevImage;
             if (Config.IsControl(code, Config.Control_NextImage, CurrentAction != Action.None))
-                CurrentAction =  Action.NextImage;
+                CurrentAction = Action.NextImage;
 
             // Open Config
             if (Config.IsControl(code, Config.Control_OpenSettings, CurrentAction != Action.None))
-                CurrentAction =  Action.OpenSettings;
+                CurrentAction = Action.OpenSettings;
 
             // Toggle Settings
             if (Config.IsControl(code, Config.Control_ToggleSmoothing, CurrentAction != Action.None))
-                CurrentAction =  Action.ToggleSmoothing;
+                CurrentAction = Action.ToggleSmoothing;
 
             if (Config.IsControl(code, Config.Control_ToggleMipmapping, CurrentAction != Action.None))
-                CurrentAction =  Action.ToggleMipmapping;
+                CurrentAction = Action.ToggleMipmapping;
 
             if (Config.IsControl(code, Config.Control_ToggleBackground, CurrentAction != Action.None))
-                CurrentAction =  Action.ToggleBackground;
+                CurrentAction = Action.ToggleBackground;
 
             if (Config.IsControl(code, Config.Control_ToggleLock, CurrentAction != Action.None))
-                CurrentAction =  Action.ToggleLock;
+                CurrentAction = Action.ToggleLock;
 
             if (Config.IsControl(code, Config.Control_ToggleAlwaysOnTop, CurrentAction != Action.None))
-                CurrentAction =  Action.ToggleAlwaysOnTop;
+                CurrentAction = Action.ToggleAlwaysOnTop;
 
             if (Config.IsControl(code, Config.Control_ToggleTitleBar, CurrentAction != Action.None))
                 CurrentAction = Action.ToggleTitleBar;
 
             // Open File At Location
             if (Config.IsControl(code, Config.Control_OpenAtLocation, CurrentAction != Action.None))
-                CurrentAction =  Action.OpenAtLocation;
+                CurrentAction = Action.OpenAtLocation;
 
             // Delete File
             if (Config.IsControl(code, Config.Control_Delete, CurrentAction != Action.None))
-                CurrentAction =  Action.Delete;
+                CurrentAction = Action.Delete;
 
             // Copy File
             if (Config.IsControl(code, Config.Control_Copy, CurrentAction != Action.None))
-                CurrentAction =  Action.Copy;
+                CurrentAction = Action.Copy;
             if (Config.IsControl(code, Config.Control_CopyAsImage, CurrentAction != Action.None))
-                CurrentAction =  Action.CopyAsImage;
+                CurrentAction = Action.CopyAsImage;
 
             // Open Duplicate Window
             if (Config.IsControl(code, Config.Control_OpenDuplicateImage, CurrentAction != Action.None))
-                CurrentAction =  Action.OpenDuplicateImage;
+                CurrentAction = Action.OpenDuplicateImage;
             if (Config.IsControl(code, Config.Control_OpenFullDuplicateImage, CurrentAction != Action.None))
-                CurrentAction =  Action.OpenFullDuplicateImage;
+                CurrentAction = Action.OpenFullDuplicateImage;
 
             // Random Image
             if (Config.IsControl(code, Config.Control_RandomImage, CurrentAction != Action.None))
@@ -619,7 +619,7 @@ namespace vimage
 
             // Toggle Image Transparency
             if (Config.IsControl(code, Config.Control_TransparencyToggle, CurrentAction != Action.None))
-                CurrentAction =  Action.TransparencyToggle;
+                CurrentAction = Action.TransparencyToggle;
 
             // Cropping - release
             if (Cropping && Config.IsControl(code, Config.Control_Crop, CurrentAction != Action.None))
@@ -1427,6 +1427,11 @@ namespace vimage
                 // Icon
                 Image = Graphics.GetSpriteFromIcon(fileName);
             }
+            else if (extension.Equals(".webp"))
+            {
+                // WebP
+                Image = Graphics.GetSpriteFromWebP(fileName);
+            }
             else
             {
                 // Other
@@ -1810,45 +1815,45 @@ namespace vimage
             switch (SortImagesBy)
             {
                 case SortBy.Name:
-                {
-                    FolderContents = contents.ToList();
-                    FolderContents.Sort(new WindowsFileSorting.NaturalStringComparer());
-                    if (SortImagesByDir == SortDirection.Descending)
-                        FolderContents.Reverse();
-                    break;
-                }
+                    {
+                        FolderContents = contents.ToList();
+                        FolderContents.Sort(new WindowsFileSorting.NaturalStringComparer());
+                        if (SortImagesByDir == SortDirection.Descending)
+                            FolderContents.Reverse();
+                        break;
+                    }
                 case SortBy.Date:
-                {
-                    if (SortImagesByDir == SortDirection.Ascending)
-                        FolderContents.AddRange(contents.OrderBy(d => ImageViewerUtils.GetDateValueFromEXIF(d)));
-                    else
-                        FolderContents.AddRange(contents.OrderByDescending(d => ImageViewerUtils.GetDateValueFromEXIF(d)));
-                    break;
-                }
+                    {
+                        if (SortImagesByDir == SortDirection.Ascending)
+                            FolderContents.AddRange(contents.OrderBy(d => ImageViewerUtils.GetDateValueFromEXIF(d)));
+                        else
+                            FolderContents.AddRange(contents.OrderByDescending(d => ImageViewerUtils.GetDateValueFromEXIF(d)));
+                        break;
+                    }
                 case SortBy.DateModified:
-                {
-                    if (SortImagesByDir == SortDirection.Ascending)
-                        FolderContents.AddRange(contents.OrderBy(d => new FileInfo(d).LastWriteTime));
-                    else
-                        FolderContents.AddRange(contents.OrderByDescending(d => new FileInfo(d).LastWriteTime));
-                    break;
-                }
+                    {
+                        if (SortImagesByDir == SortDirection.Ascending)
+                            FolderContents.AddRange(contents.OrderBy(d => new FileInfo(d).LastWriteTime));
+                        else
+                            FolderContents.AddRange(contents.OrderByDescending(d => new FileInfo(d).LastWriteTime));
+                        break;
+                    }
                 case SortBy.DateCreated:
-                {
-                    if (SortImagesByDir == SortDirection.Ascending)
-                        FolderContents.AddRange(contents.OrderBy(d => new FileInfo(d).CreationTime));
-                    else
-                        FolderContents.AddRange(contents.OrderByDescending(d => new FileInfo(d).CreationTime));
-                    break;
-                }
+                    {
+                        if (SortImagesByDir == SortDirection.Ascending)
+                            FolderContents.AddRange(contents.OrderBy(d => new FileInfo(d).CreationTime));
+                        else
+                            FolderContents.AddRange(contents.OrderByDescending(d => new FileInfo(d).CreationTime));
+                        break;
+                    }
                 case SortBy.Size:
-                {
-                    if (SortImagesByDir == SortDirection.Ascending)
-                        FolderContents.AddRange(contents.OrderBy(d => new FileInfo(d).Length));
-                    else
-                        FolderContents.AddRange(contents.OrderByDescending(d => new FileInfo(d).Length));
-                    break;
-                }
+                    {
+                        if (SortImagesByDir == SortDirection.Ascending)
+                            FolderContents.AddRange(contents.OrderBy(d => new FileInfo(d).Length));
+                        else
+                            FolderContents.AddRange(contents.OrderByDescending(d => new FileInfo(d).Length));
+                        break;
+                    }
             }
 
             FolderPosition = FolderContents.IndexOf(File);
