@@ -12,7 +12,7 @@ Corey Zeke Womack (Torrunt) - [me@torrunt.net](mailto:me@torrunt.net) - [torrunt
 ### Features
 - No ugly interface, just the image
 - Move it around, resize it, rotate it, flip it and step through images in a folder
-- Supports .bmp, .cut, .dds, .doom, .exr, .hdr, .gif, .ico, .jp2, .jpg,.lbm, .mdl, .mng, .pal, .pbm, .pcd, .pcx, .pgm, .pic, .png, .ppm, .psd, .psp, .raw, .sgi, .tga and .tif files (Image loading done via [DevIL](http://openil.sourceforge.net/about.php)) + .svg files.
+- Supports .bmp, .cut, .dds, .doom, .exr, .hdr, .gif, .ico, .jp2, .jpg,.lbm, .mdl, .mng, .pal, .pbm, .pcd, .pcx, .pgm, .pic, .png, .ppm, .psd, .psp, .raw, .sgi, .tga and .tif files (Image loading done via [DevIL](http://openil.sourceforge.net/about.php)) + .svg and .webp
 - Supports Transparency
 - Supports Animated .gifs (pauseable and the frames can be stepped through)
 - Toggleable Always on Top Mode
