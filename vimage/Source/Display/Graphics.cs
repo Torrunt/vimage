@@ -4,6 +4,7 @@ using SFML.System;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Tao.OpenGl;
@@ -533,9 +534,10 @@ namespace vimage
             {
                 System.Drawing.Imaging.PropertyItem frameDelaysItem = Image.GetPropertyItem(0x5100);
                 frameDelays = frameDelaysItem.Value;
+                if (frameDelays.Length == 0 || (frameDelays[0] == 0 && frameDelays.All(d => d == 0))) frameDelays = null;
             }
             catch { }
-            var defaultFrameDelay = AnimatedImage.DEFAULT_FRAME_DELAY;
+            int defaultFrameDelay = AnimatedImage.DEFAULT_FRAME_DELAY;
             if (frameDelays != null && frameDelays.Length > 1) defaultFrameDelay = (frameDelays[0] + frameDelays[1] * 256) * 10;
 
             for (int i = 0; i < Data.FrameCount; i++)
