@@ -228,7 +228,7 @@ namespace ImageManipulation
 		/// <summary>
 		/// Flag used to indicate whether a single pass or two passes are needed for quantization.
 		/// </summary>
-		private bool	_singlePass;
+		private readonly bool	_singlePass;
 
 		/// <summary>
 		/// Struct that defines a 32 bpp colour

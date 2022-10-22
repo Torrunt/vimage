@@ -81,7 +81,7 @@ namespace vimage_settings
         {
             for (int i = 0; i < items.Count; i++)
             {
-                dynamic o = (items[i] as dynamic);
+                dynamic o = items[i] as dynamic;
 
                 if (o is List<object>)
                 {
@@ -90,7 +90,7 @@ namespace vimage_settings
                 else
                 {
                     ContextMenuItem item = new ContextMenuItem(o is string ? o : o.name, o is string ? "" : o.func, this, panel, canvas, scroll, indent);
-                    panel.Children.Add(item);
+                    _ = panel.Children.Add(item);
                     Items.Add(item);
 
                     Canvas.SetTop(item, item.MinHeight * (panel.Children.Count - 1));
@@ -113,7 +113,7 @@ namespace vimage_settings
             ContextMenuItem item = new ContextMenuItem("", "", this, panel, canvas, scroll, CurrentItemSelection == null ? 0 : CurrentItemSelection.Indent);
             if (CurrentItemSelection == null)
             {
-                panel.Children.Add(item);
+                _ = panel.Children.Add(item);
                 Items.Add(item);
 
                 Canvas.SetTop(item, item.MinHeight * (panel.Children.Count - 1));

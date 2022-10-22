@@ -24,7 +24,7 @@ namespace vimage_settings
             for (int i = 0; i < App.vimageConfig.CustomActions.Count; i++)
             {
                 CustomActionItem item = new CustomActionItem(i, CustomActionItems);
-                CustomActionItems.Children.Add(item);
+                _ = CustomActionItems.Children.Add(item);
             }
         }
         public void UpdateItemIndices()
@@ -41,7 +41,7 @@ namespace vimage_settings
             App.vimageConfig.CustomActionBindings.Add(new { name = "ACTION", bindings = new List<int>() });
 
             CustomActionItem item = new CustomActionItem(index, CustomActionItems);
-            CustomActionItems.Children.Add(item);
+            _ = CustomActionItems.Children.Add(item);
 
             // update controls tab
             (Application.Current.MainWindow as MainWindow).ControlBindings.AddCustomActionBinding(index);

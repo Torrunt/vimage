@@ -97,12 +97,12 @@ namespace ImageManipulation
 		/// <summary>
 		/// Stores the tree
 		/// </summary>
-		private	Octree _octree;
+		private readonly Octree _octree;
 
 		/// <summary>
 		/// Maximum allowed color depth
 		/// </summary>
-		private int	_maxColors;
+		private readonly int	_maxColors;
 
 		/// <summary>
 		/// Class which does the actual quantization
@@ -230,12 +230,12 @@ namespace ImageManipulation
 			/// <summary>
 			/// Mask used when getting the appropriate pixels for a given node
 			/// </summary>
-			private static int[] mask = new int[8] { 0x80 , 0x40 , 0x20 , 0x10 , 0x08 , 0x04 , 0x02 , 0x01 };
+			private static readonly int[] mask = new int[8] { 0x80 , 0x40 , 0x20 , 0x10 , 0x08 , 0x04 , 0x02 , 0x01 };
 
 			/// <summary>
 			/// The root of the octree
 			/// </summary>
-			private	OctreeNode _root;
+			private readonly OctreeNode _root;
 
 			/// <summary>
 			/// Number of leaves in the tree
@@ -245,12 +245,12 @@ namespace ImageManipulation
 			/// <summary>
 			/// Array of reducible nodes
 			/// </summary>
-			private OctreeNode[] _reducibleNodes;
+			private readonly OctreeNode[] _reducibleNodes;
 
 			/// <summary>
 			/// Maximum number of significant bits in the image
 			/// </summary>
-			private int _maxColorBits;
+			private readonly int _maxColorBits;
 
 			/// <summary>
 			/// Store the last node quantized
@@ -276,7 +276,7 @@ namespace ImageManipulation
 				public OctreeNode ( int level , int colorBits , Octree octree )
 				{
 					// Construct the new node
-					_leaf = ( level == colorBits );
+					_leaf =  level == colorBits ;
 
 					_red = _green = _blue = 0;
 					_pixelCount = 0;
@@ -380,7 +380,7 @@ namespace ImageManipulation
 					_leaf = true;
 
 					// Return the number of nodes to decrement the leaf count by
-					return ( children - 1 );
+					return  children - 1 ;
 				}
 
 				/// <summary>
@@ -395,8 +395,8 @@ namespace ImageManipulation
 						// Consume the next palette index
 						_paletteIndex = paletteIndex++;
 
-						// And set the color of the palette entry
-						palette.Add ( Color.FromArgb ( _red / _pixelCount , _green / _pixelCount , _blue / _pixelCount ) );
+                        // And set the color of the palette entry
+                        _ = palette.Add(Color.FromArgb(_red / _pixelCount, _green / _pixelCount, _blue / _pixelCount));
 					}
 					else
 					{
@@ -423,11 +423,10 @@ namespace ImageManipulation
 									( ( pixel->Green & mask[level] ) >> ( shift - 1 ) ) |
 									( ( pixel->Blue & mask[level] ) >> ( shift ) );
 
-						if ( null != _children[index] )
-							paletteIndex = _children[index].GetPaletteIndex ( pixel , level + 1 );
-						else
-							throw new Exception ( "Didn't expect this!" );
-					}
+						paletteIndex = null != _children[index]
+                            ? _children[index].GetPaletteIndex ( pixel , level + 1 )
+                            :                         throw new Exception ( "Didn't expect this!" );
+                    }
 
 					return paletteIndex;
 				}
@@ -471,7 +470,7 @@ namespace ImageManipulation
 				/// <summary>
 				/// Pointers to any child nodes
 				/// </summary>
-				private OctreeNode[] _children;
+				private readonly OctreeNode[] _children;
 
 				/// <summary>
 				/// Pointer to next reducible node

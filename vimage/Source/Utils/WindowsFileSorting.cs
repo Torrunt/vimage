@@ -4,7 +4,7 @@ using System.IO;
 
 namespace vimage
 {
-    class WindowsFileSorting
+    internal class WindowsFileSorting
     {
         [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
         public static extern int StrCmpLogicalW(string psz1, string psz2);

@@ -20,7 +20,7 @@ namespace vimage_settings
             for (int i = 0; i < App.vimageConfig.Controls.Count; i++)
             {
                 ControlItem item = new ControlItem(App.vimageConfig.ControlNames[i], App.vimageConfig.Controls[i]);
-                ControlsPanel.Children.Add(item);
+                _ = ControlsPanel.Children.Add(item);
             }
             CustomActionBindings = new List<ControlItem>();
             for (int i = 0; i < App.vimageConfig.CustomActionBindings.Count; i++)
@@ -31,7 +31,7 @@ namespace vimage_settings
         public void AddCustomActionBinding(int index)
         {
             ControlItem item = new ControlItem((App.vimageConfig.CustomActionBindings[index] as dynamic).name, (App.vimageConfig.CustomActionBindings[index] as dynamic).bindings);
-            ControlsPanel.Children.Add(item);
+            _ = ControlsPanel.Children.Add(item);
             CustomActionBindings.Add(item);
         }
         public void RemoveCustomActionBinding(int index)

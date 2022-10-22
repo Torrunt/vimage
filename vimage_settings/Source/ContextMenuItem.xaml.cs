@@ -12,16 +12,16 @@ namespace vimage_settings
     /// </summary>
     public partial class ContextMenuItem : UserControl
     {
-        private ContextMenu ContextMenuEditor;
-        private Panel ParentPanel;
-        private ContextMenuEditorCanvas ParentCanvas;
-        private ScrollViewer ScrollViewer;
+        private readonly ContextMenu ContextMenuEditor;
+        private readonly Panel ParentPanel;
+        private readonly ContextMenuEditorCanvas ParentCanvas;
+        private readonly ScrollViewer ScrollViewer;
         private int CustomActionsStartIndex = -1;
         private Point AnchorPoint;
 
         private bool Selected = false;
-        private SolidColorBrush BrushSelected = new SolidColorBrush(Colors.DodgerBlue);
-        private SolidColorBrush BrushOver = new SolidColorBrush(Colors.LightSkyBlue);
+        private readonly SolidColorBrush BrushSelected = new SolidColorBrush(Colors.DodgerBlue);
+        private readonly SolidColorBrush BrushOver = new SolidColorBrush(Colors.LightSkyBlue);
 
         public ContextMenuItem()
         {
@@ -54,9 +54,9 @@ namespace vimage_settings
 
             ItemFunction.Items.Clear();
 
-            ItemFunction.Items.Add("-");
+            _ = ItemFunction.Items.Add("-");
             for (int i = 0; i < Actions.MenuActions.Length; i++)
-                ItemFunction.Items.Add(Actions.MenuActions[i].ToNameString());
+                _ = ItemFunction.Items.Add(Actions.MenuActions[i].ToNameString());
             if (App.vimageConfig != null)
             {
                 CustomActionsStartIndex = ItemFunction.Items.Count;
@@ -92,7 +92,7 @@ namespace vimage_settings
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
             ParentPanel?.Children.Remove(this);
-            (Application.Current.MainWindow as MainWindow).ContextMenuEditor.Items.Remove(this);
+            _ = (Application.Current.MainWindow as MainWindow).ContextMenuEditor.Items.Remove(this);
         }
 
         private void UserControl_MouseEnter(object sender, MouseEventArgs e)
@@ -130,7 +130,7 @@ namespace vimage_settings
         private void UserControl_MouseDown(object sender, MouseButtonEventArgs e)
         {
             FocusManager.SetFocusedElement(UserControl, ItemName);
-            Keyboard.Focus(ItemName);
+            _ = Keyboard.Focus(ItemName);
             ItemName.SelectAll();
             e.Handled = true;
 
@@ -156,10 +156,10 @@ namespace vimage_settings
 
             if (selectTextBox)
             {
-                Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ApplicationIdle, (System.Threading.ThreadStart)delegate ()
-                { Focus(); });
+                _ = Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ApplicationIdle, (System.Threading.ThreadStart)delegate ()
+                  { _ = Focus(); });
                 FocusManager.SetFocusedElement(UserControl, ItemName);
-                Keyboard.Focus(ItemName);
+                _ = Keyboard.Focus(ItemName);
                 ItemName.SelectAll();
             }
         }
@@ -238,7 +238,7 @@ namespace vimage_settings
                 {
                     int index = ParentPanel.Children.IndexOf(this);
                     ParentPanel.Children.Remove(this);
-                    ParentCanvas.Children.Add(this);
+                    _ = ParentCanvas.Children.Add(this);
 
                     ParentCanvas.SetupGhost(this);
                     ParentPanel.Children.Insert(index, ParentCanvas.GhostItem);
@@ -248,12 +248,12 @@ namespace vimage_settings
                     Width = ParentPanel.ActualWidth;
 
                     ParentCanvas.SelectionRect.Width = Width;
-                    ParentCanvas.Children.Add(ParentCanvas.SelectionRect);
+                    _ = ParentCanvas.Children.Add(ParentCanvas.SelectionRect);
 
                     Selected = true;
                     Opacity = 0.7f;
 
-                    CaptureMouse();
+                    _ = CaptureMouse();
                     ItemName.IsEnabled = false;
                     ItemFunction.IsEnabled = false;
                     ButtonDelete.IsEnabled = false;
@@ -274,7 +274,7 @@ namespace vimage_settings
                     if (ParentCanvas.InsertAtIndex != -1)
                     {
                         if (ParentCanvas.InsertAtIndex >= ParentPanel.Children.Count)
-                            ParentPanel.Children.Add(this);
+                            _ = ParentPanel.Children.Add(this);
                         else
                             ParentPanel.Children.Insert(ParentCanvas.InsertAtIndex, this);
                     }

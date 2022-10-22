@@ -15,16 +15,16 @@ namespace vimage
     /// Graphics Manager.
     /// Loads and stores Textures and AnimatedImageDatas.
     /// </summary>
-    class Graphics
+    internal class Graphics
     {
-        private static List<Texture> Textures = new List<Texture>();
-        private static List<string> TextureFileNames = new List<string>();
+        private static readonly List<Texture> Textures = new List<Texture>();
+        private static readonly List<string> TextureFileNames = new List<string>();
 
-        private static List<AnimatedImageData> AnimatedImageDatas = new List<AnimatedImageData>();
-        private static List<string> AnimatedImageDataFileNames = new List<string>();
+        private static readonly List<AnimatedImageData> AnimatedImageDatas = new List<AnimatedImageData>();
+        private static readonly List<string> AnimatedImageDataFileNames = new List<string>();
 
-        private static List<DisplayObject> SplitTextures = new List<DisplayObject>();
-        private static List<string> SplitTextureFileNames = new List<string>();
+        private static readonly List<DisplayObject> SplitTextures = new List<DisplayObject>();
+        private static readonly List<string> SplitTextureFileNames = new List<string>();
 
         public static uint MAX_TEXTURES = 80;
         public static uint MAX_ANIMATIONS = 8;
@@ -62,7 +62,7 @@ namespace vimage
                 int imageID = IL.GenerateImage();
                 IL.BindImage(imageID);
 
-                IL.Enable(ILEnable.AbsoluteOrigin);
+                _ = IL.Enable(ILEnable.AbsoluteOrigin);
                 IL.SetOriginLocation(DevIL.OriginLocation.UpperLeft);
 
                 bool loaded = false;
@@ -92,10 +92,7 @@ namespace vimage
                 }
                 IL.DeleteImages(new ImageID[] { imageID });
 
-                if (texture == null)
-                    return textureLarge;
-                else
-                    return texture;
+                return texture == null ? (dynamic)textureLarge : (dynamic)texture;
             }
         }
         private static Texture GetTextureFromBoundImage()
@@ -148,8 +145,8 @@ namespace vimage
                     currentSize.X -= w;
 
                     Texture texture = new Texture((uint)w, (uint)h);
-                    IntPtr partPtr = Marshal.AllocHGlobal((w * h) * 4);
-                    IL.CopyPixels(pos.X, pos.Y, 0, w, h, 1, DevIL.DataFormat.RGBA, DevIL.DataType.UnsignedByte, partPtr);
+                    IntPtr partPtr = Marshal.AllocHGlobal(w * h * 4);
+                    _ = IL.CopyPixels(pos.X, pos.Y, 0, w, h, 1, DevIL.DataFormat.RGBA, DevIL.DataType.UnsignedByte, partPtr);
                     Texture.Bind(texture);
                     {
                         Gl.glTexImage2D(
@@ -161,8 +158,10 @@ namespace vimage
                     Texture.Bind(null);
                     Marshal.FreeHGlobal(partPtr);
 
-                    Sprite sprite = new Sprite(texture);
-                    sprite.Position = new Vector2f(pos.X, pos.Y);
+                    Sprite sprite = new Sprite(texture)
+                    {
+                        Position = new Vector2f(pos.X, pos.Y)
+                    };
                     image.AddChild(sprite);
 
                     if (fileName != "")
@@ -257,7 +256,7 @@ namespace vimage
                         MemoryStream destStream = new MemoryStream();
                         BinaryWriter writer = new BinaryWriter(destStream);
                         writer.Write(srcBuf, iImageOffset, iImageSize);
-                        destStream.Seek(0, SeekOrigin.Begin);
+                        _ = destStream.Seek(0, SeekOrigin.Begin);
                         bmpPngExtracted = new System.Drawing.Bitmap(destStream); // This is PNG! :)
                         break;
                     }
@@ -331,7 +330,7 @@ namespace vimage
                 // New Texture (from .webp)
                 try
                 {
-                    var fileBytes = File.ReadAllBytes(fileName);
+                    byte[] fileBytes = File.ReadAllBytes(fileName);
                     System.Drawing.Bitmap bitmap = new Imazen.WebP.SimpleDecoder().DecodeFromBytes(fileBytes, fileBytes.Length);
                     using (MemoryStream stream = new MemoryStream())
                     {
@@ -470,7 +469,7 @@ namespace vimage
                 // if part of split texture - remove all parts
                 string name = TextureFileNames[t].Substring(0, TextureFileNames[t].Length - 7);
 
-                int i = t;
+                int i;
                 for (i = t + 1; i < TextureFileNames.Count; i++)
                 {
                     if (TextureFileNames[i].IndexOf(name) != 0)
@@ -508,11 +507,11 @@ namespace vimage
 
     }
 
-    class LoadingAnimatedImage
+    internal class LoadingAnimatedImage
     {
-        private System.Drawing.Image Image;
+        private readonly System.Drawing.Image Image;
         private ImageManipulation.OctreeQuantizer Quantizer;
-        private AnimatedImageData Data;
+        private readonly AnimatedImageData Data;
 
         public LoadingAnimatedImage(System.Drawing.Image image, AnimatedImageData data)
         {
@@ -545,7 +544,7 @@ namespace vimage
                 if (Data.CancelLoading)
                     return;
 
-                Image.SelectActiveFrame(frameDimension, i);
+                _ = Image.SelectActiveFrame(frameDimension, i);
                 Quantizer = new ImageManipulation.OctreeQuantizer(255, 8);
 
                 System.Drawing.Bitmap quantized = Quantizer.Quantize(Image);
@@ -561,11 +560,8 @@ namespace vimage
                 Data.Frames[i].Smooth = Data.Smooth;
                 Data.Frames[i].Mipmap = Data.Mipmap;
 
-                var fd = i * 4;
-                if (frameDelays != null && frameDelays.Length > fd)
-                    Data.FrameDelays[i] = (frameDelays[fd] + frameDelays[fd + 1] * 256) * 10;
-                else
-                    Data.FrameDelays[i] = defaultFrameDelay;
+                int fd = i * 4;
+                Data.FrameDelays[i] = frameDelays != null && frameDelays.Length > fd ? (frameDelays[fd] + frameDelays[fd + 1] * 256) * 10 : defaultFrameDelay;
             }
             Data.FullyLoaded = true;
         }

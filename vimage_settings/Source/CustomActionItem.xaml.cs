@@ -9,7 +9,7 @@ namespace vimage_settings
     /// </summary>
     public partial class CustomActionItem : UserControl
     {
-        private StackPanel ParentPanel;
+        private readonly StackPanel ParentPanel;
         public int Index;
 
         public CustomActionItem()

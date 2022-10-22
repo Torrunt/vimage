@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Windows.Forms;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace vimage
 {
-    class ContextMenu : ContextMenuStrip
+    internal class ContextMenu : ContextMenuStrip
     {
-        private ImageViewer ImageViewer;
+        private readonly ImageViewer ImageViewer;
         public int Setting = -1;
         private List<string> Items_General;
         private List<string> Items_Animation;
@@ -86,7 +84,7 @@ namespace vimage
                     FuncByName.Add(items[i] as string, Action.None);
 
                     i++;
-                    LoadItemsInto(list, (items[i] as List<object>), depth + 1);
+                    LoadItemsInto(list, items[i] as List<object>, depth + 1);
                 }
                 else
                 {
@@ -269,11 +267,11 @@ namespace vimage
                 Close();
 
             object func = FuncByName[item.Name];
-            if (func is string)
+            if (func is string @funcName)
             {
                 for (int i = 0; i < ImageViewer.Config.CustomActions.Count; i++)
                 {
-                    if ((ImageViewer.Config.CustomActions[i] as dynamic).name == (string)func)
+                    if ((ImageViewer.Config.CustomActions[i] as dynamic).name == @funcName)
                         ImageViewer.DoCustomAction((ImageViewer.Config.CustomActions[i] as dynamic).func);
                 }
             }
@@ -293,7 +291,7 @@ namespace vimage
                 if (collection[i].Name == "")
                     continue;
                 object currentFunc = FuncByName[collection[i].Name];
-                if (currentFunc is Action && (Action)currentFunc == func)
+                if (currentFunc is Action action && action == func)
                     return collection[i] as ToolStripMenuItem;
 
                 if (collection[i] is ToolStripDropDownItem && (collection[i] as ToolStripDropDownItem).DropDownItems.Count > 0)
@@ -320,9 +318,11 @@ namespace vimage
         private void SetupToolTip()
         {
             ShowItemToolTips = false;
-            ToolTip = new ToolTip();
-            ToolTip.UseAnimation = true;
-            ToolTip.UseFading = true;
+            ToolTip = new ToolTip
+            {
+                UseAnimation = true,
+                UseFading = true
+            };
             if (SystemInformation.HighContrast)
             {
                 ToolTip.BackColor = System.Drawing.Color.FromArgb(26, 255, 255);
@@ -344,12 +344,12 @@ namespace vimage
         }
         private void ItemMouseEnter(object sender, EventArgs e)
         {
-            ToolStripMenuItem item = (sender as ToolStripMenuItem);
+            ToolStripMenuItem item = sender as ToolStripMenuItem;
             ToolTip.Show(item.ToolTipText, item.Owner, item.Bounds.Location.X + 8, item.Bounds.Location.Y + 1);
         }
         private void ItemMouseLeave(object sender, EventArgs e)
         {
-            ToolStripMenuItem item = (sender as ToolStripMenuItem);
+            ToolStripMenuItem item = sender as ToolStripMenuItem;
             ToolTip.Hide(item.Owner);
         }
 

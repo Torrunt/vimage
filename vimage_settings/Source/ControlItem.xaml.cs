@@ -12,9 +12,8 @@ namespace vimage_settings
     public partial class ControlItem : UserControl
     {
         public List<int> Controls;
-        private bool RecordedKeyCombo = false;
         private bool CanRecordMouseButton = false;
-        private List<int> KeysHeld = new List<int>();
+        private readonly List<int> KeysHeld = new List<int>();
 
         public ControlItem()
         {
@@ -44,7 +43,7 @@ namespace vimage_settings
             e.Handled = true;
 
             int key = ConvertWindowsKey(e.Key == Key.System ? e.SystemKey : e.Key);
-            if (KeysHeld.Count == 0 || KeysHeld[KeysHeld.Count-1] != key)
+            if (KeysHeld.Count == 0 || KeysHeld[KeysHeld.Count - 1] != key)
             {
                 KeysHeld.Add(key);
                 if (KeysHeld.Count > 2)
@@ -56,7 +55,7 @@ namespace vimage_settings
             e.Handled = true;
 
             int key = ConvertWindowsKey(e.Key == Key.System ? e.SystemKey : e.Key);
-            KeysHeld.Remove(key);
+            _ = KeysHeld.Remove(key);
 
             RecordControl(key);
         }
@@ -97,19 +96,18 @@ namespace vimage_settings
                 bind = Config.MOUSE_SCROLL_UP;
             else if (e.Delta < 0)
                 bind = Config.MOUSE_SCROLL_DOWN;
-            
+
             RecordControl(bind);
         }
         private int ConvertWindowsKey(Key keyCode)
         {
             string key = keyCode.ToString().ToUpper();
 
-            RecordedKeyCombo = false;
             // Record Key Press
             if (key.Equals("SCROLL") || key.Equals("NUMLOCK") || key.Equals("CAPITAL") ||
                 key.Equals("LWIN") || key.Equals("RWIN"))
                 return -1;
-            
+
             // fix up some weird names KeyEventArgs gives
             switch (key)
             {
@@ -139,17 +137,15 @@ namespace vimage_settings
 
             if (canBeKeyCombo)
             {
-                // Key Combo? (eg: CTRL+C)
-                int c = -1;
-                if (KeysHeld.Count > 0 && KeysHeld[KeysHeld.Count-1] != bind)
+                if (KeysHeld.Count > 0 && KeysHeld[KeysHeld.Count - 1] != bind)
                 {
-                    c = KeysHeld[KeysHeld.Count - 1];
+                    // Key Combo? (eg: CTRL+C)
+                    int c = KeysHeld[KeysHeld.Count - 1];
 
                     if (i != -1 && Controls.IndexOf(c) != -1)
                         return;
                     Controls.Add(-2);
                     Controls.Add(c);
-                    RecordedKeyCombo = true;
                 }
                 else if (i != -1)
                     return;
@@ -160,7 +156,7 @@ namespace vimage_settings
 
         private void ControlSetting_GotFocus(object sender, RoutedEventArgs e)
         {
-            var window = Window.GetWindow(this);
+            Window window = Window.GetWindow(this);
             if (window == null)
                 return;
             window.PreviewKeyDown += OnKeyDown;
@@ -172,7 +168,7 @@ namespace vimage_settings
 
         private void ControlSetting_LostFocus(object sender, RoutedEventArgs e)
         {
-            var window = Window.GetWindow(this);
+            Window window = Window.GetWindow(this);
             if (window == null)
                 return;
             window.PreviewKeyDown -= OnKeyDown;

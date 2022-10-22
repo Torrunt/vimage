@@ -1,15 +1,15 @@
 ﻿// vimage - http://torrunt.net/vimage
 // Corey Zeke Womack (Torrunt) - me@torrunt.net
 
+using CrashReporterDotNET;
 using System;
 using System.Threading;
-using CrashReporterDotNET;
 
 namespace vimage
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             string file = "";
             if (args.Length > 0)
@@ -39,7 +39,7 @@ namespace vimage
         }
         public static void ReportCrash(Exception exception)
         {
-            var reportCrash = new ReportCrash { ToEmail = "torruntalt@gmail.com" };
+            ReportCrash reportCrash = new ReportCrash { ToEmail = "torruntalt@gmail.com" };
             reportCrash.Send(exception);
         }
 

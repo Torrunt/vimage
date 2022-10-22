@@ -3,7 +3,7 @@ using System;
 
 namespace vimage
 {
-    class AnimatedImageData
+    internal class AnimatedImageData
     {
         public Texture[] Frames;
         public int[] FrameDelays;
@@ -44,7 +44,7 @@ namespace vimage
         public AnimatedImageData() { }
     }
 
-    class AnimatedImage : DisplayObject
+    internal class AnimatedImage : DisplayObject
     {
         public AnimatedImageData Data;
         public Sprite Sprite;
@@ -88,7 +88,7 @@ namespace vimage
                 if (Looping || CurrentFrame < TotalFrames - 1)
                 {
                     if (CurrentFrame == TotalFrames - 1)
-                        SetFrame(0);
+                        _ = SetFrame(0);
                     else
                         NextFrame();
                 }
@@ -128,14 +128,14 @@ namespace vimage
             return true;
         }
 
-        public void NextFrame() { SetFrame(Math.Min(CurrentFrame + 1, TotalFrames)); }
-        public void PrevFrame() { SetFrame(Math.Max(CurrentFrame - 1, 0)); }
+        public void NextFrame() { _ = SetFrame(Math.Min(CurrentFrame + 1, TotalFrames)); }
+        public void PrevFrame() { _ = SetFrame(Math.Max(CurrentFrame - 1, 0)); }
 
         public void Stop() { Playing = false; }
         public void Play() { Playing = true; }
 
-        public void GotoAndPlay(int number) { SetFrame(number); Play(); }
-        public void GotoAndStop(int number) { SetFrame(number); Stop(); }
+        public void GotoAndPlay(int number) { _ = SetFrame(number); Play(); }
+        public void GotoAndStop(int number) { _ = SetFrame(number); Stop(); }
 
     }
 }

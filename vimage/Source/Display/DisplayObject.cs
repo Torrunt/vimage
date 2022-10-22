@@ -4,10 +4,9 @@ using System.Collections.Generic;
 
 namespace vimage
 {
-
-    class DisplayObject : Transformable, Drawable
+    internal class DisplayObject : Transformable, Drawable
     {
-        private List<dynamic> Children = new List<dynamic>();
+        private readonly List<dynamic> Children = new List<dynamic>();
         private int DrawListIndex = 0;
         public DisplayObject Parent = null;
 
@@ -134,9 +133,9 @@ namespace vimage
 
     }
 
-    class TextureInfo
+    internal class TextureInfo
     {
-        private DisplayObject Obj;
+        private readonly DisplayObject Obj;
         public TextureInfo(DisplayObject obj) { Obj = obj; }
 
         public Vector2u Size = new Vector2u();

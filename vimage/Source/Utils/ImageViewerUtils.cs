@@ -1,12 +1,12 @@
-﻿using System;
-using System.Linq;
+﻿using ExifLib;
 using SFML.Graphics;
 using SFML.System;
-using ExifLib;
+using System;
+using System.Linq;
 
 namespace vimage
 {
-    class ImageViewerUtils
+    internal class ImageViewerUtils
     {
         /// <summary> Returns the working area IntRect of the monitor the position is located on.</summary>
         public static IntRect GetCurrentWorkingArea(Vector2i pos)
@@ -78,12 +78,11 @@ namespace vimage
             string extension = System.IO.Path.GetExtension(fileName).ToLowerInvariant();
             if (!(extension == ".jpg" || extension == ".jpeg" || extension == ".jpe"))
                 return 0;
-            ushort orientation = 0;
             try
             {
                 using (ExifReader reader = new ExifReader(fileName))
                 {
-                    if (!reader.GetTagValue(ExifTags.Orientation, out orientation))
+                    if (!reader.GetTagValue(ExifTags.Orientation, out ushort orientation))
                         return 0;
 
                     switch (orientation)

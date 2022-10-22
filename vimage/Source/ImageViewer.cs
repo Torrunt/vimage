@@ -12,7 +12,7 @@ using System.Threading;
 
 namespace vimage
 {
-    class ImageViewer
+    internal class ImageViewer
     {
         public const string VERSION_NO = "#";
 
@@ -31,7 +31,7 @@ namespace vimage
         public string File;
         public List<string> FolderContents = new List<string>();
         public int FolderPosition = 0;
-        private ContextMenu ContextMenu;
+        private readonly ContextMenu ContextMenu;
         public Color ImageColor = Color.White;
         public Vector2u Size = new Vector2u();
         public int Rotation = 0;
@@ -39,7 +39,7 @@ namespace vimage
         private Action CurrentAction = Action.None;
 
         public Config Config;
-        private FileSystemWatcher ConfigFileWatcher;
+        private readonly FileSystemWatcher ConfigFileWatcher;
         private bool ReloadConfigNextTick = false;
 
         private bool Updated = false;
@@ -106,14 +106,18 @@ namespace vimage
             Vector2i mousePos = Mouse.GetPosition();
 
             // Create Window
-            Window = new RenderWindow(new VideoMode(0, 0), File + " - vimage", Styles.None);
-            Window.Position = mousePos;
+            Window = new RenderWindow(new VideoMode(0, 0), File + " - vimage", Styles.None)
+            {
+                Position = mousePos
+            };
 
             // Make Window Transparent (can only tell if image being viewed has transparency)
-            DWM_BLURBEHIND bb = new DWM_BLURBEHIND();
-            bb.dwFlags = DWM_BB.Enable | DWM_BB.BlurRegion;
-            bb.fEnable = true;
-            bb.hRgnBlur = DWM.CreateRectRgn(0, 0, -1, -1);
+            DWM_BLURBEHIND bb = new DWM_BLURBEHIND
+            {
+                dwFlags = DWM_BB.Enable | DWM_BB.BlurRegion,
+                fEnable = true,
+                hRgnBlur = DWM.CreateRectRgn(0, 0, -1, -1)
+            };
             DWM.DwmEnableBlurBehindWindow(Window.SystemHandle, ref bb);
 
             // Load Config File
@@ -122,8 +126,10 @@ namespace vimage
 
             if (Config.Setting_ListenForConfigChanges)
             {
-                ConfigFileWatcher = new FileSystemWatcher(AppDomain.CurrentDomain.BaseDirectory, "config.txt");
-                ConfigFileWatcher.NotifyFilter = NotifyFilters.LastWrite;
+                ConfigFileWatcher = new FileSystemWatcher(AppDomain.CurrentDomain.BaseDirectory, "config.txt")
+                {
+                    NotifyFilter = NotifyFilters.LastWrite
+                };
                 ConfigFileWatcher.Changed += new FileSystemEventHandler(OnConfigChanged);
                 ConfigFileWatcher.EnableRaisingEvents = true;
             }
@@ -138,7 +144,7 @@ namespace vimage
                 DWM.TitleBarSetVisible(Window, true);
 
             // Get Image
-            ChangeImage(file);
+            _ = ChangeImage(file);
 
             if (Image == null)
             {
@@ -183,7 +189,7 @@ namespace vimage
             Window.Position = NextWindowPos;
             Redraw();
             Updated = false;
-            Window.SetActive();
+            _ = Window.SetActive();
             ViewStateHistory = new List<ViewState>();
 
             // Get/Set Folder Sorting
@@ -326,10 +332,7 @@ namespace vimage
                         else if (NextWindowPos.Y > currentBounds.Top + currentBounds.Height - Window.Size.Y)
                             NextWindowPos.Y = currentBounds.Top + currentBounds.Height - (int)Window.Size.Y;
                     }
-                    if (ShowTitleBar)
-                        Window.Position = NextWindowPos - DWM.GetTitleBarDifference(Window.SystemHandle);
-                    else
-                        Window.Position = NextWindowPos;
+                    Window.Position = ShowTitleBar ? NextWindowPos - DWM.GetTitleBarDifference(Window.SystemHandle) : NextWindowPos;
 
                     doRedraw = true;
                 }
@@ -413,24 +416,24 @@ namespace vimage
 
                 case Action.RotateClockwise: RotateImage(Rotation + 90); return;
                 case Action.RotateAntiClockwise: RotateImage(Rotation - 90); return;
-                case Action.Flip: FlipImage(); return;
+                case Action.Flip: _ = FlipImage(); return;
                 case Action.FitToMonitorHeight: ToggleFitToMonitor(Config.HEIGHT); return;
                 case Action.FitToMonitorWidth: ToggleFitToMonitor(Config.WIDTH); return;
                 case Action.FitToMonitorAuto: ToggleFitToMonitor(Config.AUTO); return;
                 case Action.ZoomIn: Zoom(Math.Min(CurrentZoom + (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MAX), !ZoomAlt, true); return;
                 case Action.ZoomOut: Zoom(Math.Max(CurrentZoom - (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MIN), !ZoomAlt, true); return;
 
-                case Action.ToggleSmoothing: ToggleSmoothing(); return;
-                case Action.ToggleMipmapping: ToggleMipmap(); return;
-                case Action.ToggleBackground: ToggleBackground(); return;
-                case Action.TransparencyToggle: ToggleImageTransparency(); return;
-                case Action.ToggleLock: ToggleLock(); return;
-                case Action.ToggleAlwaysOnTop: ToggleAlwaysOnTop(); return;
-                case Action.ToggleTitleBar: ToggleTitleBar(); return;
+                case Action.ToggleSmoothing: _ = ToggleSmoothing(); return;
+                case Action.ToggleMipmapping: _ = ToggleMipmap(); return;
+                case Action.ToggleBackground: _ = ToggleBackground(); return;
+                case Action.TransparencyToggle: _ = ToggleImageTransparency(); return;
+                case Action.ToggleLock: _ = ToggleLock(); return;
+                case Action.ToggleAlwaysOnTop: _ = ToggleAlwaysOnTop(); return;
+                case Action.ToggleTitleBar: _ = ToggleTitleBar(); return;
 
                 case Action.NextFrame: NextFrame(); return;
                 case Action.PrevFrame: PrevFrame(); return;
-                case Action.PauseAnimation: ToggleAnimation(); return;
+                case Action.PauseAnimation: _ = ToggleAnimation(); return;
 
                 case Action.OpenSettings: OpenConfig(); return;
                 case Action.ResetImage: ResetImage(); return;
@@ -454,7 +457,7 @@ namespace vimage
                 case Action.ExitAll: ExitAllInstances(); return;
                 case Action.RerenderSVG: RenderSVGAtCurrentZoom(); return;
 
-                case Action.VisitWebsite: Process.Start("http://torrunt.net/vimage"); return;
+                case Action.VisitWebsite: _ = Process.Start("http://torrunt.net/vimage"); return;
 
                 case Action.SortName: ChangeSortBy(SortBy.Name); return;
                 case Action.SortDate: ChangeSortBy(SortBy.Date); return;
@@ -635,7 +638,7 @@ namespace vimage
             // Custom Actions
             for (int i = 0; i < Config.CustomActionBindings.Count; i++)
             {
-                if (Config.IsControl(code, ((Config.CustomActionBindings[i] as dynamic).bindings as List<int>), CurrentAction != Action.None))
+                if (Config.IsControl(code, (Config.CustomActionBindings[i] as dynamic).bindings as List<int>, CurrentAction != Action.None))
                 {
                     DoCustomAction((Config.CustomActions.Where(a => (a as dynamic).name == (Config.CustomActionBindings[i] as dynamic).name).First() as dynamic).func);
                     CurrentAction = Action.Custom;
@@ -788,21 +791,18 @@ namespace vimage
 
             if (center)
             {
-                Vector2u newSize;
-                if (Rotation == 0 || Rotation == 180)
-                    newSize = new Vector2u((uint)Math.Ceiling(Size.X * CurrentZoom), (uint)Math.Ceiling(Size.Y * CurrentZoom));
-                else
-                    newSize = new Vector2u((uint)Math.Ceiling(Size.Y * CurrentZoom), (uint)Math.Ceiling(Size.X * CurrentZoom));
+                Vector2u newSize = Rotation == 0 || Rotation == 180
+                    ? new Vector2u((uint)Math.Ceiling(Size.X * CurrentZoom), (uint)Math.Ceiling(Size.Y * CurrentZoom))
+                    : new Vector2u((uint)Math.Ceiling(Size.Y * CurrentZoom), (uint)Math.Ceiling(Size.X * CurrentZoom));
                 Vector2i difference = new Vector2i((int)newSize.X, (int)newSize.Y) - new Vector2i((int)Window.Size.X, (int)Window.Size.Y);
                 NextWindowSize = newSize;
                 NextWindowPos = new Vector2i(Window.Position.X - (difference.X / 2), Window.Position.Y - (difference.Y / 2));
             }
             else
             {
-                if (Rotation == 0 || Rotation == 180)
-                    NextWindowSize = new Vector2u((uint)Math.Ceiling(Size.X * CurrentZoom), (uint)Math.Ceiling(Size.Y * CurrentZoom));
-                else
-                    NextWindowSize = new Vector2u((uint)Math.Ceiling(Size.Y * CurrentZoom), (uint)Math.Ceiling(Size.X * CurrentZoom));
+                NextWindowSize = Rotation == 0 || Rotation == 180
+                    ? new Vector2u((uint)Math.Ceiling(Size.X * CurrentZoom), (uint)Math.Ceiling(Size.Y * CurrentZoom))
+                    : new Vector2u((uint)Math.Ceiling(Size.Y * CurrentZoom), (uint)Math.Ceiling(Size.X * CurrentZoom));
                 NextWindowPos = Window.Position;
             }
 
@@ -881,10 +881,9 @@ namespace vimage
 
             if (updateWindowSize)
                 NextWindowSize = WindowSize;
-            if (aroundCenter)
-                NextWindowPos = new Vector2i((int)center.X - (int)(WindowSize.X / 2), (int)center.Y - (int)(WindowSize.Y / 2));
-            else
-                NextWindowPos = Window.Position;
+            NextWindowPos = aroundCenter
+                ? new Vector2i((int)center.X - (int)(WindowSize.X / 2), (int)center.Y - (int)(WindowSize.Y / 2))
+                : Window.Position;
 
             if (ShowTitleBar && updateWindowSize)
                 Zoom(CurrentZoom, true); // make sure image is not too thin if title bar is on
@@ -896,10 +895,7 @@ namespace vimage
 
         public bool FlipImage(int val = -1)
         {
-            if (val == -1)
-                FlippedX = !FlippedX;
-            else
-                FlippedX = val == 1;
+            FlippedX = val == -1 ? !FlippedX : val == 1;
             View view = Window.GetView();
             view.Size = new Vector2f(Rotation == 90 || Rotation == 270 ? view.Size.X : Math.Abs(view.Size.X) * (FlippedX ? -1 : 1),
                 Rotation == 90 || Rotation == 270 ? Math.Abs(view.Size.Y) * (FlippedX ? -1 : 1) : view.Size.Y);
@@ -918,17 +914,11 @@ namespace vimage
 
             IntRect bounds;
             IntRect workingArea = ImageViewerUtils.GetCurrentWorkingArea(Mouse.GetPosition());
-            if (FitToMonitorAlt)
-                bounds = workingArea;
-            else
-                bounds = ImageViewerUtils.GetCurrentBounds(Mouse.GetPosition());
+            bounds = FitToMonitorAlt ? workingArea : ImageViewerUtils.GetCurrentBounds(Mouse.GetPosition());
 
             if (dimension == Config.AUTO)
             {
-                if (bounds.Height < bounds.Width)
-                    dimension = Config.HEIGHT;
-                else
-                    dimension = Config.WIDTH;
+                dimension = bounds.Height < bounds.Width ? Config.HEIGHT : Config.WIDTH;
             }
 
             bool center = false;
@@ -943,10 +933,9 @@ namespace vimage
                         Zoom((float)bounds.Height / Size.X, Size.Y < bounds.Width);
                     else
                         Zoom((float)bounds.Height / Size.Y, Size.X < bounds.Width);
-                    if (NextWindowSize.X >= NextWindowSize.Y && bounds.Width > bounds.Height)
-                        NextWindowPos = ImageViewerUtils.LimitToBounds(NextWindowPos, NextWindowSize, bounds);
-                    else
-                        NextWindowPos = new Vector2i(NextWindowPos.X, bounds.Top);
+                    NextWindowPos = NextWindowSize.X >= NextWindowSize.Y && bounds.Width > bounds.Height
+                        ? ImageViewerUtils.LimitToBounds(NextWindowPos, NextWindowSize, bounds)
+                        : new Vector2i(NextWindowPos.X, bounds.Top);
                 }
                 else if (dimension == Config.WIDTH)
                 {
@@ -956,10 +945,9 @@ namespace vimage
                         Zoom((float)bounds.Width / Size.Y, true);
                     else
                         Zoom((float)bounds.Width / Size.X, true);
-                    if (NextWindowSize.Y >= NextWindowSize.X && bounds.Height > bounds.Width)
-                        NextWindowPos = ImageViewerUtils.LimitToBounds(NextWindowPos, NextWindowSize, bounds);
-                    else
-                        NextWindowPos = new Vector2i(bounds.Left, NextWindowPos.Y);
+                    NextWindowPos = NextWindowSize.Y >= NextWindowSize.X && bounds.Height > bounds.Width
+                        ? ImageViewerUtils.LimitToBounds(NextWindowPos, NextWindowSize, bounds)
+                        : new Vector2i(bounds.Left, NextWindowPos.Y);
                 }
             }
             else
@@ -1018,7 +1006,7 @@ namespace vimage
 
             // Click-Through-Able?
             if (ClickThroughAble)
-                ToggleClickThroughAble();
+                _ = ToggleClickThroughAble();
 
             // Force Fit To Monitor Height?
             Vector2i mousePos = Mouse.GetPosition();
@@ -1030,10 +1018,7 @@ namespace vimage
 
                 if (limit == Config.AUTO)
                 {
-                    if (bounds.Height < bounds.Width)
-                        limit = Config.HEIGHT;
-                    else
-                        limit = Config.WIDTH;
+                    limit = bounds.Height < bounds.Width ? Config.HEIGHT : Config.WIDTH;
                 }
 
                 if (limit == Config.HEIGHT && Size.Y > bounds.Height)
@@ -1057,10 +1042,7 @@ namespace vimage
             // Center image or place in top-left corner if it's a large/wide image.
             IntRect currentWorkingArea;
             IntRect workingArea = ImageViewerUtils.GetCurrentWorkingArea(mousePos);
-            if (!FitToMonitorHeightForced)
-                currentWorkingArea = workingArea;
-            else
-                currentWorkingArea = bounds;
+            currentWorkingArea = !FitToMonitorHeightForced ? workingArea : bounds;
 
             if (Config.Setting_PositionLargeWideImagesInCorner && Size.X > Size.Y && Size.X * CurrentZoom >= bounds.Width)
                 NextWindowPos = new Vector2i(bounds.Left, bounds.Top); // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
@@ -1090,10 +1072,7 @@ namespace vimage
         }
         public bool Smoothing()
         {
-            if (Image is AnimatedImage)
-                return Image.Data.Smooth;
-            else
-                return Image.Texture.Smooth;
+            return Image is AnimatedImage ? (bool)Image.Data.Smooth : (bool)Image.Texture.Smooth;
         }
         public bool ToggleMipmap(int val = -1)
         {
@@ -1107,18 +1086,12 @@ namespace vimage
         }
         public bool Mipmapping()
         {
-            if (Image is AnimatedImage)
-                return Image.Data.Mipmap;
-            else
-                return Image.Texture.Mipmap;
+            return Image is AnimatedImage ? (bool)Image.Data.Mipmap : (bool)Image.Texture.Mipmap;
         }
 
         public bool ToggleBackground(int val = -1)
         {
-            if (val == -1)
-                BackgroundsForImagesWithTransparency = !BackgroundsForImagesWithTransparency;
-            else
-                BackgroundsForImagesWithTransparency = val == 1;
+            BackgroundsForImagesWithTransparency = val == -1 ? !BackgroundsForImagesWithTransparency : val == 1;
             Updated = true;
 
             return BackgroundsForImagesWithTransparency;
@@ -1162,10 +1135,7 @@ namespace vimage
 
         public bool ToggleLock(int val = -1)
         {
-            if (val == -1)
-                Locked = !Locked;
-            else
-                Locked = val == 1;
+            Locked = val == -1 ? !Locked : val == 1;
             Dragging = false;
 
             return Locked;
@@ -1176,10 +1146,7 @@ namespace vimage
             if (val != -1 && AlwaysOnTop == (val == 1))
                 return AlwaysOnTop;
 
-            if (val == -1)
-                AlwaysOnTop = !AlwaysOnTop;
-            else
-                AlwaysOnTop = val == 1;
+            AlwaysOnTop = val == -1 ? !AlwaysOnTop : val == 1;
             AlwaysOnTopForced = false;
             DWM.SetAlwaysOnTop(Window.SystemHandle, AlwaysOnTop);
 
@@ -1217,10 +1184,7 @@ namespace vimage
             if (val != -1 && ClickThroughAble == (val == 1))
                 return ClickThroughAble;
 
-            if (val == -1)
-                ClickThroughAble = !ClickThroughAble;
-            else
-                ClickThroughAble = val == 1;
+            ClickThroughAble = val == -1 ? !ClickThroughAble : val == 1;
             DWM.SetClickThroughAble(Window.SystemHandle, ClickThroughAble);
 
             return ClickThroughAble;
@@ -1233,10 +1197,7 @@ namespace vimage
 
             Vector2i diff = ShowTitleBar ? DWM.GetTitleBarDifference(Window.SystemHandle) : new Vector2i();
 
-            if (val == -1)
-                ShowTitleBar = !ShowTitleBar;
-            else
-                ShowTitleBar = val == -1;
+            ShowTitleBar = val == -1 ? !ShowTitleBar : val == -1;
 
             DWM.TitleBarSetVisible(Window, ShowTitleBar);
             if (ShowTitleBar)
@@ -1347,10 +1308,9 @@ namespace vimage
             Rotation = state.Rotation;
             CurrentZoom = state.Zoom;
             FlippedX = state.FlippedX;
-            if (Rotation == 90 || Rotation == 270)
-                NextWindowSize = new Vector2u((uint)(Size.Y * CurrentZoom), (uint)(Size.X * CurrentZoom));
-            else
-                NextWindowSize = new Vector2u((uint)(Size.X * CurrentZoom), (uint)(Size.Y * CurrentZoom));
+            NextWindowSize = Rotation == 90 || Rotation == 270
+                ? new Vector2u((uint)(Size.Y * CurrentZoom), (uint)(Size.X * CurrentZoom))
+                : new Vector2u((uint)(Size.X * CurrentZoom), (uint)(Size.Y * CurrentZoom));
             NextWindowPos = state.Position;
             Window.SetView(state.View);
 
@@ -1368,11 +1328,11 @@ namespace vimage
             {
                 Svg.SvgDocument svg = Svg.SvgDocument.Open(File);
 
-                float zoom = (Size.X * CurrentZoom) / svg.Width;
+                float zoom = Size.X * CurrentZoom / svg.Width;
 
                 svg.Width *= zoom;
                 svg.Height *= zoom;
-                if (svg.ViewBox == default(Svg.SvgViewBox))
+                if (svg.ViewBox == default)
                     svg.ViewBox = new Svg.SvgViewBox(0, 0, svg.Width / zoom, svg.Height / zoom);
 
                 System.Drawing.Bitmap bitmap = svg.Draw();
@@ -1438,8 +1398,8 @@ namespace vimage
                 dynamic texture = Graphics.GetTexture(fileName);
                 if (texture is Texture)
                     Image = new Sprite(texture);
-                else if (texture is DisplayObject)
-                    Image = (DisplayObject)texture;
+                else if (texture is DisplayObject @displayObject)
+                    Image = @displayObject;
             }
 
             if (Image?.Texture == null)
@@ -1529,12 +1489,12 @@ namespace vimage
             // Smoothing
             if (Image is AnimatedImage)
             {
-                Image.Data.Smooth = Math.Min(Size.X, Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
+                Image.Data.Smooth = Math.Min(Size.X, Size.Y) >= Config.Setting_SmoothingMinImageSize && Config.Setting_SmoothingDefault;
                 Image.Data.Mipmap = Config.Setting_Mipmapping;
             }
             else
             {
-                Image.Texture.Smooth = Math.Min(Size.X, Size.Y) < Config.Setting_SmoothingMinImageSize ? false : Config.Setting_SmoothingDefault;
+                Image.Texture.Smooth = Math.Min(Size.X, Size.Y) >= Config.Setting_SmoothingMinImageSize && Config.Setting_SmoothingDefault;
                 Image.Texture.Mipmap = Config.Setting_Mipmapping;
             }
 
@@ -1554,7 +1514,7 @@ namespace vimage
                 // Resize Image to be similar size to previous image
                 Vector2u actualPrevSize = (Rotation == 0 || Rotation == 180) ? prevSize : new Vector2u(prevSize.Y, prevSize.X);
                 CurrentZoom = Config.Setting_ImageSizing == SizingOption.FitHeight || (Config.Setting_ImageSizing == SizingOption.FitAuto && actualPrevSize.Y < actualPrevSize.X) ?
-                    (actualPrevSize.Y * CurrentZoom) / CurrentImageSize().Y : (actualPrevSize.X * CurrentZoom) / CurrentImageSize().X;
+                    actualPrevSize.Y * CurrentZoom / CurrentImageSize().Y : actualPrevSize.X * CurrentZoom / CurrentImageSize().X;
             }
 
             bool wasFitToMonitorDimension = FitToMonitorHeightForced;
@@ -1565,10 +1525,7 @@ namespace vimage
 
                 if (limit == Config.AUTO)
                 {
-                    if (bounds.Height < bounds.Width)
-                        limit = Config.HEIGHT;
-                    else
-                        limit = Config.WIDTH;
+                    limit = bounds.Height < bounds.Width ? Config.HEIGHT : Config.WIDTH;
                 }
 
                 if (limit == Config.HEIGHT && (FitToMonitorHeight || CurrentImageSize().Y * CurrentZoom > bounds.Height))
@@ -1621,7 +1578,7 @@ namespace vimage
             Vector2i boundsPos = NextWindowPos +
                 new Vector2i((int)(CurrentImageSize().X * CurrentZoom) / 2, (int)(CurrentImageSize().Y * CurrentZoom) / 2);
             bounds = ImageViewerUtils.GetCurrentBounds(boundsPos, false);
-            if (bounds == default(IntRect))
+            if (bounds == default)
             {
                 boundsPos = Mouse.GetPosition();
                 bounds = ImageViewerUtils.GetCurrentBounds(boundsPos);
@@ -1656,7 +1613,7 @@ namespace vimage
             if (File.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
             {
                 // Animated Image
-                Graphics.GetAnimatedImageData(fileName);
+                _ = Graphics.GetAnimatedImageData(fileName);
             }
             else if (File.EndsWith(".ico", StringComparison.OrdinalIgnoreCase))
             {
@@ -1680,9 +1637,9 @@ namespace vimage
 
             PreloadingImage = true;
             PreloadNextImageStart = false;
-
-            bool success = false;
             int pos = FolderPosition;
+
+            bool success;
             do
             {
                 if (PreloadingNextImage == 1)
@@ -1709,7 +1666,7 @@ namespace vimage
             if (!Config.Setting_LoopImageNavigation && FolderPosition == FolderContents.Count() - 1)
                 return;
 
-            bool success = false;
+            bool success;
             do
             {
                 FolderPosition = FolderPosition == FolderContents.Count() - 1 ? 0 : FolderPosition + 1;
@@ -1735,7 +1692,7 @@ namespace vimage
             if (!Config.Setting_LoopImageNavigation && FolderPosition == 0)
                 return;
 
-            bool success = false;
+            bool success;
             do
             {
                 FolderPosition = FolderPosition == 0 ? FolderContents.Count() - 1 : FolderPosition - 1;
@@ -1758,7 +1715,7 @@ namespace vimage
             if (FolderContents.Count() <= 1)
                 return;
 
-            bool success = false;
+            bool success;
             do
             {
                 FolderPosition = rnd.Next(0, FolderContents.Count);
@@ -1773,10 +1730,7 @@ namespace vimage
                 return;
             SortImagesBy = by;
 
-            if (SortImagesBy == SortBy.Name)
-                SortImagesByDir = SortDirection.Ascending;
-            else
-                SortImagesByDir = SortDirection.Descending;
+            SortImagesByDir = SortImagesBy == SortBy.Name ? SortDirection.Ascending : SortDirection.Descending;
 
             FolderContents.Clear();
             GetFolderContents();
@@ -1810,7 +1764,7 @@ namespace vimage
             if (!Directory.Exists(directory))
                 return;
 
-            var contents = Directory.GetFiles(directory, "*.*", SearchOption.TopDirectoryOnly).Where(s => ImageViewerUtils.IsValidExtension(s, EXTENSIONS));
+            IEnumerable<string> contents = Directory.GetFiles(directory, "*.*", SearchOption.TopDirectoryOnly).Where(s => ImageViewerUtils.IsValidExtension(s, EXTENSIONS));
 
             switch (SortImagesBy)
             {
@@ -1931,14 +1885,16 @@ namespace vimage
         public void OpenFileAtLocation()
         {
             if (File != "")
-                Process.Start("explorer.exe", "/select, " + File);
+                _ = Process.Start("explorer.exe", "/select, " + File);
         }
 
         public void OpenDuplicateWindow(bool full = false)
         {
             View view = Window.GetView();
-            ProcessStartInfo startInfo = new ProcessStartInfo(System.Windows.Forms.Application.ExecutablePath);
-            startInfo.Arguments = $"\"{File}\"";
+            ProcessStartInfo startInfo = new ProcessStartInfo(System.Windows.Forms.Application.ExecutablePath)
+            {
+                Arguments = $"\"{File}\""
+            };
             if (full)
             {
                 startInfo.Arguments += $" -sizeX {Size.X}";
@@ -1965,7 +1921,7 @@ namespace vimage
                 startInfo.Arguments += $" -y {Window.Position.Y}";
             }
             Console.WriteLine(startInfo.Arguments);
-            Process.Start(startInfo);
+            _ = Process.Start(startInfo);
         }
 
         public void ExitAllInstances()
@@ -1986,12 +1942,12 @@ namespace vimage
                 string vimage_settings = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vimage_settings.exe");
                 if (System.IO.File.Exists(vimage_settings))
                 {
-                    Process.Start(vimage_settings);
+                    _ = Process.Start(vimage_settings);
                     return;
                 }
             }
 
-            Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
+            _ = Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
         }
         public void ReloadConfig()
         {
@@ -2014,7 +1970,7 @@ namespace vimage
             }
 
             if (ShowTitleBar != Config.Setting_ShowTitleBar)
-                ToggleTitleBar();
+                _ = ToggleTitleBar();
         }
         private void OnConfigChanged(object source, FileSystemEventArgs e)
         {
@@ -2053,7 +2009,7 @@ namespace vimage
                 if (s[0].Contains("%"))
                     s[0] = Environment.ExpandEnvironmentVariables(s[0]);
 
-                try { Process.Start(s[0], s[1]); }
+                try { _ = Process.Start(s[0], s[1]); }
                 catch (Exception) { }
             }
         }
@@ -2069,11 +2025,10 @@ namespace vimage
             for (int i = ignoreFirst ? 1 : 0; i < args.Length; i++)
             {
                 int val = -1;
-                float valf = -1;
-
                 if (i < args.Length - 1 && !int.TryParse(args[i + 1], out val))
                     val = -1;
 
+                float valf;
                 switch (args[i])
                 {
                     case "-x":
@@ -2105,7 +2060,6 @@ namespace vimage
                         }
                         break;
                     case "-centerX":
-                        valf = -1;
                         if (!float.TryParse(args[i + 1], out valf))
                             valf = -1;
                         if (valf != -1)
@@ -2116,7 +2070,6 @@ namespace vimage
                         }
                         break;
                     case "-centerY":
-                        valf = -1;
                         if (!float.TryParse(args[i + 1], out valf))
                             valf = -1;
                         if (valf != -1)
@@ -2127,7 +2080,6 @@ namespace vimage
                         }
                         break;
                     case "-zoom":
-                        valf = 0;
                         if (!float.TryParse(args[i + 1], out valf))
                             valf = 0;
                         if (valf != 0)
@@ -2164,7 +2116,7 @@ namespace vimage
                         {
                             if (Image is AnimatedImage)
                             {
-                                (Image as AnimatedImage).SetFrame(val);
+                                _ = (Image as AnimatedImage).SetFrame(val);
                                 Updated = true;
                             }
 
@@ -2187,7 +2139,7 @@ namespace vimage
                     case "-flip":
                         if (val == 0 || val == 1)
                         {
-                            FlipImage(val);
+                            _ = FlipImage(val);
                             i++;
                         }
                         else
@@ -2196,7 +2148,7 @@ namespace vimage
                     case "-smoothing":
                         if (val == 0 || val == 1)
                         {
-                            ToggleSmoothing(val);
+                            _ = ToggleSmoothing(val);
                             i++;
                         }
                         else
@@ -2205,7 +2157,7 @@ namespace vimage
                     case "-mipmap":
                         if (val == 0 || val == 1)
                         {
-                            ToggleMipmap(val);
+                            _ = ToggleMipmap(val);
                             i++;
                         }
                         else
@@ -2214,7 +2166,7 @@ namespace vimage
                     case "-background":
                         if (val == 0 || val == 1)
                         {
-                            ToggleBackground(val);
+                            _ = ToggleBackground(val);
                             i++;
                         }
                         else
@@ -2223,7 +2175,7 @@ namespace vimage
                     case "-lock":
                         if (val == 0 || val == 1)
                         {
-                            ToggleLock(val);
+                            _ = ToggleLock(val);
                             i++;
                         }
                         else
@@ -2232,7 +2184,7 @@ namespace vimage
                     case "-alwaysOnTop":
                         if (val == 0 || val == 1)
                         {
-                            ToggleAlwaysOnTop(val);
+                            _ = ToggleAlwaysOnTop(val);
                             i++;
                         }
                         else
@@ -2241,7 +2193,7 @@ namespace vimage
                     case "-clickThrough":
                         if (val == 0 || val == 1)
                         {
-                            ToggleClickThroughAble(val);
+                            _ = ToggleClickThroughAble(val);
                             i++;
                         }
                         else
@@ -2250,7 +2202,7 @@ namespace vimage
                     case "-titleBar":
                         if (val == 0 || val == 1)
                         {
-                            ToggleTitleBar(val);
+                            _ = ToggleTitleBar(val);
                             i++;
                         }
                         else
@@ -2259,7 +2211,7 @@ namespace vimage
                     case "-taskbarIcon":
                         if (val == 0 || val == 1)
                         {
-                            ToggleTaskBarIconVisible(val);
+                            _ = ToggleTaskBarIconVisible(val);
                             i++;
                         }
                         else
@@ -2268,7 +2220,7 @@ namespace vimage
                     case "-animation":
                         if (val == 0 || val == 1)
                         {
-                            ToggleAnimation(val);
+                            _ = ToggleAnimation(val);
                             i++;
                         }
                         else
@@ -2277,7 +2229,7 @@ namespace vimage
                     case "-defaultTransparency":
                         if (val == 0 || val == 1)
                         {
-                            ToggleImageTransparency(val);
+                            _ = ToggleImageTransparency(val);
                             i++;
                         }
                         else
@@ -2313,7 +2265,7 @@ namespace vimage
 
     }
 
-    class ViewState
+    internal class ViewState
     {
         public View View;
         public Vector2u Size;

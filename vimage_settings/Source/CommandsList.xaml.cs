@@ -1,7 +1,4 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Navigation;
-using System.Diagnostics;
+﻿using System.Windows;
 
 namespace vimage_settings
 {

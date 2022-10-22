@@ -1,14 +1,14 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using SFML.Graphics;
 using SFML.System;
-using SFML.Graphics;
+using System;
+using System.Runtime.InteropServices;
 
 namespace vimage
 {
     /// <summary>
     /// Desktop Window Manager
     /// </summary>
-    class DWM
+    internal class DWM
     {
         // Make Window Background Transparent
         [DllImport("dwmapi.dll")]
@@ -22,17 +22,31 @@ namespace vimage
         private static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
         [DllImport("user32.dll")]
         private static extern int SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
-        private const int GWL_EX_STYLE = -20;  
+        private const int GWL_EX_STYLE = -20;
         private const uint WS_EX_APPWINDOW = 0x00040000, WS_EX_TOOLWINDOW = 0x00000080;
         public static bool TaskbarIconVisible = true;
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        private const int SW_HIDE = 0x00;
+        private const int SW_SHOW = 0x05;
+
 
         public static void TaskBarIconSetVisible(IntPtr hWnd, bool visible)
         {
             TaskbarIconVisible = visible;
+            bool isOlderThanWindows8 = Environment.OSVersion.Version < new Version(6, 2);
+
             if (TaskbarIconVisible)
-                SetWindowLong(hWnd, GWL_EX_STYLE, (GetWindowLong(hWnd, GWL_EX_STYLE)) & ~WS_EX_TOOLWINDOW & ~WS_EX_APPWINDOW);
+            {
+                _ = SetWindowLong(hWnd, GWL_EX_STYLE, (GetWindowLong(hWnd, GWL_EX_STYLE)) & ~WS_EX_TOOLWINDOW & ~WS_EX_APPWINDOW);
+            }
             else
-                SetWindowLong(hWnd, GWL_EX_STYLE, (GetWindowLong(hWnd, GWL_EX_STYLE) | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW);
+            {
+                if (isOlderThanWindows8) _ = ShowWindow(hWnd, SW_HIDE); // Makes hiding possible in Windows Vista/7
+                _ = SetWindowLong(hWnd, GWL_EX_STYLE, (GetWindowLong(hWnd, GWL_EX_STYLE) | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW); // Hiding TaskBar-Icon
+                if (isOlderThanWindows8) _ = ShowWindow(hWnd, SW_SHOW); // Makes hiding possible in Windows Vista/7
+            }
         }
 
         // Toggle Borderless / Title bar
@@ -46,27 +60,25 @@ namespace vimage
             if (SysMenuVisible == visible)
                 return;
             SysMenuVisible = visible;
-            if (SysMenuVisible)
-                SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) | WS_SYSMENU);
-            else
-                SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) & ~WS_SYSMENU);
+            _ = SysMenuVisible
+                ? SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) | WS_SYSMENU)
+                : SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) & ~WS_SYSMENU);
 
-            SetWindowPos(window.SystemHandle, new IntPtr(0), window.Position.X, window.Position.Y, (int)window.Size.X, (int)window.Size.Y, SWP_FRAMECHANGED);
+            _ = SetWindowPos(window.SystemHandle, new IntPtr(0), window.Position.X, window.Position.Y, (int)window.Size.X, (int)window.Size.Y, SWP_FRAMECHANGED);
         }
 
         public static void TitleBarSetVisible(RenderWindow window, bool visible)
         {
-            if (visible)
-                SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) | WS_CAPTION | WS_SYSMENU);
-            else
-                SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) & ~WS_CAPTION);
+            _ = visible
+                ? SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) | WS_CAPTION | WS_SYSMENU)
+                : SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) & ~WS_CAPTION);
 
-            SetWindowPos(window.SystemHandle, new IntPtr(0), window.Position.X, window.Position.Y, (int)window.Size.X, (int)window.Size.Y, SWP_FRAMECHANGED);
+            _ = SetWindowPos(window.SystemHandle, new IntPtr(0), window.Position.X, window.Position.Y, (int)window.Size.X, (int)window.Size.Y, SWP_FRAMECHANGED);
         }
 
         public static void PreventExlusiveFullscreen(RenderWindow window)
         {
-            SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) & ~WS_POPUP);
+            _ = SetWindowLong(window.SystemHandle, GWL_STYLE, GetWindowLong(window.SystemHandle, GWL_STYLE) & ~WS_POPUP);
         }
 
         // Window/Client Rect/Pos - used for Title Bar support
@@ -78,8 +90,7 @@ namespace vimage
         private static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
         public static RECT GetClientRect(IntPtr hWnd)
         {
-            RECT result;
-            GetClientRect(hWnd, out result);
+            _ = GetClientRect(hWnd, out RECT result);
             return result;
         }
 
@@ -88,8 +99,7 @@ namespace vimage
         private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
         public static RECT GetWindowRect(IntPtr hWnd)
         {
-            RECT result;
-            GetWindowRect(hWnd, out result);
+            _ = GetWindowRect(hWnd, out RECT result);
             return result;
         }
 
@@ -98,7 +108,7 @@ namespace vimage
         public static Vector2i ClientToScreen(IntPtr hWnd, int x, int y)
         {
             Point result = new Point() { x = x, y = y };
-            ClientToScreen(hWnd, ref result);
+            _ = ClientToScreen(hWnd, ref result);
             return new Vector2i(result.x, result.y);
         }
 
@@ -116,7 +126,7 @@ namespace vimage
 
         // Make Window Always On Top
         [DllImport("user32.dll")]
-        static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
         private const uint SWP_NOSIZE = 0x0001;
         private const uint SWP_NOMOVE = 0x0002;
@@ -126,12 +136,12 @@ namespace vimage
         {
             if (alwaysOnTop)
             {
-                SetWindowPos(hWnd, new IntPtr(-1), 0, 0, 0, 0, TOPMOST_FLAGS);
+                _ = SetWindowPos(hWnd, new IntPtr(-1), 0, 0, 0, 0, TOPMOST_FLAGS);
             }
             else
             {
-                SetWindowPos(hWnd, new IntPtr(1), 0, 0, 0, 0, TOPMOST_FLAGS);
-                SetWindowPos(hWnd, new IntPtr(0), 0, 0, 0, 0, TOPMOST_FLAGS);
+                _ = SetWindowPos(hWnd, new IntPtr(1), 0, 0, 0, 0, TOPMOST_FLAGS);
+                _ = SetWindowPos(hWnd, new IntPtr(0), 0, 0, 0, 0, TOPMOST_FLAGS);
             }
         }
 
@@ -140,15 +150,14 @@ namespace vimage
 
         public static void SetClickThroughAble(IntPtr hWnd, bool canClickThrough = true)
         {
-            if (canClickThrough)
-                SetWindowLong(hWnd, GWL_EX_STYLE, (GetWindowLong(hWnd, GWL_EX_STYLE)) | WS_EX_LAYERED | WS_EX_TRANSPARENT);
-            else
-                SetWindowLong(hWnd, GWL_EX_STYLE, (GetWindowLong(hWnd, GWL_EX_STYLE)) & ~WS_EX_LAYERED & ~WS_EX_TRANSPARENT);
+            _ = canClickThrough
+                ? SetWindowLong(hWnd, GWL_EX_STYLE, (GetWindowLong(hWnd, GWL_EX_STYLE)) | WS_EX_LAYERED | WS_EX_TRANSPARENT)
+                : SetWindowLong(hWnd, GWL_EX_STYLE, (GetWindowLong(hWnd, GWL_EX_STYLE)) & ~WS_EX_LAYERED & ~WS_EX_TRANSPARENT);
         }
     }
 
     [Flags]
-    enum DWM_BB
+    internal enum DWM_BB
     {
         Enable = 1,
         BlurRegion = 2,
@@ -156,7 +165,7 @@ namespace vimage
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    struct DWM_BLURBEHIND
+    internal struct DWM_BLURBEHIND
     {
         public DWM_BB dwFlags;
         public bool fEnable;

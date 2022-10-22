@@ -108,10 +108,10 @@ namespace vimage
             get { return (int)Settings["LIMITIMAGESTOMONITOR"]; }
             set { Settings["LIMITIMAGESTOMONITOR"] = value; }
         }
-        public const int NONE   = 0;
+        public const int NONE = 0;
         public const int HEIGHT = 1;
-        public const int WIDTH  = 2;
-        public const int AUTO   = 3;
+        public const int WIDTH = 2;
+        public const int AUTO = 3;
 
         public bool Setting_PositionLargeWideImagesInCorner
         {
@@ -311,7 +311,7 @@ namespace vimage
                 { "SETTINGSAPPHEIGHT", 550 },
                 { "DEFAULTSORTBY", SortBy.FolderDefault },
                 { "DEFAULTSORTDIR", SortDirection.FolderDefault },
-                
+
                 { "CROPTOOLFILLCOLOUR", "#78FFFFFF" },
                 { "CROPTOOLOUTLINECOLOUR", "#FF000000" },
                 { "CROPTOOLOUTLINETHICKNESS", 2 },
@@ -343,7 +343,7 @@ namespace vimage
                 { "PREVFRAME", Control_PrevFrame },
                 { "NEXTFRAME", Control_NextFrame },
                 { "OPENSETTINGS", Control_OpenSettings },
-				{ "RESETIMAGE", Control_ResetImage },
+                { "RESETIMAGE", Control_ResetImage },
                 { "OPENATLOCATION", Control_OpenAtLocation },
                 { "DELETE", Control_Delete },
                 { "COPY", Control_Copy },
@@ -480,15 +480,17 @@ namespace vimage
             ContextMenu.Add(new { name = "Next", func = Action.NextImage });
             ContextMenu.Add(new { name = "Previous", func = Action.PrevImage });
             ContextMenu.Add("Sort by");
-            List<object> SubMenu_SortBy = new List<object>();
-            SubMenu_SortBy.Add(new { name = "Name", func = Action.SortName });
-            SubMenu_SortBy.Add(new { name = "Date", func = Action.SortDate });
-            SubMenu_SortBy.Add(new { name = "Date modified", func = Action.SortDateModified });
-            SubMenu_SortBy.Add(new { name = "Date created", func = Action.SortDateCreated });
-            SubMenu_SortBy.Add(new { name = "Size", func = Action.SortSize });
-            SubMenu_SortBy.Add(new { name = "-", func = Action.None });
-            SubMenu_SortBy.Add(new { name = "Ascending", func = Action.SortAscending });
-            SubMenu_SortBy.Add(new { name = "Descending", func = Action.SortDescending });
+            List<object> SubMenu_SortBy = new List<object>
+            {
+                new { name = "Name", func = Action.SortName },
+                new { name = "Date", func = Action.SortDate },
+                new { name = "Date modified", func = Action.SortDateModified },
+                new { name = "Date created", func = Action.SortDateCreated },
+                new { name = "Size", func = Action.SortSize },
+                new { name = "-", func = Action.None },
+                new { name = "Ascending", func = Action.SortAscending },
+                new { name = "Descending", func = Action.SortDescending }
+            };
             ContextMenu.Add(SubMenu_SortBy);
             ContextMenu.Add(new { name = "-", func = Action.None });
             ContextMenu.Add(new { name = "Rotate right", func = Action.RotateClockwise });
@@ -537,10 +539,10 @@ namespace vimage
                 return;
             }
             // Clear default controls and context menu before they are loaded back in
-            foreach (var list in Settings)
+            foreach (KeyValuePair<string, object> list in Settings)
             {
-                if (list.Value is List<int>)
-                    ((List<int>)list.Value).Clear();
+                if (list.Value is List<int> list1)
+                    list1.Clear();
             }
             ContextMenu.Clear();
             ContextMenu_Animation.Clear();
@@ -600,25 +602,21 @@ namespace vimage
                 string[] values = nameValue[1].Split(',');
 
                 // Assign Values
-                if (Settings[name] is List<int>)
+                if (Settings[name] is List<int> list)
                 {
                     // Control
-                    StringToControls(values, (List<int>)Settings[name]);
+                    _ = StringToControls(values, list);
                 }
                 else if (Settings[name] is int || Settings[name] is Enum)
                 {
                     // Integer
-                    int i;
-                    if (int.TryParse(values[0], out i))
+                    if (int.TryParse(values[0], out int i))
                         Settings[name] = i;
                 }
                 else if (Settings[name] is Boolean)
                 {
                     // Boolean
-                    if (values[0].Equals("1") || values[0].ToUpper().Equals("T") || values[0].ToUpper().Equals("TRUE"))
-                        Settings[name] = true;
-                    else
-                        Settings[name] = false;
+                    Settings[name] = values[0].Equals("1") || values[0].ToUpper().Equals("T") || values[0].ToUpper().Equals("TRUE") ? true : (object)false;
                 }
                 else if (Settings[name] is String)
                 {
@@ -894,7 +892,7 @@ namespace vimage
                 {
                     // Item
                     string itemName = (items[i] as dynamic).name as string;
-                    string itemFunc = (string)((items[i] as dynamic).func is Action ? ((Action)(items[i] as dynamic).func).ToNameString() : (items[i] as dynamic).func);
+                    string itemFunc = (string)((items[i] as dynamic).func is Action action ? action.ToNameString() : (items[i] as dynamic).func);
                     if (itemName.Equals("-"))
                         writer.Write("-" + Environment.NewLine);
                     else if (itemName.Equals(""))
@@ -935,7 +933,7 @@ namespace vimage
                 }
                 if (nextIsKeyCombo)
                 {
-                    str += ControlToString(controls[i]) + "+" + ControlToString(controls[i+1]);
+                    str += ControlToString(controls[i]) + "+" + ControlToString(controls[i + 1]);
                     nextIsKeyCombo = false;
                     i++;
                 }
@@ -951,10 +949,7 @@ namespace vimage
         /// <summary> Converts Keyboard.Key or Mouse.Button to their string name. </summary>
         public static string ControlToString(object code)
         {
-            if ((int)code >= MouseCodeOffset)
-                return MouseButtonToString((int)code);
-            else
-                return KeyToString((Keyboard.Key)code);
+            return (int)code >= MouseCodeOffset ? MouseButtonToString((int)code) : KeyToString((Keyboard.Key)code);
         }
 
         public static List<int> StringToControls(string[] values, List<int> list = null)
@@ -996,33 +991,18 @@ namespace vimage
             if (Control.Count == 0)
                 return false;
 
-            int codeID = -1;
-            if (code is Mouse.Button)
-                codeID = (int)code + MouseCodeOffset;
-            else
-                codeID = (int)code;
-
+            int codeID = code is Mouse.Button ? (int)code + MouseCodeOffset : (int)code;
             int index = Control.IndexOf(codeID);
             if (index == -1)
                 return false;
-            bool value = false;
+            bool value;
             do
             {
                 // key-combo?
-                if (index >= 1 && Control[index - 1] == -2)
-                    value = false;
-                else if (index > 1 && Control[index - 2] == -2)
-                    value = Keyboard.IsKeyPressed((Keyboard.Key)Control[index - 1]);
-                else if (onlyIfKeyCombo)
-                    value = false;
-                else
-                    value = true;
+                value = (index < 1 || Control[index - 1] != -2) && (index > 1 && Control[index - 2] == -2 ? Keyboard.IsKeyPressed((Keyboard.Key)Control[index - 1]) : !onlyIfKeyCombo);
 
                 // loop if there might be second binding using the same keyCode (eg: CTRL+UP and RCTRL+UP)
-                if (!value)
-                    index = Control.IndexOf(codeID, index + 1);
-                else
-                    index = -1;
+                index = !value ? Control.IndexOf(codeID, index + 1) : -1;
             }
             while (index != -1);
 
@@ -1394,207 +1374,207 @@ namespace vimage
             switch (key)
             {
                 case Keyboard.Key.A:
-	                return "A";
+                    return "A";
                 case Keyboard.Key.B:
-	                return "B";
+                    return "B";
                 case Keyboard.Key.C:
-	                return "C";
+                    return "C";
                 case Keyboard.Key.D:
-	                return "D";
+                    return "D";
                 case Keyboard.Key.E:
-	                return "E";
+                    return "E";
                 case Keyboard.Key.F:
-	                return "F";
+                    return "F";
                 case Keyboard.Key.G:
-	                return "G";
+                    return "G";
                 case Keyboard.Key.H:
-	                return "H";
+                    return "H";
                 case Keyboard.Key.I:
-	                return "I";
+                    return "I";
                 case Keyboard.Key.J:
-	                return "J";
+                    return "J";
                 case Keyboard.Key.K:
-	                return "K";
+                    return "K";
                 case Keyboard.Key.L:
-	                return "L";
+                    return "L";
                 case Keyboard.Key.M:
-	                return "M";
+                    return "M";
                 case Keyboard.Key.N:
-	                return "N";
+                    return "N";
                 case Keyboard.Key.O:
-	                return "O";
+                    return "O";
                 case Keyboard.Key.P:
-	                return "P";
+                    return "P";
                 case Keyboard.Key.Q:
-	                return "Q";
+                    return "Q";
                 case Keyboard.Key.R:
-	                return "R";
+                    return "R";
                 case Keyboard.Key.S:
-	                return "S";
+                    return "S";
                 case Keyboard.Key.T:
-	                return "T";
+                    return "T";
                 case Keyboard.Key.U:
-	                return "U";
+                    return "U";
                 case Keyboard.Key.V:
-	                return "V";
+                    return "V";
                 case Keyboard.Key.W:
-	                return "W";
+                    return "W";
                 case Keyboard.Key.X:
-	                return "X";
+                    return "X";
                 case Keyboard.Key.Y:
-	                return "Y";
+                    return "Y";
                 case Keyboard.Key.Z:
-	                return "Z";
+                    return "Z";
                 case Keyboard.Key.Num0:
-	                return "0";
+                    return "0";
                 case Keyboard.Key.Num1:
-	                return "1";
+                    return "1";
                 case Keyboard.Key.Num2:
-	                return "2";
+                    return "2";
                 case Keyboard.Key.Num3:
-	                return "3";
+                    return "3";
                 case Keyboard.Key.Num4:
-	                return "4";
+                    return "4";
                 case Keyboard.Key.Num5:
-	                return "5";
+                    return "5";
                 case Keyboard.Key.Num6:
-	                return "6";
+                    return "6";
                 case Keyboard.Key.Num7:
-	                return "7";
+                    return "7";
                 case Keyboard.Key.Num8:
-	                return "8";
+                    return "8";
                 case Keyboard.Key.Num9:
-	                return "9";
+                    return "9";
                 case Keyboard.Key.Escape:
-	                return "ESC";
+                    return "ESC";
                 case Keyboard.Key.LControl:
-	                return "CTRL";
+                    return "CTRL";
                 case Keyboard.Key.LShift:
-	                return "SHIFT";
+                    return "SHIFT";
                 case Keyboard.Key.LAlt:
-	                return "ALT";
+                    return "ALT";
                 case Keyboard.Key.LSystem:
-	                return "SYSTEM";
+                    return "SYSTEM";
                 case Keyboard.Key.RControl:
-	                return "RCTRL";
+                    return "RCTRL";
                 case Keyboard.Key.RShift:
-	                return "RSHIFT";
+                    return "RSHIFT";
                 case Keyboard.Key.RAlt:
-	                return "RALT";
+                    return "RALT";
                 case Keyboard.Key.RSystem:
-	                return "RSYSTEM";
+                    return "RSYSTEM";
                 case Keyboard.Key.Menu:
-	                return "MENU";
+                    return "MENU";
                 case Keyboard.Key.LBracket:
-	                return "[";
+                    return "[";
                 case Keyboard.Key.RBracket:
-	                return "]";
+                    return "]";
                 case Keyboard.Key.SemiColon:
-	                return ";";
+                    return ";";
                 case Keyboard.Key.Comma:
-	                return "<";
+                    return "<";
                 case Keyboard.Key.Period:
-	                return ">";
+                    return ">";
                 case Keyboard.Key.Quote:
-	                return "\"";
+                    return "\"";
                 case Keyboard.Key.Slash:
-	                return "/";
+                    return "/";
                 case Keyboard.Key.BackSlash:
-	                return "\\";
+                    return "\\";
                 case Keyboard.Key.Tilde:
-	                return "~";
+                    return "~";
                 case Keyboard.Key.Equal:
-	                return "EQUAL";
+                    return "EQUAL";
                 case Keyboard.Key.Dash:
-	                return "DASH";
+                    return "DASH";
                 case Keyboard.Key.Space:
-	                return "SPACE";
+                    return "SPACE";
                 case Keyboard.Key.Return:
-	                return "RETURN";
+                    return "RETURN";
                 case Keyboard.Key.BackSpace:
-	                return "BACK";
+                    return "BACK";
                 case Keyboard.Key.Tab:
-	                return "TAB";
+                    return "TAB";
                 case Keyboard.Key.PageUp:
-	                return "PGUP";
+                    return "PGUP";
                 case Keyboard.Key.PageDown:
-	                return "PGDOWN";
+                    return "PGDOWN";
                 case Keyboard.Key.End:
-	                return "END";
+                    return "END";
                 case Keyboard.Key.Home:
-	                return "HOME";
+                    return "HOME";
                 case Keyboard.Key.Insert:
-	                return "INSERT";
+                    return "INSERT";
                 case Keyboard.Key.Delete:
-	                return "DELETE";
+                    return "DELETE";
                 case Keyboard.Key.Add:
-	                return "ADD";
+                    return "ADD";
                 case Keyboard.Key.Subtract:
-	                return "SUBTRACT";
+                    return "SUBTRACT";
                 case Keyboard.Key.Multiply:
-	                return "MULTIPLY";
+                    return "MULTIPLY";
                 case Keyboard.Key.Divide:
-	                return "DIVIDE";
+                    return "DIVIDE";
                 case Keyboard.Key.Left:
-	                return "LEFT";
+                    return "LEFT";
                 case Keyboard.Key.Right:
-	                return "RIGHT";
+                    return "RIGHT";
                 case Keyboard.Key.Up:
-	                return "UP";
+                    return "UP";
                 case Keyboard.Key.Down:
-	                return "DOWN";
+                    return "DOWN";
                 case Keyboard.Key.Numpad0:
-	                return "NUMPAD0";
+                    return "NUMPAD0";
                 case Keyboard.Key.Numpad1:
-	                return "NUMPAD1";
+                    return "NUMPAD1";
                 case Keyboard.Key.Numpad2:
-	                return "NUMPAD2";
+                    return "NUMPAD2";
                 case Keyboard.Key.Numpad3:
-	                return "NUMPAD3";
+                    return "NUMPAD3";
                 case Keyboard.Key.Numpad4:
-	                return "NUMPAD4";
+                    return "NUMPAD4";
                 case Keyboard.Key.Numpad5:
-	                return "NUMPAD5";
+                    return "NUMPAD5";
                 case Keyboard.Key.Numpad6:
-	                return "NUMPAD6";
+                    return "NUMPAD6";
                 case Keyboard.Key.Numpad7:
-	                return "NUMPAD7";
+                    return "NUMPAD7";
                 case Keyboard.Key.Numpad8:
-	                return "NUMPAD8";
+                    return "NUMPAD8";
                 case Keyboard.Key.Numpad9:
-	                return "NUMPAD9";
+                    return "NUMPAD9";
                 case Keyboard.Key.F1:
-	                return "F1";
+                    return "F1";
                 case Keyboard.Key.F2:
-	                return "F2";
+                    return "F2";
                 case Keyboard.Key.F3:
-	                return "F3";
+                    return "F3";
                 case Keyboard.Key.F4:
-	                return "F4";
+                    return "F4";
                 case Keyboard.Key.F5:
-	                return "F5";
+                    return "F5";
                 case Keyboard.Key.F6:
-	                return "F6";
+                    return "F6";
                 case Keyboard.Key.F7:
-	                return "F7";
+                    return "F7";
                 case Keyboard.Key.F8:
-	                return "F8";
+                    return "F8";
                 case Keyboard.Key.F9:
-	                return "F9";
+                    return "F9";
                 case Keyboard.Key.F10:
-	                return "F10";
+                    return "F10";
                 case Keyboard.Key.F11:
-	                return "F11";
+                    return "F11";
                 case Keyboard.Key.F12:
-	                return "F12";
+                    return "F12";
                 case Keyboard.Key.F13:
-	                return "F13";
+                    return "F13";
                 case Keyboard.Key.F14:
-	                return "F14";
+                    return "F14";
                 case Keyboard.Key.F15:
-	                return "F15";
+                    return "F15";
                 case Keyboard.Key.Pause:
-	                return "PAUSE";
+                    return "PAUSE";
             }
 
             return "";
@@ -1602,10 +1582,7 @@ namespace vimage
 
         public static int StringToControl(string str)
         {
-            if (str.StartsWith("MOUSE") || (str == "SCROLLUP" || str == "SCROLLDOWN"))
-                return StringToMouseButton(str);
-            else
-                return (int)StringToKey(str);
+            return str.StartsWith("MOUSE") || str == "SCROLLUP" || str == "SCROLLDOWN" ? StringToMouseButton(str) : (int)StringToKey(str);
         }
 
         public static bool KeyModifier(Keyboard.Key key)

@@ -16,10 +16,7 @@ namespace vimage_settings
                 return Enum.ToObject(targetType, value);
 
             // convert enum to int
-            if (value.GetType().IsEnum)
-                return System.Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()));
-
-            return null;
+            return value.GetType().IsEnum ? System.Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType())) : null;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
