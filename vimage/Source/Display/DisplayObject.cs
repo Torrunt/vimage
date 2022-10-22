@@ -159,8 +159,11 @@ namespace vimage
             set
             {
                 _Mipmap = value;
-                for (int i = 0; i < Obj.NumChildren; i++)
-                    Obj.GetChildAt(i).Texture.Mipmap = _Mipmap;
+                if (_Mipmap)
+                {
+                    for (int i = 0; i < Obj.NumChildren; i++)
+                        (Obj.GetChildAt(i).Texture as Texture).GenerateMipmap();
+                }
             }
         }
     }

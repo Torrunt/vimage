@@ -29,7 +29,6 @@ namespace vimage
         public List<int> Control_ZoomAlt = new List<int>();
         public List<int> Control_DragLimitToMonitorBounds = new List<int>();
         public List<int> Control_ToggleSmoothing = new List<int>();
-        public List<int> Control_ToggleMipmapping = new List<int>();
         public List<int> Control_ToggleBackground = new List<int>();
         public List<int> Control_ToggleLock = new List<int>();
         public List<int> Control_ToggleAlwaysOnTop = new List<int>();
@@ -63,7 +62,7 @@ namespace vimage
         {
             "Drag", "Close", "Open Context Menu", "Prev Image", "Next Image", "Rotate Clockwise", "Rotate Anti-Clockwise", "Flip",
             "Fit To Monitor Auto", "Fit To Monitor Width", "Fit To Monitor Height", "Fit To Monitor Alt", "Zoom In", "Zoom Out", "Zoom Faster", "Zoom Alt", "Drag Limit to Monitor Bounds",
-            "Toggle Smoothing", "Toggle Mipmapping", "Toggle Background For Transparency", "Toggle Lock", "Toggle Always On Top", "Toggle Title Bar", "Pause Animation", "Prev Frame", "Next Frame",
+            "Toggle Smoothing", "Toggle Background For Transparency", "Toggle Lock", "Toggle Always On Top", "Toggle Title Bar", "Pause Animation", "Prev Frame", "Next Frame",
             "Open Settings", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Open Full Duplicate Image", "Random Image",
             "Move Left", "Move Right", "Move Up", "Move Down", "Transparency Toggle", "Transparency Increase", "Transparency Decrease", "Crop", "Undo Crop", "Exit All Instances", "Re-render SVG"
         };
@@ -265,7 +264,7 @@ namespace vimage
             {
                 Control_Drag, Control_Close, Control_OpenContextMenu, Control_PrevImage, Control_NextImage, Control_RotateClockwise,
                 Control_RotateAntiClockwise, Control_Flip, Control_FitToMonitorHeight, Control_FitToMonitorWidth, Control_FitToMonitorAuto,
-                Control_FitToMonitorAlt, Control_ZoomIn, Control_ZoomOut, Control_ZoomFaster, Control_ZoomAlt, Control_DragLimitToMonitorBounds, Control_ToggleSmoothing, Control_ToggleMipmapping,
+                Control_FitToMonitorAlt, Control_ZoomIn, Control_ZoomOut, Control_ZoomFaster, Control_ZoomAlt, Control_DragLimitToMonitorBounds, Control_ToggleSmoothing,
                 Control_ToggleBackground, Control_ToggleLock, Control_ToggleAlwaysOnTop, Control_ToggleTitleBar, Control_PauseAnimation, Control_PrevFrame, Control_NextFrame, Control_OpenSettings,
                 Control_ResetImage, Control_OpenAtLocation, Control_Delete, Control_Copy, Control_CopyAsImage, Control_OpenDuplicateImage, Control_OpenFullDuplicateImage,
                 Control_RandomImage, Control_MoveLeft, Control_MoveRight, Control_MoveUp, Control_MoveDown,
@@ -334,7 +333,6 @@ namespace vimage
                 { "ZOOMALT", Control_ZoomAlt },
                 { "DRAGLIMITTOMONITORBOUNDS", Control_DragLimitToMonitorBounds },
                 { "TOGGLESMOOTHING", Control_ToggleSmoothing },
-                { "TOGGLEMIPMAPPING", Control_ToggleMipmapping },
                 { "TOGGLEBACKGROUNDFORTRANSPARENCY", Control_ToggleBackground },
                 { "TOGGLELOCK", Control_ToggleLock },
                 { "TOGGLEALWAYSONTOP", Control_ToggleAlwaysOnTop },
@@ -394,7 +392,6 @@ namespace vimage
             Control_ZoomAlt.Clear();
             Control_DragLimitToMonitorBounds.Clear();
             Control_ToggleSmoothing.Clear();
-            Control_ToggleMipmapping.Clear();
             Control_ToggleBackground.Clear();
             Control_ToggleLock.Clear();
             Control_ToggleAlwaysOnTop.Clear();
@@ -441,7 +438,6 @@ namespace vimage
             SetControls(Control_ZoomAlt, "RCTRL", "CTRL");
             SetControls(Control_DragLimitToMonitorBounds, "ALT");
             SetControls(Control_ToggleSmoothing, "S");
-            SetControls(Control_ToggleMipmapping, "SHIFT+S");
             SetControls(Control_ToggleBackground, "B");
             SetControls(Control_ToggleLock, "");
             SetControls(Control_ToggleAlwaysOnTop, "L");
@@ -785,7 +781,6 @@ namespace vimage
                 WriteControl(writer, "ZoomAlt", Control_ZoomAlt);
                 WriteControl(writer, "DragLimitToMonitorBounds", Control_DragLimitToMonitorBounds);
                 WriteControl(writer, "ToggleSmoothing", Control_ToggleSmoothing);
-                WriteControl(writer, "ToggleMipmapping", Control_ToggleMipmapping);
                 WriteControl(writer, "ToggleBackgroundForTransparency", Control_ToggleBackground);
                 WriteControl(writer, "ToggleLock", Control_ToggleLock);
                 WriteControl(writer, "ToggleAlwaysOnTop", Control_ToggleAlwaysOnTop);
@@ -1236,7 +1231,7 @@ namespace vimage
                 case "SEMICOLON":
                 case ";":
                 case ":":
-                    return Keyboard.Key.SemiColon;
+                    return Keyboard.Key.Semicolon;
                 case "COMMA":
                 case "<":
                     return Keyboard.Key.Comma;
@@ -1256,7 +1251,7 @@ namespace vimage
                 case "BACKSLASH":
                 case "|":
                 case "\\":
-                    return Keyboard.Key.BackSlash;
+                    return Keyboard.Key.Backslash;
                 case "TILDE":
                 case "~":
                 case "`":
@@ -1269,14 +1264,14 @@ namespace vimage
                 case "MINUS":
                 case "_":
                 case "-":
-                    return Keyboard.Key.Dash;
+                    return Keyboard.Key.Hyphen;
                 case "SPACE":
                     return Keyboard.Key.Space;
                 case "RETURN":
-                    return Keyboard.Key.Return;
+                    return Keyboard.Key.Enter;
                 case "BACK":
                 case "BACKSPACE":
-                    return Keyboard.Key.BackSpace;
+                    return Keyboard.Key.Backspace;
                 case "TAB":
                     return Keyboard.Key.Tab;
                 case "PAGEUP":
@@ -1469,7 +1464,7 @@ namespace vimage
                     return "[";
                 case Keyboard.Key.RBracket:
                     return "]";
-                case Keyboard.Key.SemiColon:
+                case Keyboard.Key.Semicolon:
                     return ";";
                 case Keyboard.Key.Comma:
                     return "<";
@@ -1479,19 +1474,19 @@ namespace vimage
                     return "\"";
                 case Keyboard.Key.Slash:
                     return "/";
-                case Keyboard.Key.BackSlash:
+                case Keyboard.Key.Backslash:
                     return "\\";
                 case Keyboard.Key.Tilde:
                     return "~";
                 case Keyboard.Key.Equal:
                     return "EQUAL";
-                case Keyboard.Key.Dash:
+                case Keyboard.Key.Hyphen:
                     return "DASH";
                 case Keyboard.Key.Space:
                     return "SPACE";
-                case Keyboard.Key.Return:
+                case Keyboard.Key.Enter:
                     return "RETURN";
-                case Keyboard.Key.BackSpace:
+                case Keyboard.Key.Backspace:
                     return "BACK";
                 case Keyboard.Key.Tab:
                     return "TAB";

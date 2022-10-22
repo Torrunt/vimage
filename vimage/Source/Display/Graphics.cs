@@ -558,7 +558,7 @@ namespace vimage
                     return;
 
                 Data.Frames[i].Smooth = Data.Smooth;
-                Data.Frames[i].Mipmap = Data.Mipmap;
+                if (Data.Mipmap) Data.Frames[i].GenerateMipmap();
 
                 int fd = i * 4;
                 Data.FrameDelays[i] = frameDelays != null && frameDelays.Length > fd ? (frameDelays[fd] + frameDelays[fd + 1] * 256) * 10 : defaultFrameDelay;
