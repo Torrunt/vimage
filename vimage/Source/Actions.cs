@@ -26,7 +26,6 @@ namespace vimage
         DragLimitToMonitorBounds,
 
         ToggleSmoothing,
-        ToggleMipmapping,
         ToggleBackground,
         ToggleLock,
         ToggleAlwaysOnTop,
@@ -99,7 +98,6 @@ namespace vimage
             "DRAG LIMIT TO MONITOR BOUNDS",
 
             "TOGGLE SMOOTHING",
-            "TOGGLE MIPMAPPING",
             "TOGGLE BACKGROUND",
             "TOGGLE LOCK",
             "ALWAYS ON TOP",
@@ -152,7 +150,7 @@ namespace vimage
         {
             Action.Close, Action.NextImage, Action.PrevImage, Action.RotateClockwise, Action.RotateAntiClockwise,
             Action.Flip, Action.FitToMonitorHeight, Action.FitToMonitorWidth, Action.FitToMonitorAuto, Action.ResetImage,
-            Action.ToggleSmoothing, Action.ToggleMipmapping, Action.ToggleBackground, Action.TransparencyToggle, Action.ToggleLock, Action.ToggleAlwaysOnTop, Action.ToggleClickThroughAble, Action.ToggleTitleBar,
+            Action.ToggleSmoothing, Action.ToggleBackground, Action.TransparencyToggle, Action.ToggleLock, Action.ToggleAlwaysOnTop, Action.ToggleClickThroughAble, Action.ToggleTitleBar,
             Action.OpenAtLocation, Action.Delete, Action.Copy, Action.CopyAsImage,
             Action.OpenDuplicateImage, Action.OpenFullDuplicateImage, Action.RandomImage, Action.UndoCrop, Action.ExitAll,
             Action.PauseAnimation, Action.NextFrame, Action.PrevFrame,

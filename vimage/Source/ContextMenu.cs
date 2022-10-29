@@ -222,9 +222,6 @@ namespace vimage
             item = GetItemByFunc(Action.ToggleSmoothing);
             if (item != null) item.Checked = ImageViewer.Smoothing();
 
-            item = GetItemByFunc(Action.ToggleMipmapping);
-            if (item != null) item.Checked = ImageViewer.Mipmapping();
-
             item = GetItemByFunc(Action.ToggleBackground);
             if (item != null) item.Checked = ImageViewer.BackgroundsForImagesWithTransparency;
 

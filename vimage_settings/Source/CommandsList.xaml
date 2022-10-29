@@ -50,7 +50,6 @@
                     <LineBreak />
                     -flip<LineBreak />
                     -smoothing<LineBreak />
-                    -mipmap<LineBreak />
                     -background<LineBreak />
                     -lock<LineBreak />
                     -alwaysOnTop<LineBreak />
@@ -91,7 +90,6 @@
                     <LineBreak />
                     flips image left/right <LineBreak />
                     toggles smoothing<LineBreak />
-                    toggles mipmapping<LineBreak />
                     toggles backgroud<LineBreak />
                     toggles image lock<LineBreak />
                     toggles Always On Top mode<LineBreak />

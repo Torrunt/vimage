@@ -424,7 +424,6 @@ namespace vimage
                 case Action.ZoomOut: Zoom(Math.Max(CurrentZoom - (ZoomFaster ? (Config.Setting_ZoomSpeedFast / 100f) : (Config.Setting_ZoomSpeed / 100f)), ZOOM_MIN), !ZoomAlt, true); return;
 
                 case Action.ToggleSmoothing: _ = ToggleSmoothing(); return;
-                case Action.ToggleMipmapping: _ = ToggleMipmap(); return;
                 case Action.ToggleBackground: _ = ToggleBackground(); return;
                 case Action.TransparencyToggle: _ = ToggleImageTransparency(); return;
                 case Action.ToggleLock: _ = ToggleLock(); return;
@@ -580,9 +579,6 @@ namespace vimage
             // Toggle Settings
             if (Config.IsControl(code, Config.Control_ToggleSmoothing, CurrentAction != Action.None))
                 CurrentAction = Action.ToggleSmoothing;
-
-            if (Config.IsControl(code, Config.Control_ToggleMipmapping, CurrentAction != Action.None))
-                CurrentAction = Action.ToggleMipmapping;
 
             if (Config.IsControl(code, Config.Control_ToggleBackground, CurrentAction != Action.None))
                 CurrentAction = Action.ToggleBackground;
@@ -1074,20 +1070,6 @@ namespace vimage
         {
             return Image is AnimatedImage ? (bool)Image.Data.Smooth : (bool)Image.Texture.Smooth;
         }
-        public bool ToggleMipmap(int val = -1)
-        {
-            if (Image is AnimatedImage)
-                Image.Data.Mipmap = val == -1 ? !Image.Data.Mipmap : (val == 1);
-            else
-                Image.Texture.Mipmap = val == -1 ? !Image.Texture.Mipmap : (val == 1);
-            Updated = true;
-
-            return Mipmapping();
-        }
-        public bool Mipmapping()
-        {
-            return Image is AnimatedImage ? (bool)Image.Data.Mipmap : (bool)Image.Texture.Mipmap;
-        }
 
         public bool ToggleBackground(int val = -1)
         {
@@ -1490,12 +1472,14 @@ namespace vimage
             if (Image is AnimatedImage)
             {
                 Image.Data.Smooth = Math.Min(Size.X, Size.Y) >= Config.Setting_SmoothingMinImageSize && Config.Setting_SmoothingDefault;
-                Image.Data.Mipmap = Config.Setting_Mipmapping;
+                if (Config.Setting_Mipmapping && Image.Data is Texture)
+                    (Image.Data as Texture).GenerateMipmap();
             }
             else
             {
                 Image.Texture.Smooth = Math.Min(Size.X, Size.Y) >= Config.Setting_SmoothingMinImageSize && Config.Setting_SmoothingDefault;
-                Image.Texture.Mipmap = Config.Setting_Mipmapping;
+                if (Config.Setting_Mipmapping && Image.Texture is Texture)
+                    (Image.Texture as Texture).GenerateMipmap();
             }
 
             // Color
@@ -2153,15 +2137,6 @@ namespace vimage
                         }
                         else
                             t = ToggleSmoothing(toggleSyncVal);
-                        break;
-                    case "-mipmap":
-                        if (val == 0 || val == 1)
-                        {
-                            _ = ToggleMipmap(val);
-                            i++;
-                        }
-                        else
-                            t = ToggleMipmap(toggleSyncVal);
                         break;
                     case "-background":
                         if (val == 0 || val == 1)

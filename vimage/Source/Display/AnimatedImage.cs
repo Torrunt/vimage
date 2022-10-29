@@ -33,10 +33,10 @@ namespace vimage
             set
             {
                 _Mipmap = value;
-                if (FullyLoaded)
+                if (FullyLoaded && _Mipmap)
                 {
                     foreach (Texture texture in Frames)
-                        texture.Mipmap = _Mipmap;
+                        texture.GenerateMipmap();
                 }
             }
         }
