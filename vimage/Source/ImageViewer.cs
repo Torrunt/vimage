@@ -1,5 +1,4 @@
-﻿using DevIL.Unmanaged;
-using SFML.Graphics;
+﻿using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
 using System;
@@ -96,7 +95,7 @@ namespace vimage
 
         public ImageViewer(string file, string[] args)
         {
-            IL.Initialize();
+            Graphics.Init();
 
             // Extension supported?
             if (file != "" && !ImageViewerUtils.IsValidExtension(file, EXTENSIONS))

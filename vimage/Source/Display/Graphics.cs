@@ -30,6 +30,11 @@ namespace vimage
         public static uint MAX_ANIMATIONS = 8;
         public static int TextureMaxSize = (int)Texture.MaximumSize;
 
+        public static void Init()
+        {
+            IL.Initialize();
+        }
+
         public static dynamic GetTexture(string fileName)
         {
             int index = TextureFileNames.IndexOf(fileName);
