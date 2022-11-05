@@ -151,7 +151,7 @@ namespace vimage
 
             // DevIL Enabled?
             if (Config.Setting_UseDevIL) Graphics.InitDevIL();
-            if (!Graphics.UseDevil && !ImageViewerUtils.IsValidExtension(file, EXTENSIONS))
+            if (file != "" && !Graphics.UseDevil && !ImageViewerUtils.IsValidExtension(file, EXTENSIONS))
             {
                 System.Windows.Forms.MessageBox.Show("vimage requires DevIL to be enabled to load this file format.\nYou can turn it on in the settings.", "vimage - File Format unsupported by default");
                 Window.Close();
