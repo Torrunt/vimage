@@ -17,9 +17,15 @@ namespace vimage
 
         public readonly string[] EXTENSIONS =
         {
-            ".bmp", ".cut", ".dds", ".doom", ".exr", ".hdr", ".gif", ".ico", ".jp2", ".jpg", ".jpeg", ".lbm", ".mdl", ".mng",
-            ".pal", ".pbm", ".pcd", ".pcx", ".pgm", ".pic", ".png", ".ppm", ".psd", ".psp", ".raw", ".sgi", ".tga", ".tif", ".tiff", ".svg", ".webp",
-            ".jpe", ".jif", ".jiff", ".jfif", ".jfi"
+            ".bmp", ".png", ".tga", ".gif", ".psd", ".hdr", ".pic", ".ico", ".svg", ".webp",
+            ".jpg", ".jpeg", ".jpe", ".jif", ".jiff", ".jfif", ".jfi"
+        };
+        public readonly string[] EXTENSIONS_DEVIL =
+        {
+            ".bmp", ".png", ".tga", ".gif", ".psd", ".hdr", ".pic", ".ico", ".svg", ".webp",
+            ".jpg", ".jpeg", ".jpe", ".jif", ".jiff", ".jfif", ".jfi",
+            ".cut", ".dds", ".doom", ".exr", ".jp2", ".lbm", ".mdl", ".mng",
+            ".pal", ".pbm", ".pcd", ".pcx", ".pgm", ".ppm", ".psp", ".raw", ".sgi", ".tif", ".tiff",
         };
 
         public readonly float ZOOM_MIN = 0.05f;
@@ -95,11 +101,12 @@ namespace vimage
 
         public ImageViewer(string file, string[] args)
         {
-            Graphics.Init();
-
             // Extension supported?
-            if (file != "" && !ImageViewerUtils.IsValidExtension(file, EXTENSIONS))
+            if (file != "" && !ImageViewerUtils.IsValidExtension(file, EXTENSIONS_DEVIL))
+            {
+                System.Windows.Forms.MessageBox.Show("vimage does not support this file format.", "vimage - Unknown File Format");
                 return;
+            }
 
             // Save Mouse Position -> will open image at this position
             Vector2i mousePos = Mouse.GetPosition();
@@ -141,6 +148,15 @@ namespace vimage
             ShowTitleBar = Config.Setting_ShowTitleBar;
             if (ShowTitleBar)
                 DWM.TitleBarSetVisible(Window, true);
+
+            // DevIL Enabled?
+            if (Config.Setting_UseDevIL) Graphics.InitDevIL();
+            if (!Graphics.UseDevil && !ImageViewerUtils.IsValidExtension(file, EXTENSIONS))
+            {
+                System.Windows.Forms.MessageBox.Show("vimage requires DevIL to be enabled to load this file format.\nYou can turn it on in the settings.", "vimage - File Format unsupported by default");
+                Window.Close();
+                return;
+            }
 
             // Get Image
             _ = ChangeImage(file);
@@ -1747,7 +1763,7 @@ namespace vimage
             if (!Directory.Exists(directory))
                 return;
 
-            IEnumerable<string> contents = Directory.GetFiles(directory, "*.*", SearchOption.TopDirectoryOnly).Where(s => ImageViewerUtils.IsValidExtension(s, EXTENSIONS));
+            IEnumerable<string> contents = Directory.GetFiles(directory, "*.*", SearchOption.TopDirectoryOnly).Where(s => ImageViewerUtils.IsValidExtension(s, Graphics.UseDevil ? EXTENSIONS_DEVIL : EXTENSIONS));
 
             switch (SortImagesBy)
             {

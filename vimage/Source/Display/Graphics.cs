@@ -30,9 +30,19 @@ namespace vimage
         public static uint MAX_ANIMATIONS = 8;
         public static int TextureMaxSize = (int)Texture.MaximumSize;
 
-        public static void Init()
+        public static bool UseDevil = false;
+
+        public static void InitDevIL()
         {
-            IL.Initialize();
+            try
+            {
+                IL.Initialize();
+                UseDevil = true;
+            }
+            catch (DllNotFoundException)
+            {
+                System.Windows.Forms.MessageBox.Show("vimage failed to find DevIL.dll.\nIf problem persists, try disabling DevIL in the settings.", "vimage - DevIL.dll not found");
+            }
         }
 
         public static dynamic GetTexture(string fileName)
@@ -59,7 +69,7 @@ namespace vimage
                 // Texture Already Exists (as split texture)
                 return SplitTextures[splitTextureIndex];
             }
-            else
+            else if (UseDevil)
             {
                 // New Texture
                 Texture texture = null;
@@ -98,6 +108,10 @@ namespace vimage
                 IL.DeleteImages(new ImageID[] { imageID });
 
                 return texture == null ? (dynamic)textureLarge : (dynamic)texture;
+            }
+            else
+            {
+                return new Texture(fileName);
             }
         }
         private static Texture GetTextureFromBoundImage()

@@ -67,6 +67,11 @@ namespace vimage
             "Move Left", "Move Right", "Move Up", "Move Down", "Transparency Toggle", "Transparency Increase", "Transparency Decrease", "Crop", "Undo Crop", "Exit All Instances", "Re-render SVG"
         };
 
+        public bool Setting_UseDevIL
+        {
+            get { return (Boolean)Settings["USEDEVIL"]; }
+            set { Settings["USEDEVIL"] = value; }
+        }
         public bool Setting_OpenAtMousePosition
         {
             get { return (Boolean)Settings["OPENATMOUSEPOSITION"]; }
@@ -282,6 +287,7 @@ namespace vimage
 
             Settings = new Dictionary<string, object>()
             {
+                { "USEDEVIL", true },
                 { "OPENATMOUSEPOSITION", true },
                 { "SMOOTHINGDEFAULT", true },
                 { "MIPMAPPING", true },
@@ -719,6 +725,7 @@ namespace vimage
                 // Write
                 writer.Write("// General Settings" + Environment.NewLine);
 
+                WriteSetting(writer, "UseDevil", Setting_UseDevIL);
                 WriteSetting(writer, "OpenAtMousePosition", Setting_OpenAtMousePosition);
                 WriteSetting(writer, "SmoothingDefault", Setting_SmoothingDefault);
                 WriteSetting(writer, "Mipmapping", Setting_Mipmapping);

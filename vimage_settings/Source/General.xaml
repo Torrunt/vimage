@@ -23,6 +23,7 @@
     </UserControl.Resources>
 
     <StackPanel>
+        <CheckBox IsChecked="{Binding Setting_UseDevIL}" Content="Use DevIL" ToolTip="Enable DevIL (Developer Image Library) to allow support for niche image formats."/>
         <CheckBox IsChecked="{Binding Setting_OpenAtMousePosition}" Content="Open images at mouse position" ToolTip="When an image is opened it will be centered at the current mouse position (commonly where the image file is).&#x0a;Otherwise it will be centered on the current monitor."/>
         <CheckBox IsChecked="{Binding Setting_SmoothingDefault}" Content="Smoothing"/>
         <CheckBox IsChecked="{Binding Setting_Mipmapping}" Content="Mipmapping (smoother images when zoomed out)"/>
