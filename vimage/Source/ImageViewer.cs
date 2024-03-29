@@ -144,7 +144,7 @@ namespace vimage
             BackgroundColour = new Color(backColour.R, backColour.G, backColour.B, backColour.A);
             Graphics.MAX_TEXTURES = (uint)Config.Setting_MaxTextures;
             Graphics.MAX_ANIMATIONS = (uint)Config.Setting_MaxAnimations;
-            Graphics.TextureMaxSize = (int)Math.Min(Graphics.TextureMaxSize, 10000);
+            Graphics.TextureMaxSize = Math.Min(Graphics.TextureMaxSize, 8192);
             ShowTitleBar = Config.Setting_ShowTitleBar;
             if (ShowTitleBar)
                 DWM.TitleBarSetVisible(Window, true);
@@ -390,6 +390,7 @@ namespace vimage
 
         private void Redraw()
         {
+            //Window.SetActive();
             // Clear screen
             if (!BackgroundsForImagesWithTransparency && !ShowTitleBar)
                 Window.Clear(new Color(0, 0, 0, 0));
@@ -1609,20 +1610,36 @@ namespace vimage
         /// <summary>Loads an image into memory but doesn't set it as the displayed image.</summary>
         private bool PreloadImage(string fileName)
         {
-            if (File.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
+            string extension = Path.GetExtension(fileName).ToLowerInvariant();
+
+            // Image
+            if (extension.Equals(".svg"))
             {
-                // Animated Image
-                _ = Graphics.GetAnimatedImageData(fileName);
+                // SVG
+                if (Graphics.GetSpriteFromSVG(fileName) == null)
+                    return false;
             }
-            else if (File.EndsWith(".ico", StringComparison.OrdinalIgnoreCase))
+            else if (extension.Equals(".gif"))
+            {
+                // Animated GIF
+                if (Graphics.GetAnimatedImageData(fileName) == null)
+                    return false;
+            }
+            else if (extension.Equals(".ico"))
             {
                 // Icon
                 if (Graphics.GetSpriteFromIcon(fileName) == null)
                     return false;
             }
+            else if (extension.Equals(".webp"))
+            {
+                // WebP
+                if (Graphics.GetSpriteFromWebP(fileName) == null)
+                    return false;
+            }
             else
             {
-                // Image
+                // Other
                 if (Graphics.GetTexture(fileName) == null)
                     return false;
             }
@@ -1668,7 +1685,7 @@ namespace vimage
             bool success;
             do
             {
-                FolderPosition = FolderPosition == FolderContents.Count() - 1 ? 0 : FolderPosition + 1;
+                FolderPosition = FolderPosition >= FolderContents.Count() - 1 ? 0 : FolderPosition + 1;
                 success = ChangeImage(FolderContents[FolderPosition]);
             }
             while (!success);
@@ -1694,7 +1711,7 @@ namespace vimage
             bool success;
             do
             {
-                FolderPosition = FolderPosition == 0 ? FolderContents.Count() - 1 : FolderPosition - 1;
+                FolderPosition = FolderPosition <= 0 ? FolderContents.Count() - 1 : FolderPosition - 1;
                 success = ChangeImage(FolderContents[FolderPosition]);
             }
             while (!success);
