@@ -2559,10 +2559,9 @@ namespace vimage
                     else if (File.EndsWith(".ico", StringComparison.OrdinalIgnoreCase))
                     {
                         // If .ico - copy largest version
-                        System.Drawing.Icon icon = new System.Drawing.Icon(File, 256, 256);
+                        var icon = new System.Drawing.Icon(File, 256, 256);
                         bitmap = Graphics.ExtractVistaIcon(icon);
-                        if (bitmap == null)
-                            bitmap = icon.ToBitmap();
+                        bitmap ??= icon.ToBitmap();
                     }
                     else
                         bitmap = new System.Drawing.Bitmap(File);
@@ -2582,10 +2581,8 @@ namespace vimage
 
         public void OpenDuplicateWindow(bool full = false)
         {
-            View view = Window.GetView();
-            ProcessStartInfo startInfo = new ProcessStartInfo(
-                System.Windows.Forms.Application.ExecutablePath
-            )
+            var view = Window.GetView();
+            var startInfo = new ProcessStartInfo(System.Windows.Forms.Application.ExecutablePath)
             {
                 Arguments = $"\"{File}\"",
             };
@@ -2622,7 +2619,7 @@ namespace vimage
 
         public void ExitAllInstances()
         {
-            Process current = Process.GetCurrentProcess();
+            var current = Process.GetCurrentProcess();
             Process
                 .GetProcessesByName(current.ProcessName)
                 .Where(t => t.Id != current.Id)
@@ -2647,7 +2644,13 @@ namespace vimage
                 }
             }
 
-            _ = Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
+            _ = Process.Start(
+                new ProcessStartInfo
+                {
+                    FileName = Path.Combine(AppContext.BaseDirectory, "config.txt"),
+                    UseShellExecute = true,
+                }
+            );
         }
 
         public void ReloadConfig()
@@ -2696,7 +2699,7 @@ namespace vimage
 
         public void DoCustomAction(string action)
         {
-            if (action.StartsWith("-"))
+            if (action.StartsWith('-'))
             {
                 // Apply arguments to current instance of vimage
                 ApplyArguments(action.Split(' '));
@@ -2716,7 +2719,7 @@ namespace vimage
                 );
                 string[] s = rgx.Split(action, 2);
 
-                if (s[0].Contains("%"))
+                if (s[0].Contains('%'))
                     s[0] = Environment.ExpandEnvironmentVariables(s[0]);
 
                 try
@@ -2729,7 +2732,7 @@ namespace vimage
 
         public void ApplyArguments(string[] args, bool ignoreFirst = false)
         {
-            Vector2f viewCenter = new Vector2f(Size.X / 2f, Size.Y / 2f);
+            var viewCenter = new Vector2f(Size.X / 2f, Size.Y / 2f);
 
             int toggleSync = -1;
             int toggleSyncVal = -1;
@@ -2809,9 +2812,7 @@ namespace vimage
                         break;
                     case "-color":
                     case "-colour":
-                        System.Drawing.Color colour = System.Drawing.ColorTranslator.FromHtml(
-                            args[i + 1]
-                        );
+                        var colour = System.Drawing.ColorTranslator.FromHtml(args[i + 1]);
                         ImageColor = new Color(colour.R, colour.G, colour.B, colour.A);
                         Image.Color = ImageColor;
                         Updated = true;
@@ -2829,9 +2830,9 @@ namespace vimage
                     case "-frame":
                         if (val != -1)
                         {
-                            if (Image is AnimatedImage)
+                            if (Image is AnimatedImage animatedImage)
                             {
-                                _ = (Image as AnimatedImage).SetFrame(val);
+                                _ = animatedImage.SetFrame(val);
                                 Updated = true;
                             }
 

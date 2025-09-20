@@ -1016,10 +1016,13 @@ namespace vimage
             }
             catch (UnauthorizedAccessException)
             {
-                System.Windows.Forms.MessageBox.Show(
-                    "vimage does not have write permissions for the folder it's located in.\nPlease place it somewhere else (or set it to run as admin).",
-                    "vimage - Error"
-                );
+                if (OperatingSystem.IsWindowsVersionAtLeast(6, 1))
+                {
+                    System.Windows.Forms.MessageBox.Show(
+                        "vimage does not have write permissions for the folder it's located in.\nPlease place it somewhere else (or set it to run as admin).",
+                        "vimage - Error"
+                    );
+                }
             }
         }
 

@@ -1,0 +1,11 @@
+{
+     "configurations": [
+          {
+               "name": "C#: vimage",
+               "type": "dotnet",
+               "request": "launch",
+               "projectPath": "${workspaceFolder}\\vimage\\vimage.csproj",
+               "launchConfigurationId": "TargetFramework=;vimage"
+          }
+     ]
+}

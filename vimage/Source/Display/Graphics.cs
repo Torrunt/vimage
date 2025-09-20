@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using DevILSharp;
-using OpenTK.Graphics.OpenGL;
 using SFML.Graphics;
 using SFML.System;
 using SkiaSharp;
@@ -92,16 +91,16 @@ namespace vimage
                         int imageID = IL.GenImage();
                         IL.BindImage(imageID);
 
-                        _ = IL.Enable(DevILSharp.EnableCap.AbsoluteOrigin);
+                        _ = IL.Enable(EnableCap.AbsoluteOrigin);
                         IL.RegisterOrigin(OriginMode.UpperLeft); // IL.SetOriginLocation(DevIL.OriginLocation.UpperLeft);
 
                         bool loaded = IL.LoadStream(fileStream);
 
                         if (loaded)
                         {
-                            var info = new ILU.Info();
-                            ILU.GetImageInfo(ref info);
-                            if (info.Width > TextureMaxSize || info.Height > TextureMaxSize)
+                            int width = IL.GetInteger(IntName.ImageWidth);
+                            int height = IL.GetInteger(IntName.ImageHeight);
+                            if (width > TextureMaxSize || height > TextureMaxSize)
                             {
                                 // Large Image split-up into multiple textures
                                 // (image is larger than GPU's max texture size)
@@ -177,31 +176,33 @@ namespace vimage
         private static Texture GetTextureFromBoundImage()
         {
             bool success = IL.ConvertImage(ChannelFormat.RGBA, ChannelType.UnsignedByte);
-
             if (!success)
                 return null;
 
-            var info = new ILU.Info();
-            ILU.GetImageInfo(ref info);
-            int width = info.Width;
-            int height = info.Height;
+            int width = IL.GetInteger(IntName.ImageWidth);
+            int height = IL.GetInteger(IntName.ImageHeight);
+            int bytesPerPixel = 4;
+            int rowBytes = width * bytesPerPixel;
+            int length = width * height * bytesPerPixel;
+            nint dataPtr = IL.GetData();
+            byte[] pixels = new byte[length];
+            Marshal.Copy(dataPtr, pixels, 0, length);
 
-            var texture = new Texture((uint)width, (uint)height);
-            Texture.Bind(texture, Texture.TextureCoordinateType.Pixels);
+            // Flip pixels since DevIL and SFML use different coordinates
+            byte[] flippedPixels = new byte[pixels.Length];
+            for (int y = 0; y < height; y++)
             {
-                GL.TexImage2D(
-                    TextureTarget.Texture2D,
-                    0,
-                    (PixelInternalFormat)IL.GetInteger(IntName.ImageBytesPerPixel),
-                    width,
-                    height,
-                    0,
-                    (PixelFormat)IL.GetInteger(IntName.ImageFormat),
-                    PixelType.UnsignedByte,
-                    IL.GetData()
+                System.Buffer.BlockCopy(
+                    pixels,
+                    y * rowBytes,
+                    flippedPixels,
+                    (height - 1 - y) * rowBytes,
+                    rowBytes
                 );
             }
 
+            var texture = new Texture((uint)width, (uint)height);
+            texture.Update(flippedPixels);
             return texture;
         }
 
@@ -211,21 +212,26 @@ namespace vimage
         )
         {
             bool success = IL.ConvertImage(ChannelFormat.RGBA, ChannelType.UnsignedByte);
-
             if (!success)
                 return null;
 
             var largeTexture = new DisplayObject();
 
-            var info = new ILU.Info();
-            ILU.GetImageInfo(ref info);
-            var size = new Vector2i(info.Width, info.Height);
+            int width = IL.GetInteger(IntName.ImageWidth);
+            int height = IL.GetInteger(IntName.ImageHeight);
+            var size = new Vector2i(width, height);
             var amount = new Vector2u(
                 (uint)Math.Ceiling(size.X / (float)sectionSize),
                 (uint)Math.Ceiling(size.Y / (float)sectionSize)
             );
+
             var currentSize = new Vector2i(size.X, size.Y);
             var pos = new Vector2i();
+            int bytesPerPixel = 4;
+
+            int maxSectionBytes = sectionSize * sectionSize * bytesPerPixel;
+            byte[] pixelBuffer = new byte[maxSectionBytes];
+            byte[] flippedBuffer = new byte[maxSectionBytes];
 
             for (int iy = 0; iy < amount.Y; iy++)
             {
@@ -238,8 +244,10 @@ namespace vimage
                     int w = Math.Min(currentSize.X, sectionSize);
                     currentSize.X -= w;
 
-                    var texture = new Texture((uint)w, (uint)h);
-                    IntPtr partPtr = Marshal.AllocHGlobal(w * h * 4);
+                    int sectionBytes = w * h * bytesPerPixel;
+
+                    // Copy pixels from DevIL into reusable buffer
+                    var partPtr = Marshal.AllocHGlobal(sectionBytes);
                     _ = IL.CopyPixels(
                         pos.X,
                         pos.Y,
@@ -251,23 +259,29 @@ namespace vimage
                         ChannelType.UnsignedByte,
                         partPtr
                     );
-                    Texture.Bind(texture, Texture.TextureCoordinateType.Pixels);
-                    {
-                        GL.TexImage2D(
-                            TextureTarget.Texture2D,
-                            0,
-                            (PixelInternalFormat)IL.GetInteger(IntName.ImageBytesPerPixel),
-                            w,
-                            h,
-                            0,
-                            (PixelFormat)IL.GetInteger(IntName.ImageFormat),
-                            PixelType.UnsignedByte,
-                            partPtr
-                        );
-                    }
+                    Marshal.Copy(partPtr, pixelBuffer, 0, sectionBytes);
                     Marshal.FreeHGlobal(partPtr);
 
-                    Sprite sprite = new Sprite(texture) { Position = new Vector2f(pos.X, pos.Y) };
+                    // Flip pixels since DevIL and SFML use different coordinates
+                    int rowBytes = w * bytesPerPixel;
+                    for (int y = 0; y < h; y++)
+                    {
+                        System.Buffer.BlockCopy(
+                            pixelBuffer,
+                            y * rowBytes,
+                            flippedBuffer,
+                            (h - 1 - y) * rowBytes,
+                            rowBytes
+                        );
+                    }
+
+                    var texture = new Texture((uint)w, (uint)h);
+                    texture.Update(flippedBuffer, (uint)w, (uint)h, 0, 0);
+
+                    var sprite = new Sprite(texture)
+                    {
+                        Position = new Vector2f(pos.X, size.Y - pos.Y - h),
+                    };
                     largeTexture.AddChild(sprite);
 
                     if (fileName != "")
@@ -299,44 +313,19 @@ namespace vimage
             Vector2u imageSize = image.Size;
             byte[] bytes = image.Pixels;
 
-            if (area == default)
-                area = new IntRect(0, 0, (int)imageSize.X, (int)imageSize.Y);
+            if (area == default || (area.Width >= imageSize.X && area.Height >= imageSize.Y))
+                return new Texture(bytes);
 
-            Texture texture = new Texture((uint)area.Width, (uint)area.Height);
-
-            byte[] pixels;
             const int blockSize = 4;
-            if (area.Width < imageSize.X || area.Height < imageSize.Y)
+            var crop = new byte[area.Width * area.Height * blockSize];
+            for (var line = 0; line <= area.Height - 1; line++)
             {
-                var crop = new byte[area.Width * area.Height * blockSize];
+                var sourceIndex = ((area.Top + line) * imageSize.X + area.Left) * blockSize;
+                var destinationIndex = line * area.Width * blockSize;
 
-                for (var line = 0; line <= area.Height - 1; line++)
-                {
-                    var sourceIndex = ((area.Top + line) * imageSize.X + area.Left) * blockSize;
-                    var destinationIndex = line * area.Width * blockSize;
-
-                    Array.Copy(bytes, sourceIndex, crop, destinationIndex, area.Width * blockSize);
-                }
-
-                pixels = crop;
+                Array.Copy(bytes, sourceIndex, crop, destinationIndex, area.Width * blockSize);
             }
-            else
-                pixels = bytes;
-
-            Texture.Bind(texture, Texture.TextureCoordinateType.Pixels);
-            GL.TexImage2D(
-                TextureTarget.Texture2D,
-                0,
-                PixelInternalFormat.Rgba,
-                area.Width,
-                area.Height,
-                0,
-                PixelFormat.Rgba,
-                PixelType.UnsignedByte,
-                pixels
-            );
-
-            return texture;
+            return new Texture(crop);
         }
 
         private static DisplayObject GetLargeTextureFromSFMLImage(
@@ -815,8 +804,8 @@ namespace vimage
                 _ = Image.SelectActiveFrame(frameDimension, i);
                 Quantizer = new ImageManipulation.OctreeQuantizer(255, 8);
 
-                System.Drawing.Bitmap quantized = Quantizer.Quantize(Image);
-                MemoryStream stream = new MemoryStream();
+                var quantized = Quantizer.Quantize(Image);
+                var stream = new MemoryStream();
                 quantized.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
                 Data.Frames[i] = new Texture(stream);
 

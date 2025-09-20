@@ -34,19 +34,22 @@ namespace ImageManipulation
             : base(false)
         {
             if (maxColors > 255)
+            {
                 throw new ArgumentOutOfRangeException(
                     "maxColors",
                     maxColors,
                     "The number of colors should be less than 256"
                 );
+            }
 
             if ((maxColorBits < 1) | (maxColorBits > 8))
+            {
                 throw new ArgumentOutOfRangeException(
                     "maxColorBits",
                     maxColorBits,
                     "This should be between 1 and 8"
                 );
-
+            }
             // Construct the octree
             _octree = new Octree(maxColorBits);
 
@@ -91,7 +94,7 @@ namespace ImageManipulation
         protected override ColorPalette GetPalette(ColorPalette original)
         {
             // First off convert the octree to _maxColors colors
-            ArrayList palette = _octree.Palletize(_maxColors - 1);
+            var palette = _octree.Palletize(_maxColors - 1);
 
             // Then convert the palette based on those colors
             for (int index = 0; index < palette.Count; index++)
@@ -420,21 +423,17 @@ namespace ImageManipulation
                         _paletteIndex = paletteIndex++;
 
                         // And set the color of the palette entry
-                        _ = palette.Add(
-                            Color.FromArgb(
-                                _red / _pixelCount,
-                                _green / _pixelCount,
-                                _blue / _pixelCount
-                            )
-                        );
+                        int r = Math.Clamp(_red / _pixelCount, 0, 255);
+                        int g = Math.Clamp(_green / _pixelCount, 0, 255);
+                        int b = Math.Clamp(_blue / _pixelCount, 0, 255);
+                        _ = palette.Add(Color.FromArgb(r, g, b));
                     }
                     else
                     {
                         // Loop through children looking for leaves
                         for (int index = 0; index < 8; index++)
                         {
-                            if (null != _children[index])
-                                _children[index].ConstructPalette(palette, ref paletteIndex);
+                            _children[index]?.ConstructPalette(palette, ref paletteIndex);
                         }
                     }
                 }
