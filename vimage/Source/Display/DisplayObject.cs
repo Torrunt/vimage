@@ -1,12 +1,12 @@
-﻿using SFML.Graphics;
+﻿using System.Collections.Generic;
+using SFML.Graphics;
 using SFML.System;
-using System.Collections.Generic;
 
 namespace vimage
 {
     internal class DisplayObject : Transformable, Drawable
     {
-        private readonly List<dynamic> Children = new List<dynamic>();
+        private readonly List<dynamic> Children = [];
         private int DrawListIndex = 0;
         public DisplayObject Parent = null;
 
@@ -14,9 +14,16 @@ namespace vimage
 
         public TextureInfo Texture;
 
-        public DisplayObject() { Texture = new TextureInfo(this); }
+        public DisplayObject()
+        {
+            Texture = new TextureInfo(this);
+        }
 
-        public int NumChildren { get { return Children.Count; } }
+        public int NumChildren
+        {
+            get { return Children.Count; }
+        }
+
         public void AddChild(dynamic child)
         {
             Children.Add(child);
@@ -26,6 +33,7 @@ namespace vimage
                 child.OnAdded();
             }
         }
+
         public void AddChildAt(dynamic child, int index)
         {
             Children.Insert(index, child);
@@ -35,6 +43,7 @@ namespace vimage
                 child.OnAdded();
             }
         }
+
         public void RemoveChild(dynamic child)
         {
             for (int i = 0; i < Children.Count; i++)
@@ -54,7 +63,12 @@ namespace vimage
                 }
             }
         }
-        public void RemoveChildAt(int index) { RemoveChild(GetChildAt(index)); }
+
+        public void RemoveChildAt(int index)
+        {
+            RemoveChild(GetChildAt(index));
+        }
+
         public void Clear()
         {
             while (NumChildren > 0)
@@ -64,9 +78,13 @@ namespace vimage
             DrawListIndex = 0;
         }
 
-        public dynamic GetChildAt(int i) { return Children[i]; }
+        public dynamic GetChildAt(int i)
+        {
+            return Children[i];
+        }
 
         public virtual void OnAdded() { }
+
         public virtual void OnRemoved() { }
 
         public void Draw(RenderTarget Target, RenderStates states)
@@ -89,11 +107,26 @@ namespace vimage
             get { return Position.Y; }
             set { Position = new Vector2f(Position.X, value); }
         }
-        public void SetPosition(float x, float y) { Position = new Vector2f(x, y); }
-        public void SetPosition(Vector2f pos) { Position = pos; }
 
-        public void Move(float offsetX, float offsetY) { Position = new Vector2f(X + offsetX, Y + offsetY); }
-        public void Move(Vector2f offset) { Position = new Vector2f(X + offset.X, Y + offset.Y); }
+        public void SetPosition(float x, float y)
+        {
+            Position = new Vector2f(x, y);
+        }
+
+        public void SetPosition(Vector2f pos)
+        {
+            Position = pos;
+        }
+
+        public void Move(float offsetX, float offsetY)
+        {
+            Position = new Vector2f(X + offsetX, Y + offsetY);
+        }
+
+        public void Move(Vector2f offset)
+        {
+            Position = new Vector2f(X + offset.X, Y + offset.Y);
+        }
 
         public float ScaleX
         {
@@ -105,9 +138,21 @@ namespace vimage
             get { return Scale.Y; }
             set { Scale = new Vector2f(Scale.X, value); }
         }
-        public void SetScale(float scaleX, float scaleY) { Scale = new Vector2f(scaleX, scaleY); }
-        public void SetScale(float scale) { Scale = new Vector2f(scale, scale); }
-        public void SetScale(Vector2f scale) { Scale = scale; }
+
+        public void SetScale(float scaleX, float scaleY)
+        {
+            Scale = new Vector2f(scaleX, scaleY);
+        }
+
+        public void SetScale(float scale)
+        {
+            Scale = new Vector2f(scale, scale);
+        }
+
+        public void SetScale(Vector2f scale)
+        {
+            Scale = scale;
+        }
 
         public void Rotate(float amount)
         {
@@ -130,13 +175,16 @@ namespace vimage
                     Children[i].Color = _Color;
             }
         }
-
     }
 
     internal class TextureInfo
     {
         private readonly DisplayObject Obj;
-        public TextureInfo(DisplayObject obj) { Obj = obj; }
+
+        public TextureInfo(DisplayObject obj)
+        {
+            Obj = obj;
+        }
 
         public Vector2u Size = new Vector2u();
 
@@ -167,5 +215,4 @@ namespace vimage
             }
         }
     }
-
 }

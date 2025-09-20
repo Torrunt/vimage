@@ -1,8 +1,7 @@
-﻿using ExifLib;
+﻿using System;
+using System.Linq;
 using SFML.Graphics;
 using SFML.System;
-using System;
-using System.Linq;
 
 namespace vimage
 {
@@ -11,38 +10,73 @@ namespace vimage
         /// <summary> Returns the working area IntRect of the monitor the position is located on.</summary>
         public static IntRect GetCurrentWorkingArea(Vector2i pos)
         {
-            foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
+            foreach (var screen in System.Windows.Forms.Screen.AllScreens)
             {
-                if (pos.X < screen.Bounds.X || pos.Y < screen.Bounds.Y || pos.X > screen.Bounds.X + screen.Bounds.Width || pos.Y > screen.Bounds.Y + screen.Bounds.Height)
+                if (
+                    pos.X < screen.Bounds.X
+                    || pos.Y < screen.Bounds.Y
+                    || pos.X > screen.Bounds.X + screen.Bounds.Width
+                    || pos.Y > screen.Bounds.Y + screen.Bounds.Height
+                )
                     continue;
 
-                return new IntRect(screen.WorkingArea.X, screen.WorkingArea.Y, screen.WorkingArea.Width, screen.WorkingArea.Height);
+                return new IntRect(
+                    screen.WorkingArea.X,
+                    screen.WorkingArea.Y,
+                    screen.WorkingArea.Width,
+                    screen.WorkingArea.Height
+                );
             }
-            System.Windows.Forms.Screen firstScreen = System.Windows.Forms.Screen.AllScreens.ElementAt(0);
+            var firstScreen = System.Windows.Forms.Screen.AllScreens.ElementAt(0);
 
-            return new IntRect(firstScreen.WorkingArea.X, firstScreen.WorkingArea.Y, firstScreen.WorkingArea.Width, firstScreen.WorkingArea.Height);
+            return new IntRect(
+                firstScreen.WorkingArea.X,
+                firstScreen.WorkingArea.Y,
+                firstScreen.WorkingArea.Width,
+                firstScreen.WorkingArea.Height
+            );
         }
+
         /// <summary> Returns the bounds IntRect of the monitor the position is located on.</summary>
         public static IntRect GetCurrentBounds(Vector2i pos, bool returnBackupScreen = true)
         {
-            System.Windows.Forms.Screen backupScreen = System.Windows.Forms.Screen.AllScreens.ElementAt(0);
+            var backupScreen = System.Windows.Forms.Screen.AllScreens.ElementAt(0);
 
             foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
             {
-                if (pos.X < screen.Bounds.X || pos.Y < screen.Bounds.Y || pos.X > screen.Bounds.X + screen.Bounds.Width || pos.Y > screen.Bounds.Y + screen.Bounds.Height)
+                if (
+                    pos.X < screen.Bounds.X
+                    || pos.Y < screen.Bounds.Y
+                    || pos.X > screen.Bounds.X + screen.Bounds.Width
+                    || pos.Y > screen.Bounds.Y + screen.Bounds.Height
+                )
                 {
-                    if ((pos.X > screen.Bounds.X && screen.Bounds.X > backupScreen.Bounds.X) ||
-                        (pos.X < screen.Bounds.X && screen.Bounds.X < backupScreen.Bounds.X) ||
-                        (pos.Y > screen.Bounds.Y && screen.Bounds.Y > backupScreen.Bounds.Y) ||
-                        (pos.Y < screen.Bounds.Y && screen.Bounds.Y < backupScreen.Bounds.Y))
+                    if (
+                        (pos.X > screen.Bounds.X && screen.Bounds.X > backupScreen.Bounds.X)
+                        || (pos.X < screen.Bounds.X && screen.Bounds.X < backupScreen.Bounds.X)
+                        || (pos.Y > screen.Bounds.Y && screen.Bounds.Y > backupScreen.Bounds.Y)
+                        || (pos.Y < screen.Bounds.Y && screen.Bounds.Y < backupScreen.Bounds.Y)
+                    )
                         backupScreen = screen;
                     continue;
                 }
 
-                return new IntRect(screen.Bounds.X, screen.Bounds.Y, screen.Bounds.Width, screen.Bounds.Height);
+                return new IntRect(
+                    screen.Bounds.X,
+                    screen.Bounds.Y,
+                    screen.Bounds.Width,
+                    screen.Bounds.Height
+                );
             }
 
-            return returnBackupScreen ? new IntRect(backupScreen.Bounds.X, backupScreen.Bounds.Y, backupScreen.Bounds.Width, backupScreen.Bounds.Height) : new IntRect();
+            return returnBackupScreen
+                ? new IntRect(
+                    backupScreen.Bounds.X,
+                    backupScreen.Bounds.Y,
+                    backupScreen.Bounds.Width,
+                    backupScreen.Bounds.Height
+                )
+                : new IntRect();
         }
 
         public static Vector2i LimitToBounds(Vector2i pos, Vector2u size, IntRect bounds)
@@ -80,19 +114,25 @@ namespace vimage
                 return 0;
             try
             {
-                using (ExifReader reader = new ExifReader(fileName))
-                {
-                    if (!reader.GetTagValue(ExifTags.Orientation, out ushort orientation))
-                        return 0;
+                var file = ExifLibrary.ImageFile.FromFile(fileName);
+                var orientation = file
+                    .Properties.Get<ExifLibrary.ExifEnumProperty<ExifLibrary.Orientation>>(
+                        ExifLibrary.ExifTag.Orientation
+                    )
+                    .Value;
 
-                    switch (orientation)
-                    {
-                        case 6: return 90;
-                        case 3: return 180;
-                        case 8: return 270;
-                        default: return 0;
-                    }
-                }
+                return orientation switch
+                {
+                    ExifLibrary.Orientation.Flipped => 0,
+                    ExifLibrary.Orientation.FlippedAndRotated180 => 0,
+                    ExifLibrary.Orientation.FlippedAndRotatedLeft => 0,
+                    ExifLibrary.Orientation.FlippedAndRotatedRight => 0,
+                    ExifLibrary.Orientation.Normal => 0,
+                    ExifLibrary.Orientation.Rotated180 => 180,
+                    ExifLibrary.Orientation.RotatedLeft => 270,
+                    ExifLibrary.Orientation.RotatedRight => 90,
+                    _ => 0,
+                };
             }
             catch (Exception) { }
             return 0;
@@ -103,11 +143,11 @@ namespace vimage
         {
             try
             {
-                using (ExifReader reader = new ExifReader(fileName))
-                {
-                    if (reader.GetTagValue(ExifTags.DateTime, out DateTime date))
-                        return date;
-                }
+                var file = ExifLibrary.ImageFile.FromFile(fileName);
+                var dateTime = file.Properties.Get<ExifLibrary.ExifDateTime>(
+                    ExifLibrary.ExifTag.DateTime
+                );
+                return dateTime.Value;
             }
             catch (Exception) { }
 
@@ -118,6 +158,5 @@ namespace vimage
         {
             return extensions.Contains(System.IO.Path.GetExtension(fileName).ToLowerInvariant());
         }
-
     }
 }

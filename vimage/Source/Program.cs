@@ -1,7 +1,6 @@
 ﻿// vimage - http://torrunt.net/vimage
 // Corey Zeke Womack (Torrunt) - me@torrunt.net
 
-using CrashReporterDotNET;
 using System;
 using System.Threading;
 
@@ -25,23 +24,27 @@ namespace vimage
                 AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
             }
 
-            ImageViewer imageViewer = new ImageViewer(file, args);
+            var imageViewer = new ImageViewer(file, args);
         }
 
-        private static void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
+        private static void CurrentDomainOnUnhandledException(
+            object sender,
+            UnhandledExceptionEventArgs unhandledExceptionEventArgs
+        )
         {
             ReportCrash((Exception)unhandledExceptionEventArgs.ExceptionObject);
             Environment.Exit(0);
         }
+
         private static void ApplicationThreadException(object sender, ThreadExceptionEventArgs e)
         {
             ReportCrash(e.Exception);
         }
+
         public static void ReportCrash(Exception exception)
         {
-            ReportCrash reportCrash = new ReportCrash { ToEmail = "torruntalt@gmail.com" };
-            reportCrash.Send(exception);
+            //   var reportCrash = new ReportCrash { ToEmail = "torruntalt@gmail.com" };
+            //   reportCrash.Send(exception);
         }
-
     }
 }

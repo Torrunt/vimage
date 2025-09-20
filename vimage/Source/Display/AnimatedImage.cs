@@ -1,5 +1,5 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
+using SFML.Graphics;
 
 namespace vimage
 {
@@ -48,14 +48,30 @@ namespace vimage
     {
         public AnimatedImageData Data;
         public Sprite Sprite;
-        public new Texture Texture { get { return Sprite.Texture; } private set { } }
+        public new Texture Texture
+        {
+            get { return Sprite.Texture; }
+            private set { }
+        }
 
         public int CurrentFrame;
-        public int TotalFrames { get { return Data.Frames.Length; } private set { } }
+        public int TotalFrames
+        {
+            get { return Data.Frames.Length; }
+            private set { }
+        }
 
         public bool Playing = true;
         private bool _Looping = true;
-        public bool Looping { get { return _Looping; } set { _Looping = value; Finished = false; } }
+        public bool Looping
+        {
+            get { return _Looping; }
+            set
+            {
+                _Looping = value;
+                Finished = false;
+            }
+        }
         public bool Finished = false;
 
         /// <summary> Keeps track of when to change frame. Resets on frame change. </summary>
@@ -128,14 +144,36 @@ namespace vimage
             return true;
         }
 
-        public void NextFrame() { _ = SetFrame(Math.Min(CurrentFrame + 1, TotalFrames)); }
-        public void PrevFrame() { _ = SetFrame(Math.Max(CurrentFrame - 1, 0)); }
+        public void NextFrame()
+        {
+            _ = SetFrame(Math.Min(CurrentFrame + 1, TotalFrames));
+        }
 
-        public void Stop() { Playing = false; }
-        public void Play() { Playing = true; }
+        public void PrevFrame()
+        {
+            _ = SetFrame(Math.Max(CurrentFrame - 1, 0));
+        }
 
-        public void GotoAndPlay(int number) { _ = SetFrame(number); Play(); }
-        public void GotoAndStop(int number) { _ = SetFrame(number); Stop(); }
+        public void Stop()
+        {
+            Playing = false;
+        }
 
+        public void Play()
+        {
+            Playing = true;
+        }
+
+        public void GotoAndPlay(int number)
+        {
+            _ = SetFrame(number);
+            Play();
+        }
+
+        public void GotoAndStop(int number)
+        {
+            _ = SetFrame(number);
+            Stop();
+        }
     }
 }

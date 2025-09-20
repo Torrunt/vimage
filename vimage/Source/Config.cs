@@ -1,71 +1,133 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using SFML.Window;
 
 namespace vimage
 {
-    public enum SortBy { FolderDefault, Name, Date, DateModified, DateCreated, Size }
-    public enum SortDirection { FolderDefault, Ascending, Descending }
-    public enum SizingOption { FitWidth, FitHeight, FitAuto, KeepZoom, FullSize }
+    public enum SortBy
+    {
+        FolderDefault,
+        Name,
+        Date,
+        DateModified,
+        DateCreated,
+        Size,
+    }
+
+    public enum SortDirection
+    {
+        FolderDefault,
+        Ascending,
+        Descending,
+    }
+
+    public enum SizingOption
+    {
+        FitWidth,
+        FitHeight,
+        FitAuto,
+        KeepZoom,
+        FullSize,
+    }
 
     public class Config
     {
-        public List<int> Control_Drag = new List<int>();
-        public List<int> Control_Close = new List<int>();
-        public List<int> Control_OpenContextMenu = new List<int>();
-        public List<int> Control_PrevImage = new List<int>();
-        public List<int> Control_NextImage = new List<int>();
-        public List<int> Control_RotateClockwise = new List<int>();
-        public List<int> Control_RotateAntiClockwise = new List<int>();
-        public List<int> Control_Flip = new List<int>();
-        public List<int> Control_FitToMonitorHeight = new List<int>();
-        public List<int> Control_FitToMonitorWidth = new List<int>();
-        public List<int> Control_FitToMonitorAuto = new List<int>();
-        public List<int> Control_FitToMonitorAlt = new List<int>();
-        public List<int> Control_ZoomIn = new List<int>();
-        public List<int> Control_ZoomOut = new List<int>();
-        public List<int> Control_ZoomFaster = new List<int>();
-        public List<int> Control_ZoomAlt = new List<int>();
-        public List<int> Control_DragLimitToMonitorBounds = new List<int>();
-        public List<int> Control_ToggleSmoothing = new List<int>();
-        public List<int> Control_ToggleBackground = new List<int>();
-        public List<int> Control_ToggleLock = new List<int>();
-        public List<int> Control_ToggleAlwaysOnTop = new List<int>();
-        public List<int> Control_ToggleTitleBar = new List<int>();
-        public List<int> Control_PauseAnimation = new List<int>();
-        public List<int> Control_PrevFrame = new List<int>();
-        public List<int> Control_NextFrame = new List<int>();
-        public List<int> Control_OpenSettings = new List<int>();
-        public List<int> Control_ResetImage = new List<int>();
-        public List<int> Control_OpenAtLocation = new List<int>();
-        public List<int> Control_Delete = new List<int>();
-        public List<int> Control_Copy = new List<int>();
-        public List<int> Control_CopyAsImage = new List<int>();
-        public List<int> Control_OpenDuplicateImage = new List<int>();
-        public List<int> Control_OpenFullDuplicateImage = new List<int>();
-        public List<int> Control_RandomImage = new List<int>();
-        public List<int> Control_MoveLeft = new List<int>();
-        public List<int> Control_MoveRight = new List<int>();
-        public List<int> Control_MoveUp = new List<int>();
-        public List<int> Control_MoveDown = new List<int>();
-        public List<int> Control_TransparencyToggle = new List<int>();
-        public List<int> Control_TransparencyInc = new List<int>();
-        public List<int> Control_TransparencyDec = new List<int>();
-        public List<int> Control_Crop = new List<int>();
-        public List<int> Control_UndoCrop = new List<int>();
-        public List<int> Control_ExitAll = new List<int>();
-        public List<int> Control_RerenderSVG = new List<int>();
+        public List<int> Control_Drag = [];
+        public List<int> Control_Close = [];
+        public List<int> Control_OpenContextMenu = [];
+        public List<int> Control_PrevImage = [];
+        public List<int> Control_NextImage = [];
+        public List<int> Control_RotateClockwise = [];
+        public List<int> Control_RotateAntiClockwise = [];
+        public List<int> Control_Flip = [];
+        public List<int> Control_FitToMonitorHeight = [];
+        public List<int> Control_FitToMonitorWidth = [];
+        public List<int> Control_FitToMonitorAuto = [];
+        public List<int> Control_FitToMonitorAlt = [];
+        public List<int> Control_ZoomIn = [];
+        public List<int> Control_ZoomOut = [];
+        public List<int> Control_ZoomFaster = [];
+        public List<int> Control_ZoomAlt = [];
+        public List<int> Control_DragLimitToMonitorBounds = [];
+        public List<int> Control_ToggleSmoothing = [];
+        public List<int> Control_ToggleBackground = [];
+        public List<int> Control_ToggleLock = [];
+        public List<int> Control_ToggleAlwaysOnTop = [];
+        public List<int> Control_ToggleTitleBar = [];
+        public List<int> Control_PauseAnimation = [];
+        public List<int> Control_PrevFrame = [];
+        public List<int> Control_NextFrame = [];
+        public List<int> Control_OpenSettings = [];
+        public List<int> Control_ResetImage = [];
+        public List<int> Control_OpenAtLocation = [];
+        public List<int> Control_Delete = [];
+        public List<int> Control_Copy = [];
+        public List<int> Control_CopyAsImage = [];
+        public List<int> Control_OpenDuplicateImage = [];
+        public List<int> Control_OpenFullDuplicateImage = [];
+        public List<int> Control_RandomImage = [];
+        public List<int> Control_MoveLeft = [];
+        public List<int> Control_MoveRight = [];
+        public List<int> Control_MoveUp = [];
+        public List<int> Control_MoveDown = [];
+        public List<int> Control_TransparencyToggle = [];
+        public List<int> Control_TransparencyInc = [];
+        public List<int> Control_TransparencyDec = [];
+        public List<int> Control_Crop = [];
+        public List<int> Control_UndoCrop = [];
+        public List<int> Control_ExitAll = [];
+        public List<int> Control_RerenderSVG = [];
 
         public List<List<int>> Controls;
-        public List<string> ControlNames = new List<string>()
-        {
-            "Drag", "Close", "Open Context Menu", "Prev Image", "Next Image", "Rotate Clockwise", "Rotate Anti-Clockwise", "Flip",
-            "Fit To Monitor Auto", "Fit To Monitor Width", "Fit To Monitor Height", "Fit To Monitor Alt", "Zoom In", "Zoom Out", "Zoom Faster", "Zoom Alt", "Drag Limit to Monitor Bounds",
-            "Toggle Smoothing", "Toggle Background For Transparency", "Toggle Lock", "Toggle Always On Top", "Toggle Title Bar", "Pause Animation", "Prev Frame", "Next Frame",
-            "Open Settings", "Reset Image", "Open At Location", "Delete", "Copy", "Copy as Image", "Open Duplicate Image", "Open Full Duplicate Image", "Random Image",
-            "Move Left", "Move Right", "Move Up", "Move Down", "Transparency Toggle", "Transparency Increase", "Transparency Decrease", "Crop", "Undo Crop", "Exit All Instances", "Re-render SVG"
-        };
+        public List<string> ControlNames =
+        [
+            "Drag",
+            "Close",
+            "Open Context Menu",
+            "Prev Image",
+            "Next Image",
+            "Rotate Clockwise",
+            "Rotate Anti-Clockwise",
+            "Flip",
+            "Fit To Monitor Auto",
+            "Fit To Monitor Width",
+            "Fit To Monitor Height",
+            "Fit To Monitor Alt",
+            "Zoom In",
+            "Zoom Out",
+            "Zoom Faster",
+            "Zoom Alt",
+            "Drag Limit to Monitor Bounds",
+            "Toggle Smoothing",
+            "Toggle Background For Transparency",
+            "Toggle Lock",
+            "Toggle Always On Top",
+            "Toggle Title Bar",
+            "Pause Animation",
+            "Prev Frame",
+            "Next Frame",
+            "Open Settings",
+            "Reset Image",
+            "Open At Location",
+            "Delete",
+            "Copy",
+            "Copy as Image",
+            "Open Duplicate Image",
+            "Open Full Duplicate Image",
+            "Random Image",
+            "Move Left",
+            "Move Right",
+            "Move Up",
+            "Move Down",
+            "Transparency Toggle",
+            "Transparency Increase",
+            "Transparency Decrease",
+            "Crop",
+            "Undo Crop",
+            "Exit All Instances",
+            "Re-render SVG",
+        ];
 
         public bool Setting_UseDevIL
         {
@@ -119,37 +181,37 @@ namespace vimage
 
         public bool Setting_PositionLargeWideImagesInCorner
         {
-            get { return (Boolean)Settings["POSITIONLARGEWIDEIMAGESINCORNER"]; }
+            get { return (bool)Settings["POSITIONLARGEWIDEIMAGESINCORNER"]; }
             set { Settings["POSITIONLARGEWIDEIMAGESINCORNER"] = value; }
         }
         public bool Setting_LoopImageNavigation
         {
-            get { return (Boolean)Settings["LOOPIMAGENAVIGATION"]; }
+            get { return (bool)Settings["LOOPIMAGENAVIGATION"]; }
             set { Settings["LOOPIMAGENAVIGATION"] = value; }
         }
         public bool Setting_PreloadNextImage
         {
-            get { return (Boolean)Settings["PRELOADNEXTIMAGE"]; }
+            get { return (bool)Settings["PRELOADNEXTIMAGE"]; }
             set { Settings["PRELOADNEXTIMAGE"] = value; }
         }
         public bool Setting_ClearMemoryOnResetImage
         {
-            get { return (Boolean)Settings["CLEARMEMORYONRESETIMAGE"]; }
+            get { return (bool)Settings["CLEARMEMORYONRESETIMAGE"]; }
             set { Settings["CLEARMEMORYONRESETIMAGE"] = value; }
         }
         public bool Setting_ShowTitleBar
         {
-            get { return (Boolean)Settings["SHOWTITLEBAR"]; }
+            get { return (bool)Settings["SHOWTITLEBAR"]; }
             set { Settings["SHOWTITLEBAR"] = value; }
         }
         public bool Setting_OpenSettingsEXE
         {
-            get { return (Boolean)Settings["OPENSETTINGSEXE"]; }
+            get { return (bool)Settings["OPENSETTINGSEXE"]; }
             set { Settings["OPENSETTINGSEXE"] = value; }
         }
         public bool Setting_ListenForConfigChanges
         {
-            get { return (Boolean)Settings["LISTENFORCONFIGCHANGES"]; }
+            get { return (bool)Settings["LISTENFORCONFIGCHANGES"]; }
             set { Settings["LISTENFORCONFIGCHANGES"] = value; }
         }
         public int Setting_MinImageSize
@@ -236,8 +298,8 @@ namespace vimage
             set { Settings["CROPTOOLOUTLINETHICKNESS"] = value; }
         }
 
-        public List<object> ContextMenu = new List<object>();
-        public List<object> ContextMenu_Animation = new List<object>();
+        public List<object> ContextMenu = [];
+        public List<object> ContextMenu_Animation = [];
         public int ContextMenu_Animation_InsertAtIndex
         {
             get { return (int)Settings["CONTEXTMENU_ANIMATION_INSERTATINDEX"]; }
@@ -245,17 +307,17 @@ namespace vimage
         }
         public bool ContextMenuShowMargin
         {
-            get { return (Boolean)Settings["CONTEXTMENU_SHOWMARGIN"]; }
+            get { return (bool)Settings["CONTEXTMENU_SHOWMARGIN"]; }
             set { Settings["CONTEXTMENU_SHOWMARGIN"] = value; }
         }
         public bool ContextMenuShowMarginSub
         {
-            get { return (Boolean)Settings["CONTEXTMENU_SHOWMARGINSUB"]; }
+            get { return (bool)Settings["CONTEXTMENU_SHOWMARGINSUB"]; }
             set { Settings["CONTEXTMENU_SHOWMARGINSUB"] = value; }
         }
 
-        public List<object> CustomActions = new List<object>();
-        public List<object> CustomActionBindings = new List<object>();
+        public List<object> CustomActions = [];
+        public List<object> CustomActionBindings = [];
 
         private Dictionary<string, object> Settings;
 
@@ -265,19 +327,58 @@ namespace vimage
 
         public Config()
         {
-            Controls = new List<List<int>>()
-            {
-                Control_Drag, Control_Close, Control_OpenContextMenu, Control_PrevImage, Control_NextImage, Control_RotateClockwise,
-                Control_RotateAntiClockwise, Control_Flip, Control_FitToMonitorHeight, Control_FitToMonitorWidth, Control_FitToMonitorAuto,
-                Control_FitToMonitorAlt, Control_ZoomIn, Control_ZoomOut, Control_ZoomFaster, Control_ZoomAlt, Control_DragLimitToMonitorBounds, Control_ToggleSmoothing,
-                Control_ToggleBackground, Control_ToggleLock, Control_ToggleAlwaysOnTop, Control_ToggleTitleBar, Control_PauseAnimation, Control_PrevFrame, Control_NextFrame, Control_OpenSettings,
-                Control_ResetImage, Control_OpenAtLocation, Control_Delete, Control_Copy, Control_CopyAsImage, Control_OpenDuplicateImage, Control_OpenFullDuplicateImage,
-                Control_RandomImage, Control_MoveLeft, Control_MoveRight, Control_MoveUp, Control_MoveDown,
-                Control_TransparencyToggle, Control_TransparencyInc, Control_TransparencyDec, Control_Crop, Control_UndoCrop, Control_ExitAll, Control_RerenderSVG
-            };
+            Controls =
+            [
+                Control_Drag,
+                Control_Close,
+                Control_OpenContextMenu,
+                Control_PrevImage,
+                Control_NextImage,
+                Control_RotateClockwise,
+                Control_RotateAntiClockwise,
+                Control_Flip,
+                Control_FitToMonitorHeight,
+                Control_FitToMonitorWidth,
+                Control_FitToMonitorAuto,
+                Control_FitToMonitorAlt,
+                Control_ZoomIn,
+                Control_ZoomOut,
+                Control_ZoomFaster,
+                Control_ZoomAlt,
+                Control_DragLimitToMonitorBounds,
+                Control_ToggleSmoothing,
+                Control_ToggleBackground,
+                Control_ToggleLock,
+                Control_ToggleAlwaysOnTop,
+                Control_ToggleTitleBar,
+                Control_PauseAnimation,
+                Control_PrevFrame,
+                Control_NextFrame,
+                Control_OpenSettings,
+                Control_ResetImage,
+                Control_OpenAtLocation,
+                Control_Delete,
+                Control_Copy,
+                Control_CopyAsImage,
+                Control_OpenDuplicateImage,
+                Control_OpenFullDuplicateImage,
+                Control_RandomImage,
+                Control_MoveLeft,
+                Control_MoveRight,
+                Control_MoveUp,
+                Control_MoveDown,
+                Control_TransparencyToggle,
+                Control_TransparencyInc,
+                Control_TransparencyDec,
+                Control_Crop,
+                Control_UndoCrop,
+                Control_ExitAll,
+                Control_RerenderSVG,
+            ];
 
             Init();
         }
+
         public void Init()
         {
             SetDefaultControls();
@@ -316,11 +417,9 @@ namespace vimage
                 { "SETTINGSAPPHEIGHT", 550 },
                 { "DEFAULTSORTBY", SortBy.FolderDefault },
                 { "DEFAULTSORTDIR", SortDirection.FolderDefault },
-
                 { "CROPTOOLFILLCOLOUR", "#78FFFFFF" },
                 { "CROPTOOLOUTLINECOLOUR", "#FF000000" },
                 { "CROPTOOLOUTLINETHICKNESS", 2 },
-
                 { "DRAG", Control_Drag },
                 { "CLOSE", Control_Close },
                 { "OPENCONTEXTMENU", Control_OpenContextMenu },
@@ -365,16 +464,14 @@ namespace vimage
                 { "CROP", Control_Crop },
                 { "UNDOCROP", Control_UndoCrop },
                 { "EXITALL", Control_ExitAll },
-                { "RERENDERSVG", Control_RerenderSVG},
-
+                { "RERENDERSVG", Control_RerenderSVG },
                 { "CONTEXTMENU", ContextMenu },
                 { "CONTEXTMENU_ANIMATION", ContextMenu_Animation },
                 { "CONTEXTMENU_ANIMATION_INSERTATINDEX", 2 },
                 { "CONTEXTMENU_SHOWMARGIN", false },
                 { "CONTEXTMENU_SHOWMARGINSUB", true },
-
                 { "CUSTOMACTIONS", CustomActions },
-                { "CUSTOMACTIONBINDINGS", CustomActionBindings }
+                { "CUSTOMACTIONBINDINGS", CustomActionBindings },
             };
         }
 
@@ -472,6 +569,7 @@ namespace vimage
             SetControls(Control_ExitAll, "SHIFT+ESC");
             SetControls(Control_RerenderSVG, "SHIFT+R");
         }
+
         public void SetDefaultContextMenu()
         {
             ContextMenu.Clear();
@@ -482,8 +580,8 @@ namespace vimage
             ContextMenu.Add(new { name = "Next", func = Action.NextImage });
             ContextMenu.Add(new { name = "Previous", func = Action.PrevImage });
             ContextMenu.Add("Sort by");
-            List<object> SubMenu_SortBy = new List<object>
-            {
+            List<object> SubMenu_SortBy =
+            [
                 new { name = "Name", func = Action.SortName },
                 new { name = "Date", func = Action.SortDate },
                 new { name = "Date modified", func = Action.SortDateModified },
@@ -491,8 +589,8 @@ namespace vimage
                 new { name = "Size", func = Action.SortSize },
                 new { name = "-", func = Action.None },
                 new { name = "Ascending", func = Action.SortAscending },
-                new { name = "Descending", func = Action.SortDescending }
-            };
+                new { name = "Descending", func = Action.SortDescending },
+            ];
             ContextMenu.Add(SubMenu_SortBy);
             ContextMenu.Add(new { name = "-", func = Action.None });
             ContextMenu.Add(new { name = "Rotate right", func = Action.RotateClockwise });
@@ -516,16 +614,33 @@ namespace vimage
             ContextMenu_Animation.Add(new { name = "Pause/Play", func = Action.PauseAnimation });
             ContextMenu_Animation.Add(new { name = "-", func = Action.None });
         }
+
         public void SetDefaultCustomActions()
         {
             CustomActions.Clear();
             CustomActionBindings.Clear();
 
-            CustomActions.Add(new { name = "TOGGLE OVERLAY MODE", func = "-toggleSync -clickThrough -alwaysOnTop -defaultTransparency" });
-            CustomActionBindings.Add(new { name = "TOGGLE OVERLAY MODE", bindings = new List<int>() { -2, 38, 11 } });
-            CustomActions.Add(new { name = "EDIT PAINT", func = @"%windir%\system32\mspaint.exe %f" });
+            CustomActions.Add(
+                new
+                {
+                    name = "TOGGLE OVERLAY MODE",
+                    func = "-toggleSync -clickThrough -alwaysOnTop -defaultTransparency",
+                }
+            );
+            CustomActionBindings.Add(
+                new { name = "TOGGLE OVERLAY MODE", bindings = new List<int>() { -2, 38, 11 } }
+            );
+            CustomActions.Add(
+                new { name = "EDIT PAINT", func = @"%windir%\system32\mspaint.exe %f" }
+            );
             CustomActionBindings.Add(new { name = "EDIT PAINT", bindings = new List<int>() });
-            CustomActions.Add(new { name = "EDIT PAINTDOTNET", func = "\"C:\\Program Files\\Paint.NET\\PaintDotNet.exe\" %f" });
+            CustomActions.Add(
+                new
+                {
+                    name = "EDIT PAINTDOTNET",
+                    func = "\"C:\\Program Files\\Paint.NET\\PaintDotNet.exe\" %f",
+                }
+            );
             CustomActionBindings.Add(new { name = "EDIT PAINTDOTNET", bindings = new List<int>() });
             CustomActions.Add(new { name = "TOGGLE TASKBAR", func = "-taskbarToggle" });
             CustomActionBindings.Add(new { name = "TOGGLE TASKBAR", bindings = new List<int>() });
@@ -550,7 +665,6 @@ namespace vimage
             ContextMenu_Animation.Clear();
             CustomActions.Clear();
             CustomActionBindings.Clear();
-
 
             StreamReader reader = File.OpenText(configFile);
             string line = reader.ReadLine();
@@ -599,7 +713,6 @@ namespace vimage
                     continue;
                 }
 
-
                 // split values by commas
                 string[] values = nameValue[1].Split(',');
 
@@ -615,10 +728,15 @@ namespace vimage
                     if (int.TryParse(values[0], out int i))
                         Settings[name] = i;
                 }
-                else if (Settings[name] is Boolean)
+                else if (Settings[name] is bool)
                 {
                     // Boolean
-                    Settings[name] = values[0].Equals("1") || values[0].ToUpper().Equals("T") || values[0].ToUpper().Equals("TRUE") ? true : (object)false;
+                    Settings[name] =
+                        values[0].Equals("1")
+                        || values[0].ToUpper().Equals("T")
+                        || values[0].ToUpper().Equals("TRUE")
+                            ? true
+                            : (object)false;
                 }
                 else if (Settings[name] is String)
                 {
@@ -631,7 +749,12 @@ namespace vimage
 
             reader.Close();
         }
-        private string ReadSection(StreamReader reader, List<object> setting, string sectionName = "")
+
+        private string ReadSection(
+            StreamReader reader,
+            List<object> setting,
+            string sectionName = ""
+        )
         {
             string line = reader.ReadLine();
             string trimedLine = RemoveSpaces(line);
@@ -650,14 +773,14 @@ namespace vimage
                     line = RemoveSpaces(reader.ReadLine());
 
                     // line is empty or is part of another setting, skip
-                    if (line.Equals("") || line.IndexOf('=') != -1)
+                    if (line.Equals("") || line.Contains('='))
                         continue;
                     // line doesn't have open brace, skip
                     if (!line.Equals("{"))
                         continue;
 
                     setting.Add(subSectionName);
-                    List<object> subSetting = new List<object>();
+                    List<object> subSetting = [];
                     setting.Add(subSetting);
 
                     line = ReadSection(reader, subSetting, sectionName);
@@ -667,9 +790,9 @@ namespace vimage
                 {
                     // Item
                     if (trimedLine.Equals("-"))
-                        splitValues = new[] { "-", "-" }; // line break
+                        splitValues = ["-", "-"]; // line break
                     else
-                        splitValues = line.Split(new char[] { ':' }, 2);
+                        splitValues = line.Split([':'], 2);
 
                     // trim tabs from name, spaces from map name
                     splitValues[0] = splitValues[0].Replace("\t", "").Trim();
@@ -677,11 +800,23 @@ namespace vimage
 
                     // assign Values
                     if (sectionName == "CUSTOMACTIONBINDINGS")
-                        setting.Add(new { name = splitValues[0], bindings = StringToControls(splitValues[1].Split(',')) });
+                        setting.Add(
+                            new
+                            {
+                                name = splitValues[0],
+                                bindings = StringToControls(splitValues[1].Split(',')),
+                            }
+                        );
                     else if (sectionName.IndexOf("CONTEXTMENU") != -1)
                     {
                         Action action = Actions.StringToAction(splitValues[1]);
-                        setting.Add(new { name = splitValues[0], func = action <= 0 ? (object)splitValues[1] : action });
+                        setting.Add(
+                            new
+                            {
+                                name = splitValues[0],
+                                func = action <= 0 ? (object)splitValues[1] : action,
+                            }
+                        );
                     }
                     else
                         setting.Add(new { name = splitValues[0], func = splitValues[1] });
@@ -703,7 +838,6 @@ namespace vimage
 
             return line;
         }
-
 
         /// <summary> Saves settings to config txt file. </summary>
         public void Save(string configFile)
@@ -729,33 +863,76 @@ namespace vimage
                 WriteSetting(writer, "OpenAtMousePosition", Setting_OpenAtMousePosition);
                 WriteSetting(writer, "SmoothingDefault", Setting_SmoothingDefault);
                 WriteSetting(writer, "Mipmapping", Setting_Mipmapping);
-                WriteSetting(writer, "BackgroundForImagesWithTransparencyDefault", Setting_BackgroundForImagesWithTransparencyDefault);
+                WriteSetting(
+                    writer,
+                    "BackgroundForImagesWithTransparencyDefault",
+                    Setting_BackgroundForImagesWithTransparencyDefault
+                );
                 WriteSetting(writer, "BackgroundColour", Setting_BackgroundColour);
                 WriteSetting(writer, "TransparencyToggleValue", Setting_TransparencyToggleValue);
                 WriteSetting(writer, "ImageSizing", (int)Setting_ImageSizing);
-                WriteSetting(writer, "LimitImagesToMonitor", Setting_LimitImagesToMonitor, "0=NONE, 1=HEIGHT, 2=WIDTH, 3=AUTO");
-                WriteSetting(writer, "PositionLargeWideImagesInCorner", Setting_PositionLargeWideImagesInCorner,
-                    "ie: Desktop Wallpapers and Screenshots");
+                WriteSetting(
+                    writer,
+                    "LimitImagesToMonitor",
+                    Setting_LimitImagesToMonitor,
+                    "0=NONE, 1=HEIGHT, 2=WIDTH, 3=AUTO"
+                );
+                WriteSetting(
+                    writer,
+                    "PositionLargeWideImagesInCorner",
+                    Setting_PositionLargeWideImagesInCorner,
+                    "ie: Desktop Wallpapers and Screenshots"
+                );
                 WriteSetting(writer, "LoopImageNavigation", Setting_LoopImageNavigation);
-                WriteSetting(writer, "PreloadNextImage", Setting_PreloadNextImage,
-                    "when using the next/prev image buttons, the image after the one just loaded will be loaded as well");
-                WriteSetting(writer, "ClearMemoryOnResetImage", Setting_ClearMemoryOnResetImage,
-                    "when the Reset Image action is used, all textures/animations will be cleared from memory (except ones used for current image)");
+                WriteSetting(
+                    writer,
+                    "PreloadNextImage",
+                    Setting_PreloadNextImage,
+                    "when using the next/prev image buttons, the image after the one just loaded will be loaded as well"
+                );
+                WriteSetting(
+                    writer,
+                    "ClearMemoryOnResetImage",
+                    Setting_ClearMemoryOnResetImage,
+                    "when the Reset Image action is used, all textures/animations will be cleared from memory (except ones used for current image)"
+                );
                 WriteSetting(writer, "ShowTitleBar", Setting_ShowTitleBar);
-                WriteSetting(writer, "OpenSettingsEXE", Setting_OpenSettingsEXE, "if false, will open config.txt instead");
-                WriteSetting(writer, "ListenForConfigChanges", Setting_ListenForConfigChanges,
-                    "vimage will reload settings automatically when they are changed.");
-                WriteSetting(writer, "MinImageSize", Setting_MinImageSize,
-                    "if an image is smaller than this (in width or height) it will scaled up to it automatically");
-                WriteSetting(writer, "SmoothingMinImageSize", Setting_SmoothingMinImageSize,
-                    "images smaller than this will not have smoothing turned on (if 0, all images with use smoothing)");
+                WriteSetting(
+                    writer,
+                    "OpenSettingsEXE",
+                    Setting_OpenSettingsEXE,
+                    "if false, will open config.txt instead"
+                );
+                WriteSetting(
+                    writer,
+                    "ListenForConfigChanges",
+                    Setting_ListenForConfigChanges,
+                    "vimage will reload settings automatically when they are changed."
+                );
+                WriteSetting(
+                    writer,
+                    "MinImageSize",
+                    Setting_MinImageSize,
+                    "if an image is smaller than this (in width or height) it will scaled up to it automatically"
+                );
+                WriteSetting(
+                    writer,
+                    "SmoothingMinImageSize",
+                    Setting_SmoothingMinImageSize,
+                    "images smaller than this will not have smoothing turned on (if 0, all images with use smoothing)"
+                );
                 WriteSetting(writer, "ZoomSpeed", Setting_ZoomSpeed);
                 WriteSetting(writer, "ZoomSpeedFast", Setting_ZoomSpeedFast);
                 WriteSetting(writer, "MoveSpeed", Setting_MoveSpeed);
                 WriteSetting(writer, "MoveSpeedFast", Setting_MoveSpeedFast);
                 WriteSetting(writer, "MaxTextures", Setting_MaxTextures);
                 WriteSetting(writer, "MaxAnimations", Setting_MaxAnimations);
-                WriteSetting(writer, "MaxTextureSize", Setting_MaxTextureSize, "will cut up images into multiple textures if they are larger than this value");
+                WriteSetting(
+                    writer,
+                    "MaxTextureSize",
+                    Setting_MaxTextureSize,
+                    "will cut up images into multiple textures if they are larger than this value"
+                );
                 WriteSetting(writer, "SettingsAppWidth", Setting_SettingsAppWidth);
                 WriteSetting(writer, "SettingsAppHeight", Setting_SettingsAppHeight);
                 WriteSetting(writer, "DefaultSortBy", (int)Setting_DefaultSortBy);
@@ -822,7 +999,11 @@ namespace vimage
                 WriteContextMenuSetup(writer, "ContextMenu", ContextMenu);
                 WriteContextMenuSetup(writer, "ContextMenu_Animation", ContextMenu_Animation);
 
-                WriteSetting(writer, "ContextMenu_Animation_InsertAtIndex", ContextMenu_Animation_InsertAtIndex);
+                WriteSetting(
+                    writer,
+                    "ContextMenu_Animation_InsertAtIndex",
+                    ContextMenu_Animation_InsertAtIndex
+                );
                 WriteSetting(writer, "ContextMenu_ShowMargin", ContextMenuShowMargin);
                 WriteSetting(writer, "ContextMenu_ShowMarginSub", ContextMenuShowMarginSub);
 
@@ -835,44 +1016,59 @@ namespace vimage
             }
             catch (UnauthorizedAccessException)
             {
-#if SETTINGSAPP
-                System.Windows.MessageBox.Show("vimage does not have write permissions for the folder it's located in.\nPlease place it somewhere else (or set it to run as admin).", "vimage - Error");
-#else
-                System.Windows.Forms.MessageBox.Show("vimage does not have write permissions for the folder it's located in.\nPlease place it somewhere else (or set it to run as admin).", "vimage - Error");
-#endif
+                System.Windows.Forms.MessageBox.Show(
+                    "vimage does not have write permissions for the folder it's located in.\nPlease place it somewhere else (or set it to run as admin).",
+                    "vimage - Error"
+                );
             }
         }
+
         private void WriteSetting(StreamWriter writer, string name, bool value, string comment = "")
         {
             writer.Write(name + " = " + (value ? 1 : 0));
             WriteComment(writer, comment);
         }
+
         private void WriteSetting(StreamWriter writer, string name, int value, string comment = "")
         {
             writer.Write(name + " = " + value.ToString());
             WriteComment(writer, comment);
         }
-        private void WriteSetting(StreamWriter writer, string name, string value, string comment = "")
+
+        private void WriteSetting(
+            StreamWriter writer,
+            string name,
+            string value,
+            string comment = ""
+        )
         {
             writer.Write(name + " = " + value);
             WriteComment(writer, comment);
         }
+
         private void WriteComment(StreamWriter writer, string comment = "")
         {
             if (!comment.Equals(""))
                 writer.Write(" // " + comment);
             writer.Write(Environment.NewLine);
         }
+
         private void WriteControl(StreamWriter writer, string name, List<int> controls)
         {
             writer.Write(name + " = " + ControlsToString(controls) + Environment.NewLine);
         }
-        private void WriteContextMenuSetup(StreamWriter writer, string name, List<object> contextMenu)
+
+        private void WriteContextMenuSetup(
+            StreamWriter writer,
+            string name,
+            List<object> contextMenu
+        )
         {
             writer.Write(name + " =" + Environment.NewLine + "{" + Environment.NewLine);
             WriteContextMenuItems(writer, contextMenu, 1);
             writer.Write("}" + Environment.NewLine);
         }
+
         private void WriteContextMenuItems(StreamWriter writer, List<object> items, int depth = 1)
         {
             if (items == null)
@@ -885,7 +1081,13 @@ namespace vimage
                 if (items[i] is string)
                 {
                     // Submenu
-                    writer.Write((items[i] as string) + Environment.NewLine + VariableAmountOfStrings(depth, "\t") + "{" + Environment.NewLine);
+                    writer.Write(
+                        (items[i] as string)
+                            + Environment.NewLine
+                            + VariableAmountOfStrings(depth, "\t")
+                            + "{"
+                            + Environment.NewLine
+                    );
                     i++;
                     WriteContextMenuItems(writer, items[i] as List<object>, depth + 1);
                     writer.Write(VariableAmountOfStrings(depth, "\t") + "}" + Environment.NewLine);
@@ -894,7 +1096,11 @@ namespace vimage
                 {
                     // Item
                     string itemName = (items[i] as dynamic).name as string;
-                    string itemFunc = (string)((items[i] as dynamic).func is Action action ? action.ToNameString() : (items[i] as dynamic).func);
+                    string itemFunc = (string)(
+                        (items[i] as dynamic).func is Action action
+                            ? action.ToNameString()
+                            : (items[i] as dynamic).func
+                    );
                     if (itemName.Equals("-"))
                         writer.Write("-" + Environment.NewLine);
                     else if (itemName.Equals(""))
@@ -904,21 +1110,42 @@ namespace vimage
                 }
             }
         }
-        private void WriteCustomActions(StreamWriter writer, string name, List<object> customActions)
+
+        private void WriteCustomActions(
+            StreamWriter writer,
+            string name,
+            List<object> customActions
+        )
         {
             writer.Write(name + " =" + Environment.NewLine + "{" + Environment.NewLine);
             for (int i = 0; i < CustomActions.Count; i++)
-                writer.Write("\t" + (customActions[i] as dynamic).name + " : " + (customActions[i] as dynamic).func + Environment.NewLine);
-            writer.Write("}" + Environment.NewLine);
-        }
-        private void WriteCustomActionBindings(StreamWriter writer, string name, List<object> customActionBindings)
-        {
-            writer.Write(name + " =" + Environment.NewLine + "{" + Environment.NewLine);
-            for (int i = 0; i < customActionBindings.Count; i++)
-                writer.Write("\t" + (customActionBindings[i] as dynamic).name + " : " + ControlsToString((customActionBindings[i] as dynamic).bindings) + Environment.NewLine);
+                writer.Write(
+                    "\t"
+                        + (customActions[i] as dynamic).name
+                        + " : "
+                        + (customActions[i] as dynamic).func
+                        + Environment.NewLine
+                );
             writer.Write("}" + Environment.NewLine);
         }
 
+        private void WriteCustomActionBindings(
+            StreamWriter writer,
+            string name,
+            List<object> customActionBindings
+        )
+        {
+            writer.Write(name + " =" + Environment.NewLine + "{" + Environment.NewLine);
+            for (int i = 0; i < customActionBindings.Count; i++)
+                writer.Write(
+                    "\t"
+                        + (customActionBindings[i] as dynamic).name
+                        + " : "
+                        + ControlsToString((customActionBindings[i] as dynamic).bindings)
+                        + Environment.NewLine
+                );
+            writer.Write("}" + Environment.NewLine);
+        }
 
         /// <summary> Converts list of controls (Keyboard.Key and Mouse.Button) to their string names seperated by commas. </summary>
         public static string ControlsToString(List<int> controls)
@@ -948,20 +1175,23 @@ namespace vimage
 
             return str;
         }
+
         /// <summary> Converts Keyboard.Key or Mouse.Button to their string name. </summary>
         public static string ControlToString(object code)
         {
-            return (int)code >= MouseCodeOffset ? MouseButtonToString((int)code) : KeyToString((Keyboard.Key)code);
+            return (int)code >= MouseCodeOffset
+                ? MouseButtonToString((int)code)
+                : KeyToString((Keyboard.Key)code);
         }
 
         public static List<int> StringToControls(string[] values, List<int> list = null)
         {
             if (list == null)
-                list = new List<int>();
+                list = [];
             // Control
             for (int i = 0; i < values.Length; i++)
             {
-                if (values[i].Contains("+"))
+                if (values[i].Contains('+'))
                 {
                     // Combo
                     list.Add(-2); // denote that it's a key combo
@@ -986,7 +1216,6 @@ namespace vimage
             return list;
         }
 
-
         /// <summary> Returns true if code is one of Control bindings. </summary>
         public static bool IsControl(object code, List<int> Control, bool onlyIfKeyCombo = false)
         {
@@ -1001,12 +1230,17 @@ namespace vimage
             do
             {
                 // key-combo?
-                value = (index < 1 || Control[index - 1] != -2) && (index > 1 && Control[index - 2] == -2 ? Keyboard.IsKeyPressed((Keyboard.Key)Control[index - 1]) : !onlyIfKeyCombo);
+                value =
+                    (index < 1 || Control[index - 1] != -2)
+                    && (
+                        index > 1 && Control[index - 2] == -2
+                            ? Keyboard.IsKeyPressed((Keyboard.Key)Control[index - 1])
+                            : !onlyIfKeyCombo
+                    );
 
                 // loop if there might be second binding using the same keyCode (eg: CTRL+UP and RCTRL+UP)
                 index = !value ? Control.IndexOf(codeID, index + 1) : -1;
-            }
-            while (index != -1);
+            } while (index != -1);
 
             return value;
         }
@@ -1087,510 +1321,258 @@ namespace vimage
 
             return -1;
         }
+
         public static string MouseButtonToString(int code)
         {
-            switch (code - MouseCodeOffset)
+            return (code - MouseCodeOffset) switch
             {
-                case 0: return "MOUSELEFT";
-                case 1: return "MOUSERIGHT";
-                case 2: return "MOUSEMIDDLE";
-                case 3: return "MOUSE4";
-                case 4: return "MOUSE5";
-                case 5: return "SCROLLUP";
-                case 6: return "SCROLLDOWN";
-            }
-
-            return "";
+                0 => "MOUSELEFT",
+                1 => "MOUSERIGHT",
+                2 => "MOUSEMIDDLE",
+                3 => "MOUSE4",
+                4 => "MOUSE5",
+                5 => "SCROLLUP",
+                6 => "SCROLLDOWN",
+                _ => "",
+            };
         }
 
         /// <summary> Converts upper-case string to SFML Keyboard.Key. </summary>
         public static Keyboard.Key StringToKey(string str)
         {
-            switch (str)
+            return str switch
             {
-                case "A":
-                    return Keyboard.Key.A;
-                case "B":
-                    return Keyboard.Key.B;
-                case "C":
-                    return Keyboard.Key.C;
-                case "D":
-                    return Keyboard.Key.D;
-                case "E":
-                    return Keyboard.Key.E;
-                case "F":
-                    return Keyboard.Key.F;
-                case "G":
-                    return Keyboard.Key.G;
-                case "H":
-                    return Keyboard.Key.H;
-                case "I":
-                    return Keyboard.Key.I;
-                case "J":
-                    return Keyboard.Key.J;
-                case "K":
-                    return Keyboard.Key.K;
-                case "L":
-                    return Keyboard.Key.L;
-                case "M":
-                    return Keyboard.Key.M;
-                case "N":
-                    return Keyboard.Key.N;
-                case "O":
-                    return Keyboard.Key.O;
-                case "P":
-                    return Keyboard.Key.P;
-                case "Q":
-                    return Keyboard.Key.Q;
-                case "R":
-                    return Keyboard.Key.R;
-                case "S":
-                    return Keyboard.Key.S;
-                case "T":
-                    return Keyboard.Key.T;
-                case "U":
-                    return Keyboard.Key.U;
-                case "V":
-                    return Keyboard.Key.V;
-                case "W":
-                    return Keyboard.Key.W;
-                case "X":
-                    return Keyboard.Key.X;
-                case "Y":
-                    return Keyboard.Key.Y;
-                case "Z":
-                    return Keyboard.Key.Z;
-                case "0":
-                case "NUM0":
-                    return Keyboard.Key.Num0;
-                case "1":
-                case "NUM1":
-                    return Keyboard.Key.Num1;
-                case "2":
-                case "NUM2":
-                    return Keyboard.Key.Num2;
-                case "3":
-                case "NUM3":
-                    return Keyboard.Key.Num3;
-                case "4":
-                case "NUM4":
-                    return Keyboard.Key.Num4;
-                case "5":
-                case "NUM5":
-                    return Keyboard.Key.Num5;
-                case "6":
-                case "NUM6":
-                    return Keyboard.Key.Num6;
-                case "7":
-                case "NUM7":
-                    return Keyboard.Key.Num7;
-                case "8":
-                case "NUM8":
-                    return Keyboard.Key.Num8;
-                case "9":
-                case "NUM9":
-                    return Keyboard.Key.Num9;
-                case "ESCAPE":
-                case "ESC":
-                    return Keyboard.Key.Escape;
-                case "CTRL":
-                case "CONTROL":
-                case "LCTRL":
-                case "LEFTCTRL":
-                case "LCONTROL":
-                case "LEFTCONTROL":
-                    return Keyboard.Key.LControl;
-                case "SHIFT":
-                case "LSHIFT":
-                case "LEFTSHIFT":
-                    return Keyboard.Key.LShift;
-                case "ALT":
-                case "LALT":
-                case "LEFTALT":
-                    return Keyboard.Key.LAlt;
-                case "LSYSTEM":
-                case "LEFTSYSTEM":
-                    return Keyboard.Key.LSystem;
-                case "RCTRL":
-                case "RIGHTCTRL":
-                case "RCONTROL":
-                case "RIGHTCONTROL":
-                    return Keyboard.Key.RControl;
-                case "RSHIFT":
-                case "RIGHTSHIFT":
-                    return Keyboard.Key.RShift;
-                case "RALT":
-                case "RIGHTALT":
-                    return Keyboard.Key.RAlt;
-                case "RSYSTEM":
-                case "RIGHTSYSTEM":
-                    return Keyboard.Key.RSystem;
-                case "MENU":
-                    return Keyboard.Key.Menu;
-                case "LBRACKET":
-                case "[":
-                case "{":
-                    return Keyboard.Key.LBracket;
-                case "RBRACKET":
-                case "]":
-                case "}":
-                    return Keyboard.Key.RBracket;
-                case "SEMICOLON":
-                case ";":
-                case ":":
-                    return Keyboard.Key.Semicolon;
-                case "COMMA":
-                case "<":
-                    return Keyboard.Key.Comma;
-                case "PERIOD":
-                case ">":
-                case ".":
-                    return Keyboard.Key.Period;
-                case "QUOTE":
-                case "\"":
-                case "'":
-                    return Keyboard.Key.Quote;
-                case "SLASH":
-                case "?":
-                case "/":
-                case "QUESTION":
-                    return Keyboard.Key.Slash;
-                case "BACKSLASH":
-                case "|":
-                case "\\":
-                    return Keyboard.Key.Backslash;
-                case "TILDE":
-                case "~":
-                case "`":
-                    return Keyboard.Key.Tilde;
-                case "EQUAL":
-                case "PLUS":
-                case "=":
-                    return Keyboard.Key.Equal;
-                case "DASH":
-                case "MINUS":
-                case "_":
-                case "-":
-                    return Keyboard.Key.Hyphen;
-                case "SPACE":
-                    return Keyboard.Key.Space;
-                case "RETURN":
-                    return Keyboard.Key.Enter;
-                case "BACK":
-                case "BACKSPACE":
-                    return Keyboard.Key.Backspace;
-                case "TAB":
-                    return Keyboard.Key.Tab;
-                case "PAGEUP":
-                case "PGUP":
-                    return Keyboard.Key.PageUp;
-                case "PAGEDOWN":
-                case "PGDOWN":
-                case "NEXT":
-                    return Keyboard.Key.PageDown;
-                case "END":
-                    return Keyboard.Key.End;
-                case "HOME":
-                    return Keyboard.Key.Home;
-                case "INSERT":
-                case "INS":
-                    return Keyboard.Key.Insert;
-                case "DELETE":
-                case "DEL":
-                case "DECIMAL":
-                    return Keyboard.Key.Delete;
-                case "ADD":
-                    return Keyboard.Key.Add;
-                case "SUBTRACT":
-                    return Keyboard.Key.Subtract;
-                case "MULTIPLY":
-                    return Keyboard.Key.Multiply;
-                case "DIVIDE":
-                    return Keyboard.Key.Divide;
-                case "LEFT":
-                    return Keyboard.Key.Left;
-                case "RIGHT":
-                    return Keyboard.Key.Right;
-                case "UP":
-                    return Keyboard.Key.Up;
-                case "DOWN":
-                    return Keyboard.Key.Down;
-                case "NUMPAD0":
-                    return Keyboard.Key.Numpad0;
-                case "NUMPAD1":
-                    return Keyboard.Key.Numpad1;
-                case "NUMPAD2":
-                    return Keyboard.Key.Numpad2;
-                case "NUMPAD3":
-                    return Keyboard.Key.Numpad3;
-                case "NUMPAD4":
-                    return Keyboard.Key.Numpad4;
-                case "NUMPAD5":
-                    return Keyboard.Key.Numpad5;
-                case "NUMPAD6":
-                    return Keyboard.Key.Numpad6;
-                case "NUMPAD7":
-                    return Keyboard.Key.Numpad7;
-                case "NUMPAD8":
-                    return Keyboard.Key.Numpad8;
-                case "NUMPAD9":
-                    return Keyboard.Key.Numpad9;
-                case "F1":
-                    return Keyboard.Key.F1;
-                case "F2":
-                    return Keyboard.Key.F2;
-                case "F3":
-                    return Keyboard.Key.F3;
-                case "F4":
-                    return Keyboard.Key.F4;
-                case "F5":
-                    return Keyboard.Key.F5;
-                case "F6":
-                    return Keyboard.Key.F6;
-                case "F7":
-                    return Keyboard.Key.F7;
-                case "F8":
-                    return Keyboard.Key.F8;
-                case "F9":
-                    return Keyboard.Key.F9;
-                case "F10":
-                    return Keyboard.Key.F10;
-                case "F11":
-                    return Keyboard.Key.F11;
-                case "F12":
-                    return Keyboard.Key.F12;
-                case "F13":
-                    return Keyboard.Key.F13;
-                case "F14":
-                    return Keyboard.Key.F14;
-                case "F15":
-                    return Keyboard.Key.F15;
-                case "PAUSE":
-                    return Keyboard.Key.Pause;
-            }
-            return Keyboard.Key.Unknown;
+                "A" => Keyboard.Key.A,
+                "B" => Keyboard.Key.B,
+                "C" => Keyboard.Key.C,
+                "D" => Keyboard.Key.D,
+                "E" => Keyboard.Key.E,
+                "F" => Keyboard.Key.F,
+                "G" => Keyboard.Key.G,
+                "H" => Keyboard.Key.H,
+                "I" => Keyboard.Key.I,
+                "J" => Keyboard.Key.J,
+                "K" => Keyboard.Key.K,
+                "L" => Keyboard.Key.L,
+                "M" => Keyboard.Key.M,
+                "N" => Keyboard.Key.N,
+                "O" => Keyboard.Key.O,
+                "P" => Keyboard.Key.P,
+                "Q" => Keyboard.Key.Q,
+                "R" => Keyboard.Key.R,
+                "S" => Keyboard.Key.S,
+                "T" => Keyboard.Key.T,
+                "U" => Keyboard.Key.U,
+                "V" => Keyboard.Key.V,
+                "W" => Keyboard.Key.W,
+                "X" => Keyboard.Key.X,
+                "Y" => Keyboard.Key.Y,
+                "Z" => Keyboard.Key.Z,
+                "0" or "NUM0" => Keyboard.Key.Num0,
+                "1" or "NUM1" => Keyboard.Key.Num1,
+                "2" or "NUM2" => Keyboard.Key.Num2,
+                "3" or "NUM3" => Keyboard.Key.Num3,
+                "4" or "NUM4" => Keyboard.Key.Num4,
+                "5" or "NUM5" => Keyboard.Key.Num5,
+                "6" or "NUM6" => Keyboard.Key.Num6,
+                "7" or "NUM7" => Keyboard.Key.Num7,
+                "8" or "NUM8" => Keyboard.Key.Num8,
+                "9" or "NUM9" => Keyboard.Key.Num9,
+                "ESCAPE" or "ESC" => Keyboard.Key.Escape,
+                "CTRL" or "CONTROL" or "LCTRL" or "LEFTCTRL" or "LCONTROL" or "LEFTCONTROL" =>
+                    Keyboard.Key.LControl,
+                "SHIFT" or "LSHIFT" or "LEFTSHIFT" => Keyboard.Key.LShift,
+                "ALT" or "LALT" or "LEFTALT" => Keyboard.Key.LAlt,
+                "LSYSTEM" or "LEFTSYSTEM" => Keyboard.Key.LSystem,
+                "RCTRL" or "RIGHTCTRL" or "RCONTROL" or "RIGHTCONTROL" => Keyboard.Key.RControl,
+                "RSHIFT" or "RIGHTSHIFT" => Keyboard.Key.RShift,
+                "RALT" or "RIGHTALT" => Keyboard.Key.RAlt,
+                "RSYSTEM" or "RIGHTSYSTEM" => Keyboard.Key.RSystem,
+                "MENU" => Keyboard.Key.Menu,
+                "LBRACKET" or "[" or "{" => Keyboard.Key.LBracket,
+                "RBRACKET" or "]" or "}" => Keyboard.Key.RBracket,
+                "SEMICOLON" or ";" or ":" => Keyboard.Key.Semicolon,
+                "COMMA" or "<" => Keyboard.Key.Comma,
+                "PERIOD" or ">" or "." => Keyboard.Key.Period,
+                "QUOTE" or "APOSTROPHE" or "\"" or "'" => Keyboard.Key.Apostrophe,
+                "SLASH" or "?" or "/" or "QUESTION" => Keyboard.Key.Slash,
+                "BACKSLASH" or "|" or "\\" => Keyboard.Key.Backslash,
+                "TILDE" or "GRAVE" or "~" or "`" => Keyboard.Key.Grave,
+                "EQUAL" or "PLUS" or "=" => Keyboard.Key.Equal,
+                "DASH" or "MINUS" or "_" or "-" => Keyboard.Key.Hyphen,
+                "SPACE" => Keyboard.Key.Space,
+                "RETURN" => Keyboard.Key.Enter,
+                "BACK" or "BACKSPACE" => Keyboard.Key.Backspace,
+                "TAB" => Keyboard.Key.Tab,
+                "PAGEUP" or "PGUP" => Keyboard.Key.PageUp,
+                "PAGEDOWN" or "PGDOWN" or "NEXT" => Keyboard.Key.PageDown,
+                "END" => Keyboard.Key.End,
+                "HOME" => Keyboard.Key.Home,
+                "INSERT" or "INS" => Keyboard.Key.Insert,
+                "DELETE" or "DEL" or "DECIMAL" => Keyboard.Key.Delete,
+                "ADD" => Keyboard.Key.Add,
+                "SUBTRACT" => Keyboard.Key.Subtract,
+                "MULTIPLY" => Keyboard.Key.Multiply,
+                "DIVIDE" => Keyboard.Key.Divide,
+                "LEFT" => Keyboard.Key.Left,
+                "RIGHT" => Keyboard.Key.Right,
+                "UP" => Keyboard.Key.Up,
+                "DOWN" => Keyboard.Key.Down,
+                "NUMPAD0" => Keyboard.Key.Numpad0,
+                "NUMPAD1" => Keyboard.Key.Numpad1,
+                "NUMPAD2" => Keyboard.Key.Numpad2,
+                "NUMPAD3" => Keyboard.Key.Numpad3,
+                "NUMPAD4" => Keyboard.Key.Numpad4,
+                "NUMPAD5" => Keyboard.Key.Numpad5,
+                "NUMPAD6" => Keyboard.Key.Numpad6,
+                "NUMPAD7" => Keyboard.Key.Numpad7,
+                "NUMPAD8" => Keyboard.Key.Numpad8,
+                "NUMPAD9" => Keyboard.Key.Numpad9,
+                "F1" => Keyboard.Key.F1,
+                "F2" => Keyboard.Key.F2,
+                "F3" => Keyboard.Key.F3,
+                "F4" => Keyboard.Key.F4,
+                "F5" => Keyboard.Key.F5,
+                "F6" => Keyboard.Key.F6,
+                "F7" => Keyboard.Key.F7,
+                "F8" => Keyboard.Key.F8,
+                "F9" => Keyboard.Key.F9,
+                "F10" => Keyboard.Key.F10,
+                "F11" => Keyboard.Key.F11,
+                "F12" => Keyboard.Key.F12,
+                "F13" => Keyboard.Key.F13,
+                "F14" => Keyboard.Key.F14,
+                "F15" => Keyboard.Key.F15,
+                "PAUSE" => Keyboard.Key.Pause,
+                _ => Keyboard.Key.Unknown,
+            };
         }
+
         /// <summary> Converts SFML Keyboard.Key to upper-case string. </summary>
         public static string KeyToString(Keyboard.Key key)
         {
-            switch (key)
+            return key switch
             {
-                case Keyboard.Key.A:
-                    return "A";
-                case Keyboard.Key.B:
-                    return "B";
-                case Keyboard.Key.C:
-                    return "C";
-                case Keyboard.Key.D:
-                    return "D";
-                case Keyboard.Key.E:
-                    return "E";
-                case Keyboard.Key.F:
-                    return "F";
-                case Keyboard.Key.G:
-                    return "G";
-                case Keyboard.Key.H:
-                    return "H";
-                case Keyboard.Key.I:
-                    return "I";
-                case Keyboard.Key.J:
-                    return "J";
-                case Keyboard.Key.K:
-                    return "K";
-                case Keyboard.Key.L:
-                    return "L";
-                case Keyboard.Key.M:
-                    return "M";
-                case Keyboard.Key.N:
-                    return "N";
-                case Keyboard.Key.O:
-                    return "O";
-                case Keyboard.Key.P:
-                    return "P";
-                case Keyboard.Key.Q:
-                    return "Q";
-                case Keyboard.Key.R:
-                    return "R";
-                case Keyboard.Key.S:
-                    return "S";
-                case Keyboard.Key.T:
-                    return "T";
-                case Keyboard.Key.U:
-                    return "U";
-                case Keyboard.Key.V:
-                    return "V";
-                case Keyboard.Key.W:
-                    return "W";
-                case Keyboard.Key.X:
-                    return "X";
-                case Keyboard.Key.Y:
-                    return "Y";
-                case Keyboard.Key.Z:
-                    return "Z";
-                case Keyboard.Key.Num0:
-                    return "0";
-                case Keyboard.Key.Num1:
-                    return "1";
-                case Keyboard.Key.Num2:
-                    return "2";
-                case Keyboard.Key.Num3:
-                    return "3";
-                case Keyboard.Key.Num4:
-                    return "4";
-                case Keyboard.Key.Num5:
-                    return "5";
-                case Keyboard.Key.Num6:
-                    return "6";
-                case Keyboard.Key.Num7:
-                    return "7";
-                case Keyboard.Key.Num8:
-                    return "8";
-                case Keyboard.Key.Num9:
-                    return "9";
-                case Keyboard.Key.Escape:
-                    return "ESC";
-                case Keyboard.Key.LControl:
-                    return "CTRL";
-                case Keyboard.Key.LShift:
-                    return "SHIFT";
-                case Keyboard.Key.LAlt:
-                    return "ALT";
-                case Keyboard.Key.LSystem:
-                    return "SYSTEM";
-                case Keyboard.Key.RControl:
-                    return "RCTRL";
-                case Keyboard.Key.RShift:
-                    return "RSHIFT";
-                case Keyboard.Key.RAlt:
-                    return "RALT";
-                case Keyboard.Key.RSystem:
-                    return "RSYSTEM";
-                case Keyboard.Key.Menu:
-                    return "MENU";
-                case Keyboard.Key.LBracket:
-                    return "[";
-                case Keyboard.Key.RBracket:
-                    return "]";
-                case Keyboard.Key.Semicolon:
-                    return ";";
-                case Keyboard.Key.Comma:
-                    return "<";
-                case Keyboard.Key.Period:
-                    return ">";
-                case Keyboard.Key.Quote:
-                    return "\"";
-                case Keyboard.Key.Slash:
-                    return "/";
-                case Keyboard.Key.Backslash:
-                    return "\\";
-                case Keyboard.Key.Tilde:
-                    return "~";
-                case Keyboard.Key.Equal:
-                    return "EQUAL";
-                case Keyboard.Key.Hyphen:
-                    return "DASH";
-                case Keyboard.Key.Space:
-                    return "SPACE";
-                case Keyboard.Key.Enter:
-                    return "RETURN";
-                case Keyboard.Key.Backspace:
-                    return "BACK";
-                case Keyboard.Key.Tab:
-                    return "TAB";
-                case Keyboard.Key.PageUp:
-                    return "PGUP";
-                case Keyboard.Key.PageDown:
-                    return "PGDOWN";
-                case Keyboard.Key.End:
-                    return "END";
-                case Keyboard.Key.Home:
-                    return "HOME";
-                case Keyboard.Key.Insert:
-                    return "INSERT";
-                case Keyboard.Key.Delete:
-                    return "DELETE";
-                case Keyboard.Key.Add:
-                    return "ADD";
-                case Keyboard.Key.Subtract:
-                    return "SUBTRACT";
-                case Keyboard.Key.Multiply:
-                    return "MULTIPLY";
-                case Keyboard.Key.Divide:
-                    return "DIVIDE";
-                case Keyboard.Key.Left:
-                    return "LEFT";
-                case Keyboard.Key.Right:
-                    return "RIGHT";
-                case Keyboard.Key.Up:
-                    return "UP";
-                case Keyboard.Key.Down:
-                    return "DOWN";
-                case Keyboard.Key.Numpad0:
-                    return "NUMPAD0";
-                case Keyboard.Key.Numpad1:
-                    return "NUMPAD1";
-                case Keyboard.Key.Numpad2:
-                    return "NUMPAD2";
-                case Keyboard.Key.Numpad3:
-                    return "NUMPAD3";
-                case Keyboard.Key.Numpad4:
-                    return "NUMPAD4";
-                case Keyboard.Key.Numpad5:
-                    return "NUMPAD5";
-                case Keyboard.Key.Numpad6:
-                    return "NUMPAD6";
-                case Keyboard.Key.Numpad7:
-                    return "NUMPAD7";
-                case Keyboard.Key.Numpad8:
-                    return "NUMPAD8";
-                case Keyboard.Key.Numpad9:
-                    return "NUMPAD9";
-                case Keyboard.Key.F1:
-                    return "F1";
-                case Keyboard.Key.F2:
-                    return "F2";
-                case Keyboard.Key.F3:
-                    return "F3";
-                case Keyboard.Key.F4:
-                    return "F4";
-                case Keyboard.Key.F5:
-                    return "F5";
-                case Keyboard.Key.F6:
-                    return "F6";
-                case Keyboard.Key.F7:
-                    return "F7";
-                case Keyboard.Key.F8:
-                    return "F8";
-                case Keyboard.Key.F9:
-                    return "F9";
-                case Keyboard.Key.F10:
-                    return "F10";
-                case Keyboard.Key.F11:
-                    return "F11";
-                case Keyboard.Key.F12:
-                    return "F12";
-                case Keyboard.Key.F13:
-                    return "F13";
-                case Keyboard.Key.F14:
-                    return "F14";
-                case Keyboard.Key.F15:
-                    return "F15";
-                case Keyboard.Key.Pause:
-                    return "PAUSE";
-            }
-
-            return "";
+                Keyboard.Key.A => "A",
+                Keyboard.Key.B => "B",
+                Keyboard.Key.C => "C",
+                Keyboard.Key.D => "D",
+                Keyboard.Key.E => "E",
+                Keyboard.Key.F => "F",
+                Keyboard.Key.G => "G",
+                Keyboard.Key.H => "H",
+                Keyboard.Key.I => "I",
+                Keyboard.Key.J => "J",
+                Keyboard.Key.K => "K",
+                Keyboard.Key.L => "L",
+                Keyboard.Key.M => "M",
+                Keyboard.Key.N => "N",
+                Keyboard.Key.O => "O",
+                Keyboard.Key.P => "P",
+                Keyboard.Key.Q => "Q",
+                Keyboard.Key.R => "R",
+                Keyboard.Key.S => "S",
+                Keyboard.Key.T => "T",
+                Keyboard.Key.U => "U",
+                Keyboard.Key.V => "V",
+                Keyboard.Key.W => "W",
+                Keyboard.Key.X => "X",
+                Keyboard.Key.Y => "Y",
+                Keyboard.Key.Z => "Z",
+                Keyboard.Key.Num0 => "0",
+                Keyboard.Key.Num1 => "1",
+                Keyboard.Key.Num2 => "2",
+                Keyboard.Key.Num3 => "3",
+                Keyboard.Key.Num4 => "4",
+                Keyboard.Key.Num5 => "5",
+                Keyboard.Key.Num6 => "6",
+                Keyboard.Key.Num7 => "7",
+                Keyboard.Key.Num8 => "8",
+                Keyboard.Key.Num9 => "9",
+                Keyboard.Key.Escape => "ESC",
+                Keyboard.Key.LControl => "CTRL",
+                Keyboard.Key.LShift => "SHIFT",
+                Keyboard.Key.LAlt => "ALT",
+                Keyboard.Key.LSystem => "SYSTEM",
+                Keyboard.Key.RControl => "RCTRL",
+                Keyboard.Key.RShift => "RSHIFT",
+                Keyboard.Key.RAlt => "RALT",
+                Keyboard.Key.RSystem => "RSYSTEM",
+                Keyboard.Key.Menu => "MENU",
+                Keyboard.Key.LBracket => "[",
+                Keyboard.Key.RBracket => "]",
+                Keyboard.Key.Semicolon => ";",
+                Keyboard.Key.Comma => "<",
+                Keyboard.Key.Period => ">",
+                Keyboard.Key.Apostrophe => "\"",
+                Keyboard.Key.Slash => "/",
+                Keyboard.Key.Backslash => "\\",
+                Keyboard.Key.Grave => "~",
+                Keyboard.Key.Equal => "EQUAL",
+                Keyboard.Key.Hyphen => "DASH",
+                Keyboard.Key.Space => "SPACE",
+                Keyboard.Key.Enter => "RETURN",
+                Keyboard.Key.Backspace => "BACK",
+                Keyboard.Key.Tab => "TAB",
+                Keyboard.Key.PageUp => "PGUP",
+                Keyboard.Key.PageDown => "PGDOWN",
+                Keyboard.Key.End => "END",
+                Keyboard.Key.Home => "HOME",
+                Keyboard.Key.Insert => "INSERT",
+                Keyboard.Key.Delete => "DELETE",
+                Keyboard.Key.Add => "ADD",
+                Keyboard.Key.Subtract => "SUBTRACT",
+                Keyboard.Key.Multiply => "MULTIPLY",
+                Keyboard.Key.Divide => "DIVIDE",
+                Keyboard.Key.Left => "LEFT",
+                Keyboard.Key.Right => "RIGHT",
+                Keyboard.Key.Up => "UP",
+                Keyboard.Key.Down => "DOWN",
+                Keyboard.Key.Numpad0 => "NUMPAD0",
+                Keyboard.Key.Numpad1 => "NUMPAD1",
+                Keyboard.Key.Numpad2 => "NUMPAD2",
+                Keyboard.Key.Numpad3 => "NUMPAD3",
+                Keyboard.Key.Numpad4 => "NUMPAD4",
+                Keyboard.Key.Numpad5 => "NUMPAD5",
+                Keyboard.Key.Numpad6 => "NUMPAD6",
+                Keyboard.Key.Numpad7 => "NUMPAD7",
+                Keyboard.Key.Numpad8 => "NUMPAD8",
+                Keyboard.Key.Numpad9 => "NUMPAD9",
+                Keyboard.Key.F1 => "F1",
+                Keyboard.Key.F2 => "F2",
+                Keyboard.Key.F3 => "F3",
+                Keyboard.Key.F4 => "F4",
+                Keyboard.Key.F5 => "F5",
+                Keyboard.Key.F6 => "F6",
+                Keyboard.Key.F7 => "F7",
+                Keyboard.Key.F8 => "F8",
+                Keyboard.Key.F9 => "F9",
+                Keyboard.Key.F10 => "F10",
+                Keyboard.Key.F11 => "F11",
+                Keyboard.Key.F12 => "F12",
+                Keyboard.Key.F13 => "F13",
+                Keyboard.Key.F14 => "F14",
+                Keyboard.Key.F15 => "F15",
+                Keyboard.Key.Pause => "PAUSE",
+                _ => "",
+            };
         }
 
         public static int StringToControl(string str)
         {
-            return str.StartsWith("MOUSE") || str == "SCROLLUP" || str == "SCROLLDOWN" ? StringToMouseButton(str) : (int)StringToKey(str);
+            return str.StartsWith("MOUSE") || str == "SCROLLUP" || str == "SCROLLDOWN"
+                ? StringToMouseButton(str)
+                : (int)StringToKey(str);
         }
 
         public static bool KeyModifier(Keyboard.Key key)
         {
-            return key == Keyboard.Key.LControl || key == Keyboard.Key.LShift || key == Keyboard.Key.LAlt ||
-                key == Keyboard.Key.RControl || key == Keyboard.Key.RShift || key == Keyboard.Key.RAlt;
+            return key == Keyboard.Key.LControl
+                || key == Keyboard.Key.LShift
+                || key == Keyboard.Key.LAlt
+                || key == Keyboard.Key.RControl
+                || key == Keyboard.Key.RShift
+                || key == Keyboard.Key.RAlt;
         }
 
         private static string VariableAmountOfStrings(int amount, string s)
@@ -1604,6 +1586,9 @@ namespace vimage
             return str;
         }
 
-        private static string RemoveSpaces(string str) { return str.Replace(" ", "").Replace("\t", ""); }
+        private static string RemoveSpaces(string str)
+        {
+            return str.Replace(" ", "").Replace("\t", "");
+        }
     }
 }
