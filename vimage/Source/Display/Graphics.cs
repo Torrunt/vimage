@@ -394,7 +394,7 @@ namespace vimage
                 Textures.Add(texture);
                 TextureFileNames.Add(name);
 
-                return new Sprite(Textures[Textures.Count - 1]);
+                return new Sprite(Textures[^1]);
             }
             else
             {
@@ -484,7 +484,7 @@ namespace vimage
             {
                 // Texture Already Exists
                 // move it to the end of the array and return it
-                Texture texture = Textures[index];
+                var texture = Textures[index];
                 string name = TextureFileNames[index];
 
                 Textures.RemoveAt(index);
@@ -492,7 +492,7 @@ namespace vimage
                 Textures.Add(texture);
                 TextureFileNames.Add(name);
 
-                return new Sprite(Textures[Textures.Count - 1]);
+                return new Sprite(Textures[^1]);
             }
             else
             {
@@ -607,7 +607,7 @@ namespace vimage
                     AnimatedImageDatas.Add(data);
                     AnimatedImageDataFileNames.Add(name);
 
-                    return AnimatedImageDatas[AnimatedImageDatas.Count - 1];
+                    return AnimatedImageDatas[^1];
                 }
                 else
                 {

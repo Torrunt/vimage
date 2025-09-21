@@ -717,7 +717,13 @@ namespace vimage
                     return;
 
                 case Action.VisitWebsite:
-                    _ = Process.Start("http://torrunt.net/vimage");
+                    _ = Process.Start(
+                        new ProcessStartInfo
+                        {
+                            FileName = "http://torrunt.net/vimage",
+                            UseShellExecute = true,
+                        }
+                    );
                     return;
 
                 case Action.SortName:
@@ -822,7 +828,7 @@ namespace vimage
                 return;
             }
 
-            Action DownAction = CurrentAction; // Remember ControlDown Action so it won't be repeated on release
+            var DownAction = CurrentAction; // Remember ControlDown Action so it won't be repeated on release
 
             // Dragging
             if (Config.IsControl(code, Config.Control_Drag))
@@ -1118,39 +1124,37 @@ namespace vimage
 
         public void NextFrame()
         {
-            if (Image is AnimatedImage)
-            {
-                if (Image.Playing)
-                    Image.Stop();
-                Image.NextFrame();
-                Update();
-            }
+            if (Image is not AnimatedImage animatedImage)
+                return;
+
+            if (animatedImage.Playing)
+                animatedImage.Stop();
+            animatedImage.NextFrame();
+            Update();
         }
 
         public void PrevFrame()
         {
-            if (Image is AnimatedImage)
-            {
-                if (Image.Playing)
-                    Image.Stop();
-                Image.PrevFrame();
-                Update();
-            }
+            if (Image is not AnimatedImage animatedImage)
+                return;
+
+            if (animatedImage.Playing)
+                animatedImage.Stop();
+            animatedImage.PrevFrame();
+            Update();
         }
 
         public bool ToggleAnimation(int val = -1)
         {
-            if (Image is AnimatedImage)
-            {
-                if ((val == -1 && Image.Playing) || val == 0)
-                    Image.Stop();
-                else if (val != 0)
-                    Image.Play();
+            if (Image is not AnimatedImage animatedImage)
+                return false;
 
-                return Image.Playing;
-            }
+            if ((val == -1 && animatedImage.Playing) || val == 0)
+                animatedImage.Stop();
+            else if (val != 0)
+                animatedImage.Play();
 
-            return false;
+            return animatedImage.Playing;
         }
 
         private void Zoom(float value, bool center = false, bool manualZoom = false)
@@ -1198,7 +1202,7 @@ namespace vimage
                             (uint)Math.Ceiling(Size.Y * CurrentZoom),
                             (uint)Math.Ceiling(Size.X * CurrentZoom)
                         );
-                Vector2i difference =
+                var difference =
                     new Vector2i((int)newSize.X, (int)newSize.Y)
                     - new Vector2i((int)Window.Size.X, (int)Window.Size.Y);
                 NextWindowSize = newSize;
@@ -1258,7 +1262,7 @@ namespace vimage
 
                     if (center && CurrentZoom != originalZoom)
                     {
-                        Vector2i difference =
+                        var difference =
                             new Vector2i((int)NextWindowSize.X, (int)NextWindowSize.Y)
                             - new Vector2i((int)Window.Size.X, (int)Window.Size.Y);
                         NextWindowPos = new Vector2i(
@@ -1537,8 +1541,13 @@ namespace vimage
                 && Size.X > Size.Y
                 && Size.X * CurrentZoom >= bounds.Width
             )
-                NextWindowPos = new Vector2i(bounds.Left, bounds.Top); // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
+            {
+                // Position Window at 0,0 if the image is large (ie: a Desktop wallpaper)
+                NextWindowPos = new Vector2i(bounds.Left, bounds.Top);
+            }
             else
+            {
+                // Center
                 NextWindowPos = new Vector2i(
                     NextWindowSize.X >= currentWorkingArea.Width - 2
                         ? currentWorkingArea.Left
@@ -1550,7 +1559,8 @@ namespace vimage
                         : currentWorkingArea.Top
                             + (currentWorkingArea.Height / 2)
                             - ((int)(Size.Y * CurrentZoom) / 2)
-                ); // Center
+                );
+            }
 
             // Temporarily set always on top to bring it infront of the taskbar?
             ForceAlwaysOnTopCheck(bounds, workingArea);
@@ -1596,7 +1606,7 @@ namespace vimage
             }
             if ((val == -1 && ImageColor == Color.White) || val == 1)
             {
-                System.Drawing.Color colour = System.Drawing.ColorTranslator.FromHtml(
+                var colour = System.Drawing.ColorTranslator.FromHtml(
                     Config.Setting_TransparencyToggleValue
                 );
                 ImageColor = new Color(colour.R, colour.G, colour.B, colour.A);
@@ -1618,22 +1628,20 @@ namespace vimage
                 ImageColor.G,
                 ImageColor.B,
                 (byte)
-                    Math.Min(
-                        Math.Max(
-                            ImageColor.A
-                                + (
-                                    amount
+                    Math.Clamp(
+                        ImageColor.A
+                            + (
+                                amount
+                                * (
+                                    255
                                     * (
-                                        255
-                                        * (
-                                            ZoomFaster
-                                                ? (Config.Setting_ZoomSpeedFast / 100f)
-                                                : (Config.Setting_ZoomSpeed / 100f)
-                                        )
+                                        ZoomFaster
+                                            ? (Config.Setting_ZoomSpeedFast / 100f)
+                                            : (Config.Setting_ZoomSpeed / 100f)
                                     )
-                                ),
-                            2
-                        ),
+                                )
+                            ),
+                        2,
                         255
                     )
             );
@@ -1861,7 +1869,7 @@ namespace vimage
             if (ViewStateHistory.Count == 0)
                 return;
 
-            var state = ViewStateHistory[ViewStateHistory.Count - 1];
+            var state = ViewStateHistory[^1];
 
             Size = state.Size;
             Rotation = state.Rotation;
@@ -1969,11 +1977,11 @@ namespace vimage
             else
             {
                 // Other
-                dynamic texture = Graphics.GetTexture(fileName);
-                if (texture is Texture)
-                    Image = new Sprite(texture);
-                else if (texture is DisplayObject @displayObject)
-                    Image = @displayObject;
+                var texture = Graphics.GetTexture(fileName);
+                if (texture is Texture texture1)
+                    Image = new Sprite(texture1);
+                else if (texture is DisplayObject displayObject)
+                    Image = displayObject;
             }
 
             if (Image?.Texture == null)
@@ -2072,7 +2080,7 @@ namespace vimage
             else if (fileName == "" && !LoadImageFromClipboard())
                 return false;
 
-            View view = Window.DefaultView;
+            var view = Window.DefaultView;
             view.Center = new Vector2f(Size.X / 2f, Size.Y / 2f);
             view.Size = new Vector2f(Size.X, Size.Y);
             Window.SetView(view);
@@ -2084,21 +2092,20 @@ namespace vimage
                 false
             );
             // Smoothing
-            if (Image is AnimatedImage)
+            if (Image is AnimatedImage animatedImage)
             {
-                Image.Data.Smooth =
+                animatedImage.Data.Smooth =
                     Math.Min(Size.X, Size.Y) >= Config.Setting_SmoothingMinImageSize
                     && Config.Setting_SmoothingDefault;
-                if (Config.Setting_Mipmapping && Image.Data is Texture)
-                    (Image.Data as Texture).GenerateMipmap();
+                animatedImage.Data.Mipmap = Config.Setting_Mipmapping;
             }
             else
             {
                 Image.Texture.Smooth =
                     Math.Min(Size.X, Size.Y) >= Config.Setting_SmoothingMinImageSize
                     && Config.Setting_SmoothingDefault;
-                if (Config.Setting_Mipmapping && Image.Texture is Texture)
-                    (Image.Texture as Texture).GenerateMipmap();
+                if (Config.Setting_Mipmapping && Image.Texture is Texture texture)
+                    texture.GenerateMipmap();
             }
 
             // Color
@@ -2204,7 +2211,7 @@ namespace vimage
                     Zoom(CurrentZoom, true);
             }
 
-            Vector2i boundsPos =
+            var boundsPos =
                 NextWindowPos
                 + new Vector2i(
                     (int)(CurrentImageSize().X * CurrentZoom) / 2,
@@ -2224,7 +2231,9 @@ namespace vimage
                 && CurrentImageSize().X > CurrentImageSize().Y
                 && CurrentImageSize().X * CurrentZoom >= bounds.Width
             )
+            {
                 NextWindowPos = new Vector2i(bounds.Left, bounds.Top);
+            }
             else if (
                 !prevSize.Equals(Size)
                 && (
@@ -2235,10 +2244,12 @@ namespace vimage
                         >= bounds.Top + bounds.Height
                 )
             )
+            {
                 NextWindowPos = new Vector2i(
                     bounds.Left + (int)((bounds.Width - (CurrentImageSize().X * CurrentZoom)) / 2),
                     bounds.Top + (int)((bounds.Height - (CurrentImageSize().Y * CurrentZoom)) / 2)
                 );
+            }
 
             // Temporarily set always on top to bring it infront of the taskbar?
             ForceAlwaysOnTopCheck(bounds, ImageViewerUtils.GetCurrentWorkingArea(boundsPos));
@@ -2255,7 +2266,7 @@ namespace vimage
         }
 
         /// <summary>Loads an image into memory but doesn't set it as the displayed image.</summary>
-        private bool PreloadImage(string fileName)
+        private static bool PreloadImage(string fileName)
         {
             string extension = Path.GetExtension(fileName).ToLowerInvariant();
 
@@ -2307,9 +2318,9 @@ namespace vimage
             do
             {
                 if (PreloadingNextImage == 1)
-                    pos = pos == FolderContents.Count() - 1 ? 0 : pos + 1;
+                    pos = pos == FolderContents.Count - 1 ? 0 : pos + 1;
                 else if (PreloadingNextImage == -1)
-                    pos = pos == 0 ? FolderContents.Count() - 1 : pos - 1;
+                    pos = pos == 0 ? FolderContents.Count - 1 : pos - 1;
                 else
                     return;
 
@@ -2323,17 +2334,17 @@ namespace vimage
         public void NextImage()
         {
             GetFolderContents();
-            if (FolderContents.Count() <= 1)
+            if (FolderContents.Count <= 1)
                 return;
 
-            if (!Config.Setting_LoopImageNavigation && FolderPosition == FolderContents.Count() - 1)
+            if (!Config.Setting_LoopImageNavigation && FolderPosition == FolderContents.Count - 1)
                 return;
 
             bool success;
             do
             {
                 FolderPosition =
-                    FolderPosition >= FolderContents.Count() - 1 ? 0 : FolderPosition + 1;
+                    FolderPosition >= FolderContents.Count - 1 ? 0 : FolderPosition + 1;
                 success = ChangeImage(FolderContents[FolderPosition]);
             } while (!success);
 
@@ -2350,7 +2361,7 @@ namespace vimage
         public void PrevImage()
         {
             GetFolderContents();
-            if (FolderContents.Count() <= 1)
+            if (FolderContents.Count <= 1)
                 return;
 
             if (!Config.Setting_LoopImageNavigation && FolderPosition == 0)
@@ -2360,7 +2371,7 @@ namespace vimage
             do
             {
                 FolderPosition =
-                    FolderPosition <= 0 ? FolderContents.Count() - 1 : FolderPosition - 1;
+                    FolderPosition <= 0 ? FolderContents.Count - 1 : FolderPosition - 1;
                 success = ChangeImage(FolderContents[FolderPosition]);
             } while (!success);
 
@@ -2377,7 +2388,7 @@ namespace vimage
         public void RandomImage()
         {
             GetFolderContents();
-            if (FolderContents.Count() <= 1)
+            if (FolderContents.Count <= 1)
                 return;
 
             bool success;
@@ -2417,7 +2428,7 @@ namespace vimage
 
         private void GetFolderContents()
         {
-            if (FolderContents != null && FolderContents.Count() > 0)
+            if (FolderContents != null && FolderContents.Count > 0)
                 return;
 
             if (File == "")
@@ -2579,14 +2590,22 @@ namespace vimage
 
         public void OpenFileAtLocation()
         {
-            if (File != "")
-                _ = Process.Start("explorer.exe", "/select, " + File);
+            if (File == "")
+                return;
+            _ = Process.Start(
+                new ProcessStartInfo
+                {
+                    FileName = "explorer.exe",
+                    Arguments = $"/select,\"{File}\"",
+                    UseShellExecute = true,
+                }
+            );
         }
 
         public void OpenDuplicateWindow(bool full = false)
         {
             var view = Window.GetView();
-            var startInfo = new ProcessStartInfo(System.Windows.Forms.Application.ExecutablePath)
+            var startInfo = new ProcessStartInfo(Environment.ProcessPath)
             {
                 Arguments = $"\"{File}\"",
             };
@@ -2621,7 +2640,7 @@ namespace vimage
             _ = Process.Start(startInfo);
         }
 
-        public void ExitAllInstances()
+        public static void ExitAllInstances()
         {
             var current = Process.GetCurrentProcess();
             Process
@@ -2638,7 +2657,7 @@ namespace vimage
             if (Config.Setting_OpenSettingsEXE)
             {
                 string vimage_settings = Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory,
+                    AppContext.BaseDirectory,
                     "vimage_settings.exe"
                 );
                 if (System.IO.File.Exists(vimage_settings))

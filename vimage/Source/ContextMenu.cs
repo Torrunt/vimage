@@ -58,10 +58,10 @@ namespace vimage
                 if (ImageViewer.File == "")
                 {
                     // Remove certain items if there is no file (looking at clipboard image)
-                    if (items[i] is string)
+                    if (items[i] is string str)
                     {
                         // remove Sort By submenu
-                        if ((items[i] as string).IndexOf("Sort") == 0)
+                        if (str.StartsWith("Sort"))
                         {
                             i++;
                             if (i < items.Count - 1 && (items[i + 1] as dynamic).name == "-")
@@ -220,28 +220,24 @@ namespace vimage
                         string fileName =
                             ImageViewer.File == ""
                                 ? "Clipboard Image"
-                                : ImageViewer.File.Substring(
-                                    ImageViewer.File.LastIndexOf('\\') + 1
-                                );
+                                : ImageViewer.File[(ImageViewer.File.LastIndexOf('\\') + 1)..];
                         string extension =
-                            ImageViewer.File == ""
-                                ? ""
-                                : fileName.Substring(fileName.LastIndexOf("."));
+                            ImageViewer.File == "" ? "" : fileName[fileName.LastIndexOf('.')..];
                         if (
                             nameLength >= fileName.Length - 6
-                            || fileName.LastIndexOf(".") <= nameLength
+                            || fileName.LastIndexOf('.') <= nameLength
                         )
                             nameLength = fileName.Length;
                         Items[Items_General[FileNameItem]].Text =
-                            (a > 10 ? Items_General[FileNameItem].Substring(0, a - 10) : "")
+                            (a > 10 ? Items_General[FileNameItem][..(a - 10)] : "")
                             + (
                                 fileName.Length > nameLength
-                                    ? fileName.Substring(0, nameLength) + ".." + extension
+                                    ? fileName[..nameLength] + ".." + extension
                                     : fileName
                             )
                             + (
                                 b < Items_General[FileNameItem].Length - 1
-                                    ? Items_General[FileNameItem].Substring(b + 1)
+                                    ? Items_General[FileNameItem][(b + 1)..]
                                     : ""
                             );
                         Items[Items_General[FileNameItem]].ToolTipText =
@@ -329,11 +325,11 @@ namespace vimage
                 Close();
 
             object func = FuncByName[item.Name];
-            if (func is string @funcName)
+            if (func is string funcName)
             {
                 for (int i = 0; i < ImageViewer.Config.CustomActions.Count; i++)
                 {
-                    if ((ImageViewer.Config.CustomActions[i] as dynamic).name == @funcName)
+                    if ((ImageViewer.Config.CustomActions[i] as dynamic).name == funcName)
                         ImageViewer.DoCustomAction(
                             (ImageViewer.Config.CustomActions[i] as dynamic).func
                         );
