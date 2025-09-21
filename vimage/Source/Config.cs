@@ -131,27 +131,27 @@ namespace vimage
 
         public bool Setting_UseDevIL
         {
-            get { return (Boolean)Settings["USEDEVIL"]; }
+            get { return (bool)Settings["USEDEVIL"]; }
             set { Settings["USEDEVIL"] = value; }
         }
         public bool Setting_OpenAtMousePosition
         {
-            get { return (Boolean)Settings["OPENATMOUSEPOSITION"]; }
+            get { return (bool)Settings["OPENATMOUSEPOSITION"]; }
             set { Settings["OPENATMOUSEPOSITION"] = value; }
         }
         public bool Setting_SmoothingDefault
         {
-            get { return (Boolean)Settings["SMOOTHINGDEFAULT"]; }
+            get { return (bool)Settings["SMOOTHINGDEFAULT"]; }
             set { Settings["SMOOTHINGDEFAULT"] = value; }
         }
         public bool Setting_Mipmapping
         {
-            get { return (Boolean)Settings["MIPMAPPING"]; }
+            get { return (bool)Settings["MIPMAPPING"]; }
             set { Settings["MIPMAPPING"] = value; }
         }
         public bool Setting_BackgroundForImagesWithTransparencyDefault
         {
-            get { return (Boolean)Settings["BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT"]; }
+            get { return (bool)Settings["BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT"]; }
             set { Settings["BACKGROUNDFORIMAGESWITHTRANSPARENCYDEFAULT"] = value; }
         }
         public string Setting_BackgroundColour
@@ -642,7 +642,7 @@ namespace vimage
                 }
             );
             CustomActionBindings.Add(new { name = "EDIT PAINTDOTNET", bindings = new List<int>() });
-            CustomActions.Add(new { name = "TOGGLE TASKBAR", func = "-taskbarToggle" });
+            CustomActions.Add(new { name = "TOGGLE TASKBAR", func = "-taskbarIcon" });
             CustomActionBindings.Add(new { name = "TOGGLE TASKBAR", bindings = new List<int>() });
         }
 
@@ -1032,13 +1032,18 @@ namespace vimage
             WriteComment(writer, comment);
         }
 
-        private void WriteSetting(StreamWriter writer, string name, int value, string comment = "")
+        private static void WriteSetting(
+            StreamWriter writer,
+            string name,
+            int value,
+            string comment = ""
+        )
         {
             writer.Write(name + " = " + value.ToString());
             WriteComment(writer, comment);
         }
 
-        private void WriteSetting(
+        private static void WriteSetting(
             StreamWriter writer,
             string name,
             string value,
@@ -1049,19 +1054,19 @@ namespace vimage
             WriteComment(writer, comment);
         }
 
-        private void WriteComment(StreamWriter writer, string comment = "")
+        private static void WriteComment(StreamWriter writer, string comment = "")
         {
             if (!comment.Equals(""))
                 writer.Write(" // " + comment);
             writer.Write(Environment.NewLine);
         }
 
-        private void WriteControl(StreamWriter writer, string name, List<int> controls)
+        private static void WriteControl(StreamWriter writer, string name, List<int> controls)
         {
             writer.Write(name + " = " + ControlsToString(controls) + Environment.NewLine);
         }
 
-        private void WriteContextMenuSetup(
+        private static void WriteContextMenuSetup(
             StreamWriter writer,
             string name,
             List<object> contextMenu
@@ -1072,7 +1077,11 @@ namespace vimage
             writer.Write("}" + Environment.NewLine);
         }
 
-        private void WriteContextMenuItems(StreamWriter writer, List<object> items, int depth = 1)
+        private static void WriteContextMenuItems(
+            StreamWriter writer,
+            List<object> items,
+            int depth = 1
+        )
         {
             if (items == null)
                 return;

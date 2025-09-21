@@ -249,7 +249,9 @@ namespace vimage
                 && CurrentImageSize().X > CurrentImageSize().Y
                 && CurrentImageSize().X * CurrentZoom >= bounds.Width
             )
+            {
                 winPos = new Vector2i(bounds.Left, bounds.Top);
+            }
             else if (Config.Setting_OpenAtMousePosition)
             {
                 // At Mouse Position
@@ -273,10 +275,12 @@ namespace vimage
                     winPos.X = bounds.Left + bounds.Width - (int)NextWindowSize.X;
             }
             else
+            {
                 winPos = new Vector2i(
                     bounds.Left + (int)((bounds.Width - (Size.X * CurrentZoom)) / 2),
                     bounds.Top + (int)((bounds.Height - (Size.Y * CurrentZoom)) / 2)
                 );
+            }
             NextWindowPos = winPos;
 
             // Arguments?
@@ -2544,7 +2548,7 @@ namespace vimage
 
         public void CopyAsImage()
         {
-            Thread thread = new Thread(() =>
+            var thread = new Thread(() =>
             {
                 try
                 {

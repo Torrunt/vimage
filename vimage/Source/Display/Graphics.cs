@@ -62,15 +62,15 @@ namespace vimage
             {
                 // Texture Already Exists
                 // move it to the end of the array and return it
-                Texture texture = Textures[index];
-                string name = TextureFileNames[index];
+                var texture = Textures[index];
+                var name = TextureFileNames[index];
 
                 Textures.RemoveAt(index);
                 TextureFileNames.RemoveAt(index);
                 Textures.Add(texture);
                 TextureFileNames.Add(name);
 
-                return Textures[Textures.Count - 1];
+                return Textures[^1];
             }
             else if (splitTextureIndex >= 0)
             {
@@ -92,7 +92,7 @@ namespace vimage
                         IL.BindImage(imageID);
 
                         _ = IL.Enable(EnableCap.AbsoluteOrigin);
-                        IL.RegisterOrigin(OriginMode.UpperLeft); // IL.SetOriginLocation(DevIL.OriginLocation.UpperLeft);
+                        IL.RegisterOrigin(OriginMode.UpperLeft);
 
                         bool loaded = IL.LoadStream(fileStream);
 
@@ -127,26 +127,24 @@ namespace vimage
                         // Load image via SFML
                         try
                         {
-                            using (var image = new SFML.Graphics.Image(fileStream))
-                            {
-                                Vector2u imageSize = image.Size;
+                            using var image = new SFML.Graphics.Image(fileStream);
+                            Vector2u imageSize = image.Size;
 
-                                if (imageSize.X > TextureMaxSize || imageSize.Y > TextureMaxSize)
-                                {
-                                    // Large Image split-up into multiple textures
-                                    textureLarge = GetLargeTextureFromSFMLImage(
-                                        TextureMaxSize,
-                                        image,
-                                        fileName
-                                    );
-                                }
-                                else
-                                {
-                                    // Single Texture
-                                    texture = GetTextureFromSFMLImage(image);
-                                    Textures.Add(texture);
-                                    TextureFileNames.Add(fileName);
-                                }
+                            if (imageSize.X > TextureMaxSize || imageSize.Y > TextureMaxSize)
+                            {
+                                // Large Image split-up into multiple textures
+                                textureLarge = GetLargeTextureFromSFMLImage(
+                                    TextureMaxSize,
+                                    image,
+                                    fileName
+                                );
+                            }
+                            else
+                            {
+                                // Single Texture
+                                texture = GetTextureFromSFMLImage(image);
+                                Textures.Add(texture);
+                                TextureFileNames.Add(fileName);
                             }
                         }
                         catch (SFML.LoadingFailedException)
@@ -548,15 +546,15 @@ namespace vimage
             {
                 // Texture Already Exists
                 // move it to the end of the array and return it
-                Texture texture = Textures[index];
-                string name = TextureFileNames[index];
+                var texture = Textures[index];
+                var name = TextureFileNames[index];
 
                 Textures.RemoveAt(index);
                 TextureFileNames.RemoveAt(index);
                 Textures.Add(texture);
                 TextureFileNames.Add(name);
 
-                return new Sprite(Textures[Textures.Count - 1]);
+                return new Sprite(Textures[^1]);
             }
             else
             {
@@ -601,7 +599,7 @@ namespace vimage
                 {
                     // AnimatedImageData Already Exists
                     // move it to the end of the array and return it
-                    AnimatedImageData data = AnimatedImageDatas[index];
+                    var data = AnimatedImageDatas[index];
                     string name = AnimatedImageDataFileNames[index];
 
                     AnimatedImageDatas.RemoveAt(index);
@@ -721,7 +719,7 @@ namespace vimage
                 int i;
                 for (i = t + 1; i < TextureFileNames.Count; i++)
                 {
-                    if (TextureFileNames[i].IndexOf(name) != 0)
+                    if (!TextureFileNames[i].StartsWith(name))
                         break;
                 }
                 for (int d = t; d < i; d++)

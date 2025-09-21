@@ -39,7 +39,7 @@ namespace vimage
             LoadItemsInto(Items_General, General);
 
             // Animation
-            Items_Animation = new List<string>(Items_General);
+            Items_Animation = [.. Items_General];
             List<string> list = [];
 
             // inserting into submenu?
@@ -115,7 +115,7 @@ namespace vimage
             if (
                 !force
                 && (
-                    (Setting == 0 && !(ImageViewer.Image is AnimatedImage))
+                    (Setting == 0 && ImageViewer.Image is not AnimatedImage)
                     || (Setting == 1 && ImageViewer.Image is AnimatedImage)
                 )
             )
@@ -323,7 +323,7 @@ namespace vimage
 
         private void ContexMenuItemClicked(object sender, EventArgs e)
         {
-            ToolStripItem item = sender as ToolStripItem;
+            var item = sender as ToolStripItem;
 
             if (!(item as ToolStripDropDownItem).HasDropDownItems)
                 Close();
@@ -360,14 +360,11 @@ namespace vimage
                     return collection[i] as ToolStripMenuItem;
 
                 if (
-                    collection[i] is ToolStripDropDownItem
-                    && (collection[i] as ToolStripDropDownItem).DropDownItems.Count > 0
+                    collection[i] is ToolStripDropDownItem toolStripDropDownItem
+                    && toolStripDropDownItem.DropDownItems.Count > 0
                 )
                 {
-                    var item = GetItemByFuncFrom(
-                        func,
-                        (collection[i] as ToolStripDropDownItem).DropDownItems
-                    );
+                    var item = GetItemByFuncFrom(func, toolStripDropDownItem.DropDownItems);
                     if (item != null)
                         return item;
                 }

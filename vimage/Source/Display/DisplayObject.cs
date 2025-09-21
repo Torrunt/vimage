@@ -177,16 +177,10 @@ namespace vimage
         }
     }
 
-    internal class TextureInfo
+    internal class TextureInfo(DisplayObject obj)
     {
-        private readonly DisplayObject Obj;
-
-        public TextureInfo(DisplayObject obj)
-        {
-            Obj = obj;
-        }
-
-        public Vector2u Size = new Vector2u();
+        private readonly DisplayObject Obj = obj;
+        public Vector2u Size = new();
 
         private bool _Smooth = true;
         public bool Smooth
