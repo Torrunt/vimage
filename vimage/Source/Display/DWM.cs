@@ -83,39 +83,6 @@ namespace vimage
             WS_SYSMENU = 0x00080000,
             WS_POPUP = 0x80000000;
         private const uint SWP_FRAMECHANGED = 0x0020;
-        private static bool SysMenuVisible = true;
-
-        public static void SysMenuSetVisible(RenderWindow window, bool visible)
-        {
-            if (SysMenuVisible == visible)
-                return;
-            SysMenuVisible = visible;
-            _ = SysMenuVisible
-                ? SetWindowLongPtr(
-                    window.SystemHandle,
-                    GWL_STYLE,
-                    new nint(
-                        GetWindowLongPtr(window.SystemHandle, GWL_STYLE).ToInt64() | WS_SYSMENU
-                    )
-                )
-                : SetWindowLongPtr(
-                    window.SystemHandle,
-                    GWL_STYLE,
-                    new nint(
-                        GetWindowLongPtr(window.SystemHandle, GWL_STYLE).ToInt64() & ~WS_SYSMENU
-                    )
-                );
-
-            _ = SetWindowPos(
-                window.SystemHandle,
-                new nint(0),
-                window.Position.X,
-                window.Position.Y,
-                (int)window.Size.X,
-                (int)window.Size.Y,
-                SWP_FRAMECHANGED
-            );
-        }
 
         public static void TitleBarSetVisible(RenderWindow window, bool visible)
         {
