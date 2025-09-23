@@ -630,9 +630,7 @@ namespace vimage
             CustomActionBindings.Add(
                 new { name = "TOGGLE OVERLAY MODE", bindings = new List<int>() { -2, 38, 11 } }
             );
-            CustomActions.Add(
-                new { name = "EDIT PAINT", func = @"%windir%\system32\mspaint.exe %f" }
-            );
+            CustomActions.Add(new { name = "EDIT PAINT", func = @"mspaint.exe %f" });
             CustomActionBindings.Add(new { name = "EDIT PAINT", bindings = new List<int>() });
             CustomActions.Add(
                 new
@@ -666,13 +664,13 @@ namespace vimage
             CustomActions.Clear();
             CustomActionBindings.Clear();
 
-            StreamReader reader = File.OpenText(configFile);
-            string line = reader.ReadLine();
+            var reader = File.OpenText(configFile);
+            var line = reader.ReadLine();
 
             while (line != null)
             {
                 // if line is empty of has no '=' symbol, go to next
-                if (line.Equals("") || line.IndexOf('=') == -1)
+                if (line.Equals("") || !line.Contains('='))
                 {
                     line = reader.ReadLine();
                     continue;
@@ -682,14 +680,14 @@ namespace vimage
                 line = RemoveSpaces(line);
 
                 // ignore comments
-                if (line.IndexOf("//") != -1)
-                    line = line.Substring(0, line.IndexOf("//"));
+                if (line.IndexOf("//") is int commentIndex and >= 0)
+                    line = line[..commentIndex];
 
                 // split variable name and values
-                string[] nameValue = line.Split('=');
+                var nameValue = line.Split('=');
 
                 // invalid name?
-                string name = nameValue[0].ToUpper();
+                var name = nameValue[0].ToUpper();
                 if (!Settings.ContainsKey(name))
                 {
                     line = reader.ReadLine();
@@ -702,7 +700,7 @@ namespace vimage
                     line = RemoveSpaces(reader.ReadLine());
 
                     // line is empty or is part of another setting, skip
-                    if (line.Equals("") || line.IndexOf('=') != -1)
+                    if (line.Equals("") || line.Contains('='))
                         continue;
                     // line doesn't have open brace, skip
                     if (!line.Equals("{"))
@@ -714,7 +712,7 @@ namespace vimage
                 }
 
                 // split values by commas
-                string[] values = nameValue[1].Split(',');
+                var values = nameValue[1].Split(',');
 
                 // Assign Values
                 if (Settings[name] is List<int> list)
@@ -738,7 +736,7 @@ namespace vimage
                             ? true
                             : (object)false;
                 }
-                else if (Settings[name] is String)
+                else if (Settings[name] is string)
                 {
                     Settings[name] = values[0];
                 }
@@ -750,7 +748,7 @@ namespace vimage
             reader.Close();
         }
 
-        private string ReadSection(
+        private static string ReadSection(
             StreamReader reader,
             List<object> setting,
             string sectionName = ""
@@ -765,7 +763,7 @@ namespace vimage
 
             while (line != null)
             {
-                if (!trimedLine.Equals("-") && trimedLine.IndexOf(':') == -1)
+                if (!trimedLine.Equals("-") && !trimedLine.Contains(':'))
                 {
                     // Subsection
                     string subSectionName = line.Replace("\t", "");
@@ -800,6 +798,7 @@ namespace vimage
 
                     // assign Values
                     if (sectionName == "CUSTOMACTIONBINDINGS")
+                    {
                         setting.Add(
                             new
                             {
@@ -807,9 +806,10 @@ namespace vimage
                                 bindings = StringToControls(splitValues[1].Split(',')),
                             }
                         );
-                    else if (sectionName.IndexOf("CONTEXTMENU") != -1)
+                    }
+                    else if (sectionName.Contains("CONTEXTMENU"))
                     {
-                        Action action = Actions.StringToAction(splitValues[1]);
+                        var action = Actions.StringToAction(splitValues[1]);
                         setting.Add(
                             new
                             {
@@ -849,12 +849,12 @@ namespace vimage
                 if (File.Exists(configFile))
                 {
                     // Clear if file already exists
-                    File.WriteAllText(configFile, String.Empty);
+                    File.WriteAllText(configFile, string.Empty);
                     fileStream = File.Open(configFile, FileMode.Open, FileAccess.Write);
                 }
                 else
                     fileStream = File.Create(configFile);
-                StreamWriter writer = new StreamWriter(fileStream);
+                var writer = new StreamWriter(fileStream);
 
                 // Write
                 writer.Write("// General Settings" + Environment.NewLine);
@@ -1026,7 +1026,12 @@ namespace vimage
             }
         }
 
-        private void WriteSetting(StreamWriter writer, string name, bool value, string comment = "")
+        private static void WriteSetting(
+            StreamWriter writer,
+            string name,
+            bool value,
+            string comment = ""
+        )
         {
             writer.Write(name + " = " + (value ? 1 : 0));
             WriteComment(writer, comment);
@@ -1123,14 +1128,15 @@ namespace vimage
             }
         }
 
-        private void WriteCustomActions(
+        private static void WriteCustomActions(
             StreamWriter writer,
             string name,
             List<object> customActions
         )
         {
             writer.Write(name + " =" + Environment.NewLine + "{" + Environment.NewLine);
-            for (int i = 0; i < CustomActions.Count; i++)
+            for (int i = 0; i < customActions.Count; i++)
+            {
                 writer.Write(
                     "\t"
                         + (customActions[i] as dynamic).name
@@ -1138,10 +1144,11 @@ namespace vimage
                         + (customActions[i] as dynamic).func
                         + Environment.NewLine
                 );
+            }
             writer.Write("}" + Environment.NewLine);
         }
 
-        private void WriteCustomActionBindings(
+        private static void WriteCustomActionBindings(
             StreamWriter writer,
             string name,
             List<object> customActionBindings
@@ -1149,6 +1156,7 @@ namespace vimage
         {
             writer.Write(name + " =" + Environment.NewLine + "{" + Environment.NewLine);
             for (int i = 0; i < customActionBindings.Count; i++)
+            {
                 writer.Write(
                     "\t"
                         + (customActionBindings[i] as dynamic).name
@@ -1156,6 +1164,7 @@ namespace vimage
                         + ControlsToString((customActionBindings[i] as dynamic).bindings)
                         + Environment.NewLine
                 );
+            }
             writer.Write("}" + Environment.NewLine);
         }
 
@@ -1198,8 +1207,7 @@ namespace vimage
 
         public static List<int> StringToControls(string[] values, List<int> list = null)
         {
-            if (list == null)
-                list = [];
+            list ??= [];
             // Control
             for (int i = 0; i < values.Length; i++)
             {
@@ -1264,7 +1272,7 @@ namespace vimage
                 if (str.Equals(""))
                     continue;
 
-                if (str.Contains("+"))
+                if (str.Contains('+'))
                 {
                     // Combo
                     controls.Add(-2); // denote that it's a key combo
@@ -1290,10 +1298,10 @@ namespace vimage
         public List<int> UpdateControl(string name, int bind)
         {
             name = name.ToUpper();
-            if (!Settings.ContainsKey(name))
+            if (!Settings.TryGetValue(name, out object value))
                 return null;
 
-            List<int> Control = (List<int>)Settings[name];
+            var Control = (List<int>)value;
 
             if (bind == -1)
                 Control.Clear();
@@ -1306,32 +1314,19 @@ namespace vimage
         /// <summary> Converts upper-case string to SFML Mouse.Button (as an int + offset). </summary>
         public static int StringToMouseButton(string str)
         {
-            switch (str)
+            return str switch
             {
-                case "MOUSELEFT":
-                case "MOUSE1":
-                    return (int)Mouse.Button.Left + MouseCodeOffset;
-                case "MOUSERIGHT":
-                case "MOUSE2":
-                    return (int)Mouse.Button.Right + MouseCodeOffset;
-                case "MOUSEMIDDLE":
-                case "MOUSE3":
-                    return (int)Mouse.Button.Middle + MouseCodeOffset;
-                case "MOUSEX1":
-                case "MOUSEXBUTTON1":
-                case "MOUSE4":
-                    return (int)Mouse.Button.XButton1 + MouseCodeOffset;
-                case "MOUSEX2":
-                case "MOUSEXBUTTON2":
-                case "MOUSE5":
-                    return (int)Mouse.Button.XButton2 + MouseCodeOffset;
-                case "SCROLLUP":
-                    return MOUSE_SCROLL_UP;
-                case "SCROLLDOWN":
-                    return MOUSE_SCROLL_DOWN;
-            }
-
-            return -1;
+                "MOUSELEFT" or "MOUSE1" => (int)Mouse.Button.Left + MouseCodeOffset,
+                "MOUSERIGHT" or "MOUSE2" => (int)Mouse.Button.Right + MouseCodeOffset,
+                "MOUSEMIDDLE" or "MOUSE3" => (int)Mouse.Button.Middle + MouseCodeOffset,
+                "MOUSEX1" or "MOUSEXBUTTON1" or "MOUSE4" => (int)Mouse.Button.XButton1
+                    + MouseCodeOffset,
+                "MOUSEX2" or "MOUSEXBUTTON2" or "MOUSE5" => (int)Mouse.Button.XButton2
+                    + MouseCodeOffset,
+                "SCROLLUP" => MOUSE_SCROLL_UP,
+                "SCROLLDOWN" => MOUSE_SCROLL_DOWN,
+                _ => -1,
+            };
         }
 
         public static string MouseButtonToString(int code)

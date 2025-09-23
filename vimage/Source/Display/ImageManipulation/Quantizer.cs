@@ -176,7 +176,7 @@ namespace ImageManipulation
                 for (int row = 0; row < height; row++)
                 {
                     // Set the source pixel to the first pixel in this row
-                    pSourcePixel = (Int32*)pSourceRow;
+                    pSourcePixel = (int*)pSourceRow;
 
                     // And set the destination pixel pointer to the first pixel in the row
                     pDestinationPixel = pDestinationRow;

@@ -202,20 +202,15 @@ namespace vimage
                             "[filename]",
                             ImageViewer.File == ""
                                 ? "Clipboard Image"
-                                : ImageViewer.File.Substring(ImageViewer.File.LastIndexOf('\\') + 1)
+                                : ImageViewer.File[(ImageViewer.File.LastIndexOf('\\') + 1)..]
                         );
                 }
                 else if (Items_General[FileNameItem].Contains("[filename"))
                 {
                     // File Name (trimmed)
                     int a = Items_General[FileNameItem].IndexOf("[filename.") + 10;
-                    int b = Items_General[FileNameItem].IndexOf("]");
-                    if (
-                        int.TryParse(
-                            Items_General[FileNameItem].Substring(a, b - a),
-                            out int nameLength
-                        )
-                    )
+                    int b = Items_General[FileNameItem].IndexOf(']');
+                    if (int.TryParse(Items_General[FileNameItem][a..b], out int nameLength))
                     {
                         string fileName =
                             ImageViewer.File == ""
@@ -329,10 +324,11 @@ namespace vimage
             {
                 for (int i = 0; i < ImageViewer.Config.CustomActions.Count; i++)
                 {
-                    if ((ImageViewer.Config.CustomActions[i] as dynamic).name == funcName)
-                        ImageViewer.DoCustomAction(
-                            (ImageViewer.Config.CustomActions[i] as dynamic).func
-                        );
+                    if ((ImageViewer.Config.CustomActions[i] as dynamic).name != funcName)
+                        continue;
+                    ImageViewer.DoCustomAction(
+                        (ImageViewer.Config.CustomActions[i] as dynamic).func
+                    );
                 }
             }
             else

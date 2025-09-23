@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace vimage
 {
@@ -72,7 +73,7 @@ namespace vimage
         Custom,
     }
 
-    public static class Actions
+    public static partial class Actions
     {
         public static List<string> Names =
         [
@@ -185,5 +186,11 @@ namespace vimage
             Action.SortAscending,
             Action.SortDescending,
         ];
+
+        /// <summary>
+        /// Split exe and arguments by the first space (regex to exclude the spaces within the quotes of the exe's path)
+        /// </summary>
+        [GeneratedRegex("(?<=^[^\"]*(?:\"[^\"]*\"[^\"]*)*) (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)")]
+        public static partial Regex CustomActionSplitRegex();
     }
 }

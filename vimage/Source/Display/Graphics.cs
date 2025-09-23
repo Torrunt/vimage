@@ -755,17 +755,11 @@ namespace vimage
         }
     }
 
-    internal class LoadingAnimatedImage
+    internal class LoadingAnimatedImage(System.Drawing.Image image, AnimatedImageData data)
     {
-        private readonly System.Drawing.Image Image;
+        private readonly System.Drawing.Image Image = image;
         private ImageManipulation.OctreeQuantizer Quantizer;
-        private readonly AnimatedImageData Data;
-
-        public LoadingAnimatedImage(System.Drawing.Image image, AnimatedImageData data)
-        {
-            Image = image;
-            Data = data;
-        }
+        private readonly AnimatedImageData Data = data;
 
         public void LoadFrames()
         {

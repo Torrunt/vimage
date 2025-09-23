@@ -6,7 +6,7 @@ namespace vimage
 {
     internal class DisplayObject : Transformable, Drawable
     {
-        private readonly List<dynamic> Children = [];
+        private readonly List<Transformable> Children = [];
         private int DrawListIndex = 0;
         public DisplayObject Parent = null;
 
@@ -24,43 +24,43 @@ namespace vimage
             get { return Children.Count; }
         }
 
-        public void AddChild(dynamic child)
+        public void AddChild(Transformable child)
         {
             Children.Add(child);
-            if (child is DisplayObject)
+            if (child is DisplayObject displayObject)
             {
-                child.Parent = this;
-                child.OnAdded();
+                displayObject.Parent = this;
+                displayObject.OnAdded();
             }
         }
 
-        public void AddChildAt(dynamic child, int index)
+        public void AddChildAt(Transformable child, int index)
         {
             Children.Insert(index, child);
-            if (child is DisplayObject)
+            if (child is DisplayObject displayObject)
             {
-                child.Parent = this;
-                child.OnAdded();
+                displayObject.Parent = this;
+                displayObject.OnAdded();
             }
         }
 
-        public void RemoveChild(dynamic child)
+        public void RemoveChild(Transformable child)
         {
             for (int i = 0; i < Children.Count; i++)
             {
-                if (Children[i].Equals(child))
-                {
-                    if (child is DisplayObject)
-                    {
-                        child.OnRemoved();
-                        child.Parent = null;
-                    }
+                if (!Children[i].Equals(child))
+                    continue;
 
-                    Children.RemoveAt(i);
-                    if (i <= DrawListIndex)
-                        DrawListIndex--;
-                    break;
+                if (child is DisplayObject displayObject)
+                {
+                    displayObject.OnRemoved();
+                    displayObject.Parent = null;
                 }
+
+                Children.RemoveAt(i);
+                if (i <= DrawListIndex)
+                    DrawListIndex--;
+                break;
             }
         }
 
@@ -78,7 +78,7 @@ namespace vimage
             DrawListIndex = 0;
         }
 
-        public dynamic GetChildAt(int i)
+        public Transformable GetChildAt(int i)
         {
             return Children[i];
         }
@@ -92,8 +92,13 @@ namespace vimage
             states.Transform *= Transform;
             for (DrawListIndex = 0; DrawListIndex < Children.Count; DrawListIndex++)
             {
-                if (!(Children[DrawListIndex] is DisplayObject) || Children[DrawListIndex].Visible)
-                    Children[DrawListIndex].Draw(Target, states);
+                if (Children[DrawListIndex] is DisplayObject displayObject)
+                {
+                    if (displayObject.Visible)
+                        displayObject.Draw(Target, states);
+                }
+                else if (Children[DrawListIndex] is Drawable drawable)
+                    drawable.Draw(Target, states);
             }
         }
 
@@ -172,7 +177,12 @@ namespace vimage
             {
                 _Color = value;
                 for (int i = 0; i < Children.Count; i++)
-                    Children[i].Color = _Color;
+                {
+                    if (Children[i] is Sprite spite)
+                        spite.Color = _Color;
+                    else if (Children[i] is DisplayObject displayObject)
+                        displayObject.Color = _Color;
+                }
             }
         }
     }
@@ -190,7 +200,13 @@ namespace vimage
             {
                 _Smooth = value;
                 for (int i = 0; i < Obj.NumChildren; i++)
-                    Obj.GetChildAt(i).Texture.Smooth = _Smooth;
+                {
+                    var child = Obj.GetChildAt(i);
+                    if (child is Sprite sprite)
+                        sprite.Texture.Smooth = _Smooth;
+                    else if (child is DisplayObject displayObject)
+                        displayObject.Texture.Smooth = _Smooth;
+                }
             }
         }
 
@@ -201,10 +217,16 @@ namespace vimage
             set
             {
                 _Mipmap = value;
-                if (_Mipmap)
+                if (!_Mipmap)
+                    return;
+
+                for (int i = 0; i < Obj.NumChildren; i++)
                 {
-                    for (int i = 0; i < Obj.NumChildren; i++)
-                        (Obj.GetChildAt(i).Texture as Texture).GenerateMipmap();
+                    var child = Obj.GetChildAt(i);
+                    if (child is Sprite sprite)
+                        sprite.Texture.GenerateMipmap();
+                    else if (child is DisplayObject displayObject)
+                        displayObject.Texture.Mipmap = true;
                 }
             }
         }

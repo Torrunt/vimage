@@ -20,7 +20,7 @@ namespace vimage
                 _Smooth = value;
                 if (FullyLoaded)
                 {
-                    foreach (Texture texture in Frames)
+                    foreach (var texture in Frames)
                         texture.Smooth = _Smooth;
                 }
             }
@@ -35,7 +35,7 @@ namespace vimage
                 _Mipmap = value;
                 if (FullyLoaded && _Mipmap)
                 {
-                    foreach (Texture texture in Frames)
+                    foreach (var texture in Frames)
                         texture.GenerateMipmap();
                 }
             }

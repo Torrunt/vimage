@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using SFML.Graphics;
 using SFML.System;
@@ -2454,7 +2453,7 @@ namespace vimage
             {
                 case SortBy.Name:
                 {
-                    FolderContents = contents.ToList();
+                    FolderContents = [.. contents];
                     FolderContents.Sort(new WindowsFileSorting.NaturalStringComparer());
                     if (SortImagesByDir == SortDirection.Descending)
                         FolderContents.Reverse();
@@ -2462,50 +2461,38 @@ namespace vimage
                 }
                 case SortBy.Date:
                 {
-                    if (SortImagesByDir == SortDirection.Ascending)
-                        FolderContents.AddRange(
-                            contents.OrderBy(d => ImageViewerUtils.GetDateValueFromEXIF(d))
-                        );
-                    else
-                        FolderContents.AddRange(
-                            contents.OrderByDescending(d =>
-                                ImageViewerUtils.GetDateValueFromEXIF(d)
-                            )
-                        );
+                    FolderContents.AddRange(
+                        SortImagesByDir == SortDirection.Ascending
+                            ? contents.OrderBy(ImageViewerUtils.GetDateValueFromEXIF)
+                            : contents.OrderByDescending(ImageViewerUtils.GetDateValueFromEXIF)
+                    );
                     break;
                 }
                 case SortBy.DateModified:
                 {
-                    if (SortImagesByDir == SortDirection.Ascending)
-                        FolderContents.AddRange(
-                            contents.OrderBy(d => new FileInfo(d).LastWriteTime)
-                        );
-                    else
-                        FolderContents.AddRange(
-                            contents.OrderByDescending(d => new FileInfo(d).LastWriteTime)
-                        );
+                    FolderContents.AddRange(
+                        SortImagesByDir == SortDirection.Ascending
+                            ? contents.OrderBy(d => new FileInfo(d).LastWriteTime)
+                            : contents.OrderByDescending(d => new FileInfo(d).LastWriteTime)
+                    );
                     break;
                 }
                 case SortBy.DateCreated:
                 {
-                    if (SortImagesByDir == SortDirection.Ascending)
-                        FolderContents.AddRange(
-                            contents.OrderBy(d => new FileInfo(d).CreationTime)
-                        );
-                    else
-                        FolderContents.AddRange(
-                            contents.OrderByDescending(d => new FileInfo(d).CreationTime)
-                        );
+                    FolderContents.AddRange(
+                        SortImagesByDir == SortDirection.Ascending
+                            ? contents.OrderBy(d => new FileInfo(d).CreationTime)
+                            : contents.OrderByDescending(d => new FileInfo(d).CreationTime)
+                    );
                     break;
                 }
                 case SortBy.Size:
                 {
-                    if (SortImagesByDir == SortDirection.Ascending)
-                        FolderContents.AddRange(contents.OrderBy(d => new FileInfo(d).Length));
-                    else
-                        FolderContents.AddRange(
-                            contents.OrderByDescending(d => new FileInfo(d).Length)
-                        );
+                    FolderContents.AddRange(
+                        SortImagesByDir == SortDirection.Ascending
+                            ? contents.OrderBy(d => new FileInfo(d).Length)
+                            : contents.OrderByDescending(d => new FileInfo(d).Length)
+                    );
                     break;
                 }
             }
@@ -2737,17 +2724,21 @@ namespace vimage
                 action = action.Replace("%d", Path.GetDirectoryName(File) + "\\");
 
                 // Split exe and arguments by the first space (regex to exclude the spaces within the quotes of the exe's path)
-                var rgx = new Regex(
-                    "(?<=^[^\"]*(?:\"[^\"]*\"[^\"]*)*) (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"
-                );
-                string[] s = rgx.Split(action, 2);
+                var s = Actions.CustomActionSplitRegex().Split(action, 2);
 
                 if (s[0].Contains('%'))
                     s[0] = Environment.ExpandEnvironmentVariables(s[0]);
 
                 try
                 {
-                    _ = Process.Start(s[0], s[1]);
+                    _ = Process.Start(
+                        new ProcessStartInfo
+                        {
+                            FileName = s[0],
+                            Arguments = s[1],
+                            UseShellExecute = true,
+                        }
+                    );
                 }
                 catch (Exception) { }
             }
