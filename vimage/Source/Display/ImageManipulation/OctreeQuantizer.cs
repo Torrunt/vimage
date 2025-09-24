@@ -178,11 +178,12 @@ namespace ImageManipulation
                     ;
 
                 // Reduce the node most recently added to the list at level 'index'
-                OctreeNode node = _reducibleNodes[index];
-                _reducibleNodes[index] = node.NextReducible;
+                var node = _reducibleNodes[index];
+                _reducibleNodes[index] = node?.NextReducible;
 
                 // Decrement the leaf count after reducing the node
-                _leafCount -= node.Reduce();
+                if (node is not null)
+                    _leafCount -= node.Reduce();
 
                 // And just in case I've reduced the last color to be added, and the next color to
                 // be added is the same, invalidate the previousNode...
@@ -201,7 +202,7 @@ namespace ImageManipulation
             /// <summary>
             /// Return the array of reducible nodes
             /// </summary>
-            protected OctreeNode[] ReducibleNodes
+            protected OctreeNode?[] ReducibleNodes
             {
                 get { return _reducibleNodes; }
             }
@@ -272,7 +273,7 @@ namespace ImageManipulation
             /// <summary>
             /// Array of reducible nodes
             /// </summary>
-            private readonly OctreeNode[] _reducibleNodes;
+            private readonly OctreeNode?[] _reducibleNodes;
 
             /// <summary>
             /// Maximum number of significant bits in the image
@@ -282,7 +283,7 @@ namespace ImageManipulation
             /// <summary>
             /// Store the last node quantized
             /// </summary>
-            private OctreeNode _previousNode;
+            private OctreeNode? _previousNode;
 
             /// <summary>
             /// Cache the previous color quantized
@@ -349,13 +350,14 @@ namespace ImageManipulation
                             | ((pixel->Green & mask[level]) >> (shift - 1))
                             | ((pixel->Blue & mask[level]) >> (shift));
 
-                        OctreeNode child = _children[index];
+                        var child = _children?[index];
 
-                        if (null == child)
+                        if (child is null)
                         {
                             // Create a new child node & store in the array
                             child = new OctreeNode(level + 1, colorBits, octree);
-                            _children[index] = child;
+                            if (_children is not null)
+                                _children[index] = child;
                         }
 
                         // Add the color to the child node
@@ -366,7 +368,7 @@ namespace ImageManipulation
                 /// <summary>
                 /// Get/Set the next reducible node
                 /// </summary>
-                public OctreeNode NextReducible
+                public OctreeNode? NextReducible
                 {
                     get { return _nextReducible; }
                     set { _nextReducible = value; }
@@ -375,7 +377,7 @@ namespace ImageManipulation
                 /// <summary>
                 /// Return the child nodes
                 /// </summary>
-                public OctreeNode[] Children
+                public OctreeNode?[]? Children
                 {
                     get { return _children; }
                 }
@@ -390,16 +392,19 @@ namespace ImageManipulation
                     int children = 0;
 
                     // Loop through all children and add their information to this node
-                    for (int index = 0; index < 8; index++)
+                    if (_children is not null)
                     {
-                        if (null != _children[index])
+                        for (int index = 0; index < 8; index++)
                         {
-                            _red += _children[index]._red;
-                            _green += _children[index]._green;
-                            _blue += _children[index]._blue;
-                            _pixelCount += _children[index]._pixelCount;
-                            ++children;
-                            _children[index] = null;
+                            if (_children[index] is OctreeNode child)
+                            {
+                                _red += child._red;
+                                _green += child._green;
+                                _blue += child._blue;
+                                _pixelCount += child._pixelCount;
+                                ++children;
+                                _children[index] = null;
+                            }
                         }
                     }
 
@@ -431,6 +436,8 @@ namespace ImageManipulation
                     else
                     {
                         // Loop through children looking for leaves
+                        if (_children is null)
+                            return;
                         for (int index = 0; index < 8; index++)
                         {
                             _children[index]?.ConstructPalette(palette, ref paletteIndex);
@@ -453,10 +460,10 @@ namespace ImageManipulation
                             | ((pixel->Green & mask[level]) >> (shift - 1))
                             | ((pixel->Blue & mask[level]) >> (shift));
 
-                        paletteIndex =
-                            null != _children[index]
-                                ? _children[index].GetPaletteIndex(pixel, level + 1)
-                                : throw new Exception("Didn't expect this!");
+                        if (_children is not null && _children[index] is OctreeNode child)
+                            paletteIndex = child.GetPaletteIndex(pixel, level + 1);
+                        else
+                            throw new Exception("Didn't expect this!");
                     }
 
                     return paletteIndex;
@@ -501,12 +508,12 @@ namespace ImageManipulation
                 /// <summary>
                 /// Pointers to any child nodes
                 /// </summary>
-                private readonly OctreeNode[] _children;
+                private readonly OctreeNode?[]? _children;
 
                 /// <summary>
                 /// Pointer to next reducible node
                 /// </summary>
-                private OctreeNode _nextReducible;
+                private OctreeNode? _nextReducible;
 
                 /// <summary>
                 /// The index of this node in the palette

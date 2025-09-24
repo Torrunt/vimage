@@ -8,7 +8,7 @@ namespace vimage
     {
         private readonly List<Transformable> Children = [];
         private int DrawListIndex = 0;
-        public DisplayObject Parent = null;
+        public DisplayObject? Parent = null;
 
         public bool Visible = true;
 

@@ -78,7 +78,7 @@ namespace vimage
         public readonly float ZOOM_MAX = 75f;
 
         public RenderWindow Window;
-        public dynamic Image;
+        public dynamic? Image;
         public string File;
         public List<string> FolderContents = [];
         public int FolderPosition = 0;
@@ -121,7 +121,7 @@ namespace vimage
         public bool BackgroundsForImagesWithTransparency = false;
         public Color BackgroundColour = new(230, 230, 230);
         private bool Cropping = false;
-        private RectangleShape CropRect;
+        private RectangleShape? CropRect;
         private Vector2i CropStartPos = new();
         public bool Locked = false;
         public bool AlwaysOnTop = false;
@@ -307,7 +307,7 @@ namespace vimage
             )
             {
                 // Get parent folder name
-                string parentFolder = Path.GetFileName(Path.GetDirectoryName(file));
+                //string parentFolder = Path.GetFileName(Path.GetDirectoryName(file));
 
                 // Get sort column info from window with corresponding name
                 // FIXME: Fix get window sorting
@@ -482,10 +482,13 @@ namespace vimage
                     else if (MousePos.Y > Window.Size.Y)
                         MousePos.Y = (int)Window.Size.Y;
                     var m = Window.MapPixelToCoords(MousePos);
-                    CropRect.Size = new Vector2f(
-                        m.X - CropRect.Position.X,
-                        m.Y - CropRect.Position.Y
-                    );
+                    if (CropRect != null)
+                    {
+                        CropRect.Size = new Vector2f(
+                            m.X - CropRect.Position.X,
+                            m.Y - CropRect.Position.Y
+                        );
+                    }
 
                     doRedraw = true;
                 }
@@ -526,13 +529,13 @@ namespace vimage
             // Draw Image
             Window.Draw(Image);
             // Draw Other
-            if (Cropping)
+            if (Cropping && CropRect != null)
                 Window.Draw(CropRect);
             // Update the window
             Window.Display();
         }
 
-        private void OnWindowClosed(object sender, EventArgs e)
+        private void OnWindowClosed(object? sender, EventArgs e)
         {
             Window.Close();
         }
@@ -753,7 +756,7 @@ namespace vimage
         //      Controls     //
         ///////////////////////
 
-        private void OnMouseMoved(object sender, MouseMoveEventArgs e)
+        private void OnMouseMoved(object? sender, MouseMoveEventArgs e)
         {
             MousePos = new Vector2i(e.X, e.Y);
 
@@ -761,7 +764,7 @@ namespace vimage
                 UnforceAlwaysOnTop();
         }
 
-        private void OnMouseWheelScrolled(object sender, MouseWheelScrollEventArgs e)
+        private void OnMouseWheelScrolled(object? sender, MouseWheelScrollEventArgs e)
         {
             if (Locked)
                 return;
@@ -793,22 +796,22 @@ namespace vimage
             CurrentAction = Action.None;
         }
 
-        private void OnMouseDown(object sender, MouseButtonEventArgs e)
+        private void OnMouseDown(object? sender, MouseButtonEventArgs e)
         {
             ControlDown(e.Button);
         }
 
-        private void OnMouseUp(object sender, MouseButtonEventArgs e)
+        private void OnMouseUp(object? sender, MouseButtonEventArgs e)
         {
             ControlUp(e.Button);
         }
 
-        private void OnKeyDown(object sender, KeyEventArgs e)
+        private void OnKeyDown(object? sender, KeyEventArgs e)
         {
             ControlDown(e.Code);
         }
 
-        private void OnKeyUp(object sender, KeyEventArgs e)
+        private void OnKeyUp(object? sender, KeyEventArgs e)
         {
             ControlUp(e.Code);
         }
@@ -1572,10 +1575,21 @@ namespace vimage
 
         public bool ToggleSmoothing(int val = -1)
         {
-            if (Image is AnimatedImage)
-                Image.Data.Smooth = val == -1 ? !Image.Data.Smooth : (val == 1);
-            else
-                Image.Texture.Smooth = val == -1 ? !Image.Texture.Smooth : (val == 1);
+            if (Image is AnimatedImage animatedImage)
+                animatedImage.Data.Smooth = val == -1 ? !animatedImage.Data.Smooth : (val == 1);
+            else if (Image is Sprite sprite)
+                sprite.Texture.Smooth = val == -1 ? !sprite.Texture.Smooth : (val == 1);
+            else if (Image is DisplayObject displayObject && displayObject.NumChildren > 0)
+            {
+                for (int i = 0; i < displayObject.NumChildren; i++)
+                {
+                    var child = displayObject.GetChildAt(i);
+                    if (child is not Sprite childSprite)
+                        continue;
+                    childSprite.Texture.Smooth =
+                        val == -1 ? !childSprite.Texture.Smooth : (val == 1);
+                }
+            }
             Updated = true;
 
             return Smoothing();
@@ -1583,7 +1597,17 @@ namespace vimage
 
         public bool Smoothing()
         {
-            return Image is AnimatedImage ? (bool)Image.Data.Smooth : (bool)Image.Texture.Smooth;
+            if (Image is AnimatedImage animatedImage)
+                return animatedImage.Data.Smooth;
+            else if (Image is Sprite sprite)
+                return sprite.Texture.Smooth;
+            else if (Image is DisplayObject displayObject && displayObject.NumChildren > 0)
+            {
+                var child = displayObject.GetChildAt(0);
+                if (child is Sprite childSprite)
+                    return childSprite.Texture.Smooth;
+            }
+            return false;
         }
 
         public bool ToggleBackground(int val = -1)
@@ -1803,7 +1827,7 @@ namespace vimage
 
         public void CropEnd()
         {
-            if (!Cropping)
+            if (!Cropping || CropRect == null)
                 return;
             Cropping = false;
 
@@ -1951,6 +1975,11 @@ namespace vimage
             File = fileName;
 
             string extension = Path.GetExtension(fileName).ToLowerInvariant();
+
+            //   Console.WriteLine(extension);
+            //   var (mimeTypes, desc) = MimeTypes.GetFileType(fileName);
+            //   Console.WriteLine(mimeTypes);
+            //   Console.WriteLine(desc);
 
             // Image
             if (extension.Equals(".svg"))

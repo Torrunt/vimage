@@ -52,7 +52,7 @@ namespace vimage
             }
         }
 
-        public static dynamic GetTexture(string fileName)
+        public static dynamic? GetTexture(string fileName)
         {
             int index = TextureFileNames.IndexOf(fileName);
             int splitTextureIndex =
@@ -80,10 +80,10 @@ namespace vimage
             else
             {
                 // New Texture
-                Texture texture = null;
-                DisplayObject textureLarge = null;
+                Texture? texture = null;
+                DisplayObject? textureLarge = null;
 
-                using (FileStream fileStream = File.OpenRead(fileName))
+                using (var fileStream = File.OpenRead(fileName))
                 {
                     if (UseDevil)
                     {
@@ -128,7 +128,7 @@ namespace vimage
                         try
                         {
                             using var image = new SFML.Graphics.Image(fileStream);
-                            Vector2u imageSize = image.Size;
+                            var imageSize = image.Size;
 
                             if (imageSize.X > TextureMaxSize || imageSize.Y > TextureMaxSize)
                             {
@@ -167,11 +167,15 @@ namespace vimage
                 if (Textures.Count > MAX_TEXTURES)
                     RemoveTexture();
 
-                return texture ?? (dynamic)textureLarge;
+                if (texture != null)
+                    return texture;
+                if (textureLarge != null)
+                    return textureLarge;
+                return null;
             }
         }
 
-        private static Texture GetTextureFromBoundImage()
+        private static Texture? GetTextureFromBoundImage()
         {
             bool success = IL.ConvertImage(ChannelFormat.RGBA, ChannelType.UnsignedByte);
             if (!success)
@@ -204,7 +208,7 @@ namespace vimage
             return texture;
         }
 
-        private static DisplayObject GetLargeTextureFromBoundImage(
+        private static DisplayObject? GetLargeTextureFromBoundImage(
             int sectionSize,
             string fileName = ""
         )
@@ -308,8 +312,8 @@ namespace vimage
             IntRect area = default
         )
         {
-            Vector2u imageSize = image.Size;
-            byte[] bytes = image.Pixels;
+            var imageSize = image.Size;
+            var bytes = image.Pixels;
 
             if (area == default || (area.Width >= imageSize.X && area.Height >= imageSize.Y))
                 return new Texture(bytes);
@@ -378,7 +382,7 @@ namespace vimage
             return largeTexture;
         }
 
-        public static Sprite GetSpriteFromIcon(string fileName)
+        public static Sprite? GetSpriteFromIcon(string fileName)
         {
             int index = TextureFileNames.IndexOf(fileName);
 
@@ -428,9 +432,9 @@ namespace vimage
         // http://stackoverflow.com/questions/220465/using-256-x-256-vista-icon-in-application/1945764#1945764
         // Based on: http://www.codeproject.com/KB/cs/IconExtractor.aspx
         // And a hint from: http://www.codeproject.com/KB/cs/IconLib.aspx
-        public static System.Drawing.Bitmap ExtractVistaIcon(System.Drawing.Icon icoIcon)
+        public static System.Drawing.Bitmap? ExtractVistaIcon(System.Drawing.Icon icoIcon)
         {
-            System.Drawing.Bitmap bmpPngExtracted = null;
+            System.Drawing.Bitmap? bmpPngExtracted = null;
             try
             {
                 byte[] srcBuf = null;
@@ -476,7 +480,7 @@ namespace vimage
             return bmpPngExtracted;
         }
 
-        public static Sprite GetSpriteFromSVG(string fileName)
+        public static Sprite? GetSpriteFromSVG(string fileName)
         {
             int index = TextureFileNames.IndexOf(fileName);
 
@@ -538,7 +542,7 @@ namespace vimage
             return null;
         }
 
-        public static Sprite GetSpriteFromWebP(string fileName)
+        public static Sprite? GetSpriteFromWebP(string fileName)
         {
             int index = TextureFileNames.IndexOf(fileName);
 
@@ -658,7 +662,11 @@ namespace vimage
             int a = 0;
             while (AnimatedImageDatas.Count > s)
             {
-                if (s == 1 && (image as AnimatedImage).Data == AnimatedImageDatas[a])
+                if (
+                    s == 1
+                    && image is AnimatedImage animatedImage
+                    && animatedImage.Data == AnimatedImageDatas[a]
+                )
                     a++;
                 RemoveAnimatedImage(a);
             }
@@ -681,14 +689,14 @@ namespace vimage
                 {
                     for (int i = 0; i < TextureFileNames.Count; i++)
                     {
-                        if (TextureFileNames[i].IndexOf(file) == 0)
+                        if (TextureFileNames[i].StartsWith(file))
                             s++;
                         else if (s > 0)
                             break;
                     }
                     while (TextureFileNames.Count > s)
                     {
-                        if (TextureFileNames[a].IndexOf(file) == 0)
+                        if (TextureFileNames[a].StartsWith(file))
                             a += s;
                         RemoveTexture(a);
                     }
@@ -714,7 +722,7 @@ namespace vimage
             if (TextureFileNames[t].IndexOf('^') == TextureFileNames[t].Length - 1)
             {
                 // if part of split texture - remove all parts
-                string name = TextureFileNames[t].Substring(0, TextureFileNames[t].Length - 7);
+                string name = TextureFileNames[t][..^7];
 
                 int i;
                 for (i = t + 1; i < TextureFileNames.Count; i++)
@@ -758,7 +766,7 @@ namespace vimage
     internal class LoadingAnimatedImage(System.Drawing.Image image, AnimatedImageData data)
     {
         private readonly System.Drawing.Image Image = image;
-        private ImageManipulation.OctreeQuantizer Quantizer;
+        private ImageManipulation.OctreeQuantizer? Quantizer;
         private readonly AnimatedImageData Data = data;
 
         public void LoadFrames()
@@ -772,7 +780,7 @@ namespace vimage
             Data.FrameDelays = new int[Data.FrameCount];
 
             // Get Frame Delays
-            byte[] frameDelays = null;
+            byte[]? frameDelays = null;
             try
             {
                 var frameDelaysItem = Image.GetPropertyItem(0x5100);

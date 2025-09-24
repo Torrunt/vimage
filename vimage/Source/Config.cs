@@ -697,7 +697,10 @@ namespace vimage
                 // nothing after '='?, check next line
                 if (nameValue[1].Equals(""))
                 {
-                    line = RemoveSpaces(reader.ReadLine());
+                    line = reader.ReadLine();
+                    if (line == null)
+                        continue;
+                    line = RemoveSpaces(line);
 
                     // line is empty or is part of another setting, skip
                     if (line.Equals("") || line.Contains('='))
@@ -754,8 +757,8 @@ namespace vimage
             string sectionName = ""
         )
         {
-            string line = reader.ReadLine();
-            string trimedLine = RemoveSpaces(line);
+            var line = reader.ReadLine();
+            var trimedLine = RemoveSpaces(line);
             string[] splitValues;
 
             if (trimedLine.Equals("}"))

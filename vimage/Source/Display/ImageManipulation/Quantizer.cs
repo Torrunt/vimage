@@ -66,7 +66,7 @@ namespace ImageManipulation
             }
 
             // Define a pointer to the bitmap data
-            BitmapData sourceData = null;
+            BitmapData? sourceData = null;
 
             try
             {
@@ -85,7 +85,7 @@ namespace ImageManipulation
 
                 // Then set the color palette on the output bitmap. I'm passing in the current palette
                 // as there's no way to construct a new, empty palette.
-                output.Palette = this.GetPalette(output.Palette);
+                output.Palette = GetPalette(output.Palette);
 
                 // Then call the second pass which actually does the conversion
                 SecondPass(sourceData, output, width, height, bounds);
@@ -111,7 +111,7 @@ namespace ImageManipulation
             // Define the source data pointers. The source row is a byte to
             // keep addition of the stride value easier(as this is in bytes)
             byte* pSourceRow = (byte*)sourceData.Scan0.ToPointer();
-            Int32* pSourcePixel;
+            int* pSourcePixel;
 
             // Loop through each row
             for (int row = 0; row < height; row++)
@@ -145,7 +145,7 @@ namespace ImageManipulation
             Rectangle bounds
         )
         {
-            BitmapData outputData = null;
+            BitmapData? outputData = null;
 
             try
             {
@@ -159,8 +159,8 @@ namespace ImageManipulation
                 // Define the source data pointers. The source row is a byte to
                 // keep addition of the stride value easier(as this is in bytes)
                 byte* pSourceRow = (byte*)sourceData.Scan0.ToPointer();
-                Int32* pSourcePixel = (Int32*)pSourceRow;
-                Int32* pPreviousPixel = pSourcePixel;
+                int* pSourcePixel = (int*)pSourceRow;
+                int* pPreviousPixel = pSourcePixel;
 
                 // Now define the destination data pointers
                 byte* pDestinationRow = (byte*)outputData.Scan0.ToPointer();

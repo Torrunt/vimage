@@ -5,8 +5,8 @@ namespace vimage
 {
     internal class AnimatedImageData
     {
-        public Texture[] Frames;
-        public int[] FrameDelays;
+        public Texture[] Frames = [];
+        public int[] FrameDelays = [];
         public int FrameCount = 0;
         public bool FullyLoaded = false;
         public bool CancelLoading = false;
