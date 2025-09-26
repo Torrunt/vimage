@@ -14,75 +14,15 @@ namespace vimage
     {
         public const string VERSION_NO = "#";
 
-        public readonly string[] EXTENSIONS =
-        [
-            ".bmp",
-            ".png",
-            ".tga",
-            ".gif",
-            ".psd",
-            ".hdr",
-            ".pic",
-            ".ico",
-            ".svg",
-            ".webp",
-            ".jpg",
-            ".jpeg",
-            ".jpe",
-            ".jif",
-            ".jiff",
-            ".jfif",
-            ".jfi",
-        ];
-        public readonly string[] EXTENSIONS_DEVIL =
-        [
-            ".bmp",
-            ".png",
-            ".tga",
-            ".gif",
-            ".psd",
-            ".hdr",
-            ".pic",
-            ".ico",
-            ".svg",
-            ".webp",
-            ".jpg",
-            ".jpeg",
-            ".jpe",
-            ".jif",
-            ".jiff",
-            ".jfif",
-            ".jfi",
-            ".cut",
-            ".dds",
-            ".doom",
-            ".exr",
-            ".jp2",
-            ".lbm",
-            ".mdl",
-            ".mng",
-            ".pal",
-            ".pbm",
-            ".pcd",
-            ".pcx",
-            ".pgm",
-            ".ppm",
-            ".psp",
-            ".raw",
-            ".sgi",
-            ".tif",
-            ".tiff",
-        ];
-
         public readonly float ZOOM_MIN = 0.05f;
         public readonly float ZOOM_MAX = 75f;
 
         public RenderWindow Window;
         public dynamic? Image;
-        public string File;
+        public string File = "";
         public List<string> FolderContents = [];
         public int FolderPosition = 0;
-        private readonly ContextMenu ContextMenu;
+        private readonly ContextMenu? ContextMenu;
         public Color ImageColor = Color.White;
         public Vector2u Size = new();
         public int Rotation = 0;
@@ -90,7 +30,7 @@ namespace vimage
         private Action CurrentAction = Action.None;
 
         public Config Config;
-        private readonly FileSystemWatcher ConfigFileWatcher;
+        private readonly FileSystemWatcher? ConfigFileWatcher;
         private bool ReloadConfigNextTick = false;
 
         private bool Updated = false;
@@ -145,25 +85,12 @@ namespace vimage
         private bool ImageTransparencyTweaked = false;
 
         /// <summary>Bitmap of image loaded in via Clipboard (used to copy it back into clipboard).</summary>
-        private System.Drawing.Bitmap ClipboardBitmap;
+        private System.Drawing.Bitmap? ClipboardBitmap;
 
         private static readonly Random rnd = new();
 
         public ImageViewer(string file, string[] args)
         {
-            // Extension supported?
-            if (file != "" && !ImageViewerUtils.IsValidExtension(file, EXTENSIONS_DEVIL))
-            {
-                if (OperatingSystem.IsWindowsVersionAtLeast(6, 1))
-                {
-                    System.Windows.Forms.MessageBox.Show(
-                        "vimage does not support this file format.",
-                        "vimage - Unknown File Format"
-                    );
-                }
-                return;
-            }
-
             // Save Mouse Position -> will open image at this position
             var mousePos = Mouse.GetPosition();
 
@@ -217,7 +144,7 @@ namespace vimage
             if (
                 file != ""
                 && !Graphics.UseDevil
-                && !ImageViewerUtils.IsValidExtension(file, EXTENSIONS)
+                && !ImageViewerUtils.IsValidExtension(file, useDevil: false)
             )
             {
                 if (OperatingSystem.IsWindowsVersionAtLeast(6, 1))
@@ -1974,7 +1901,7 @@ namespace vimage
         {
             File = fileName;
 
-            string extension = Path.GetExtension(fileName).ToLowerInvariant();
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
 
             //   Console.WriteLine(extension);
             //   var (mimeTypes, desc) = MimeTypes.GetFileType(fileName);
@@ -2127,17 +2054,17 @@ namespace vimage
                     && Config.Setting_SmoothingDefault;
                 animatedImage.Data.Mipmap = Config.Setting_Mipmapping;
             }
-            else
+            else if (Image is Sprite sprite)
             {
-                Image.Texture.Smooth =
+                sprite.Texture.Smooth =
                     Math.Min(Size.X, Size.Y) >= Config.Setting_SmoothingMinImageSize
                     && Config.Setting_SmoothingDefault;
-                if (Config.Setting_Mipmapping && Image.Texture is Texture texture)
-                    texture.GenerateMipmap();
+                if (Config.Setting_Mipmapping)
+                    sprite.Texture.GenerateMipmap();
             }
 
             // Color
-            if (ImageColor != Color.White)
+            if (Image is not null && ImageColor != Color.White)
                 Image.Color = ImageColor;
 
             // Don't keep current zoom value if it wasn't set by user
@@ -2456,7 +2383,7 @@ namespace vimage
 
         private void GetFolderContents()
         {
-            if (FolderContents != null && FolderContents.Count > 0)
+            if (FolderContents.Count > 0)
                 return;
 
             if (File == "")
@@ -2465,18 +2392,13 @@ namespace vimage
                 return;
             }
 
-            string directory = Path.GetDirectoryName(File);
-            if (!Directory.Exists(directory))
+            var directory = Path.GetDirectoryName(File);
+            if (directory is null || !Directory.Exists(directory))
                 return;
 
             var contents = Directory
                 .GetFiles(directory, "*.*", SearchOption.TopDirectoryOnly)
-                .Where(s =>
-                    ImageViewerUtils.IsValidExtension(
-                        s,
-                        Graphics.UseDevil ? EXTENSIONS_DEVIL : EXTENSIONS
-                    )
-                );
+                .Where(s => ImageViewerUtils.IsValidExtension(s, Graphics.UseDevil));
 
             switch (SortImagesBy)
             {
@@ -2539,7 +2461,7 @@ namespace vimage
             GetFolderContents();
             if (FolderContents.Count == 1)
             {
-                Image.Dispose();
+                Image?.Dispose();
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
                 Window.Close();
             }
@@ -2579,7 +2501,7 @@ namespace vimage
             {
                 try
                 {
-                    System.Drawing.Bitmap bitmap;
+                    System.Drawing.Bitmap? bitmap;
                     if (File == "")
                     {
                         // No File (viewing clipboard image?)
@@ -2621,8 +2543,9 @@ namespace vimage
         public void OpenDuplicateWindow(bool full = false)
         {
             var view = Window.GetView();
-            var startInfo = new ProcessStartInfo(Environment.ProcessPath)
+            var startInfo = new ProcessStartInfo
             {
+                FileName = Environment.ProcessPath,
                 Arguments = $"\"{File}\"",
             };
             if (full)
@@ -2698,13 +2621,16 @@ namespace vimage
             Config.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
 
             // Update ContextMenu
-            ContextMenu.FileNameCurrent = "";
-            ContextMenu.LoadItems(
-                Config.ContextMenu,
-                Config.ContextMenu_Animation,
-                Config.ContextMenu_Animation_InsertAtIndex
-            );
-            ContextMenu.Setup(true);
+            if (ContextMenu is not null)
+            {
+                ContextMenu.FileNameCurrent = "";
+                ContextMenu.LoadItems(
+                    Config.ContextMenu,
+                    Config.ContextMenu_Animation,
+                    Config.ContextMenu_Animation_InsertAtIndex
+                );
+                ContextMenu.Setup(true);
+            }
 
             // Update Background Colour?
             var backColour = System.Drawing.ColorTranslator.FromHtml(
@@ -2731,6 +2657,8 @@ namespace vimage
 
         public void OpenContextMenu()
         {
+            if (ContextMenu is null)
+                return;
             ContextMenu.RefreshItems();
             ContextMenu.Show(Mouse.GetPosition().X, Mouse.GetPosition().Y);
             ContextMenu.Capture = true;
@@ -2857,7 +2785,8 @@ namespace vimage
                     case "-colour":
                         var colour = System.Drawing.ColorTranslator.FromHtml(args[i + 1]);
                         ImageColor = new Color(colour.R, colour.G, colour.B, colour.A);
-                        Image.Color = ImageColor;
+                        if (Image is not null)
+                            Image.Color = ImageColor;
                         Updated = true;
                         i++;
                         break;

@@ -7,6 +7,70 @@ namespace vimage
 {
     internal class ImageViewerUtils
     {
+        public static readonly string[] EXTENSIONS =
+        [
+            ".avif",
+            ".bmp",
+            ".gif",
+            ".hdr",
+            ".heic",
+            ".ico",
+            ".jfi",
+            ".jfif",
+            ".jif",
+            ".jiff",
+            ".jpe",
+            ".jpeg",
+            ".jpg",
+            ".pic",
+            ".png",
+            ".psd",
+            ".svg",
+            ".tga",
+            ".webp",
+        ];
+        public static readonly string[] EXTENSIONS_DEVIL =
+        [
+            ".avif",
+            ".bmp",
+            ".cut",
+            ".dds",
+            ".doom",
+            ".exr",
+            ".gif",
+            ".hdr",
+            ".heic",
+            ".ico",
+            ".jfi",
+            ".jfif",
+            ".jif",
+            ".jiff",
+            ".jp2",
+            ".jpe",
+            ".jpeg",
+            ".jpg",
+            ".lbm",
+            ".mdl",
+            ".mng",
+            ".pal",
+            ".pbm",
+            ".pcd",
+            ".pcx",
+            ".pgm",
+            ".pic",
+            ".png",
+            ".ppm",
+            ".psd",
+            ".psp",
+            ".raw",
+            ".sgi",
+            ".svg",
+            ".tga",
+            ".tif",
+            ".tiff",
+            ".webp",
+        ];
+
         /// <summary> Returns the working area IntRect of the monitor the position is located on.</summary>
         public static IntRect GetCurrentWorkingArea(Vector2i pos)
         {
@@ -42,7 +106,7 @@ namespace vimage
         {
             var backupScreen = System.Windows.Forms.Screen.AllScreens.ElementAt(0);
 
-            foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
+            foreach (var screen in System.Windows.Forms.Screen.AllScreens)
             {
                 if (
                     pos.X < screen.Bounds.X
@@ -154,9 +218,11 @@ namespace vimage
             return new System.IO.FileInfo(fileName).LastWriteTime;
         }
 
-        public static bool IsValidExtension(string fileName, string[] extensions)
+        public static bool IsValidExtension(string fileName, bool useDevil = true)
         {
-            return extensions.Contains(System.IO.Path.GetExtension(fileName).ToLowerInvariant());
+            return (useDevil ? EXTENSIONS_DEVIL : EXTENSIONS).Contains(
+                System.IO.Path.GetExtension(fileName).ToLowerInvariant()
+            );
         }
     }
 }

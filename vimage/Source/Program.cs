@@ -24,6 +24,19 @@ namespace vimage
                 AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
             }
 
+            // Extension supported?
+            if (file != "" && !ImageViewerUtils.IsValidExtension(file))
+            {
+                if (OperatingSystem.IsWindowsVersionAtLeast(6, 1))
+                {
+                    System.Windows.Forms.MessageBox.Show(
+                        "vimage does not support this file format.",
+                        "vimage - Unknown File Format"
+                    );
+                }
+                return;
+            }
+
             var imageViewer = new ImageViewer(file, args);
         }
 

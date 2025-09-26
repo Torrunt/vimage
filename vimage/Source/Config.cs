@@ -319,7 +319,7 @@ namespace vimage
         public List<object> CustomActions = [];
         public List<object> CustomActionBindings = [];
 
-        private Dictionary<string, object> Settings;
+        private Dictionary<string, object> Settings = [];
 
         public const int MouseCodeOffset = 150;
         public const int MOUSE_SCROLL_UP = 155;
@@ -751,13 +751,15 @@ namespace vimage
             reader.Close();
         }
 
-        private static string ReadSection(
+        private static string? ReadSection(
             StreamReader reader,
             List<object> setting,
             string sectionName = ""
         )
         {
             var line = reader.ReadLine();
+            if (line is null)
+                return line;
             var trimedLine = RemoveSpaces(line);
             string[] splitValues;
 
@@ -771,7 +773,10 @@ namespace vimage
                     // Subsection
                     string subSectionName = line.Replace("\t", "");
 
-                    line = RemoveSpaces(reader.ReadLine());
+                    line = reader.ReadLine();
+                    if (line is null)
+                        continue;
+                    line = RemoveSpaces(line);
 
                     // line is empty or is part of another setting, skip
                     if (line.Equals("") || line.Contains('='))
@@ -826,15 +831,19 @@ namespace vimage
 
                     // next line
                     line = reader.ReadLine();
+                    if (line == null)
+                        continue;
                     trimedLine = RemoveSpaces(line);
                 }
 
                 // break if end brace
-                if (trimedLine.Equals("}"))
+                if (trimedLine is not null && trimedLine.Equals("}"))
                 {
                     if (reader.Peek() == -1)
                         return line;
-                    line = RemoveSpaces(reader.ReadLine());
+                    line = reader.ReadLine();
+                    if (line is not null)
+                        line = RemoveSpaces(line);
                     break;
                 }
             }
@@ -1208,7 +1217,7 @@ namespace vimage
                 : KeyToString((Keyboard.Key)code);
         }
 
-        public static List<int> StringToControls(string[] values, List<int> list = null)
+        public static List<int> StringToControls(string[] values, List<int>? list = null)
         {
             list ??= [];
             // Control
@@ -1298,10 +1307,10 @@ namespace vimage
             }
         }
 
-        public List<int> UpdateControl(string name, int bind)
+        public List<int>? UpdateControl(string name, int bind)
         {
             name = name.ToUpper();
-            if (!Settings.TryGetValue(name, out object value))
+            if (!Settings.TryGetValue(name, out object? value))
                 return null;
 
             var Control = (List<int>)value;

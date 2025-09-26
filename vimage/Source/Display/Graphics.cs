@@ -437,7 +437,7 @@ namespace vimage
             System.Drawing.Bitmap? bmpPngExtracted = null;
             try
             {
-                byte[] srcBuf = null;
+                byte[]? srcBuf = null;
                 using (var stream = new MemoryStream())
                 {
                     icoIcon.Save(stream);
