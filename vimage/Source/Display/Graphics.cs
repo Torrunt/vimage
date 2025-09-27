@@ -4,11 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
-using DevILSharp;
+using DevIL;
 using SFML.Graphics;
 using SFML.System;
-using SkiaSharp;
-using Svg.Skia;
 
 namespace vimage
 {
@@ -501,42 +499,42 @@ namespace vimage
             else
             {
                 // New Texture (from .svg)
-                try
-                {
-                    // FIXME: Test svg support
-                    var svg = new SKSvg();
-                    svg.Load(fileName);
-                    if (svg.Picture == null)
-                        return null;
+                //  try
+                //  {
+                //      // FIXME: Test svg support
+                //      var svg = new SKSvg();
+                //      svg.Load(fileName);
+                //      if (svg.Picture == null)
+                //          return null;
 
-                    // Decide output size (you can use Picture.CullRect for intrinsic bounds)
-                    var bounds = svg.Picture.CullRect;
-                    int width = (int)bounds.Width;
-                    int height = (int)bounds.Height;
+                //      // Decide output size (you can use Picture.CullRect for intrinsic bounds)
+                //      var bounds = svg.Picture.CullRect;
+                //      int width = (int)bounds.Width;
+                //      int height = (int)bounds.Height;
 
-                    // Render to a bitmap
-                    using var bitmap = new SKBitmap(width, height);
-                    using (var canvas = new SKCanvas(bitmap))
-                    {
-                        canvas.Clear(SKColors.Transparent);
-                        canvas.DrawPicture(svg.Picture);
-                    }
+                //      // Render to a bitmap
+                //      using var bitmap = new SKBitmap(width, height);
+                //      using (var canvas = new SKCanvas(bitmap))
+                //      {
+                //          canvas.Clear(SKColors.Transparent);
+                //          canvas.DrawPicture(svg.Picture);
+                //      }
 
-                    // Encode bitmap into PNG memory stream
-                    using var image = SKImage.FromBitmap(bitmap);
-                    using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+                //      // Encode bitmap into PNG memory stream
+                //      using var image = SKImage.FromBitmap(bitmap);
+                //      using var data = image.Encode(SKEncodedImageFormat.Png, 100);
 
-                    using var stream = new MemoryStream();
-                    data.SaveTo(stream);
-                    stream.Position = 0;
+                //      using var stream = new MemoryStream();
+                //      data.SaveTo(stream);
+                //      stream.Position = 0;
 
-                    var texture = new Texture(stream);
-                    Textures.Add(texture);
-                    TextureFileNames.Add(fileName);
+                //      var texture = new Texture(stream);
+                //      Textures.Add(texture);
+                //      TextureFileNames.Add(fileName);
 
-                    return new Sprite(new Texture(texture));
-                }
-                catch (Exception) { }
+                //      return new Sprite(new Texture(texture));
+                //  }
+                //  catch (Exception) { }
             }
 
             return null;
