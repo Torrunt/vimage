@@ -8,15 +8,15 @@ namespace vimage
     {
         private readonly ImageViewer ImageViewer;
         public int Setting = -1;
-        private List<string> Items_General;
-        private List<string> Items_Animation;
+        private List<string> Items_General = [];
+        private List<string> Items_Animation = [];
 
-        private Dictionary<string, dynamic> FuncByName;
+        private Dictionary<string, dynamic> FuncByName = [];
 
         public int FileNameItem = -1;
         public string FileNameCurrent = ".";
 
-        private ToolTip ToolTip;
+        private ToolTip? ToolTip;
 
         public ContextMenu(ImageViewer ImageViewer)
             : base()
@@ -138,7 +138,7 @@ namespace vimage
 
             for (int i = 0; i < items.Count; i++)
             {
-                ToolStripItem item = null;
+                ToolStripItem? item = null;
                 string name = items[i];
                 bool itemClickable = true;
 
@@ -336,12 +336,15 @@ namespace vimage
         }
 
         /// <summary>returns the ToolStripMenuItem based on the name of the function.</summary>
-        public ToolStripMenuItem GetItemByFunc(Action func)
+        public ToolStripMenuItem? GetItemByFunc(Action func)
         {
             return GetItemByFuncFrom(func, Items);
         }
 
-        private ToolStripMenuItem GetItemByFuncFrom(Action func, ToolStripItemCollection collection)
+        private ToolStripMenuItem? GetItemByFuncFrom(
+            Action func,
+            ToolStripItemCollection collection
+        )
         {
             for (int i = 0; i < collection.Count; i++)
             {

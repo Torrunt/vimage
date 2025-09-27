@@ -50,4 +50,14 @@
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </None>
   </ItemGroup>
+
+  <!-- Remove junk .dlls from CSFML nuget package -->
+  <Target Name="RemoveUnusedDlls" AfterTargets="Publish">
+    <ItemGroup>
+      <JunkFiles Include="$(PublishDir)csfml-audio.dll" />
+      <JunkFiles Include="$(PublishDir)openal32.dll" />
+    </ItemGroup>
+
+    <Delete Files="@(JunkFiles)" />
+  </Target>
 </Project>

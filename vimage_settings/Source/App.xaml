@@ -7,6 +7,6 @@
         <Style TargetType="{x:Type CheckBox}">
             <Setter Property="Margin" Value="0,0,0,10" />
         </Style>
-        <local:EnumConverter xmlns:converter="clr-namespace:vimage_settings" x:Key="EnumConverter"/>
+        <local:EnumConverter x:Key="EnumConverter"/>
     </Application.Resources>
 </Application>

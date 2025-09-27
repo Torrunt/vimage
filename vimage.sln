@@ -4,7 +4,7 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vimage", "vimage\vimage.csproj", "{92394A27-D9C5-1F3C-9D83-93543FA5CDB2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vimage_settings", "vimage_settings\vimage_settings.csproj", "{80DD9197-20D6-164E-9F06-82E5645C1AFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vimage_settings", "vimage_settings\vimage_settings.csproj", "{80DD9197-20D6-164E-9F06-82E5645C1AFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
