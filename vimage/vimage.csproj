@@ -51,6 +51,10 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\vimage.Common\vimage.Common.csproj" />
+  </ItemGroup>
+
   <!-- Remove junk .dlls from CSFML nuget package -->
   <Target Name="RemoveUnusedDlls" AfterTargets="Publish">
     <ItemGroup>

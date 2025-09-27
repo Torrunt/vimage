@@ -26,8 +26,6 @@
             Icons - <Hyperlink NavigateUri="http://www.famfamfam.com/lab/icons/silk" RequestNavigate="Hyperlink_RequestNavigate">famfamfam.com/lab/icons/silk</Hyperlink>
             <LineBreak />
             ExifLib - <Hyperlink NavigateUri="https://www.codeproject.com/articles/36342/exiflib-a-fast-exif-data-extractor-for-net-2-0" RequestNavigate="Hyperlink_RequestNavigate">Simon McKenzie @ CodeProject.com</Hyperlink>
-            <LineBreak />
-            CrashReporter.NET - <Hyperlink NavigateUri="https://crashreporterdotnet.codeplex.com" RequestNavigate="Hyperlink_RequestNavigate">crashreporterdotnet.codeplex.com/</Hyperlink>
         </TextBlock>
     </StackPanel>
 </UserControl>

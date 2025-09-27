@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Navigation;
-using System.Diagnostics;
 
 namespace vimage_settings
 {
@@ -10,7 +10,6 @@ namespace vimage_settings
     /// </summary>
     public partial class MainWindow : Window
     {
-
         public MainWindow()
         {
             InitializeComponent();
@@ -27,7 +26,9 @@ namespace vimage_settings
         {
             ContextMenuEditor.Save();
 
-            App.vimageConfig.Save(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
+            App.vimageConfig?.Save(
+                System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt")
+            );
         }
     }
 }

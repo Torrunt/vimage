@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
-namespace vimage
+namespace vimage.Common
 {
     public enum Action
     {

@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using vimage;
+using vimage.Common;
 
 namespace vimage_settings
 {
@@ -13,7 +13,7 @@ namespace vimage_settings
     {
         public List<int> Controls;
         private bool CanRecordMouseButton = false;
-        private readonly List<int> KeysHeld = new List<int>();
+        private readonly List<int> KeysHeld = [];
 
         public ControlItem()
         {

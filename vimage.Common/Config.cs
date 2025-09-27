@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections;
 using SFML.Window;
 
-namespace vimage
+namespace vimage.Common
 {
     public enum SortBy
     {
@@ -29,6 +27,24 @@ namespace vimage
         FitAuto,
         KeepZoom,
         FullSize,
+    }
+
+    public struct ContextMenuItem
+    {
+        public string name;
+        public object func;
+    }
+
+    public struct CustomAction
+    {
+        public string name;
+        public string func;
+    }
+
+    public struct CustomActionBinding
+    {
+        public string name;
+        public List<int> bindings;
     }
 
     public class Config
@@ -316,8 +332,8 @@ namespace vimage
             set { Settings["CONTEXTMENU_SHOWMARGINSUB"] = value; }
         }
 
-        public List<object> CustomActions = [];
-        public List<object> CustomActionBindings = [];
+        public List<CustomAction> CustomActions = [];
+        public List<CustomActionBinding> CustomActionBindings = [];
 
         private Dictionary<string, object> Settings = [];
 
@@ -575,44 +591,62 @@ namespace vimage
             ContextMenu.Clear();
             ContextMenu_Animation.Clear();
 
-            ContextMenu.Add(new { name = "Close", func = Action.Close });
-            ContextMenu.Add(new { name = "-", func = Action.None });
-            ContextMenu.Add(new { name = "Next", func = Action.NextImage });
-            ContextMenu.Add(new { name = "Previous", func = Action.PrevImage });
+            ContextMenu.Add(new ContextMenuItem { name = "Close", func = Action.Close });
+            ContextMenu.Add(new ContextMenuItem { name = "-", func = Action.None });
+            ContextMenu.Add(new ContextMenuItem { name = "Next", func = Action.NextImage });
+            ContextMenu.Add(new ContextMenuItem { name = "Previous", func = Action.PrevImage });
             ContextMenu.Add("Sort by");
             List<object> SubMenu_SortBy =
             [
-                new { name = "Name", func = Action.SortName },
-                new { name = "Date", func = Action.SortDate },
-                new { name = "Date modified", func = Action.SortDateModified },
-                new { name = "Date created", func = Action.SortDateCreated },
-                new { name = "Size", func = Action.SortSize },
-                new { name = "-", func = Action.None },
-                new { name = "Ascending", func = Action.SortAscending },
-                new { name = "Descending", func = Action.SortDescending },
+                new ContextMenuItem { name = "Name", func = Action.SortName },
+                new ContextMenuItem { name = "Date", func = Action.SortDate },
+                new ContextMenuItem { name = "Date modified", func = Action.SortDateModified },
+                new ContextMenuItem { name = "Date created", func = Action.SortDateCreated },
+                new ContextMenuItem { name = "Size", func = Action.SortSize },
+                new ContextMenuItem { name = "-", func = Action.None },
+                new ContextMenuItem { name = "Ascending", func = Action.SortAscending },
+                new ContextMenuItem { name = "Descending", func = Action.SortDescending },
             ];
             ContextMenu.Add(SubMenu_SortBy);
-            ContextMenu.Add(new { name = "-", func = Action.None });
-            ContextMenu.Add(new { name = "Rotate right", func = Action.RotateClockwise });
-            ContextMenu.Add(new { name = "Rotate left", func = Action.RotateAntiClockwise });
-            ContextMenu.Add(new { name = "Flip", func = Action.Flip });
-            ContextMenu.Add(new { name = "Fit to height", func = Action.FitToMonitorHeight });
-            ContextMenu.Add(new { name = "Fit to width", func = Action.FitToMonitorWidth });
-            ContextMenu.Add(new { name = "Smoothing", func = Action.ToggleSmoothing });
-            ContextMenu.Add(new { name = "Always on top", func = Action.ToggleAlwaysOnTop });
-            ContextMenu.Add(new { name = "Reset", func = Action.ResetImage });
-            ContextMenu.Add(new { name = "-", func = Action.None });
-            ContextMenu.Add(new { name = "Edit", func = "EDIT PAINT" });
-            ContextMenu.Add(new { name = "Copy", func = Action.Copy });
-            ContextMenu.Add(new { name = "Delete", func = Action.Delete });
-            ContextMenu.Add(new { name = "-", func = Action.None });
-            ContextMenu.Add(new { name = "[filename.14]", func = Action.OpenAtLocation });
-            ContextMenu.Add(new { name = "-", func = Action.None });
-            ContextMenu.Add(new { name = "Settings", func = Action.OpenSettings });
-            ContextMenu.Add(new { name = "vimage [version]", func = Action.VisitWebsite });
+            ContextMenu.Add(new ContextMenuItem { name = "-", func = Action.None });
+            ContextMenu.Add(
+                new ContextMenuItem { name = "Rotate right", func = Action.RotateClockwise }
+            );
+            ContextMenu.Add(
+                new ContextMenuItem { name = "Rotate left", func = Action.RotateAntiClockwise }
+            );
+            ContextMenu.Add(new ContextMenuItem { name = "Flip", func = Action.Flip });
+            ContextMenu.Add(
+                new ContextMenuItem { name = "Fit to height", func = Action.FitToMonitorHeight }
+            );
+            ContextMenu.Add(
+                new ContextMenuItem { name = "Fit to width", func = Action.FitToMonitorWidth }
+            );
+            ContextMenu.Add(
+                new ContextMenuItem { name = "Smoothing", func = Action.ToggleSmoothing }
+            );
+            ContextMenu.Add(
+                new ContextMenuItem { name = "Always on top", func = Action.ToggleAlwaysOnTop }
+            );
+            ContextMenu.Add(new ContextMenuItem { name = "Reset", func = Action.ResetImage });
+            ContextMenu.Add(new ContextMenuItem { name = "-", func = Action.None });
+            ContextMenu.Add(new ContextMenuItem { name = "Edit", func = "EDIT PAINT" });
+            ContextMenu.Add(new ContextMenuItem { name = "Copy", func = Action.Copy });
+            ContextMenu.Add(new ContextMenuItem { name = "Delete", func = Action.Delete });
+            ContextMenu.Add(new ContextMenuItem { name = "-", func = Action.None });
+            ContextMenu.Add(
+                new ContextMenuItem { name = "[filename.14]", func = Action.OpenAtLocation }
+            );
+            ContextMenu.Add(new ContextMenuItem { name = "-", func = Action.None });
+            ContextMenu.Add(new ContextMenuItem { name = "Settings", func = Action.OpenSettings });
+            ContextMenu.Add(
+                new ContextMenuItem { name = "vimage [version]", func = Action.VisitWebsite }
+            );
 
-            ContextMenu_Animation.Add(new { name = "Pause/Play", func = Action.PauseAnimation });
-            ContextMenu_Animation.Add(new { name = "-", func = Action.None });
+            ContextMenu_Animation.Add(
+                new ContextMenuItem { name = "Pause/Play", func = Action.PauseAnimation }
+            );
+            ContextMenu_Animation.Add(new ContextMenuItem { name = "-", func = Action.None });
         }
 
         public void SetDefaultCustomActions()
@@ -621,27 +655,33 @@ namespace vimage
             CustomActionBindings.Clear();
 
             CustomActions.Add(
-                new
+                new CustomAction
                 {
                     name = "TOGGLE OVERLAY MODE",
                     func = "-toggleSync -clickThrough -alwaysOnTop -defaultTransparency",
                 }
             );
             CustomActionBindings.Add(
-                new { name = "TOGGLE OVERLAY MODE", bindings = new List<int>() { -2, 38, 11 } }
+                new CustomActionBinding { name = "TOGGLE OVERLAY MODE", bindings = [-2, 38, 11] }
             );
-            CustomActions.Add(new { name = "EDIT PAINT", func = @"mspaint.exe %f" });
-            CustomActionBindings.Add(new { name = "EDIT PAINT", bindings = new List<int>() });
+            CustomActions.Add(new CustomAction { name = "EDIT PAINT", func = @"mspaint.exe %f" });
+            CustomActionBindings.Add(
+                new CustomActionBinding { name = "EDIT PAINT", bindings = [] }
+            );
             CustomActions.Add(
-                new
+                new CustomAction
                 {
                     name = "EDIT PAINTDOTNET",
                     func = "\"C:\\Program Files\\Paint.NET\\PaintDotNet.exe\" %f",
                 }
             );
-            CustomActionBindings.Add(new { name = "EDIT PAINTDOTNET", bindings = new List<int>() });
-            CustomActions.Add(new { name = "TOGGLE TASKBAR", func = "-taskbarIcon" });
-            CustomActionBindings.Add(new { name = "TOGGLE TASKBAR", bindings = new List<int>() });
+            CustomActionBindings.Add(
+                new CustomActionBinding { name = "EDIT PAINTDOTNET", bindings = [] }
+            );
+            CustomActions.Add(new CustomAction { name = "TOGGLE TASKBAR", func = "-taskbarIcon" });
+            CustomActionBindings.Add(
+                new CustomActionBinding { name = "TOGGLE TASKBAR", bindings = [] }
+            );
         }
 
         /// <summary> Loads and parses a config txt file. If it doesn't exist, a default one will be made. </summary>
@@ -710,7 +750,8 @@ namespace vimage
                         continue;
 
                     // read section
-                    line = ReadSection(reader, Settings[name] as List<object>, name);
+                    if (Settings[name] is IList settingList)
+                        line = ReadSection(reader, settingList, name);
                     continue;
                 }
 
@@ -753,7 +794,7 @@ namespace vimage
 
         private static string? ReadSection(
             StreamReader reader,
-            List<object> setting,
+            IList setting,
             string sectionName = ""
         )
         {
@@ -808,7 +849,7 @@ namespace vimage
                     if (sectionName == "CUSTOMACTIONBINDINGS")
                     {
                         setting.Add(
-                            new
+                            new CustomActionBinding
                             {
                                 name = splitValues[0],
                                 bindings = StringToControls(splitValues[1].Split(',')),
@@ -819,15 +860,25 @@ namespace vimage
                     {
                         var action = Actions.StringToAction(splitValues[1]);
                         setting.Add(
-                            new
+                            new ContextMenuItem
                             {
                                 name = splitValues[0],
-                                func = action <= 0 ? (object)splitValues[1] : action,
+                                func = action <= 0 ? splitValues[1] : action,
                             }
                         );
                     }
+                    else if (sectionName.Contains("CUSTOMACTIONS"))
+                    {
+                        setting.Add(
+                            new CustomAction { name = splitValues[0], func = splitValues[1] }
+                        );
+                    }
                     else
-                        setting.Add(new { name = splitValues[0], func = splitValues[1] });
+                    {
+                        setting.Add(
+                            new ContextMenuItem { name = splitValues[0], func = splitValues[1] }
+                        );
+                    }
 
                     // next line
                     line = reader.ReadLine();
@@ -1107,11 +1158,11 @@ namespace vimage
             {
                 writer.Write(VariableAmountOfStrings(depth, "\t"));
 
-                if (items[i] is string)
+                if (items[i] is string str)
                 {
                     // Submenu
                     writer.Write(
-                        (items[i] as string)
+                        str
                             + Environment.NewLine
                             + VariableAmountOfStrings(depth, "\t")
                             + "{"
@@ -1124,18 +1175,21 @@ namespace vimage
                 else
                 {
                     // Item
-                    string itemName = (items[i] as dynamic).name as string;
-                    string itemFunc = (string)(
-                        (items[i] as dynamic).func is Action action
-                            ? action.ToNameString()
-                            : (items[i] as dynamic).func
-                    );
-                    if (itemName.Equals("-"))
-                        writer.Write("-" + Environment.NewLine);
-                    else if (itemName.Equals(""))
-                        writer.Write(": " + itemFunc + Environment.NewLine);
-                    else
-                        writer.Write(itemName + " : " + itemFunc + Environment.NewLine);
+                    var itemName = (items[i] as dynamic).name as string;
+                    if (itemName is not null)
+                    {
+                        var itemFunc = (string)(
+                            (items[i] as dynamic).func is Action action
+                                ? action.ToNameString()
+                                : (items[i] as dynamic).func
+                        );
+                        if (itemName.Equals("-"))
+                            writer.Write("-" + Environment.NewLine);
+                        else if (itemName.Equals(""))
+                            writer.Write(": " + itemFunc + Environment.NewLine);
+                        else
+                            writer.Write(itemName + " : " + itemFunc + Environment.NewLine);
+                    }
                 }
             }
         }
@@ -1143,7 +1197,7 @@ namespace vimage
         private static void WriteCustomActions(
             StreamWriter writer,
             string name,
-            List<object> customActions
+            List<CustomAction> customActions
         )
         {
             writer.Write(name + " =" + Environment.NewLine + "{" + Environment.NewLine);
@@ -1151,9 +1205,9 @@ namespace vimage
             {
                 writer.Write(
                     "\t"
-                        + (customActions[i] as dynamic).name
+                        + customActions[i].name
                         + " : "
-                        + (customActions[i] as dynamic).func
+                        + customActions[i].func
                         + Environment.NewLine
                 );
             }
@@ -1163,7 +1217,7 @@ namespace vimage
         private static void WriteCustomActionBindings(
             StreamWriter writer,
             string name,
-            List<object> customActionBindings
+            List<CustomActionBinding> customActionBindings
         )
         {
             writer.Write(name + " =" + Environment.NewLine + "{" + Environment.NewLine);
@@ -1171,9 +1225,9 @@ namespace vimage
             {
                 writer.Write(
                     "\t"
-                        + (customActionBindings[i] as dynamic).name
+                        + customActionBindings[i].name
                         + " : "
-                        + ControlsToString((customActionBindings[i] as dynamic).bindings)
+                        + ControlsToString(customActionBindings[i].bindings)
                         + Environment.NewLine
                 );
             }

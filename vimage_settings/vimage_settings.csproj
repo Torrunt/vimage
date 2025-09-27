@@ -29,12 +29,7 @@
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\vimage\Source\Actions.cs">
-      <Link>Source\Actions.cs</Link>
-    </Compile>
-    <Compile Include="..\vimage\Source\Config.cs">
-      <Link>Source\Config.cs</Link>
-    </Compile>
+    <ProjectReference Include="..\vimage.Common\vimage.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -59,9 +54,6 @@
 
   <!-- Copy over vimage_settings.exe to vimage publish folder  -->
   <Target Name="CopyToVimagePublishFolder" AfterTargets="Publish">
-    <Copy 
-      SourceFiles="$(PublishDir)vimage_settings.exe" 
-      DestinationFolder="$(SolutionDir)vimage\bin\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\publish" 
-    />
+    <Copy SourceFiles="$(PublishDir)vimage_settings.exe" DestinationFolder="..\vimage\bin\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\publish" />
   </Target>
 </Project>

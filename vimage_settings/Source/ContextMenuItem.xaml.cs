@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using vimage;
+using vimage.Common;
 
 namespace vimage_settings
 {
@@ -28,7 +28,16 @@ namespace vimage_settings
             InitializeComponent();
             SetFunctions();
         }
-        public ContextMenuItem(string name, dynamic func, ContextMenu contextMenu, Panel parentPanel, ContextMenuEditorCanvas canvas, ScrollViewer scroll, int indent = 0)
+
+        public ContextMenuItem(
+            string name,
+            dynamic func,
+            ContextMenu contextMenu,
+            Panel parentPanel,
+            ContextMenuEditorCanvas canvas,
+            ScrollViewer scroll,
+            int indent = 0
+        )
         {
             InitializeComponent();
 
@@ -41,7 +50,13 @@ namespace vimage_settings
 
             ItemName.Text = name;
 
-            int funcIndex = ItemFunction.Items.IndexOf((string)(func is vimage.Action ? ((vimage.Action)func).ToNameString() : func));
+            int funcIndex = ItemFunction.Items.IndexOf(
+                (string)(
+                    func is vimage.Common.Action
+                        ? ((vimage.Common.Action)func).ToNameString()
+                        : func
+                )
+            );
             if (funcIndex != -1)
                 ItemFunction.SelectedIndex = funcIndex;
         }
@@ -68,6 +83,7 @@ namespace vimage_settings
             if (prevIndex != -1 && prevIndex < ItemFunction.Items.Count)
                 ItemFunction.SelectedIndex = prevIndex;
         }
+
         public void UpdateCustomActions()
         {
             if (CustomActionsStartIndex == -1)
@@ -75,14 +91,27 @@ namespace vimage_settings
 
             int prevSelected = ItemFunction.SelectedIndex;
 
-            for (int i = CustomActionsStartIndex; i < CustomActionsStartIndex + App.vimageConfig.CustomActions.Count; i++)
+            for (
+                int i = CustomActionsStartIndex;
+                i < CustomActionsStartIndex + App.vimageConfig.CustomActions.Count;
+                i++
+            )
             {
                 if (i >= ItemFunction.Items.Count)
-                    ItemFunction.Items.Add((App.vimageConfig.CustomActions[i - CustomActionsStartIndex] as dynamic).name); // add
+                    ItemFunction.Items.Add(
+                        (
+                            App.vimageConfig.CustomActions[i - CustomActionsStartIndex] as dynamic
+                        ).name
+                    ); // add
                 else
-                    ItemFunction.Items[i] = (App.vimageConfig.CustomActions[i - CustomActionsStartIndex] as dynamic).name; // update name
+                    ItemFunction.Items[i] = (
+                        App.vimageConfig.CustomActions[i - CustomActionsStartIndex] as dynamic
+                    ).name; // update name
             }
-            while (ItemFunction.Items.Count > CustomActionsStartIndex + App.vimageConfig.CustomActions.Count)
+            while (
+                ItemFunction.Items.Count
+                > CustomActionsStartIndex + App.vimageConfig.CustomActions.Count
+            )
                 ItemFunction.Items.RemoveAt(ItemFunction.Items.Count - 1); // delete
 
             if (ItemFunction.SelectedIndex < 0 && prevSelected < ItemFunction.Items.Count)
@@ -145,6 +174,7 @@ namespace vimage_settings
             Selected = false;
             UserControl.Background = new SolidColorBrush();
         }
+
         public void SelectItem(bool selectTextBox = false)
         {
             if (ParentCanvas.MovingItem != null)
@@ -156,8 +186,14 @@ namespace vimage_settings
 
             if (selectTextBox)
             {
-                _ = Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ApplicationIdle, (System.Threading.ThreadStart)delegate ()
-                  { _ = Focus(); });
+                _ = Dispatcher.BeginInvoke(
+                    System.Windows.Threading.DispatcherPriority.ApplicationIdle,
+                    (System.Threading.ThreadStart)
+                        delegate()
+                        {
+                            _ = Focus();
+                        }
+                );
                 FocusManager.SetFocusedElement(UserControl, ItemName);
                 _ = Keyboard.Focus(ItemName);
                 ItemName.SelectAll();
@@ -171,7 +207,12 @@ namespace vimage_settings
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 // start dragging
-                if (!Dragging && Parent == ParentPanel && ParentCanvas.MovingItem == null && e.GetPosition(null).X < (Indent + 1) * 30)
+                if (
+                    !Dragging
+                    && Parent == ParentPanel
+                    && ParentCanvas.MovingItem == null
+                    && e.GetPosition(null).X < (Indent + 1) * 30
+                )
                     Dragging = true;
 
                 if (Dragging)
@@ -179,7 +220,10 @@ namespace vimage_settings
                     // update position
                     double posX = e.GetPosition(ParentCanvas).X - AnchorPoint.X;
                     double posY = e.GetPosition(ParentCanvas).Y - AnchorPoint.Y;
-                    int i = Math.Max((int)Math.Round((posY + ((MinHeight - 2) / 2)) / (MinHeight - 2)), 0);
+                    int i = Math.Max(
+                        (int)Math.Round((posY + ((MinHeight - 2) / 2)) / (MinHeight - 2)),
+                        0
+                    );
                     i = Math.Min(i, ParentPanel.Children.Count);
 
                     double top = Math.Max(i * (MinHeight - 2), 0);
@@ -204,9 +248,21 @@ namespace vimage_settings
 
                     // scroll window when dragging past top/bottom
                     if (posY + MinHeight > ScrollViewer.ActualHeight + ScrollViewer.VerticalOffset)
-                        ScrollViewer.ScrollToVerticalOffset(ScrollViewer.VerticalOffset + (posY - (ScrollViewer.ActualHeight + ScrollViewer.VerticalOffset - MinHeight)));
+                        ScrollViewer.ScrollToVerticalOffset(
+                            ScrollViewer.VerticalOffset
+                                + (
+                                    posY
+                                    - (
+                                        ScrollViewer.ActualHeight
+                                        + ScrollViewer.VerticalOffset
+                                        - MinHeight
+                                    )
+                                )
+                        );
                     else if (posY < ScrollViewer.VerticalOffset)
-                        ScrollViewer.ScrollToVerticalOffset(ScrollViewer.VerticalOffset - (ScrollViewer.VerticalOffset - posY));
+                        ScrollViewer.ScrollToVerticalOffset(
+                            ScrollViewer.VerticalOffset - (ScrollViewer.VerticalOffset - posY)
+                        );
 
                     e.Handled = true;
                 }
@@ -291,10 +347,9 @@ namespace vimage_settings
                     ItemFunction.IsEnabled = true;
                     ButtonDelete.IsEnabled = true;
                 }
-                
+
                 _Dragging = value;
             }
         }
-
     }
 }

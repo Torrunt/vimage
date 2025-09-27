@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using vimage.Common;
+using Action = vimage.Common.Action;
 
 namespace vimage
 {
@@ -82,29 +84,29 @@ namespace vimage
                     }
                 }
 
-                if (items[i] is string)
+                if (items[i] is string str2)
                 {
                     // Submenu
                     list.Add(VariableAmountOfStrings(depth, ":") + items[i] + ":");
-                    FuncByName.Add(items[i] as string, Action.None);
+                    FuncByName.Add(str2, Action.None);
 
                     i++;
                     LoadItemsInto(list, items[i] as List<object>, depth + 1);
                 }
-                else
+                else if (items[i] is ContextMenuItem contextMenuItem)
                 {
                     // Item
-                    if (!FuncByName.ContainsKey((items[i] as dynamic).name))
+                    if (!FuncByName.ContainsKey(contextMenuItem.name))
                     {
-                        string itemName = (items[i] as dynamic).name;
-                        if (itemName.IndexOf("[filename") == 0)
+                        var itemName = contextMenuItem.name;
+                        if (itemName.StartsWith("[filename"))
                             FileNameItem = list.Count;
                         if (itemName.Contains("[version]"))
                             itemName = itemName.Replace("[version]", ImageViewer.VERSION_NO);
 
                         list.Add(VariableAmountOfStrings(depth, ":") + itemName);
                         if (!itemName.Equals("-"))
-                            FuncByName.Add(itemName, (items[i] as dynamic).func);
+                            FuncByName.Add(itemName, contextMenuItem.func);
                     }
                 }
             }
@@ -249,7 +251,7 @@ namespace vimage
             )
                 return;
 
-            ToolStripMenuItem item;
+            ToolStripMenuItem? item;
 
             item = GetItemByFunc(Action.Flip);
             if (item != null)
@@ -319,16 +321,14 @@ namespace vimage
             if (!(item as ToolStripDropDownItem).HasDropDownItems)
                 Close();
 
-            object func = FuncByName[item.Name];
+            var func = FuncByName[item.Name];
             if (func is string funcName)
             {
                 for (int i = 0; i < ImageViewer.Config.CustomActions.Count; i++)
                 {
-                    if ((ImageViewer.Config.CustomActions[i] as dynamic).name != funcName)
+                    if (ImageViewer.Config.CustomActions[i].name != funcName)
                         continue;
-                    ImageViewer.DoCustomAction(
-                        (ImageViewer.Config.CustomActions[i] as dynamic).func
-                    );
+                    ImageViewer.DoCustomAction(ImageViewer.Config.CustomActions[i].func);
                 }
             }
             else

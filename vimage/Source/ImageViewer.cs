@@ -7,6 +7,8 @@ using System.Threading;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
+using vimage.Common;
+using Action = vimage.Common.Action;
 
 namespace vimage
 {
@@ -927,7 +929,7 @@ namespace vimage
                 if (
                     Config.IsControl(
                         code,
-                        (Config.CustomActionBindings[i] as dynamic).bindings as List<int>,
+                        Config.CustomActionBindings[i].bindings,
                         CurrentAction != Action.None
                     )
                 )
@@ -936,10 +938,9 @@ namespace vimage
                         (
                             Config
                                 .CustomActions.Where(a =>
-                                    (a as dynamic).name
-                                    == (Config.CustomActionBindings[i] as dynamic).name
+                                    a.name == Config.CustomActionBindings[i].name
                                 )
-                                .First() as dynamic
+                                .First()
                         ).func
                     );
                     CurrentAction = Action.Custom;
@@ -1909,35 +1910,46 @@ namespace vimage
             //   Console.WriteLine(desc);
 
             // Image
-            if (extension.Equals(".svg"))
-            {
-                // SVG
-                Image = Graphics.GetSpriteFromSVG(fileName);
-            }
-            else if (extension.Equals(".gif"))
+
+            if (extension.Equals(".gif"))
             {
                 // Animated GIF
                 Image = Graphics.GetAnimatedImage(fileName);
             }
-            else if (extension.Equals(".ico"))
-            {
-                // Icon
-                Image = Graphics.GetSpriteFromIcon(fileName);
-            }
-            else if (extension.Equals(".webp"))
-            {
-                // WebP
-                Image = Graphics.GetSpriteFromWebP(fileName);
-            }
             else
             {
-                // Other
-                var texture = Graphics.GetTexture(fileName);
-                if (texture is Texture texture1)
-                    Image = new Sprite(texture1);
-                else if (texture is DisplayObject displayObject)
-                    Image = displayObject;
+                Image = Graphics.GetSpriteFromMagick(fileName);
             }
+
+            //   if (extension.Equals(".svg"))
+            //   {
+            //       // SVG
+            //       Image = Graphics.GetSpriteFromSVG(fileName);
+            //   }
+            //   else if (extension.Equals(".gif"))
+            //   {
+            //       // Animated GIF
+            //       Image = Graphics.GetAnimatedImage(fileName);
+            //   }
+            //   else if (extension.Equals(".ico"))
+            //   {
+            //       // Icon
+            //       Image = Graphics.GetSpriteFromIcon(fileName);
+            //   }
+            //   else if (extension.Equals(".webp"))
+            //   {
+            //       // WebP
+            //       Image = Graphics.GetSpriteFromMagick(fileName);
+            //   }
+            //   else
+            //   {
+            //       // Other
+            //       var texture = Graphics.GetTexture(fileName);
+            //       if (texture is Texture texture1)
+            //           Image = new Sprite(texture1);
+            //       else if (texture is DisplayObject displayObject)
+            //           Image = displayObject;
+            //   }
 
             if (Image?.Texture == null)
                 return false;
@@ -2226,36 +2238,48 @@ namespace vimage
             string extension = Path.GetExtension(fileName).ToLowerInvariant();
 
             // Image
-            if (extension.Equals(".svg"))
-            {
-                // SVG
-                if (Graphics.GetSpriteFromSVG(fileName) == null)
-                    return false;
-            }
-            else if (extension.Equals(".gif"))
+            if (extension.Equals(".gif"))
             {
                 // Animated GIF
                 if (Graphics.GetAnimatedImageData(fileName) == null)
                     return false;
             }
-            else if (extension.Equals(".ico"))
-            {
-                // Icon
-                if (Graphics.GetSpriteFromIcon(fileName) == null)
-                    return false;
-            }
-            else if (extension.Equals(".webp"))
-            {
-                // WebP
-                if (Graphics.GetSpriteFromWebP(fileName) == null)
-                    return false;
-            }
             else
             {
-                // Other
-                if (Graphics.GetTexture(fileName) == null)
+                if (Graphics.GetSpriteFromMagick(fileName) == null)
                     return false;
             }
+
+            //   if (extension.Equals(".svg"))
+            //   {
+            //       // SVG
+            //       if (Graphics.GetSpriteFromSVG(fileName) == null)
+            //           return false;
+            //   }
+            //   else if (extension.Equals(".gif"))
+            //   {
+            //       // Animated GIF
+            //       if (Graphics.GetAnimatedImageData(fileName) == null)
+            //           return false;
+            //   }
+            //   else if (extension.Equals(".ico"))
+            //   {
+            //       // Icon
+            //       if (Graphics.GetSpriteFromIcon(fileName) == null)
+            //           return false;
+            //   }
+            //   else if (extension.Equals(".webp"))
+            //   {
+            //       // WebP
+            //       if (Graphics.GetSpriteFromMagick(fileName) == null)
+            //           return false;
+            //   }
+            //   else
+            //   {
+            //       // Other
+            //       if (Graphics.GetTexture(fileName) == null)
+            //           return false;
+            //   }
 
             return true;
         }
