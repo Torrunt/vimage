@@ -143,22 +143,6 @@ namespace vimage
             // DevIL Enabled?
             if (Config.Setting_UseDevIL)
                 Graphics.InitDevIL();
-            if (
-                file != ""
-                && !Graphics.UseDevil
-                && !ImageViewerUtils.IsValidExtension(file, useDevil: false)
-            )
-            {
-                if (OperatingSystem.IsWindowsVersionAtLeast(6, 1))
-                {
-                    System.Windows.Forms.MessageBox.Show(
-                        "vimage requires DevIL to be enabled to load this file format.\nYou can turn it on in the settings.",
-                        "vimage - File Format unsupported by default"
-                    );
-                }
-                Window.Close();
-                return;
-            }
 
             // Get Image
             _ = ChangeImage(file);
@@ -2423,7 +2407,7 @@ namespace vimage
 
             var contents = Directory
                 .GetFiles(directory, "*.*", SearchOption.TopDirectoryOnly)
-                .Where(s => ImageViewerUtils.IsValidExtension(s, Graphics.UseDevil));
+                .Where(ImageViewerUtils.IsSupportedFileType);
 
             switch (SortImagesBy)
             {

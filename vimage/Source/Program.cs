@@ -25,7 +25,7 @@ namespace vimage
             }
 
             // Extension supported?
-            if (file != "" && !ImageViewerUtils.IsValidExtension(file))
+            if (file != "" && !ImageViewerUtils.IsSupportedFileType(file))
             {
                 if (OperatingSystem.IsWindowsVersionAtLeast(6, 1))
                 {
