@@ -2524,28 +2524,25 @@ namespace vimage
         {
             var thread = new Thread(() =>
             {
-                try
+                if (File == "")
                 {
-                    System.Drawing.Bitmap? bitmap;
-                    if (File == "")
-                    {
-                        // No File (viewing clipboard image?)
-                        if (ClipboardBitmap == null)
-                            return;
-                        bitmap = ClipboardBitmap;
-                    }
-                    else if (File.EndsWith(".ico", StringComparison.OrdinalIgnoreCase))
-                    {
-                        // If .ico - copy largest version
-                        var icon = new System.Drawing.Icon(File, 256, 256);
-                        bitmap = Graphics.ExtractVistaIcon(icon);
-                        bitmap ??= icon.ToBitmap();
-                    }
-                    else
-                        bitmap = new System.Drawing.Bitmap(File);
-                    System.Windows.Forms.Clipboard.SetImage(bitmap);
+                    // No File (viewing clipboard image?)
+                    if (ClipboardBitmap == null)
+                        return;
+                    System.Windows.Forms.Clipboard.SetImage(ClipboardBitmap);
                 }
-                catch (Exception) { }
+                else
+                {
+                    using var image = Graphics.GetMagickImage(File);
+                    if (image == null)
+                        return;
+                    using var ms = new MemoryStream();
+                    image.Write(ms, ImageMagick.MagickFormat.Png32);
+                    ms.Position = 0;
+                    var data = new System.Windows.Forms.DataObject();
+                    data.SetData("PNG", false, ms);
+                    System.Windows.Forms.Clipboard.SetDataObject(data, true);
+                }
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();

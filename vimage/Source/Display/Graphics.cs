@@ -422,13 +422,26 @@ namespace vimage
             MagickReadSettings? settings = null
         )
         {
-            var info = MagickFormatInfo.Create(fileName);
-            if (info is null)
+            using var image = GetMagickImage(fileName, settings);
+            if (image is null)
                 return null;
-            if (info.Format == MagickFormat.Ico)
-                return GetTextureFromMagickIco(fileName);
+            var bytes = image.GetPixels().ToByteArray(PixelMapping.RGBA);
+            var texture = new Texture(image.Width, image.Height);
+            texture.Update(bytes);
 
-            using var image = settings is null
+            return texture;
+        }
+
+        public static MagickImage? GetMagickImage(
+            string fileName,
+            MagickReadSettings? settings = null
+        )
+        {
+            var info = MagickFormatInfo.Create(fileName);
+            if (info is not null && info.Format == MagickFormat.Ico)
+                return GetMagickImageIco(fileName);
+
+            var image = settings is null
                 ? new MagickImage(
                     fileName,
                     new MagickReadSettings { BackgroundColor = MagickColors.None }
@@ -437,29 +450,15 @@ namespace vimage
             if (image is null)
                 return null;
             image.Format = MagickFormat.Rgba;
-            var bytes = image.GetPixels().ToByteArray(PixelMapping.RGBA);
-            if (bytes is null)
-                return null;
-            var texture = new Texture(image.Width, image.Height);
-            texture.Update(bytes);
-
-            return texture;
+            return image;
         }
 
         /// <summary>Gets the highest resolution image in the .ico</summary>
-        private static Texture? GetTextureFromMagickIco(string fileName)
+        private static MagickImage? GetMagickImageIco(string fileName)
         {
             using var images = new MagickImageCollection(fileName);
             var best = images.OrderByDescending(i => i.Width * i.Height).First();
-
-            var icoImage = new MagickImage(best);
-            var bytes = icoImage.GetPixels().ToByteArray(PixelMapping.RGBA);
-            if (bytes is null)
-                return null;
-            var texture = new Texture(icoImage.Width, icoImage.Height);
-            texture.Update(bytes);
-
-            return texture;
+            return new MagickImage(best);
         }
 
         /// <param name="filename">Animated Image (ie: animated gif).</param>
