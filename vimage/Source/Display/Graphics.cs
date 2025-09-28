@@ -378,104 +378,6 @@ namespace vimage
             return largeTexture;
         }
 
-        public static Sprite? GetSpriteFromIcon(string fileName)
-        {
-            int index = TextureFileNames.IndexOf(fileName);
-
-            if (index >= 0)
-            {
-                // Texture Already Exists
-                // move it to the end of the array and return it
-                var texture = Textures[index];
-                string name = TextureFileNames[index];
-
-                Textures.RemoveAt(index);
-                TextureFileNames.RemoveAt(index);
-                Textures.Add(texture);
-                TextureFileNames.Add(name);
-
-                return new Sprite(Textures[^1]);
-            }
-            else
-            {
-                // New Texture (from .ico)
-                try
-                {
-                    var icon = new System.Drawing.Icon(fileName, 256, 256);
-                    var iconImage = ExtractVistaIcon(icon);
-                    iconImage ??= icon.ToBitmap();
-
-                    Sprite iconSprite;
-
-                    using (var iconStream = new MemoryStream())
-                    {
-                        iconImage.Save(iconStream, System.Drawing.Imaging.ImageFormat.Png);
-                        var iconTexture = new Texture(iconStream);
-                        Textures.Add(iconTexture);
-                        TextureFileNames.Add(fileName);
-
-                        iconSprite = new Sprite(new Texture(iconTexture));
-                    }
-
-                    return iconSprite;
-                }
-                catch (Exception) { }
-            }
-
-            return null;
-        }
-
-        // http://stackoverflow.com/questions/220465/using-256-x-256-vista-icon-in-application/1945764#1945764
-        // Based on: http://www.codeproject.com/KB/cs/IconExtractor.aspx
-        // And a hint from: http://www.codeproject.com/KB/cs/IconLib.aspx
-        public static System.Drawing.Bitmap? ExtractVistaIcon(System.Drawing.Icon icoIcon)
-        {
-            System.Drawing.Bitmap? bmpPngExtracted = null;
-            try
-            {
-                byte[]? srcBuf = null;
-                using (var stream = new MemoryStream())
-                {
-                    icoIcon.Save(stream);
-                    srcBuf = stream.ToArray();
-                }
-                const int SizeICONDIR = 6;
-                const int SizeICONDIRENTRY = 16;
-                int iCount = BitConverter.ToInt16(srcBuf, 4);
-                for (int iIndex = 0; iIndex < iCount; iIndex++)
-                {
-                    int iWidth = srcBuf[SizeICONDIR + SizeICONDIRENTRY * iIndex];
-                    int iHeight = srcBuf[SizeICONDIR + SizeICONDIRENTRY * iIndex + 1];
-                    int iBitCount = BitConverter.ToInt16(
-                        srcBuf,
-                        SizeICONDIR + SizeICONDIRENTRY * iIndex + 6
-                    );
-                    if (iWidth == 0 && iHeight == 0 && iBitCount == 32)
-                    {
-                        int iImageSize = BitConverter.ToInt32(
-                            srcBuf,
-                            SizeICONDIR + SizeICONDIRENTRY * iIndex + 8
-                        );
-                        int iImageOffset = BitConverter.ToInt32(
-                            srcBuf,
-                            SizeICONDIR + SizeICONDIRENTRY * iIndex + 12
-                        );
-                        var destStream = new MemoryStream();
-                        var writer = new BinaryWriter(destStream);
-                        writer.Write(srcBuf, iImageOffset, iImageSize);
-                        _ = destStream.Seek(0, SeekOrigin.Begin);
-                        bmpPngExtracted = new System.Drawing.Bitmap(destStream); // This is PNG! :)
-                        break;
-                    }
-                }
-            }
-            catch
-            {
-                return null;
-            }
-            return bmpPngExtracted;
-        }
-
         public static Sprite? GetSpriteFromMagick(
             string fileName,
             MagickReadSettings? settings = null
@@ -520,19 +422,41 @@ namespace vimage
             MagickReadSettings? settings = null
         )
         {
+            var info = MagickFormatInfo.Create(fileName);
+            if (info is null)
+                return null;
+            if (info.Format == MagickFormat.Ico)
+                return GetTextureFromMagickIco(fileName);
+
             using var image = settings is null
                 ? new MagickImage(
                     fileName,
                     new MagickReadSettings { BackgroundColor = MagickColors.None }
                 )
                 : new MagickImage(fileName, settings);
-            if (image == null)
+            if (image is null)
                 return null;
             image.Format = MagickFormat.Rgba;
             var bytes = image.GetPixels().ToByteArray(PixelMapping.RGBA);
-            if (bytes == null)
+            if (bytes is null)
                 return null;
             var texture = new Texture(image.Width, image.Height);
+            texture.Update(bytes);
+
+            return texture;
+        }
+
+        /// <summary>Gets the highest resolution image in the .ico</summary>
+        private static Texture? GetTextureFromMagickIco(string fileName)
+        {
+            using var images = new MagickImageCollection(fileName);
+            var best = images.OrderByDescending(i => i.Width * i.Height).First();
+
+            var icoImage = new MagickImage(best);
+            var bytes = icoImage.GetPixels().ToByteArray(PixelMapping.RGBA);
+            if (bytes is null)
+                return null;
+            var texture = new Texture(icoImage.Width, icoImage.Height);
             texture.Update(bytes);
 
             return texture;
