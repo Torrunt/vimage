@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using DevIL;
+using ImageMagick;
 using SFML.Graphics;
 using SFML.System;
 
@@ -125,7 +126,7 @@ namespace vimage
                         // Load image via SFML
                         try
                         {
-                            using var image = new SFML.Graphics.Image(fileStream);
+                            using var image = new Image(fileStream);
                             var imageSize = image.Size;
 
                             if (imageSize.X > TextureMaxSize || imageSize.Y > TextureMaxSize)
@@ -305,10 +306,7 @@ namespace vimage
             return largeTexture;
         }
 
-        private static Texture GetTextureFromSFMLImage(
-            SFML.Graphics.Image image,
-            IntRect area = default
-        )
+        private static Texture GetTextureFromSFMLImage(Image image, IntRect area = default)
         {
             var imageSize = image.Size;
             var bytes = image.Pixels;
@@ -330,7 +328,7 @@ namespace vimage
 
         private static DisplayObject GetLargeTextureFromSFMLImage(
             int sectionSize,
-            SFML.Graphics.Image image,
+            Image image,
             string fileName = ""
         )
         {
@@ -478,69 +476,10 @@ namespace vimage
             return bmpPngExtracted;
         }
 
-        public static Sprite? GetSpriteFromSVG(string fileName)
-        {
-            int index = TextureFileNames.IndexOf(fileName);
-
-            if (index >= 0)
-            {
-                // Texture Already Exists
-                // move it to the end of the array and return it
-                var texture = Textures[index];
-                string name = TextureFileNames[index];
-
-                Textures.RemoveAt(index);
-                TextureFileNames.RemoveAt(index);
-                Textures.Add(texture);
-                TextureFileNames.Add(name);
-
-                return new Sprite(Textures[^1]);
-            }
-            else
-            {
-                // New Texture (from .svg)
-                //  try
-                //  {
-                //      // FIXME: Test svg support
-                //      var svg = new SKSvg();
-                //      svg.Load(fileName);
-                //      if (svg.Picture == null)
-                //          return null;
-
-                //      // Decide output size (you can use Picture.CullRect for intrinsic bounds)
-                //      var bounds = svg.Picture.CullRect;
-                //      int width = (int)bounds.Width;
-                //      int height = (int)bounds.Height;
-
-                //      // Render to a bitmap
-                //      using var bitmap = new SKBitmap(width, height);
-                //      using (var canvas = new SKCanvas(bitmap))
-                //      {
-                //          canvas.Clear(SKColors.Transparent);
-                //          canvas.DrawPicture(svg.Picture);
-                //      }
-
-                //      // Encode bitmap into PNG memory stream
-                //      using var image = SKImage.FromBitmap(bitmap);
-                //      using var data = image.Encode(SKEncodedImageFormat.Png, 100);
-
-                //      using var stream = new MemoryStream();
-                //      data.SaveTo(stream);
-                //      stream.Position = 0;
-
-                //      var texture = new Texture(stream);
-                //      Textures.Add(texture);
-                //      TextureFileNames.Add(fileName);
-
-                //      return new Sprite(new Texture(texture));
-                //  }
-                //  catch (Exception) { }
-            }
-
-            return null;
-        }
-
-        public static Sprite? GetSpriteFromWebP(string fileName)
+        public static Sprite? GetSpriteFromMagick(
+            string fileName,
+            MagickReadSettings? settings = null
+        )
         {
             int index = TextureFileNames.IndexOf(fileName);
 
@@ -560,28 +499,43 @@ namespace vimage
             }
             else
             {
-                // New Texture (from .webp)
-                //  try
-                //  {
-                //      byte[] fileBytes = File.ReadAllBytes(fileName);
-                //      var bitmap = new Imazen.WebP.SimpleDecoder().DecodeFromBytes(
-                //          fileBytes,
-                //          fileBytes.Length
-                //      );
-                //      using (var stream = new MemoryStream())
-                //      {
-                //          bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                //          var texture = new Texture(stream);
-                //          Textures.Add(texture);
-                //          TextureFileNames.Add(fileName);
-
-                //          return new Sprite(new Texture(texture));
-                //      }
-                //  }
-                //  catch (Exception) { }
+                // New Texture
+                try
+                {
+                    var texture = GetTextureFromMagick(fileName, settings);
+                    if (texture == null)
+                        return null;
+                    Textures.Add(texture);
+                    TextureFileNames.Add(fileName);
+                    return new Sprite(new Texture(texture));
+                }
+                catch (Exception) { }
             }
 
             return null;
+        }
+
+        public static Texture? GetTextureFromMagick(
+            string fileName,
+            MagickReadSettings? settings = null
+        )
+        {
+            using var image = settings is null
+                ? new MagickImage(
+                    fileName,
+                    new MagickReadSettings { BackgroundColor = MagickColors.None }
+                )
+                : new MagickImage(fileName, settings);
+            if (image == null)
+                return null;
+            image.Format = MagickFormat.Rgba;
+            var bytes = image.GetPixels().ToByteArray(PixelMapping.RGBA);
+            if (bytes == null)
+                return null;
+            var texture = new Texture(image.Width, image.Height);
+            texture.Update(bytes);
+
+            return texture;
         }
 
         /// <param name="filename">Animated Image (ie: animated gif).</param>

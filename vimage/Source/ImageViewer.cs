@@ -1852,46 +1852,47 @@ namespace vimage
 
         public void RenderSVGAtCurrentZoom()
         {
-            if (CurrentZoom == 1 || !File.EndsWith(".svg", StringComparison.OrdinalIgnoreCase))
+            if (
+                CurrentZoom == 1
+                || Image is null
+                || !File.EndsWith(".svg", StringComparison.OrdinalIgnoreCase)
+            )
                 return;
-            // FIXME: Fix RenderSVGAtCurrentZoom
-            //   try
-            //   {
-            //       var svg = Svg.SvgDocument.Open(File);
 
-            //       float zoom = Size.X.Value * CurrentZoom / svg.Width.Value;
+            var targetWidth = (uint)(Size.X * CurrentZoom);
+            var targetHeight = (uint)(Size.Y * CurrentZoom);
 
-            //       svg.Width  *= zoom;
-            //       svg.Height *= zoom;
-            //       if (svg.ViewBox == default)
-            //           svg.ViewBox = new Svg.SvgViewBox(0, 0, svg.Width / zoom, svg.Height / zoom);
+            var densityX = targetWidth / (Size.X / 72.0);
+            var densityY = targetHeight / (Size.Y / 72.0);
 
-            //       System.Drawing.Bitmap bitmap = svg.Draw();
-            //       using (MemoryStream stream = new MemoryStream())
-            //       {
-            //           bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-            //           Sprite sprite = new Sprite(new Texture(new Texture(stream)));
-            //           if (sprite?.Texture == null)
-            //               return;
+            var texture = Graphics.GetTextureFromMagick(
+                File,
+                new ImageMagick.MagickReadSettings
+                {
+                    Density = new ImageMagick.Density(densityX, densityY),
+                    Width = targetWidth,
+                    Height = targetHeight,
+                    BackgroundColor = ImageMagick.MagickColors.None,
+                }
+            );
+            if (texture == null)
+                return;
 
-            //           Image = sprite;
-            //           Size = Image.Texture.Size;
-            //           Window.SetView(
-            //               new View(Window.DefaultView)
-            //               {
-            //                   Center = new Vector2f(Size.X / 2f, Size.Y / 2f),
-            //                   Size = new Vector2f(Size.X, Size.Y),
-            //               }
-            //           );
+            Image = new Sprite(new Texture(texture));
+            Size = Image.Texture.Size;
 
-            //           // Zoom, Flip and Rotate
-            //           Zoom(1f);
-            //           AutomaticallyZoomed = false;
-            //           FlippedX = false;
-            //           RotateImage(DefaultRotation);
-            //       }
-            //   }
-            //   catch (Exception) { }
+            Window.SetView(
+                new View(Window.DefaultView)
+                {
+                    Center = new Vector2f(Size.X / 2f, Size.Y / 2f),
+                    Size = new Vector2f(Size.X, Size.Y),
+                }
+            );
+            // Zoom, Flip and Rotate
+            Zoom(1f);
+            AutomaticallyZoomed = false;
+            FlippedX = false;
+            RotateImage(DefaultRotation);
         }
 
         ///////////////////////////

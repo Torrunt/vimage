@@ -1145,11 +1145,7 @@ namespace vimage.Common
             writer.Write("}" + Environment.NewLine);
         }
 
-        private static void WriteContextMenuItems(
-            StreamWriter writer,
-            List<object> items,
-            int depth = 1
-        )
+        private static void WriteContextMenuItems(StreamWriter writer, IList items, int depth = 1)
         {
             if (items == null)
                 return;
@@ -1169,19 +1165,20 @@ namespace vimage.Common
                             + Environment.NewLine
                     );
                     i++;
-                    WriteContextMenuItems(writer, items[i] as List<object>, depth + 1);
+                    if (items[i] is IList itemList)
+                        WriteContextMenuItems(writer, itemList, depth + 1);
                     writer.Write(VariableAmountOfStrings(depth, "\t") + "}" + Environment.NewLine);
                 }
-                else
+                else if (items[i] is ContextMenuItem contextMenuItem)
                 {
                     // Item
-                    var itemName = (items[i] as dynamic).name as string;
+                    var itemName = contextMenuItem.name;
                     if (itemName is not null)
                     {
                         var itemFunc = (string)(
-                            (items[i] as dynamic).func is Action action
+                            contextMenuItem.func is Action action
                                 ? action.ToNameString()
-                                : (items[i] as dynamic).func
+                                : contextMenuItem.func
                         );
                         if (itemName.Equals("-"))
                             writer.Write("-" + Environment.NewLine);
