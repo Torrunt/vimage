@@ -419,7 +419,8 @@ namespace vimage
 
         public static Texture? GetTextureFromMagick(
             string fileName,
-            MagickReadSettings? settings = null
+            MagickReadSettings? settings = null,
+            bool cache = true
         )
         {
             using var image = GetMagickImage(fileName, settings);
@@ -428,6 +429,11 @@ namespace vimage
             var bytes = image.GetPixels().ToByteArray(PixelMapping.RGBA);
             var texture = new Texture(image.Width, image.Height);
             texture.Update(bytes);
+            if (cache)
+            {
+                Textures.Add(texture);
+                TextureFileNames.Add(fileName);
+            }
 
             return texture;
         }
@@ -491,7 +497,6 @@ namespace vimage
                 else
                 {
                     // New AnimatedImageData
-                    var image = System.Drawing.Image.FromFile(fileName);
                     var data = new AnimatedImageData();
 
                     // Store AnimatedImageData
@@ -503,7 +508,7 @@ namespace vimage
                         RemoveAnimatedImage();
 
                     // Get Frames
-                    var loadingAnimatedImage = new LoadingAnimatedImage(image, data);
+                    var loadingAnimatedImage = new LoadingAnimatedImage(fileName, data);
                     var loadFramesThread = new Thread(
                         new ThreadStart(loadingAnimatedImage.LoadFrames)
                     )
@@ -638,53 +643,38 @@ namespace vimage
         }
     }
 
-    internal class LoadingAnimatedImage(System.Drawing.Image image, AnimatedImageData data)
+    internal class LoadingAnimatedImage(string fileName, AnimatedImageData data)
     {
-        private readonly System.Drawing.Image Image = image;
-        private ImageManipulation.OctreeQuantizer? Quantizer;
+        private readonly string FileName = fileName;
         private readonly AnimatedImageData Data = data;
 
         public void LoadFrames()
         {
-            // Get Frame Count
-            var frameDimension = new System.Drawing.Imaging.FrameDimension(
-                Image.FrameDimensionsList[0]
+            // In Magick.NET, animated images are stored as a collection of frames
+            using var collection = new MagickImageCollection(
+                FileName,
+                new MagickReadSettings { BackgroundColor = MagickColors.None }
             );
-            Data.FrameCount = Image.GetFrameCount(frameDimension);
+            collection.Coalesce();
+
+            Data.FrameCount = collection.Count;
             Data.Frames = new Texture[Data.FrameCount];
             Data.FrameDelays = new int[Data.FrameCount];
 
-            // Get Frame Delays
-            byte[]? frameDelays = null;
-            try
-            {
-                var frameDelaysItem = Image.GetPropertyItem(0x5100);
-                frameDelays = frameDelaysItem.Value;
-                if (
-                    frameDelays.Length == 0
-                    || (frameDelays[0] == 0 && frameDelays.All(d => d == 0))
-                )
-                    frameDelays = null;
-            }
-            catch { }
             int defaultFrameDelay = AnimatedImage.DEFAULT_FRAME_DELAY;
-            if (frameDelays != null && frameDelays.Length > 1)
-                defaultFrameDelay = (frameDelays[0] + frameDelays[1] * 256) * 10;
 
             for (int i = 0; i < Data.FrameCount; i++)
             {
                 if (Data.CancelLoading)
                     return;
 
-                _ = Image.SelectActiveFrame(frameDimension, i);
-                Quantizer = new ImageManipulation.OctreeQuantizer(255, 8);
+                using var frame = collection[i];
 
-                var quantized = Quantizer.Quantize(Image);
-                var stream = new MemoryStream();
-                quantized.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                Data.Frames[i] = new Texture(stream);
+                var bytes = frame.GetPixelsUnsafe().ToByteArray(PixelMapping.RGBA);
+                var texture = new Texture(frame.Width, frame.Height);
+                texture.Update(bytes);
 
-                stream.Dispose();
+                Data.Frames[i] = texture;
 
                 if (Data.CancelLoading)
                     return;
@@ -693,12 +683,11 @@ namespace vimage
                 if (Data.Mipmap)
                     Data.Frames[i].GenerateMipmap();
 
-                int fd = i * 4;
-                Data.FrameDelays[i] =
-                    frameDelays != null && frameDelays.Length > fd
-                        ? (frameDelays[fd] + frameDelays[fd + 1] * 256) * 10
-                        : defaultFrameDelay;
+                // Delay is stored in 1/100ths of a second
+                var delay = frame.AnimationDelay * 10;
+                Data.FrameDelays[i] = delay > 0 ? (int)delay : defaultFrameDelay;
             }
+
             Data.FullyLoaded = true;
         }
     }

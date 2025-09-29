@@ -157,7 +157,29 @@ namespace vimage
         public static bool IsSupportedFileType(string fileName)
         {
             var info = ImageMagick.MagickFormatInfo.Create(fileName);
-            return info is not null && info.SupportsReading;
+            if (info is null || !info.SupportsReading)
+                return false;
+
+            return info.Format switch
+            {
+                ImageMagick.MagickFormat.Pdf => false,
+                _ => true,
+            };
+        }
+
+        public static bool IsAnimatedImage(string fileName)
+        {
+            var info = ImageMagick.MagickFormatInfo.Create(fileName);
+            if (info is null || !info.SupportsReading || !info.SupportsMultipleFrames)
+                return false;
+
+            return info.Format switch
+            {
+                ImageMagick.MagickFormat.Ico
+                or ImageMagick.MagickFormat.Icon
+                or ImageMagick.MagickFormat.Pdf => false,
+                _ => true,
+            };
         }
     }
 }

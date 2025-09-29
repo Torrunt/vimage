@@ -1841,7 +1841,8 @@ namespace vimage
                     Width = targetWidth,
                     Height = targetHeight,
                     BackgroundColor = ImageMagick.MagickColors.None,
-                }
+                },
+                false
             );
             if (texture == null)
                 return;
@@ -1871,54 +1872,10 @@ namespace vimage
         {
             File = fileName;
 
-            var extension = Path.GetExtension(fileName).ToLowerInvariant();
-
-            //   Console.WriteLine(extension);
-            //   var (mimeTypes, desc) = MimeTypes.GetFileType(fileName);
-            //   Console.WriteLine(mimeTypes);
-            //   Console.WriteLine(desc);
-
-            // Image
-
-            if (extension.Equals(".gif"))
-            {
-                // Animated GIF
+            if (ImageViewerUtils.IsAnimatedImage(fileName))
                 Image = Graphics.GetAnimatedImage(fileName);
-            }
             else
-            {
                 Image = Graphics.GetSpriteFromMagick(fileName);
-            }
-
-            //   if (extension.Equals(".svg"))
-            //   {
-            //       // SVG
-            //       Image = Graphics.GetSpriteFromSVG(fileName);
-            //   }
-            //   else if (extension.Equals(".gif"))
-            //   {
-            //       // Animated GIF
-            //       Image = Graphics.GetAnimatedImage(fileName);
-            //   }
-            //   else if (extension.Equals(".ico"))
-            //   {
-            //       // Icon
-            //       Image = Graphics.GetSpriteFromIcon(fileName);
-            //   }
-            //   else if (extension.Equals(".webp"))
-            //   {
-            //       // WebP
-            //       Image = Graphics.GetSpriteFromMagick(fileName);
-            //   }
-            //   else
-            //   {
-            //       // Other
-            //       var texture = Graphics.GetTexture(fileName);
-            //       if (texture is Texture texture1)
-            //           Image = new Sprite(texture1);
-            //       else if (texture is DisplayObject displayObject)
-            //           Image = displayObject;
-            //   }
 
             if (Image?.Texture == null)
                 return false;
@@ -2204,51 +2161,16 @@ namespace vimage
         /// <summary>Loads an image into memory but doesn't set it as the displayed image.</summary>
         private static bool PreloadImage(string fileName)
         {
-            string extension = Path.GetExtension(fileName).ToLowerInvariant();
-
-            // Image
-            if (extension.Equals(".gif"))
+            if (ImageViewerUtils.IsAnimatedImage(fileName))
             {
-                // Animated GIF
-                if (Graphics.GetAnimatedImageData(fileName) == null)
+                if (Graphics.GetAnimatedImageData(fileName) is null)
                     return false;
             }
             else
             {
-                if (Graphics.GetSpriteFromMagick(fileName) == null)
+                if (Graphics.GetTextureFromMagick(fileName) is null)
                     return false;
             }
-
-            //   if (extension.Equals(".svg"))
-            //   {
-            //       // SVG
-            //       if (Graphics.GetSpriteFromSVG(fileName) == null)
-            //           return false;
-            //   }
-            //   else if (extension.Equals(".gif"))
-            //   {
-            //       // Animated GIF
-            //       if (Graphics.GetAnimatedImageData(fileName) == null)
-            //           return false;
-            //   }
-            //   else if (extension.Equals(".ico"))
-            //   {
-            //       // Icon
-            //       if (Graphics.GetSpriteFromIcon(fileName) == null)
-            //           return false;
-            //   }
-            //   else if (extension.Equals(".webp"))
-            //   {
-            //       // WebP
-            //       if (Graphics.GetSpriteFromMagick(fileName) == null)
-            //           return false;
-            //   }
-            //   else
-            //   {
-            //       // Other
-            //       if (Graphics.GetTexture(fileName) == null)
-            //           return false;
-            //   }
 
             return true;
         }
