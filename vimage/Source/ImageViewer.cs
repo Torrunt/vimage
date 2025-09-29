@@ -219,50 +219,34 @@ namespace vimage
                 )
             )
             {
-                // Get parent folder name
-                //string parentFolder = Path.GetFileName(Path.GetDirectoryName(file));
-
                 // Get sort column info from window with corresponding name
-                // FIXME: Fix get window sorting
-                //  try
-                //  {
-                //      // var shellWindows = new SHDocVw.ShellWindows();
-                //      // foreach (SHDocVw.ShellBrowserWindow shellWindow in shellWindows)
-                //      // {
-                //      //     if (shellWindow.LocationName != parentFolder)
-                //      //         continue;
+                var sort = WindowsFileSorting.GetWindowsSortOrder(file);
+                if (sort is not null)
+                {
+                    // Direction
+                    if (sort[0] == '-')
+                    {
+                        sort = sort[1..];
 
-                //      //     Shell32.ShellFolderView view = (Shell32.ShellFolderView)
-                //      //         shellWindow.Document;
+                        if (SortImagesByDir == SortDirection.FolderDefault)
+                            SortImagesByDir = SortDirection.Descending;
+                    }
+                    else if (SortImagesByDir == SortDirection.FolderDefault)
+                        SortImagesByDir = SortDirection.Ascending;
 
-                //      string sort = view.SortColumns; // can be sorted by multiple columns (eg: date then name) - we will just look at the first one
-                //      sort = sort[5..sort.IndexOf(';')];
-
-                //      // Direction
-                //      if (sort[0] == '-')
-                //      {
-                //          sort = sort[1..];
-
-                //          if (SortImagesByDir == SortDirection.FolderDefault)
-                //              SortImagesByDir = SortDirection.Descending;
-                //      }
-                //      else if (SortImagesByDir == SortDirection.FolderDefault)
-                //          SortImagesByDir = SortDirection.Ascending;
-
-                //      // By
-                //      if (SortImagesBy == SortBy.FolderDefault)
-                //      {
-                //          SortImagesBy = sort switch
-                //          {
-                //              "System.ItemDate" => SortBy.Date,
-                //              "System.DateModified" => SortBy.DateModified,
-                //              "System.DateCreated" => SortBy.DateCreated,
-                //              "System.Size" => SortBy.Size,
-                //              _ => SortBy.Name,
-                //          };
-                //      }
-                //  }
-                //  catch (Exception) { }
+                    // By
+                    if (SortImagesBy == SortBy.FolderDefault)
+                    {
+                        SortImagesBy = sort switch
+                        {
+                            "System.ItemDate" => SortBy.Date,
+                            "System.DateModified" => SortBy.DateModified,
+                            "System.DateCreated" => SortBy.DateCreated,
+                            "System.Size" => SortBy.Size,
+                            _ => SortBy.Name,
+                        };
+                    }
+                }
             }
             // Default sorting if folder was closed
             if (SortImagesBy == SortBy.FolderDefault)
