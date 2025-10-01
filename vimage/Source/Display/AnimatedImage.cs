@@ -133,12 +133,7 @@ namespace vimage
             CurrentFrame = number;
             Finished = CurrentFrame == TotalFrames - 1;
 
-            RemoveChild(Sprite);
-            Sprite = new Sprite(Data.Frames[CurrentFrame]);
-            if (Color != Color.White)
-                Sprite.Color = Color;
-            AddChild(Sprite);
-
+            Sprite.Texture = Data.Frames[CurrentFrame];
             CurrentFrameDelay = Data.FrameDelays[CurrentFrame];
 
             return true;

@@ -301,9 +301,9 @@ namespace vimage
                 doRedraw = false;
 
                 // Animated Image?
-                if (Image is AnimatedImage)
+                if (Image is AnimatedImage animatedImage)
                 {
-                    bool imageUpdated = Image.Update((float)clock.Elapsed.TotalMilliseconds);
+                    var imageUpdated = animatedImage.Update((float)clock.Elapsed.TotalMilliseconds);
                     if (!Updated && imageUpdated)
                         doRedraw = true;
                 }
@@ -413,16 +413,19 @@ namespace vimage
 
         private void Redraw()
         {
-            //Window.SetActive();
             // Clear screen
             if (!BackgroundsForImagesWithTransparency && !ShowTitleBar)
+            {
                 Window.Clear(new Color(0, 0, 0, 0));
+            }
             else
+            {
                 Window.Clear(
                     ShowTitleBar
                         ? new Color(BackgroundColour.R, BackgroundColour.G, BackgroundColour.B)
                         : BackgroundColour
                 );
+            }
             // Draw Image
             Window.Draw(Image);
             // Draw Other
@@ -1372,7 +1375,8 @@ namespace vimage
         public void ResetImage()
         {
             // Reset size / crops
-            Size = Image.Texture.Size;
+            if (Image is not null)
+                Size = Image.Texture.Size;
             Window.SetView(
                 new View(Window.DefaultView)
                 {
@@ -1391,7 +1395,8 @@ namespace vimage
             if (ImageColor != Color.White)
             {
                 ImageColor = Color.White;
-                Image.Color = ImageColor;
+                if (Image is not null)
+                    Image.Color = ImageColor;
             }
 
             // Click-Through-Able?
@@ -1532,7 +1537,8 @@ namespace vimage
             }
             else
                 ImageColor = Color.White;
-            Image.Color = ImageColor;
+            if (Image is not null)
+                Image.Color = ImageColor;
             Updated = true;
 
             return true;
@@ -1564,14 +1570,16 @@ namespace vimage
                         255
                     )
             );
-            Image.Color = ImageColor;
+            if (Image is not null)
+                Image.Color = ImageColor;
             Updated = true;
         }
 
         public void SetImageTransparency(byte alpha = 255)
         {
             ImageColor = new Color(ImageColor.R, ImageColor.G, ImageColor.B, alpha);
-            Image.Color = ImageColor;
+            if (Image is not null)
+                Image.Color = ImageColor;
             Updated = true;
         }
 
@@ -1881,6 +1889,7 @@ namespace vimage
                 return false;
 
             Size = Image.Texture.Size;
+            // FIXME: Use Magick.NET for Exif info
             DefaultRotation = ImageViewerUtils.GetDefaultRotationFromEXIF(fileName);
 
             return true;

@@ -426,7 +426,8 @@ namespace vimage
             using var image = GetMagickImage(fileName, settings);
             if (image is null)
                 return null;
-            var bytes = image.GetPixels().ToByteArray(PixelMapping.RGBA);
+            using var pixels = image.GetPixels();
+            var bytes = pixels.ToByteArray(PixelMapping.RGBA);
             var texture = new Texture(image.Width, image.Height);
             texture.Update(bytes);
             if (cache)
@@ -670,22 +671,18 @@ namespace vimage
 
                 using var frame = collection[i];
 
-                var bytes = frame.GetPixelsUnsafe().ToByteArray(PixelMapping.RGBA);
+                var delay = frame.AnimationDelay * 10;
+                Data.FrameDelays[i] = delay > 0 ? (int)delay : defaultFrameDelay;
+
+                using var pixels = frame.GetPixelsUnsafe();
+                var bytes = pixels.ToByteArray(PixelMapping.RGBA);
                 var texture = new Texture(frame.Width, frame.Height);
                 texture.Update(bytes);
 
                 Data.Frames[i] = texture;
-
-                if (Data.CancelLoading)
-                    return;
-
-                Data.Frames[i].Smooth = Data.Smooth;
+                texture.Smooth = Data.Smooth;
                 if (Data.Mipmap)
-                    Data.Frames[i].GenerateMipmap();
-
-                // Delay is stored in 1/100ths of a second
-                var delay = frame.AnimationDelay * 10;
-                Data.FrameDelays[i] = delay > 0 ? (int)delay : defaultFrameDelay;
+                    texture.GenerateMipmap();
             }
 
             Data.FullyLoaded = true;
