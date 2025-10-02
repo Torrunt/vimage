@@ -1889,7 +1889,6 @@ namespace vimage
                 return false;
 
             Size = Image.Texture.Size;
-            // FIXME: Use Magick.NET for Exif info
             DefaultRotation = ImageViewerUtils.GetDefaultRotationFromEXIF(fileName);
 
             return true;

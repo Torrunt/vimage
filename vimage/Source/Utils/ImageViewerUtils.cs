@@ -109,47 +109,49 @@ namespace vimage
         /// <summary>Returns Orientation from the EXIF data of a jpg.</summary>
         public static int GetDefaultRotationFromEXIF(string fileName)
         {
-            string extension = System.IO.Path.GetExtension(fileName).ToLowerInvariant();
-            if (!(extension == ".jpg" || extension == ".jpeg" || extension == ".jpe"))
-                return 0;
-            try
-            {
-                var file = ExifLibrary.ImageFile.FromFile(fileName);
-                var orientation = file
-                    .Properties.Get<ExifLibrary.ExifEnumProperty<ExifLibrary.Orientation>>(
-                        ExifLibrary.ExifTag.Orientation
-                    )
-                    .Value;
+            using var image = new ImageMagick.MagickImage();
+            image.Ping(fileName);
 
-                return orientation switch
-                {
-                    ExifLibrary.Orientation.Flipped => 0,
-                    ExifLibrary.Orientation.FlippedAndRotated180 => 0,
-                    ExifLibrary.Orientation.FlippedAndRotatedLeft => 0,
-                    ExifLibrary.Orientation.FlippedAndRotatedRight => 0,
-                    ExifLibrary.Orientation.Normal => 0,
-                    ExifLibrary.Orientation.Rotated180 => 180,
-                    ExifLibrary.Orientation.RotatedLeft => 270,
-                    ExifLibrary.Orientation.RotatedRight => 90,
-                    _ => 0,
-                };
-            }
-            catch (Exception) { }
-            return 0;
+            var exif = image.GetExifProfile();
+            if (exif is null)
+                return 0;
+
+            var orientation = exif.GetValue(ImageMagick.ExifTag.Orientation)?.Value ?? 1;
+            return orientation switch
+            {
+                3 or 4 => 180,
+                5 or 6 => 90,
+                7 or 8 => 270,
+                _ => 0,
+            };
         }
 
         /// <summary>Returns DateTime from EXIF data or the FileInfo is there isn't one</summary>
         public static DateTime GetDateValueFromEXIF(string fileName)
         {
-            try
+            using var image = new ImageMagick.MagickImage();
+            image.Ping(fileName);
+
+            var exif = image.GetExifProfile();
+            if (exif is null)
+                return new System.IO.FileInfo(fileName).LastWriteTime;
+
+            var dateTime = exif.GetValue(ImageMagick.ExifTag.DateTime);
+            if (dateTime == null || string.IsNullOrWhiteSpace(dateTime.Value))
+                return new System.IO.FileInfo(fileName).LastWriteTime;
+
+            if (
+                DateTime.TryParseExact(
+                    dateTime.Value,
+                    "yyyy:MM:dd HH:mm:ss",
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.None,
+                    out var parsed
+                )
+            )
             {
-                var file = ExifLibrary.ImageFile.FromFile(fileName);
-                var dateTime = file.Properties.Get<ExifLibrary.ExifDateTime>(
-                    ExifLibrary.ExifTag.DateTime
-                );
-                return dateTime.Value;
+                return parsed;
             }
-            catch (Exception) { }
 
             return new System.IO.FileInfo(fileName).LastWriteTime;
         }
