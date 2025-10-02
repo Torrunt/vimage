@@ -651,12 +651,8 @@ namespace vimage
 
         public void LoadFrames()
         {
-            // In Magick.NET, animated images are stored as a collection of frames
-            using var collection = new MagickImageCollection(
-                FileName,
-                new MagickReadSettings { BackgroundColor = MagickColors.None }
-            );
-            collection.Coalesce();
+            using var collection = new MagickImageCollection();
+            collection.Ping(FileName);
 
             Data.FrameCount = collection.Count;
             Data.Frames = new Texture[Data.FrameCount];
@@ -664,28 +660,51 @@ namespace vimage
 
             int defaultFrameDelay = AnimatedImage.DEFAULT_FRAME_DELAY;
 
+            // Load first frame (so it can be shown as soon as possible)
+            ReadAndLoadFrame(0);
+
+            // Process the rest
+            collection.Read(FileName);
+            collection.Coalesce();
             for (int i = 0; i < Data.FrameCount; i++)
             {
                 if (Data.CancelLoading)
                     return;
-
                 using var frame = collection[i];
-
-                var delay = frame.AnimationDelay * 10;
-                Data.FrameDelays[i] = delay > 0 ? (int)delay : defaultFrameDelay;
-
-                using var pixels = frame.GetPixelsUnsafe();
-                var bytes = pixels.ToByteArray(PixelMapping.RGBA);
-                var texture = new Texture(frame.Width, frame.Height);
-                texture.Update(bytes);
-
-                Data.Frames[i] = texture;
-                texture.Smooth = Data.Smooth;
-                if (Data.Mipmap)
-                    texture.GenerateMipmap();
+                LoadFrame(frame, i);
             }
 
             Data.FullyLoaded = true;
+        }
+
+        public void LoadFrame(IMagickImage<byte> frame, int index)
+        {
+            var delay = frame.AnimationDelay * 10;
+            Data.FrameDelays[index] = delay > 0 ? (int)delay : AnimatedImage.DEFAULT_FRAME_DELAY;
+
+            using var pixels = frame.GetPixelsUnsafe();
+            var bytes = pixels.ToByteArray(PixelMapping.RGBA);
+            var texture = new Texture(frame.Width, frame.Height);
+            texture.Update(bytes);
+
+            Data.Frames[index] = texture;
+            texture.Smooth = Data.Smooth;
+            if (Data.Mipmap)
+                texture.GenerateMipmap();
+        }
+
+        public void ReadAndLoadFrame(int index)
+        {
+            using var frame = new MagickImage(
+                FileName,
+                new MagickReadSettings
+                {
+                    FrameIndex = (uint)index,
+                    FrameCount = 1,
+                    BackgroundColor = MagickColors.None,
+                }
+            );
+            LoadFrame(frame, index);
         }
     }
 }

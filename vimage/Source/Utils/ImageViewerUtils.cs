@@ -160,6 +160,9 @@ namespace vimage
             if (info is null || !info.SupportsReading)
                 return false;
 
+            if (info.SupportsMultipleFrames && !IsSupportedAnimatedImage(info))
+                return false;
+
             return info.Format switch
             {
                 ImageMagick.MagickFormat.Pdf => false,
@@ -173,12 +176,19 @@ namespace vimage
             if (info is null || !info.SupportsReading || !info.SupportsMultipleFrames)
                 return false;
 
+            return IsSupportedAnimatedImage(info);
+        }
+
+        private static bool IsSupportedAnimatedImage(ImageMagick.IMagickFormatInfo info)
+        {
             return info.Format switch
             {
-                ImageMagick.MagickFormat.Ico
-                or ImageMagick.MagickFormat.Icon
-                or ImageMagick.MagickFormat.Pdf => false,
-                _ => true,
+                ImageMagick.MagickFormat.Gif
+                or ImageMagick.MagickFormat.Gif87
+                or ImageMagick.MagickFormat.WebP
+                or ImageMagick.MagickFormat.APng
+                or ImageMagick.MagickFormat.Mng => true,
+                _ => false,
             };
         }
     }
