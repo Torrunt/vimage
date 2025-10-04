@@ -41,13 +41,10 @@ namespace vimage
             }
             catch (DllNotFoundException)
             {
-                if (OperatingSystem.IsWindowsVersionAtLeast(6, 1))
-                {
-                    System.Windows.Forms.MessageBox.Show(
-                        "vimage failed to find DevIL.dll.\nIf problem persists, try disabling DevIL in the settings.",
-                        "vimage - DevIL.dll not found"
-                    );
-                }
+                System.Windows.Forms.MessageBox.Show(
+                    "vimage failed to find DevIL.dll.\nIf problem persists, try disabling DevIL in the settings.",
+                    "vimage - DevIL.dll not found"
+                );
             }
         }
 
@@ -148,15 +145,12 @@ namespace vimage
                         }
                         catch (SFML.LoadingFailedException)
                         {
-                            if (OperatingSystem.IsWindowsVersionAtLeast(6, 1))
-                            {
-                                System.Windows.Forms.MessageBox.Show(
-                                    "Failed to load image:\n"
-                                        + fileName
-                                        + ".\n\nTry changing \"Use DevIL\" on in the settings to help with this issue.",
-                                    "vimage - SFML Image Loading Failed"
-                                );
-                            }
+                            System.Windows.Forms.MessageBox.Show(
+                                "Failed to load image:\n"
+                                    + fileName
+                                    + ".\n\nTry changing \"Use DevIL\" on in the settings to help with this issue.",
+                                "vimage - SFML Image Loading Failed"
+                            );
                             return null;
                         }
                     }

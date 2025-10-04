@@ -305,6 +305,13 @@ namespace vimage_settings
             {
                 if (_Dragging == value)
                     return;
+
+                if (ParentPanel is null || ParentCanvas is null)
+                {
+                    _Dragging = value;
+                    return;
+                }
+
                 if (!Dragging)
                 {
                     int index = ParentPanel.Children.IndexOf(this);

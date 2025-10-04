@@ -155,21 +155,30 @@ namespace vimage
                 if (name.StartsWith(':'))
                 {
                     // sub item
-                    var dropDownItem = Items[Items.Count - 1] as ToolStripDropDownItem;
-                    ((ToolStripDropDownMenu)dropDownItem.DropDown).ShowImageMargin = ImageViewer
-                        .Config
-                        .ContextMenuShowMarginSub;
-                    name = name[1..];
-                    while (name.StartsWith(':'))
+                    if (Items[Items.Count - 1] is ToolStripDropDownItem dropDownItem)
                     {
-                        if (dropDownItem.DropDownItems.Count > 0)
-                            dropDownItem =
-                                dropDownItem.DropDownItems[dropDownItem.DropDownItems.Count - 1]
-                                as ToolStripDropDownItem;
+                        if (dropDownItem.DropDown is ToolStripDropDownMenu dropDownMenu)
+                        {
+                            dropDownMenu.ShowImageMargin = ImageViewer
+                                .Config
+                                .ContextMenuShowMarginSub;
+                        }
                         name = name[1..];
-                    }
+                        while (name.StartsWith(':'))
+                        {
+                            if (
+                                dropDownItem.DropDownItems.Count > 0
+                                && dropDownItem.DropDownItems[dropDownItem.DropDownItems.Count - 1]
+                                    is ToolStripDropDownItem subDropDownitem
+                            )
+                            {
+                                dropDownItem = subDropDownitem;
+                            }
+                            name = name[1..];
+                        }
 
-                    item = dropDownItem.DropDownItems.Add(name);
+                        item = dropDownItem.DropDownItems.Add(name);
+                    }
                 }
                 else
                 {
@@ -179,10 +188,12 @@ namespace vimage
                 if (name.Equals("-"))
                     continue;
 
-                if (itemClickable)
-                    item.Click += ContexMenuItemClicked;
-
-                item.Name = name;
+                if (item is not null)
+                {
+                    if (itemClickable)
+                        item.Click += ContexMenuItemClicked;
+                    item.Name = name;
+                }
             }
 
             var websiteItem = GetItemByFunc(Action.VisitWebsite);
@@ -200,13 +211,17 @@ namespace vimage
                 if (Items_General[FileNameItem].Contains("[filename]"))
                 {
                     // File Name
-                    Items[Items_General[FileNameItem]].Text = Items_General[FileNameItem]
-                        .Replace(
-                            "[filename]",
-                            ImageViewer.File == ""
-                                ? "Clipboard Image"
-                                : ImageViewer.File[(ImageViewer.File.LastIndexOf('\\') + 1)..]
-                        );
+                    var fileNameItem = Items[Items_General[FileNameItem]];
+                    if (fileNameItem is not null)
+                    {
+                        fileNameItem.Text = Items_General[FileNameItem]
+                            .Replace(
+                                "[filename]",
+                                ImageViewer.File == ""
+                                    ? "Clipboard Image"
+                                    : ImageViewer.File[(ImageViewer.File.LastIndexOf('\\') + 1)..]
+                            );
+                    }
                 }
                 else if (Items_General[FileNameItem].Contains("[filename"))
                 {
@@ -226,22 +241,26 @@ namespace vimage
                             || fileName.LastIndexOf('.') <= nameLength
                         )
                             nameLength = fileName.Length;
-                        Items[Items_General[FileNameItem]].Text =
-                            (a > 10 ? Items_General[FileNameItem][..(a - 10)] : "")
-                            + (
-                                fileName.Length > nameLength
-                                    ? fileName[..nameLength] + ".." + extension
-                                    : fileName
-                            )
-                            + (
-                                b < Items_General[FileNameItem].Length - 1
-                                    ? Items_General[FileNameItem][(b + 1)..]
-                                    : ""
-                            );
-                        Items[Items_General[FileNameItem]].ToolTipText =
-                            fileName.Length > nameLength ? fileName : "";
-                        Items[Items_General[FileNameItem]].MouseEnter += ItemMouseEnter;
-                        Items[Items_General[FileNameItem]].MouseLeave += ItemMouseLeave;
+
+                        var fileNameItem = Items[Items_General[FileNameItem]];
+                        if (fileNameItem is not null)
+                        {
+                            fileNameItem.Text =
+                                (a > 10 ? Items_General[FileNameItem][..(a - 10)] : "")
+                                + (
+                                    fileName.Length > nameLength
+                                        ? fileName[..nameLength] + ".." + extension
+                                        : fileName
+                                )
+                                + (
+                                    b < Items_General[FileNameItem].Length - 1
+                                        ? Items_General[FileNameItem][(b + 1)..]
+                                        : ""
+                                );
+                            fileNameItem.ToolTipText = fileName.Length > nameLength ? fileName : "";
+                            fileNameItem.MouseEnter += ItemMouseEnter;
+                            fileNameItem.MouseLeave += ItemMouseLeave;
+                        }
                     }
                 }
             }
@@ -315,14 +334,18 @@ namespace vimage
                 item.Checked = ImageViewer.SortImagesByDir == SortDirection.Descending;
         }
 
-        private void ContexMenuItemClicked(object sender, EventArgs e)
+        private void ContexMenuItemClicked(object? sender, EventArgs e)
         {
-            var item = sender as ToolStripItem;
+            if (sender is not ToolStripItem item)
+                return;
 
-            if (!(item as ToolStripDropDownItem).HasDropDownItems)
+            if (
+                item is ToolStripDropDownItem toolStripDropDownItem
+                && !toolStripDropDownItem.HasDropDownItems
+            )
                 Close();
 
-            var func = FuncByName[item.Name];
+            var func = FuncByName[item.Name ?? ""];
             if (func is string funcName)
             {
                 for (int i = 0; i < ImageViewer.Config.CustomActions.Count; i++)
@@ -349,9 +372,10 @@ namespace vimage
         {
             for (int i = 0; i < collection.Count; i++)
             {
-                if (collection[i].Name == "")
+                var name = collection[i].Name;
+                if (name is null || name == "")
                     continue;
-                object currentFunc = FuncByName[collection[i].Name];
+                object currentFunc = FuncByName[name];
                 if (currentFunc is Action action && action == func)
                     return collection[i] as ToolStripMenuItem;
 
@@ -394,8 +418,10 @@ namespace vimage
             ToolTip.Draw += new DrawToolTipEventHandler(ToolTipDraw);
         }
 
-        private void ToolTipDraw(object sender, DrawToolTipEventArgs e)
+        private void ToolTipDraw(object? sender, DrawToolTipEventArgs e)
         {
+            if (ToolTip is null)
+                return;
             var bounds = e.Bounds;
             bounds.Height -= 1;
             var newArgs = new DrawToolTipEventArgs(
@@ -412,10 +438,11 @@ namespace vimage
             newArgs.DrawText(TextFormatFlags.VerticalCenter);
         }
 
-        private void ItemMouseEnter(object sender, EventArgs e)
+        private void ItemMouseEnter(object? sender, EventArgs e)
         {
-            var item = sender as ToolStripMenuItem;
-            ToolTip.Show(
+            if (sender is not ToolStripMenuItem item || item.Owner is null)
+                return;
+            ToolTip?.Show(
                 item.ToolTipText,
                 item.Owner,
                 item.Bounds.Location.X + 8,
@@ -423,10 +450,11 @@ namespace vimage
             );
         }
 
-        private void ItemMouseLeave(object sender, EventArgs e)
+        private void ItemMouseLeave(object? sender, EventArgs e)
         {
-            var item = sender as ToolStripMenuItem;
-            ToolTip.Hide(item.Owner);
+            if (sender is not ToolStripMenuItem item || item.Owner is null)
+                return;
+            ToolTip?.Hide(item.Owner);
         }
     }
 }

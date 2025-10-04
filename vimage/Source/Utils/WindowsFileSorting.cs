@@ -19,17 +19,17 @@ namespace vimage
 
         public sealed class NaturalStringComparer : IComparer<string>
         {
-            public int Compare(string a, string b)
+            public int Compare(string? a, string? b)
             {
-                return SafeNativeMethods.StrCmpLogicalW(a, b);
+                return SafeNativeMethods.StrCmpLogicalW(a ?? "", b ?? "");
             }
         }
 
         public sealed class NaturalFileInfoNameComparer : IComparer<FileInfo>
         {
-            public int Compare(FileInfo a, FileInfo b)
+            public int Compare(FileInfo? a, FileInfo? b)
             {
-                return SafeNativeMethods.StrCmpLogicalW(a.Name, b.Name);
+                return SafeNativeMethods.StrCmpLogicalW(a?.Name ?? "", b?.Name ?? "");
             }
         }
 
