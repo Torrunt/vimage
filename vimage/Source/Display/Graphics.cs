@@ -503,15 +503,36 @@ namespace vimage
                         RemoveAnimatedImage();
 
                     // Get Frames
-                    var loadingAnimatedImage = new LoadingAnimatedImage(fileName, data);
-                    var loadFramesThread = new Thread(
-                        new ThreadStart(loadingAnimatedImage.LoadFrames)
-                    )
+                    var info = MagickFormatInfo.Create(fileName);
+                    if (info is not null && info.Format == MagickFormat.Gif)
                     {
-                        Name = "AnimationLoadThread - " + fileName,
-                        IsBackground = true,
-                    };
-                    loadFramesThread.Start();
+                        // Use System.Drawing and OctreeQuantizer (faster and uses less memory)
+                        var loadingAnimatedImage = new LoadingAnimatedImage(fileName, data);
+                        var loadFramesThread = new Thread(
+                            new ThreadStart(loadingAnimatedImage.LoadFrames)
+                        )
+                        {
+                            Name = "AnimationLoadThread - " + fileName,
+                            IsBackground = true,
+                        };
+                        loadFramesThread.Start();
+                    }
+                    else
+                    {
+                        // Use ImageMagick
+                        var loadingAnimatedImage = new LoadingAnimatedImageFromMagick(
+                            fileName,
+                            data
+                        );
+                        var loadFramesThread = new Thread(
+                            new ThreadStart(loadingAnimatedImage.LoadFrames)
+                        )
+                        {
+                            Name = "AnimationLoadThread - " + fileName,
+                            IsBackground = true,
+                        };
+                        loadFramesThread.Start();
+                    }
 
                     // Wait for at least one frame to be loaded
                     while (data.Frames == null || data.Frames.Length <= 0 || data.Frames[0] == null)
@@ -638,7 +659,7 @@ namespace vimage
         }
     }
 
-    internal class LoadingAnimatedImage(string fileName, AnimatedImageData data)
+    internal class LoadingAnimatedImageFromMagick(string fileName, AnimatedImageData data)
     {
         private readonly string FileName = fileName;
         private readonly AnimatedImageData Data = data;
@@ -665,7 +686,7 @@ namespace vimage
 
             // Process the rest
             collection.Read(FileName, settings);
-            collection.Coalesce();
+            collection.Coalesce(); // FIXME: Need alternative that doesn't use as some much resources
             for (int i = 0; i < Data.FrameCount; i++)
             {
                 if (Data.CancelLoading)
@@ -705,6 +726,73 @@ namespace vimage
                 }
             );
             LoadFrame(frame, index);
+        }
+    }
+
+    internal class LoadingAnimatedImage(string fileName, AnimatedImageData data)
+    {
+        private readonly string FileName = fileName;
+        private ImageManipulation.OctreeQuantizer? Quantizer;
+        private readonly AnimatedImageData Data = data;
+
+        public void LoadFrames()
+        {
+            using var image = System.Drawing.Image.FromFile(FileName);
+
+            // Get Frame Count
+            var frameDimension = new System.Drawing.Imaging.FrameDimension(
+                image.FrameDimensionsList[0]
+            );
+            Data.FrameCount = image.GetFrameCount(frameDimension);
+            Data.Frames = new Texture[Data.FrameCount];
+            Data.FrameDelays = new int[Data.FrameCount];
+
+            // Get Frame Delays
+            byte[]? frameDelays = null;
+            try
+            {
+                var frameDelaysItem = image.GetPropertyItem(0x5100);
+                if (frameDelaysItem is not null)
+                {
+                    frameDelays = frameDelaysItem.Value;
+                    if (
+                        frameDelays is null
+                        || frameDelays.Length == 0
+                        || (frameDelays[0] == 0 && frameDelays.All(d => d == 0))
+                    )
+                        frameDelays = null;
+                }
+            }
+            catch { }
+            int defaultFrameDelay = AnimatedImage.DEFAULT_FRAME_DELAY;
+            if (frameDelays != null && frameDelays.Length > 1)
+                defaultFrameDelay = (frameDelays[0] + frameDelays[1] * 256) * 10;
+
+            for (int i = 0; i < Data.FrameCount; i++)
+            {
+                if (Data.CancelLoading)
+                    return;
+
+                int fd = i * 4;
+                Data.FrameDelays[i] =
+                    frameDelays != null && frameDelays.Length > fd
+                        ? (frameDelays[fd] + frameDelays[fd + 1] * 256) * 10
+                        : defaultFrameDelay;
+
+                _ = image.SelectActiveFrame(frameDimension, i);
+                Quantizer = new ImageManipulation.OctreeQuantizer(255, 8);
+
+                using var quantized = Quantizer.Quantize(image);
+                using var stream = new MemoryStream();
+                quantized.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                var texture = new Texture(stream);
+
+                Data.Frames[i] = texture;
+                texture.Smooth = Data.Smooth;
+                if (Data.Mipmap)
+                    texture.GenerateMipmap();
+            }
+            Data.FullyLoaded = true;
         }
     }
 }

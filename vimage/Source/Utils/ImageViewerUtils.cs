@@ -107,10 +107,10 @@ namespace vimage
         }
 
         /// <summary>Returns Orientation from the EXIF data of a jpg.</summary>
-        public static int GetDefaultRotationFromEXIF(string fileName)
+        public static int GetDefaultRotationFromEXIF(string path)
         {
             using var image = new ImageMagick.MagickImage();
-            image.Ping(fileName);
+            image.Ping(path);
 
             var exif = image.GetExifProfile();
             if (exif is null)
@@ -127,18 +127,18 @@ namespace vimage
         }
 
         /// <summary>Returns DateTime from EXIF data or the FileInfo is there isn't one</summary>
-        public static DateTime GetDateValueFromEXIF(string fileName)
+        public static DateTime GetDateValueFromEXIF(string path)
         {
             using var image = new ImageMagick.MagickImage();
-            image.Ping(fileName);
+            image.Ping(path);
 
             var exif = image.GetExifProfile();
             if (exif is null)
-                return new System.IO.FileInfo(fileName).LastWriteTime;
+                return new System.IO.FileInfo(path).LastWriteTime;
 
             var dateTime = exif.GetValue(ImageMagick.ExifTag.DateTime);
             if (dateTime == null || string.IsNullOrWhiteSpace(dateTime.Value))
-                return new System.IO.FileInfo(fileName).LastWriteTime;
+                return new System.IO.FileInfo(path).LastWriteTime;
 
             if (
                 DateTime.TryParseExact(
@@ -153,12 +153,12 @@ namespace vimage
                 return parsed;
             }
 
-            return new System.IO.FileInfo(fileName).LastWriteTime;
+            return new System.IO.FileInfo(path).LastWriteTime;
         }
 
-        public static bool IsSupportedFileType(string fileName)
+        public static bool IsSupportedFileType(string path)
         {
-            var info = ImageMagick.MagickFormatInfo.Create(fileName);
+            var info = ImageMagick.MagickFormatInfo.Create(path);
             if (info is null || !info.SupportsReading)
                 return false;
             return info.Format switch
@@ -178,31 +178,23 @@ namespace vimage
             };
         }
 
-        public static bool IsAnimatedImage(string fileName)
+        public static bool IsAnimatedImage(string path)
         {
-            var info = ImageMagick.MagickFormatInfo.Create(fileName);
+            var info = ImageMagick.MagickFormatInfo.Create(path);
             if (info is null || !info.SupportsReading)
                 return false;
-            if (!info.SupportsMultipleFrames)
+
+            if (info.Format == ImageMagick.MagickFormat.Png)
             {
-                if (info.Format == ImageMagick.MagickFormat.Png)
-                {
-                    // SupportsMultipleFrames is always false for png so check if it's an apng
-                    using var collection = new ImageMagick.MagickImageCollection();
-                    collection.Ping(
-                        fileName,
-                        new ImageMagick.MagickReadSettings
-                        {
-                            Format = ImageMagick.MagickFormat.APng,
-                        }
-                    );
-                    if (collection.Count > 1)
-                        return true;
-                }
+                // SupportsMultipleFrames is always false for png so check if it's an apng
+                return IsAnimatedPng(path);
+            }
+            else if (!info.SupportsMultipleFrames)
+            {
                 return false;
             }
 
-            return info.Format switch
+            var validFormat = info.Format switch
             {
                 ImageMagick.MagickFormat.Gif
                 or ImageMagick.MagickFormat.Gif87
@@ -211,6 +203,51 @@ namespace vimage
                 or ImageMagick.MagickFormat.Mng => true,
                 _ => false,
             };
+            if (!validFormat)
+                return false;
+
+            using var collection = new ImageMagick.MagickImageCollection();
+            collection.Ping(path);
+            return collection.Count > 1;
+        }
+
+        static bool IsAnimatedPng(string path)
+        {
+            using var fs = System.IO.File.OpenRead(path);
+            using var br = new System.IO.BinaryReader(fs);
+
+            // skip PNG signature
+            br.BaseStream.Seek(8, System.IO.SeekOrigin.Begin);
+
+            while (br.BaseStream.Position + 8 <= br.BaseStream.Length)
+            {
+                var lengthBytes = br.ReadBytes(4);
+                if (lengthBytes.Length < 4)
+                    break;
+
+                var typeBytes = br.ReadBytes(4);
+                if (typeBytes.Length < 4)
+                    break;
+
+                var type = System.Text.Encoding.ASCII.GetString(typeBytes);
+
+                if (type == "acTL")
+                    return true; // APNG detected
+
+                if (type == "IDAT" || type == "IEND")
+                    break; // no animation info before first image data
+
+                // skip chunk data + CRC
+                uint length = (uint)(
+                    (lengthBytes[0] << 24)
+                    | (lengthBytes[1] << 16)
+                    | (lengthBytes[2] << 8)
+                    | lengthBytes[3]
+                );
+                br.BaseStream.Seek(length + 4, System.IO.SeekOrigin.Current);
+            }
+
+            return false;
         }
     }
 }
