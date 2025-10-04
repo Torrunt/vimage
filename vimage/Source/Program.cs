@@ -27,13 +27,10 @@ namespace vimage
             // Extension supported?
             if (file != "" && !ImageViewerUtils.IsSupportedFileType(file))
             {
-                if (OperatingSystem.IsWindowsVersionAtLeast(6, 1))
-                {
-                    System.Windows.Forms.MessageBox.Show(
-                        "vimage does not support this file format.",
-                        "vimage - Unknown File Format"
-                    );
-                }
+                System.Windows.Forms.MessageBox.Show(
+                    "vimage does not support this file format.",
+                    "vimage - Unknown File Format"
+                );
                 return;
             }
 
@@ -56,6 +53,7 @@ namespace vimage
 
         public static void ReportCrash(Exception exception)
         {
+            // FIXME: Implement Sentry
             //   var reportCrash = new ReportCrash { ToEmail = "torruntalt@gmail.com" };
             //   reportCrash.Send(exception);
         }

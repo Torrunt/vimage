@@ -44,7 +44,12 @@
 
         <Button Grid.Row="2" Width="24" Height="24" HorizontalAlignment="Left" Margin="5" BorderBrush="#FFACACAC" Click="Add_Click">
             <Button.Content>
-                <Image Source="../Resources/add.png" Width="16" Height="16" />
+                <Viewbox Width="12" Height="12" >
+                    <Grid>
+                        <Path Stroke="DimGray" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Data="M5 12h14" Stretch="Fill"/>
+                        <Path Stroke="DimGray" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Data="M12 5v14" Stretch="Fill"/>
+                    </Grid>
+                </Viewbox>
             </Button.Content>
         </Button>
         <Button Grid.Row="2" Width="70" Height="25" HorizontalAlignment="Right" Margin="5" Click="Default_Click">Default</Button>

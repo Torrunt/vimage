@@ -37,19 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\cross.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\add.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\drag.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\information.png" />
   </ItemGroup>
 
   <!-- Copy over vimage_settings.exe to vimage publish folder  -->

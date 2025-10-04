@@ -22,8 +22,6 @@
             Created by Corey Zeke Womack (Torrunt) - <Hyperlink NavigateUri="mailto:me@torrunt.net" RequestNavigate="Hyperlink_RequestNavigate">me@torrunt.net</Hyperlink>
             <LineBreak />
             Image Loading via Magick.NET - <Hyperlink NavigateUri="https://github.com/dlemstra/Magick.NET" RequestNavigate="Hyperlink_RequestNavigate">github.com/dlemstra/Magick.NET</Hyperlink>
-            <LineBreak />
-            Icons - <Hyperlink NavigateUri="http://www.famfamfam.com/lab/icons/silk" RequestNavigate="Hyperlink_RequestNavigate">famfamfam.com/lab/icons/silk</Hyperlink>
         </TextBlock>
     </StackPanel>
 </UserControl>
