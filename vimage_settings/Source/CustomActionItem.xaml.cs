@@ -12,10 +12,6 @@ namespace vimage_settings
         private readonly StackPanel ParentPanel;
         public int Index;
 
-        public CustomActionItem()
-        {
-            InitializeComponent();
-        }
         public CustomActionItem(int index, StackPanel parentPanel)
         {
             InitializeComponent();

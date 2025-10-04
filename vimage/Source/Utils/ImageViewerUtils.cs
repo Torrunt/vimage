@@ -161,13 +161,19 @@ namespace vimage
             var info = ImageMagick.MagickFormatInfo.Create(fileName);
             if (info is null || !info.SupportsReading)
                 return false;
-
-            if (info.SupportsMultipleFrames && !IsSupportedAnimatedImage(info))
-                return false;
-
             return info.Format switch
             {
-                ImageMagick.MagickFormat.Pdf => false,
+                ImageMagick.MagickFormat.Avi
+                or ImageMagick.MagickFormat.Flv
+                or ImageMagick.MagickFormat.M2v
+                or ImageMagick.MagickFormat.M4v
+                or ImageMagick.MagickFormat.Mkv
+                or ImageMagick.MagickFormat.Mov
+                or ImageMagick.MagickFormat.Mp4
+                or ImageMagick.MagickFormat.Mpeg
+                or ImageMagick.MagickFormat.Mpg
+                or ImageMagick.MagickFormat.Pdf
+                or ImageMagick.MagickFormat.Wmv => false,
                 _ => true,
             };
         }
@@ -177,12 +183,6 @@ namespace vimage
             var info = ImageMagick.MagickFormatInfo.Create(fileName);
             if (info is null || !info.SupportsReading || !info.SupportsMultipleFrames)
                 return false;
-
-            return IsSupportedAnimatedImage(info);
-        }
-
-        private static bool IsSupportedAnimatedImage(ImageMagick.IMagickFormatInfo info)
-        {
             return info.Format switch
             {
                 ImageMagick.MagickFormat.Gif

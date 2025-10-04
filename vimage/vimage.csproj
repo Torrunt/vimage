@@ -30,6 +30,9 @@
     <PackageReference Include="SFML.Window" Version="2.6.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\vimage.Common\vimage.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Update="Source\ContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -49,10 +52,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\vimage.Common\vimage.Common.csproj" />
   </ItemGroup>
 
   <!-- Remove junk .dlls from CSFML nuget package -->

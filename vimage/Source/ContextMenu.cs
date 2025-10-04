@@ -91,7 +91,8 @@ namespace vimage
                     FuncByName.Add(str2, Action.None);
 
                     i++;
-                    LoadItemsInto(list, items[i] as List<object>, depth + 1);
+                    if (items[i] is List<object> itemList)
+                        LoadItemsInto(list, itemList, depth + 1);
                 }
                 else if (items[i] is ContextMenuItem contextMenuItem)
                 {
@@ -144,10 +145,10 @@ namespace vimage
                 string name = items[i];
                 bool itemClickable = true;
 
-                if (name.Length > 0 && name.LastIndexOf(":") == name.Length - 1)
+                if (name.Length > 0 && name.LastIndexOf(':') == name.Length - 1)
                 {
                     // non-clickable item?
-                    name = name.Substring(0, name.Length - 1);
+                    name = name[..^1];
                     itemClickable = false;
                 }
 

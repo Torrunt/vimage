@@ -42,14 +42,15 @@ namespace vimage_settings
             SaveContextMenu(App.vimageConfig.ContextMenu_Animation, ContextMenuItems_Animation);
         }
 
-        private void SaveContextMenu(List<object> contextMenu, Panel panel)
+        private static void SaveContextMenu(List<object> contextMenu, Panel panel)
         {
             int currentSubLevel = 0;
             List<object> currentMenu = contextMenu;
-            List<object> prevMenu = null;
+            List<object>? prevMenu = null;
             for (int i = 0; i < panel.Children.Count; i++)
             {
-                ContextMenuItem item = (ContextMenuItem)panel.Children[i];
+                if (panel.Children[i] is not ContextMenuItem item)
+                    continue;
                 if (
                     i < panel.Children.Count - 1
                     && ((ContextMenuItem)panel.Children[i + 1]).Indent > item.Indent
@@ -67,16 +68,22 @@ namespace vimage_settings
                         currentSubLevel = item.Indent;
                         currentMenu.Add(new List<object>());
                         prevMenu = currentMenu;
-                        currentMenu = currentMenu[currentMenu.Count - 1] as List<object>;
+                        var subMenu = currentMenu[^1];
+                        if (subMenu is List<object> subMenuList)
+                            currentMenu = subMenuList;
                     }
-                    else if (item.Indent < currentSubLevel)
+                    else if (item.Indent < currentSubLevel && prevMenu is not null)
                     {
                         currentSubLevel = item.Indent;
                         currentMenu = prevMenu;
                     }
 
                     currentMenu.Add(
-                        new { name = item.ItemName.Text, func = item.ItemFunction.Text.Trim() }
+                        new vimage.Common.ContextMenuItem
+                        {
+                            name = item.ItemName.Text,
+                            func = item.ItemFunction.Text.Trim(),
+                        }
                     );
                 }
                 else
@@ -89,7 +96,11 @@ namespace vimage_settings
                     }
 
                     currentMenu.Add(
-                        new { name = item.ItemName.Text, func = item.ItemFunction.Text.Trim() }
+                        new vimage.Common.ContextMenuItem
+                        {
+                            name = item.ItemName.Text,
+                            func = item.ItemFunction.Text.Trim(),
+                        }
                     );
                 }
             }
@@ -105,28 +116,28 @@ namespace vimage_settings
         {
             for (int i = 0; i < items.Count; i++)
             {
-                dynamic o = items[i] as dynamic;
-
-                if (o is List<object>)
+                if (items[i] is List<object> list)
                 {
-                    LoadItems(o, panel, canvas, scroll, indent + 1);
+                    LoadItems(list, panel, canvas, scroll, indent + 1);
+                    continue;
                 }
-                else
+                var name = "";
+                object func = "";
+                if (items[i] is vimage.Common.ContextMenuItem cmi)
                 {
-                    ContextMenuItem item = new ContextMenuItem(
-                        o is string ? o : o.name,
-                        o is string ? "" : o.func,
-                        this,
-                        panel,
-                        canvas,
-                        scroll,
-                        indent
-                    );
-                    _ = panel.Children.Add(item);
-                    Items.Add(item);
-
-                    Canvas.SetTop(item, item.MinHeight * (panel.Children.Count - 1));
+                    name = cmi.name;
+                    func = cmi.func;
                 }
+                else if (items[i] is string str)
+                {
+                    name = str;
+                }
+
+                var item = new ContextMenuItem(name, func, this, panel, canvas, scroll, indent);
+                _ = panel.Children.Add(item);
+                Items.Add(item);
+
+                Canvas.SetTop(item, item.MinHeight * (panel.Children.Count - 1));
             }
         }
 
@@ -138,18 +149,18 @@ namespace vimage_settings
 
         private void Add_Click(object sender, RoutedEventArgs e)
         {
-            Panel panel =
+            var panel =
                 Tabs.SelectedIndex == 0 ? ContextMenuItems_General : ContextMenuItems_Animation;
-            ContextMenuEditorCanvas canvas =
+            var canvas =
                 Tabs.SelectedIndex == 0
                     ? ContextMenuItems_GeneralCanvas
                     : ContextMenuItems_AnimationCanvas;
-            ScrollViewer scroll =
+            var scroll =
                 Tabs.SelectedIndex == 0
                     ? ContextMenuItems_GeneralScroll
                     : ContextMenuItems_AnimationScroll;
 
-            ContextMenuItem item = new ContextMenuItem(
+            var item = new ContextMenuItem(
                 "",
                 "",
                 this,

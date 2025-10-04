@@ -6,9 +6,9 @@ namespace vimage_settings
 {
     public class ContextMenuEditorCanvas : Canvas
     {
-        public ContextMenuItem MovingItem;
-        public ContextMenuItem GhostItem = new ContextMenuItem();
-        public Rectangle SelectionRect = new Rectangle() { Height = 4, Fill = System.Windows.Media.Brushes.Black, Opacity = 0.5f };
+        public ContextMenuItem? MovingItem;
+        public ContextMenuItem GhostItem = new();
+        public Rectangle SelectionRect = new() { Height = 4, Fill = System.Windows.Media.Brushes.Black, Opacity = 0.5f };
         public int InsertAtIndex = -1;
 
         public ContextMenuEditorCanvas() : base()

@@ -807,7 +807,7 @@ namespace vimage.Common
             if (trimedLine.Equals("}"))
                 return line;
 
-            while (line != null)
+            while (line is not null && trimedLine is not null)
             {
                 if (!trimedLine.Equals("-") && !trimedLine.Contains(':'))
                 {
@@ -906,187 +906,174 @@ namespace vimage.Common
         public void Save(string configFile)
         {
             // Open
-            try
+            FileStream fileStream;
+            if (File.Exists(configFile))
             {
-                FileStream fileStream;
-                if (File.Exists(configFile))
-                {
-                    // Clear if file already exists
-                    File.WriteAllText(configFile, string.Empty);
-                    fileStream = File.Open(configFile, FileMode.Open, FileAccess.Write);
-                }
-                else
-                    fileStream = File.Create(configFile);
-                var writer = new StreamWriter(fileStream);
-
-                // Write
-                writer.Write("// General Settings" + Environment.NewLine);
-
-                WriteSetting(writer, "UseDevil", Setting_UseDevIL);
-                WriteSetting(writer, "OpenAtMousePosition", Setting_OpenAtMousePosition);
-                WriteSetting(writer, "SmoothingDefault", Setting_SmoothingDefault);
-                WriteSetting(writer, "Mipmapping", Setting_Mipmapping);
-                WriteSetting(
-                    writer,
-                    "BackgroundForImagesWithTransparencyDefault",
-                    Setting_BackgroundForImagesWithTransparencyDefault
-                );
-                WriteSetting(writer, "BackgroundColour", Setting_BackgroundColour);
-                WriteSetting(writer, "TransparencyToggleValue", Setting_TransparencyToggleValue);
-                WriteSetting(writer, "ImageSizing", (int)Setting_ImageSizing);
-                WriteSetting(
-                    writer,
-                    "LimitImagesToMonitor",
-                    Setting_LimitImagesToMonitor,
-                    "0=NONE, 1=HEIGHT, 2=WIDTH, 3=AUTO"
-                );
-                WriteSetting(
-                    writer,
-                    "PositionLargeWideImagesInCorner",
-                    Setting_PositionLargeWideImagesInCorner,
-                    "ie: Desktop Wallpapers and Screenshots"
-                );
-                WriteSetting(writer, "LoopImageNavigation", Setting_LoopImageNavigation);
-                WriteSetting(
-                    writer,
-                    "PreloadNextImage",
-                    Setting_PreloadNextImage,
-                    "when using the next/prev image buttons, the image after the one just loaded will be loaded as well"
-                );
-                WriteSetting(
-                    writer,
-                    "ClearMemoryOnResetImage",
-                    Setting_ClearMemoryOnResetImage,
-                    "when the Reset Image action is used, all textures/animations will be cleared from memory (except ones used for current image)"
-                );
-                WriteSetting(writer, "ShowTitleBar", Setting_ShowTitleBar);
-                WriteSetting(
-                    writer,
-                    "OpenSettingsEXE",
-                    Setting_OpenSettingsEXE,
-                    "if false, will open config.txt instead"
-                );
-                WriteSetting(
-                    writer,
-                    "ListenForConfigChanges",
-                    Setting_ListenForConfigChanges,
-                    "vimage will reload settings automatically when they are changed."
-                );
-                WriteSetting(
-                    writer,
-                    "MinImageSize",
-                    Setting_MinImageSize,
-                    "if an image is smaller than this (in width or height) it will scaled up to it automatically"
-                );
-                WriteSetting(
-                    writer,
-                    "SmoothingMinImageSize",
-                    Setting_SmoothingMinImageSize,
-                    "images smaller than this will not have smoothing turned on (if 0, all images with use smoothing)"
-                );
-                WriteSetting(writer, "ZoomSpeed", Setting_ZoomSpeed);
-                WriteSetting(writer, "ZoomSpeedFast", Setting_ZoomSpeedFast);
-                WriteSetting(writer, "MoveSpeed", Setting_MoveSpeed);
-                WriteSetting(writer, "MoveSpeedFast", Setting_MoveSpeedFast);
-                WriteSetting(writer, "MaxTextures", Setting_MaxTextures);
-                WriteSetting(writer, "MaxAnimations", Setting_MaxAnimations);
-                WriteSetting(
-                    writer,
-                    "MaxTextureSize",
-                    Setting_MaxTextureSize,
-                    "will cut up images into multiple textures if they are larger than this value"
-                );
-                WriteSetting(writer, "SettingsAppWidth", Setting_SettingsAppWidth);
-                WriteSetting(writer, "SettingsAppHeight", Setting_SettingsAppHeight);
-                WriteSetting(writer, "DefaultSortBy", (int)Setting_DefaultSortBy);
-                WriteSetting(writer, "DefaultSortDir", (int)Setting_DefaultSortDir);
-
-                writer.Write(Environment.NewLine);
-
-                WriteSetting(writer, "CropToolFillColour", Setting_CropToolFillColour);
-                WriteSetting(writer, "CropToolOutlineColour", Setting_CropToolOutlineColour);
-                WriteSetting(writer, "CropToolOutlineThickness", Setting_CropToolOutlineThickness);
-
-                writer.Write(Environment.NewLine);
-                writer.Write("// Bindings" + Environment.NewLine);
-
-                WriteControl(writer, "Drag", Control_Drag);
-                WriteControl(writer, "Close", Control_Close);
-                WriteControl(writer, "OpenContextMenu", Control_OpenContextMenu);
-                WriteControl(writer, "PrevImage", Control_PrevImage);
-                WriteControl(writer, "NextImage", Control_NextImage);
-                WriteControl(writer, "RotateClockwise", Control_RotateClockwise);
-                WriteControl(writer, "RotateAntiClockwise", Control_RotateAntiClockwise);
-                WriteControl(writer, "Flip", Control_Flip);
-                WriteControl(writer, "FitToMonitorHeight", Control_FitToMonitorHeight);
-                WriteControl(writer, "FitToMonitorWidth", Control_FitToMonitorWidth);
-                WriteControl(writer, "FitToMonitorAuto", Control_FitToMonitorAuto);
-                WriteControl(writer, "FitToMonitorAlt", Control_FitToMonitorAlt);
-                WriteControl(writer, "ZoomIn", Control_ZoomIn);
-                WriteControl(writer, "ZoomOut", Control_ZoomOut);
-                WriteControl(writer, "ZoomFaster", Control_ZoomFaster);
-                WriteControl(writer, "ZoomAlt", Control_ZoomAlt);
-                WriteControl(writer, "DragLimitToMonitorBounds", Control_DragLimitToMonitorBounds);
-                WriteControl(writer, "ToggleSmoothing", Control_ToggleSmoothing);
-                WriteControl(writer, "ToggleBackgroundForTransparency", Control_ToggleBackground);
-                WriteControl(writer, "ToggleLock", Control_ToggleLock);
-                WriteControl(writer, "ToggleAlwaysOnTop", Control_ToggleAlwaysOnTop);
-                WriteControl(writer, "ToggleTitleBar", Control_ToggleTitleBar);
-                WriteControl(writer, "PauseAnimation", Control_PauseAnimation);
-                WriteControl(writer, "PrevFrame", Control_PrevFrame);
-                WriteControl(writer, "NextFrame", Control_NextFrame);
-                WriteControl(writer, "OpenSettings", Control_OpenSettings);
-                WriteControl(writer, "ResetImage", Control_ResetImage);
-                WriteControl(writer, "OpenAtLocation", Control_OpenAtLocation);
-                WriteControl(writer, "Delete", Control_Delete);
-                WriteControl(writer, "Copy", Control_Copy);
-                WriteControl(writer, "CopyAsImage", Control_CopyAsImage);
-                WriteControl(writer, "OpenDuplicateImage", Control_OpenDuplicateImage);
-                WriteControl(writer, "OpenFullDuplicateImage", Control_OpenFullDuplicateImage);
-                WriteControl(writer, "RandomImage", Control_RandomImage);
-                WriteControl(writer, "MoveLeft", Control_MoveLeft);
-                WriteControl(writer, "MoveRight", Control_MoveRight);
-                WriteControl(writer, "MoveUp", Control_MoveUp);
-                WriteControl(writer, "MoveDown", Control_MoveDown);
-                WriteControl(writer, "TransparencyToggle", Control_TransparencyToggle);
-                WriteControl(writer, "TransparencyInc", Control_TransparencyInc);
-                WriteControl(writer, "TransparencyDec", Control_TransparencyDec);
-                WriteControl(writer, "Crop", Control_Crop);
-                WriteControl(writer, "UndoCrop", Control_UndoCrop);
-                WriteControl(writer, "ExitAll", Control_ExitAll);
-                WriteControl(writer, "RerenderSVG", Control_RerenderSVG);
-
-                writer.Write(Environment.NewLine);
-                writer.Write("// Context Menu" + Environment.NewLine);
-
-                WriteContextMenuSetup(writer, "ContextMenu", ContextMenu);
-                WriteContextMenuSetup(writer, "ContextMenu_Animation", ContextMenu_Animation);
-
-                WriteSetting(
-                    writer,
-                    "ContextMenu_Animation_InsertAtIndex",
-                    ContextMenu_Animation_InsertAtIndex
-                );
-                WriteSetting(writer, "ContextMenu_ShowMargin", ContextMenuShowMargin);
-                WriteSetting(writer, "ContextMenu_ShowMarginSub", ContextMenuShowMarginSub);
-
-                writer.Write(Environment.NewLine);
-                WriteCustomActions(writer, "CustomActions", CustomActions);
-                WriteCustomActionBindings(writer, "CustomActionBindings", CustomActionBindings);
-
-                // Close
-                writer.Close();
+                // Clear if file already exists
+                File.WriteAllText(configFile, string.Empty);
+                fileStream = File.Open(configFile, FileMode.Open, FileAccess.Write);
             }
-            catch (UnauthorizedAccessException)
-            {
-                //  if (OperatingSystem.IsWindowsVersionAtLeast(6, 1))
-                //  {
-                //      System.Windows.Forms.MessageBox.Show(
-                //          "vimage does not have write permissions for the folder it's located in.\nPlease place it somewhere else (or set it to run as admin).",
-                //          "vimage - Error"
-                //      );
-                //  }
-            }
+            else
+                fileStream = File.Create(configFile);
+            var writer = new StreamWriter(fileStream);
+
+            // Write
+            writer.Write("// General Settings" + Environment.NewLine);
+
+            WriteSetting(writer, "UseDevil", Setting_UseDevIL);
+            WriteSetting(writer, "OpenAtMousePosition", Setting_OpenAtMousePosition);
+            WriteSetting(writer, "SmoothingDefault", Setting_SmoothingDefault);
+            WriteSetting(writer, "Mipmapping", Setting_Mipmapping);
+            WriteSetting(
+                writer,
+                "BackgroundForImagesWithTransparencyDefault",
+                Setting_BackgroundForImagesWithTransparencyDefault
+            );
+            WriteSetting(writer, "BackgroundColour", Setting_BackgroundColour);
+            WriteSetting(writer, "TransparencyToggleValue", Setting_TransparencyToggleValue);
+            WriteSetting(writer, "ImageSizing", (int)Setting_ImageSizing);
+            WriteSetting(
+                writer,
+                "LimitImagesToMonitor",
+                Setting_LimitImagesToMonitor,
+                "0=NONE, 1=HEIGHT, 2=WIDTH, 3=AUTO"
+            );
+            WriteSetting(
+                writer,
+                "PositionLargeWideImagesInCorner",
+                Setting_PositionLargeWideImagesInCorner,
+                "ie: Desktop Wallpapers and Screenshots"
+            );
+            WriteSetting(writer, "LoopImageNavigation", Setting_LoopImageNavigation);
+            WriteSetting(
+                writer,
+                "PreloadNextImage",
+                Setting_PreloadNextImage,
+                "when using the next/prev image buttons, the image after the one just loaded will be loaded as well"
+            );
+            WriteSetting(
+                writer,
+                "ClearMemoryOnResetImage",
+                Setting_ClearMemoryOnResetImage,
+                "when the Reset Image action is used, all textures/animations will be cleared from memory (except ones used for current image)"
+            );
+            WriteSetting(writer, "ShowTitleBar", Setting_ShowTitleBar);
+            WriteSetting(
+                writer,
+                "OpenSettingsEXE",
+                Setting_OpenSettingsEXE,
+                "if false, will open config.txt instead"
+            );
+            WriteSetting(
+                writer,
+                "ListenForConfigChanges",
+                Setting_ListenForConfigChanges,
+                "vimage will reload settings automatically when they are changed."
+            );
+            WriteSetting(
+                writer,
+                "MinImageSize",
+                Setting_MinImageSize,
+                "if an image is smaller than this (in width or height) it will scaled up to it automatically"
+            );
+            WriteSetting(
+                writer,
+                "SmoothingMinImageSize",
+                Setting_SmoothingMinImageSize,
+                "images smaller than this will not have smoothing turned on (if 0, all images with use smoothing)"
+            );
+            WriteSetting(writer, "ZoomSpeed", Setting_ZoomSpeed);
+            WriteSetting(writer, "ZoomSpeedFast", Setting_ZoomSpeedFast);
+            WriteSetting(writer, "MoveSpeed", Setting_MoveSpeed);
+            WriteSetting(writer, "MoveSpeedFast", Setting_MoveSpeedFast);
+            WriteSetting(writer, "MaxTextures", Setting_MaxTextures);
+            WriteSetting(writer, "MaxAnimations", Setting_MaxAnimations);
+            WriteSetting(
+                writer,
+                "MaxTextureSize",
+                Setting_MaxTextureSize,
+                "will cut up images into multiple textures if they are larger than this value"
+            );
+            WriteSetting(writer, "SettingsAppWidth", Setting_SettingsAppWidth);
+            WriteSetting(writer, "SettingsAppHeight", Setting_SettingsAppHeight);
+            WriteSetting(writer, "DefaultSortBy", (int)Setting_DefaultSortBy);
+            WriteSetting(writer, "DefaultSortDir", (int)Setting_DefaultSortDir);
+
+            writer.Write(Environment.NewLine);
+
+            WriteSetting(writer, "CropToolFillColour", Setting_CropToolFillColour);
+            WriteSetting(writer, "CropToolOutlineColour", Setting_CropToolOutlineColour);
+            WriteSetting(writer, "CropToolOutlineThickness", Setting_CropToolOutlineThickness);
+
+            writer.Write(Environment.NewLine);
+            writer.Write("// Bindings" + Environment.NewLine);
+
+            WriteControl(writer, "Drag", Control_Drag);
+            WriteControl(writer, "Close", Control_Close);
+            WriteControl(writer, "OpenContextMenu", Control_OpenContextMenu);
+            WriteControl(writer, "PrevImage", Control_PrevImage);
+            WriteControl(writer, "NextImage", Control_NextImage);
+            WriteControl(writer, "RotateClockwise", Control_RotateClockwise);
+            WriteControl(writer, "RotateAntiClockwise", Control_RotateAntiClockwise);
+            WriteControl(writer, "Flip", Control_Flip);
+            WriteControl(writer, "FitToMonitorHeight", Control_FitToMonitorHeight);
+            WriteControl(writer, "FitToMonitorWidth", Control_FitToMonitorWidth);
+            WriteControl(writer, "FitToMonitorAuto", Control_FitToMonitorAuto);
+            WriteControl(writer, "FitToMonitorAlt", Control_FitToMonitorAlt);
+            WriteControl(writer, "ZoomIn", Control_ZoomIn);
+            WriteControl(writer, "ZoomOut", Control_ZoomOut);
+            WriteControl(writer, "ZoomFaster", Control_ZoomFaster);
+            WriteControl(writer, "ZoomAlt", Control_ZoomAlt);
+            WriteControl(writer, "DragLimitToMonitorBounds", Control_DragLimitToMonitorBounds);
+            WriteControl(writer, "ToggleSmoothing", Control_ToggleSmoothing);
+            WriteControl(writer, "ToggleBackgroundForTransparency", Control_ToggleBackground);
+            WriteControl(writer, "ToggleLock", Control_ToggleLock);
+            WriteControl(writer, "ToggleAlwaysOnTop", Control_ToggleAlwaysOnTop);
+            WriteControl(writer, "ToggleTitleBar", Control_ToggleTitleBar);
+            WriteControl(writer, "PauseAnimation", Control_PauseAnimation);
+            WriteControl(writer, "PrevFrame", Control_PrevFrame);
+            WriteControl(writer, "NextFrame", Control_NextFrame);
+            WriteControl(writer, "OpenSettings", Control_OpenSettings);
+            WriteControl(writer, "ResetImage", Control_ResetImage);
+            WriteControl(writer, "OpenAtLocation", Control_OpenAtLocation);
+            WriteControl(writer, "Delete", Control_Delete);
+            WriteControl(writer, "Copy", Control_Copy);
+            WriteControl(writer, "CopyAsImage", Control_CopyAsImage);
+            WriteControl(writer, "OpenDuplicateImage", Control_OpenDuplicateImage);
+            WriteControl(writer, "OpenFullDuplicateImage", Control_OpenFullDuplicateImage);
+            WriteControl(writer, "RandomImage", Control_RandomImage);
+            WriteControl(writer, "MoveLeft", Control_MoveLeft);
+            WriteControl(writer, "MoveRight", Control_MoveRight);
+            WriteControl(writer, "MoveUp", Control_MoveUp);
+            WriteControl(writer, "MoveDown", Control_MoveDown);
+            WriteControl(writer, "TransparencyToggle", Control_TransparencyToggle);
+            WriteControl(writer, "TransparencyInc", Control_TransparencyInc);
+            WriteControl(writer, "TransparencyDec", Control_TransparencyDec);
+            WriteControl(writer, "Crop", Control_Crop);
+            WriteControl(writer, "UndoCrop", Control_UndoCrop);
+            WriteControl(writer, "ExitAll", Control_ExitAll);
+            WriteControl(writer, "RerenderSVG", Control_RerenderSVG);
+
+            writer.Write(Environment.NewLine);
+            writer.Write("// Context Menu" + Environment.NewLine);
+
+            WriteContextMenuSetup(writer, "ContextMenu", ContextMenu);
+            WriteContextMenuSetup(writer, "ContextMenu_Animation", ContextMenu_Animation);
+
+            WriteSetting(
+                writer,
+                "ContextMenu_Animation_InsertAtIndex",
+                ContextMenu_Animation_InsertAtIndex
+            );
+            WriteSetting(writer, "ContextMenu_ShowMargin", ContextMenuShowMargin);
+            WriteSetting(writer, "ContextMenu_ShowMarginSub", ContextMenuShowMarginSub);
+
+            writer.Write(Environment.NewLine);
+            WriteCustomActions(writer, "CustomActions", CustomActions);
+            WriteCustomActionBindings(writer, "CustomActionBindings", CustomActionBindings);
+
+            // Close
+            writer.Close();
         }
 
         private static void WriteSetting(
@@ -1147,7 +1134,7 @@ namespace vimage.Common
 
         private static void WriteContextMenuItems(StreamWriter writer, IList items, int depth = 1)
         {
-            if (items == null)
+            if (items is null)
                 return;
 
             for (int i = 0; i < items.Count; i++)
@@ -1187,6 +1174,10 @@ namespace vimage.Common
                         else
                             writer.Write(itemName + " : " + itemFunc + Environment.NewLine);
                     }
+                }
+                else
+                {
+                    Console.WriteLine("WTF");
                 }
             }
         }

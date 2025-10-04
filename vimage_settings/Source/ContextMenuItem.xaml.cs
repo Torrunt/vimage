@@ -12,16 +12,16 @@ namespace vimage_settings
     /// </summary>
     public partial class ContextMenuItem : UserControl
     {
-        private readonly ContextMenu ContextMenuEditor;
-        private readonly Panel ParentPanel;
-        private readonly ContextMenuEditorCanvas ParentCanvas;
-        private readonly ScrollViewer ScrollViewer;
+        private readonly ContextMenu? ContextMenuEditor;
+        private readonly Panel? ParentPanel;
+        private readonly ContextMenuEditorCanvas? ParentCanvas;
+        private readonly ScrollViewer? ScrollViewer;
         private int CustomActionsStartIndex = -1;
         private Point AnchorPoint;
 
         private bool Selected = false;
-        private readonly SolidColorBrush BrushSelected = new SolidColorBrush(Colors.DodgerBlue);
-        private readonly SolidColorBrush BrushOver = new SolidColorBrush(Colors.LightSkyBlue);
+        private readonly SolidColorBrush BrushSelected = new(Colors.DodgerBlue);
+        private readonly SolidColorBrush BrushOver = new(Colors.LightSkyBlue);
 
         public ContextMenuItem()
         {
@@ -31,7 +31,7 @@ namespace vimage_settings
 
         public ContextMenuItem(
             string name,
-            dynamic func,
+            object func,
             ContextMenu contextMenu,
             Panel parentPanel,
             ContextMenuEditorCanvas canvas,
@@ -51,11 +51,7 @@ namespace vimage_settings
             ItemName.Text = name;
 
             int funcIndex = ItemFunction.Items.IndexOf(
-                (string)(
-                    func is vimage.Common.Action
-                        ? ((vimage.Common.Action)func).ToNameString()
-                        : func
-                )
+                (string)(func is vimage.Common.Action action ? action.ToNameString() : func)
             );
             if (funcIndex != -1)
                 ItemFunction.SelectedIndex = funcIndex;
@@ -76,7 +72,7 @@ namespace vimage_settings
             {
                 CustomActionsStartIndex = ItemFunction.Items.Count;
                 for (int i = 0; i < App.vimageConfig.CustomActions.Count; i++)
-                    ItemFunction.Items.Add((App.vimageConfig.CustomActions[i] as dynamic).name);
+                    ItemFunction.Items.Add(App.vimageConfig.CustomActions[i].name);
             }
             ItemFunction.SelectedIndex = 0;
 
@@ -98,15 +94,19 @@ namespace vimage_settings
             )
             {
                 if (i >= ItemFunction.Items.Count)
+                {
+                    // add
                     ItemFunction.Items.Add(
-                        (
-                            App.vimageConfig.CustomActions[i - CustomActionsStartIndex] as dynamic
-                        ).name
-                    ); // add
+                        App.vimageConfig.CustomActions[i - CustomActionsStartIndex].name
+                    );
+                }
                 else
-                    ItemFunction.Items[i] = (
-                        App.vimageConfig.CustomActions[i - CustomActionsStartIndex] as dynamic
-                    ).name; // update name
+                {
+                    // update name
+                    ItemFunction.Items[i] = App.vimageConfig
+                        .CustomActions[i - CustomActionsStartIndex]
+                        .name;
+                }
             }
             while (
                 ItemFunction.Items.Count
@@ -121,18 +121,19 @@ namespace vimage_settings
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
             ParentPanel?.Children.Remove(this);
-            _ = (Application.Current.MainWindow as MainWindow).ContextMenuEditor.Items.Remove(this);
+            if (Application.Current.MainWindow is MainWindow mainWindow)
+                _ = mainWindow.ContextMenuEditor.Items.Remove(this);
         }
 
         private void UserControl_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (ParentCanvas.MovingItem == null)
+            if (ParentCanvas?.MovingItem is null)
                 UserControl.Background = Selected ? BrushSelected : BrushOver;
         }
 
         private void UserControl_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (ParentCanvas.MovingItem == null)
+            if (ParentCanvas?.MovingItem is null)
                 UserControl.Background = Selected ? BrushSelected : new SolidColorBrush();
         }
 
@@ -168,7 +169,7 @@ namespace vimage_settings
 
         public void UnselectItem()
         {
-            if (ParentCanvas.MovingItem != null)
+            if (ParentCanvas?.MovingItem is not null)
                 return;
 
             Selected = false;
@@ -177,11 +178,12 @@ namespace vimage_settings
 
         public void SelectItem(bool selectTextBox = false)
         {
-            if (ParentCanvas.MovingItem != null)
+            if (ParentCanvas?.MovingItem is not null)
                 return;
 
             Selected = true;
-            ContextMenuEditor.CurrentItemSelection = this;
+            if (ContextMenuEditor is not null)
+                ContextMenuEditor.CurrentItemSelection = this;
             UserControl.Background = BrushSelected;
 
             if (selectTextBox)
@@ -210,33 +212,36 @@ namespace vimage_settings
                 if (
                     !Dragging
                     && Parent == ParentPanel
-                    && ParentCanvas.MovingItem == null
+                    && ParentCanvas?.MovingItem is null
                     && e.GetPosition(null).X < (Indent + 1) * 30
                 )
                     Dragging = true;
 
-                if (Dragging)
+                if (Dragging && ParentCanvas is not null)
                 {
                     // update position
-                    double posX = e.GetPosition(ParentCanvas).X - AnchorPoint.X;
-                    double posY = e.GetPosition(ParentCanvas).Y - AnchorPoint.Y;
-                    int i = Math.Max(
+                    var posX = e.GetPosition(ParentCanvas).X - AnchorPoint.X;
+                    var posY = e.GetPosition(ParentCanvas).Y - AnchorPoint.Y;
+                    var i = Math.Max(
                         (int)Math.Round((posY + ((MinHeight - 2) / 2)) / (MinHeight - 2)),
                         0
                     );
-                    i = Math.Min(i, ParentPanel.Children.Count);
+                    i = Math.Min(i, ParentPanel?.Children.Count ?? 0);
 
-                    double top = Math.Max(i * (MinHeight - 2), 0);
+                    var top = Math.Max(i * (MinHeight - 2), 0);
                     Canvas.SetTop(ParentCanvas.SelectionRect, top - 2);
 
                     int indent = 0;
                     if (i != 0)
                     {
-                        ContextMenuItem itemAbove = (ContextMenuItem)ParentPanel.Children[i - 1];
-                        if (posX >= (itemAbove.Indent + 1) * 30)
-                            indent = itemAbove.Indent + 1;
-                        else if (posX >= itemAbove.Indent * 30)
-                            indent = itemAbove.Indent;
+                        var itemAbove = ParentPanel?.Children[i - 1];
+                        if (itemAbove is ContextMenuItem itemAboveItem)
+                        {
+                            if (posX >= (itemAboveItem.Indent + 1) * 30)
+                                indent = itemAboveItem.Indent + 1;
+                            else if (posX >= itemAboveItem.Indent * 30)
+                                indent = itemAboveItem.Indent;
+                        }
                     }
                     Canvas.SetLeft(ParentCanvas.SelectionRect, indent * 30);
 
@@ -247,22 +252,32 @@ namespace vimage_settings
                     Canvas.SetLeft(this, posX);
 
                     // scroll window when dragging past top/bottom
-                    if (posY + MinHeight > ScrollViewer.ActualHeight + ScrollViewer.VerticalOffset)
-                        ScrollViewer.ScrollToVerticalOffset(
-                            ScrollViewer.VerticalOffset
-                                + (
-                                    posY
-                                    - (
-                                        ScrollViewer.ActualHeight
-                                        + ScrollViewer.VerticalOffset
-                                        - MinHeight
+                    if (ScrollViewer is not null)
+                    {
+                        if (
+                            posY + MinHeight
+                            > ScrollViewer.ActualHeight + ScrollViewer.VerticalOffset
+                        )
+                        {
+                            ScrollViewer.ScrollToVerticalOffset(
+                                ScrollViewer.VerticalOffset
+                                    + (
+                                        posY
+                                        - (
+                                            ScrollViewer.ActualHeight
+                                            + ScrollViewer.VerticalOffset
+                                            - MinHeight
+                                        )
                                     )
-                                )
-                        );
-                    else if (posY < ScrollViewer.VerticalOffset)
-                        ScrollViewer.ScrollToVerticalOffset(
-                            ScrollViewer.VerticalOffset - (ScrollViewer.VerticalOffset - posY)
-                        );
+                            );
+                        }
+                        else if (posY < ScrollViewer.VerticalOffset)
+                        {
+                            ScrollViewer.ScrollToVerticalOffset(
+                                ScrollViewer.VerticalOffset - (ScrollViewer.VerticalOffset - posY)
+                            );
+                        }
+                    }
 
                     e.Handled = true;
                 }

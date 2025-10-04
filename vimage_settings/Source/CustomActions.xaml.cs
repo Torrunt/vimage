@@ -47,7 +47,7 @@ namespace vimage_settings
             {
                 App.vimageConfig.CustomActions.Add(new CustomAction { name = "ACTION", func = "" });
                 App.vimageConfig.CustomActionBindings.Add(
-                    new CustomActionBinding { name = "ACTION", bindings = new List<int>() }
+                    new CustomActionBinding { name = "ACTION", bindings = [] }
                 );
             }
 
