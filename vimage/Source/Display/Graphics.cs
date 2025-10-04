@@ -645,8 +645,14 @@ namespace vimage
 
         public void LoadFrames()
         {
+            var settings = new MagickReadSettings { };
+
+            var info = MagickFormatInfo.Create(FileName);
+            if (info is not null && info.Format == MagickFormat.Png)
+                settings.Format = MagickFormat.APng;
+
             using var collection = new MagickImageCollection();
-            collection.Ping(FileName);
+            collection.Ping(FileName, settings);
 
             Data.FrameCount = collection.Count;
             Data.Frames = new Texture[Data.FrameCount];
@@ -658,7 +664,7 @@ namespace vimage
             ReadAndLoadFrame(0);
 
             // Process the rest
-            collection.Read(FileName);
+            collection.Read(FileName, settings);
             collection.Coalesce();
             for (int i = 0; i < Data.FrameCount; i++)
             {

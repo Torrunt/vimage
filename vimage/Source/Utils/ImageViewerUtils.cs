@@ -181,8 +181,27 @@ namespace vimage
         public static bool IsAnimatedImage(string fileName)
         {
             var info = ImageMagick.MagickFormatInfo.Create(fileName);
-            if (info is null || !info.SupportsReading || !info.SupportsMultipleFrames)
+            if (info is null || !info.SupportsReading)
                 return false;
+            if (!info.SupportsMultipleFrames)
+            {
+                if (info.Format == ImageMagick.MagickFormat.Png)
+                {
+                    // SupportsMultipleFrames is always false for png so check if it's an apng
+                    using var collection = new ImageMagick.MagickImageCollection();
+                    collection.Ping(
+                        fileName,
+                        new ImageMagick.MagickReadSettings
+                        {
+                            Format = ImageMagick.MagickFormat.APng,
+                        }
+                    );
+                    if (collection.Count > 1)
+                        return true;
+                }
+                return false;
+            }
+
             return info.Format switch
             {
                 ImageMagick.MagickFormat.Gif
