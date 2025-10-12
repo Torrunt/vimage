@@ -2,12 +2,13 @@
 // Corey Zeke Womack (Torrunt) - me@torrunt.net
 
 using System;
-using System.Threading;
 
 namespace vimage
 {
     internal class Program
     {
+        public const string SENTRY_DSN = "";
+
         private static void Main(string[] args)
         {
             string file = "";
@@ -17,15 +18,12 @@ namespace vimage
                 if (!System.IO.File.Exists(file))
                     return;
             }
-
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-                System.Windows.Forms.Application.ThreadException += ApplicationThreadException;
-                AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
-            }
+            if (file == "")
+                return;
 
             // Extension supported?
-            if (file != "" && !ImageViewerUtils.IsSupportedFileType(file))
+            var info = ImageMagick.MagickFormatInfo.Create(file);
+            if (info is null || !ImageViewerUtils.IsSupportedFileType(info))
             {
                 System.Windows.Forms.MessageBox.Show(
                     "vimage does not support this file format.",
@@ -34,28 +32,26 @@ namespace vimage
                 return;
             }
 
-            var imageViewer = new ImageViewer(file, args);
-        }
+            Sentry.SentrySdk.Init(options =>
+            {
+                options.Dsn = SENTRY_DSN;
+                options.IsGlobalModeEnabled = true;
+                options.AutoSessionTracking = true;
+            });
+            Sentry.SentrySdk.ConfigureScope(scope =>
+            {
+                scope.Contexts["File"] = new
+                {
+                    Path = file,
+                    Format = Enum.GetName(info.Format),
+                    ModuleFormat = Enum.GetName(info.ModuleFormat),
+                    info.MimeType,
+                    info.Description,
+                    info.SupportsMultipleFrames,
+                };
+            });
 
-        private static void CurrentDomainOnUnhandledException(
-            object sender,
-            UnhandledExceptionEventArgs unhandledExceptionEventArgs
-        )
-        {
-            ReportCrash((Exception)unhandledExceptionEventArgs.ExceptionObject);
-            Environment.Exit(0);
-        }
-
-        private static void ApplicationThreadException(object sender, ThreadExceptionEventArgs e)
-        {
-            ReportCrash(e.Exception);
-        }
-
-        public static void ReportCrash(Exception exception)
-        {
-            // FIXME: Implement Sentry
-            //   var reportCrash = new ReportCrash { ToEmail = "torruntalt@gmail.com" };
-            //   reportCrash.Send(exception);
+            _ = new ImageViewer(file, args);
         }
     }
 }

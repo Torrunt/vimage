@@ -156,9 +156,8 @@ namespace vimage
             return new System.IO.FileInfo(path).LastWriteTime;
         }
 
-        public static bool IsSupportedFileType(string path)
+        public static bool IsSupportedFileType(ImageMagick.IMagickFormatInfo? info)
         {
-            var info = ImageMagick.MagickFormatInfo.Create(path);
             if (info is null || !info.SupportsReading)
                 return false;
             return info.Format switch
@@ -176,6 +175,12 @@ namespace vimage
                 or ImageMagick.MagickFormat.Wmv => false,
                 _ => true,
             };
+        }
+
+        public static bool IsSupportedFileType(string path)
+        {
+            var info = ImageMagick.MagickFormatInfo.Create(path);
+            return IsSupportedFileType(info);
         }
 
         public static bool IsAnimatedImage(string path)
