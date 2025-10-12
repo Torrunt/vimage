@@ -145,11 +145,6 @@ namespace vimage.Common
             "Re-render SVG",
         ];
 
-        public bool Setting_UseDevIL
-        {
-            get { return (bool)Settings["USEDEVIL"]; }
-            set { Settings["USEDEVIL"] = value; }
-        }
         public bool Setting_OpenAtMousePosition
         {
             get { return (bool)Settings["OPENATMOUSEPOSITION"]; }
@@ -404,7 +399,6 @@ namespace vimage.Common
 
             Settings = new Dictionary<string, object>()
             {
-                { "USEDEVIL", true },
                 { "OPENATMOUSEPOSITION", true },
                 { "SMOOTHINGDEFAULT", true },
                 { "MIPMAPPING", true },
@@ -920,7 +914,6 @@ namespace vimage.Common
             // Write
             writer.Write("// General Settings" + Environment.NewLine);
 
-            WriteSetting(writer, "UseDevil", Setting_UseDevIL);
             WriteSetting(writer, "OpenAtMousePosition", Setting_OpenAtMousePosition);
             WriteSetting(writer, "SmoothingDefault", Setting_SmoothingDefault);
             WriteSetting(writer, "Mipmapping", Setting_Mipmapping);

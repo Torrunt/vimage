@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
-using DevIL;
 using ImageMagick;
 using SFML.Graphics;
 using SFML.System;
@@ -28,354 +26,9 @@ namespace vimage
 
         public static uint MAX_TEXTURES = 80;
         public static uint MAX_ANIMATIONS = 8;
-        public static int TextureMaxSize = (int)Texture.MaximumSize;
+        public static uint TextureMaxSize = Texture.MaximumSize;
 
-        public static bool UseDevil = false;
-
-        public static void InitDevIL()
-        {
-            try
-            {
-                IL.Init();
-                UseDevil = true;
-            }
-            catch (DllNotFoundException)
-            {
-                System.Windows.Forms.MessageBox.Show(
-                    "vimage failed to find DevIL.dll.\nIf problem persists, try disabling DevIL in the settings.",
-                    "vimage - DevIL.dll not found"
-                );
-            }
-        }
-
-        public static dynamic? GetTexture(string fileName)
-        {
-            int index = TextureFileNames.IndexOf(fileName);
-            int splitTextureIndex =
-                SplitTextureFileNames.Count == 0 ? -1 : SplitTextureFileNames.IndexOf(fileName);
-
-            if (index >= 0)
-            {
-                // Texture Already Exists
-                // move it to the end of the array and return it
-                var texture = Textures[index];
-                var name = TextureFileNames[index];
-
-                Textures.RemoveAt(index);
-                TextureFileNames.RemoveAt(index);
-                Textures.Add(texture);
-                TextureFileNames.Add(name);
-
-                return Textures[^1];
-            }
-            else if (splitTextureIndex >= 0)
-            {
-                // Texture Already Exists (as split texture)
-                return SplitTextures[splitTextureIndex];
-            }
-            else
-            {
-                // New Texture
-                Texture? texture = null;
-                DisplayObject? textureLarge = null;
-
-                using (var fileStream = File.OpenRead(fileName))
-                {
-                    if (UseDevil)
-                    {
-                        // Load image via DevIL
-                        int imageID = IL.GenImage();
-                        IL.BindImage(imageID);
-
-                        _ = IL.Enable(EnableCap.AbsoluteOrigin);
-                        IL.RegisterOrigin(OriginMode.UpperLeft);
-
-                        bool loaded = IL.LoadStream(fileStream);
-
-                        if (loaded)
-                        {
-                            int width = IL.GetInteger(IntName.ImageWidth);
-                            int height = IL.GetInteger(IntName.ImageHeight);
-                            if (width > TextureMaxSize || height > TextureMaxSize)
-                            {
-                                // Large Image split-up into multiple textures
-                                // (image is larger than GPU's max texture size)
-                                textureLarge = GetLargeTextureFromBoundImage(
-                                    TextureMaxSize / 2,
-                                    fileName
-                                );
-                            }
-                            else
-                            {
-                                // Single Texture
-                                texture = GetTextureFromBoundImage();
-                                if (texture == null)
-                                    return null;
-
-                                Textures.Add(texture);
-                                TextureFileNames.Add(fileName);
-                            }
-                        }
-                        IL.DeleteImage(imageID);
-                    }
-                    else
-                    {
-                        // Load image via SFML
-                        try
-                        {
-                            using var image = new Image(fileStream);
-                            var imageSize = image.Size;
-
-                            if (imageSize.X > TextureMaxSize || imageSize.Y > TextureMaxSize)
-                            {
-                                // Large Image split-up into multiple textures
-                                textureLarge = GetLargeTextureFromSFMLImage(
-                                    TextureMaxSize,
-                                    image,
-                                    fileName
-                                );
-                            }
-                            else
-                            {
-                                // Single Texture
-                                texture = GetTextureFromSFMLImage(image);
-                                Textures.Add(texture);
-                                TextureFileNames.Add(fileName);
-                            }
-                        }
-                        catch (SFML.LoadingFailedException)
-                        {
-                            System.Windows.Forms.MessageBox.Show(
-                                "Failed to load image:\n"
-                                    + fileName
-                                    + ".\n\nTry changing \"Use DevIL\" on in the settings to help with this issue.",
-                                "vimage - SFML Image Loading Failed"
-                            );
-                            return null;
-                        }
-                    }
-                }
-
-                // Limit amount of Textures in Memory
-                if (Textures.Count > MAX_TEXTURES)
-                    RemoveTexture();
-
-                if (texture != null)
-                    return texture;
-                if (textureLarge != null)
-                    return textureLarge;
-                return null;
-            }
-        }
-
-        private static Texture? GetTextureFromBoundImage()
-        {
-            bool success = IL.ConvertImage(ChannelFormat.RGBA, ChannelType.UnsignedByte);
-            if (!success)
-                return null;
-
-            int width = IL.GetInteger(IntName.ImageWidth);
-            int height = IL.GetInteger(IntName.ImageHeight);
-            int bytesPerPixel = 4;
-            int rowBytes = width * bytesPerPixel;
-            int length = width * height * bytesPerPixel;
-            nint dataPtr = IL.GetData();
-            byte[] pixels = new byte[length];
-            Marshal.Copy(dataPtr, pixels, 0, length);
-
-            // Flip pixels since DevIL and SFML use different coordinates
-            byte[] flippedPixels = new byte[pixels.Length];
-            for (int y = 0; y < height; y++)
-            {
-                System.Buffer.BlockCopy(
-                    pixels,
-                    y * rowBytes,
-                    flippedPixels,
-                    (height - 1 - y) * rowBytes,
-                    rowBytes
-                );
-            }
-
-            var texture = new Texture((uint)width, (uint)height);
-            texture.Update(flippedPixels);
-            return texture;
-        }
-
-        private static DisplayObject? GetLargeTextureFromBoundImage(
-            int sectionSize,
-            string fileName = ""
-        )
-        {
-            bool success = IL.ConvertImage(ChannelFormat.RGBA, ChannelType.UnsignedByte);
-            if (!success)
-                return null;
-
-            var largeTexture = new DisplayObject();
-
-            int width = IL.GetInteger(IntName.ImageWidth);
-            int height = IL.GetInteger(IntName.ImageHeight);
-            var size = new Vector2i(width, height);
-            var amount = new Vector2u(
-                (uint)Math.Ceiling(size.X / (float)sectionSize),
-                (uint)Math.Ceiling(size.Y / (float)sectionSize)
-            );
-
-            var currentSize = new Vector2i(size.X, size.Y);
-            var pos = new Vector2i();
-            int bytesPerPixel = 4;
-
-            int maxSectionBytes = sectionSize * sectionSize * bytesPerPixel;
-            byte[] pixelBuffer = new byte[maxSectionBytes];
-            byte[] flippedBuffer = new byte[maxSectionBytes];
-
-            for (int iy = 0; iy < amount.Y; iy++)
-            {
-                int h = Math.Min(currentSize.Y, sectionSize);
-                currentSize.Y -= h;
-                currentSize.X = size.X;
-
-                for (int ix = 0; ix < amount.X; ix++)
-                {
-                    int w = Math.Min(currentSize.X, sectionSize);
-                    currentSize.X -= w;
-
-                    int sectionBytes = w * h * bytesPerPixel;
-
-                    // Copy pixels from DevIL into reusable buffer
-                    var partPtr = Marshal.AllocHGlobal(sectionBytes);
-                    _ = IL.CopyPixels(
-                        pos.X,
-                        pos.Y,
-                        0,
-                        w,
-                        h,
-                        1,
-                        ChannelFormat.RGBA,
-                        ChannelType.UnsignedByte,
-                        partPtr
-                    );
-                    Marshal.Copy(partPtr, pixelBuffer, 0, sectionBytes);
-                    Marshal.FreeHGlobal(partPtr);
-
-                    // Flip pixels since DevIL and SFML use different coordinates
-                    int rowBytes = w * bytesPerPixel;
-                    for (int y = 0; y < h; y++)
-                    {
-                        System.Buffer.BlockCopy(
-                            pixelBuffer,
-                            y * rowBytes,
-                            flippedBuffer,
-                            (h - 1 - y) * rowBytes,
-                            rowBytes
-                        );
-                    }
-
-                    var texture = new Texture((uint)w, (uint)h);
-                    texture.Update(flippedBuffer, (uint)w, (uint)h, 0, 0);
-
-                    var sprite = new Sprite(texture)
-                    {
-                        Position = new Vector2f(pos.X, size.Y - pos.Y - h),
-                    };
-                    largeTexture.AddChild(sprite);
-
-                    if (fileName != "")
-                    {
-                        Textures.Add(texture);
-                        TextureFileNames.Add(
-                            fileName + "_" + ix.ToString("00") + "_" + iy.ToString("00") + "^"
-                        );
-                    }
-
-                    pos.X += w;
-                }
-                pos.Y += h;
-                pos.X = 0;
-            }
-
-            largeTexture.Texture.Size = new Vector2u((uint)size.X, (uint)size.Y);
-            SplitTextures.Add(largeTexture);
-            SplitTextureFileNames.Add(fileName);
-
-            return largeTexture;
-        }
-
-        private static Texture GetTextureFromSFMLImage(Image image, IntRect area = default)
-        {
-            var imageSize = image.Size;
-            var bytes = image.Pixels;
-
-            if (area == default || (area.Width >= imageSize.X && area.Height >= imageSize.Y))
-                return new Texture(bytes);
-
-            const int blockSize = 4;
-            var crop = new byte[area.Width * area.Height * blockSize];
-            for (var line = 0; line <= area.Height - 1; line++)
-            {
-                var sourceIndex = ((area.Top + line) * imageSize.X + area.Left) * blockSize;
-                var destinationIndex = line * area.Width * blockSize;
-
-                Array.Copy(bytes, sourceIndex, crop, destinationIndex, area.Width * blockSize);
-            }
-            return new Texture(crop);
-        }
-
-        private static DisplayObject GetLargeTextureFromSFMLImage(
-            int sectionSize,
-            Image image,
-            string fileName = ""
-        )
-        {
-            var imageSize = image.Size;
-            var amount = new Vector2u(
-                (uint)Math.Ceiling((float)imageSize.X / sectionSize),
-                (uint)Math.Ceiling((float)imageSize.Y / sectionSize)
-            );
-            var currentSize = new Vector2i((int)imageSize.X, (int)imageSize.Y);
-            var pos = new Vector2i();
-
-            var largeTexture = new DisplayObject();
-
-            for (int iy = 0; iy < amount.Y; iy++)
-            {
-                int h = Math.Min(currentSize.Y, sectionSize);
-                currentSize.Y -= h;
-                currentSize.X = (int)imageSize.X;
-
-                for (int ix = 0; ix < amount.X; ix++)
-                {
-                    int w = Math.Min(currentSize.X, sectionSize);
-                    currentSize.X -= w;
-
-                    var texture = GetTextureFromSFMLImage(image, new IntRect(pos.X, pos.Y, w, h));
-                    var sprite = new Sprite(texture) { Position = new Vector2f(pos.X, pos.Y) };
-                    largeTexture.AddChild(sprite);
-
-                    if (fileName != "")
-                    {
-                        Textures.Add(texture);
-                        TextureFileNames.Add(
-                            fileName + "_" + ix.ToString("00") + "_" + iy.ToString("00") + "^"
-                        );
-                    }
-
-                    pos.X += w;
-                }
-                pos.Y += h;
-                pos.X = 0;
-            }
-
-            largeTexture.Texture.Size = new Vector2u(imageSize.X, imageSize.Y);
-            SplitTextures.Add(largeTexture);
-            SplitTextureFileNames.Add(fileName);
-
-            return largeTexture;
-        }
-
-        public static Sprite? GetSpriteFromMagick(
-            string fileName,
-            MagickReadSettings? settings = null
-        )
+        public static object? GetImage(string fileName, MagickReadSettings? settings = null)
         {
             int index = TextureFileNames.IndexOf(fileName);
 
@@ -398,12 +51,13 @@ namespace vimage
                 // New Texture
                 try
                 {
-                    var texture = GetTextureFromMagick(fileName, settings);
+                    var texture = GetTexture(fileName, settings);
                     if (texture == null)
                         return null;
-                    Textures.Add(texture);
-                    TextureFileNames.Add(fileName);
-                    return new Sprite(new Texture(texture));
+                    if (texture is Texture tex)
+                        return new Sprite(new Texture(tex));
+                    else if (texture is DisplayObject displayObject)
+                        return displayObject;
                 }
                 catch (Exception) { }
             }
@@ -411,7 +65,7 @@ namespace vimage
             return null;
         }
 
-        public static Texture? GetTextureFromMagick(
+        public static object? GetTexture(
             string fileName,
             MagickReadSettings? settings = null,
             bool cache = true
@@ -420,17 +74,83 @@ namespace vimage
             using var image = GetMagickImage(fileName, settings);
             if (image is null)
                 return null;
-            using var pixels = image.GetPixels();
-            var bytes = pixels.ToByteArray(PixelMapping.RGBA);
-            var texture = new Texture(image.Width, image.Height);
-            texture.Update(bytes);
-            if (cache)
+
+            if (image.Width > TextureMaxSize || image.Height > TextureMaxSize)
             {
-                Textures.Add(texture);
-                TextureFileNames.Add(fileName);
+                return GetLargeTexture(image, TextureMaxSize, cache ? fileName : null);
+            }
+            else
+            {
+                using var pixels = image.GetPixels();
+                var bytes = pixels.ToByteArray(PixelMapping.RGBA);
+                var texture = new Texture(image.Width, image.Height);
+                texture.Update(bytes);
+                if (cache)
+                {
+                    Textures.Add(texture);
+                    TextureFileNames.Add(fileName);
+                }
+
+                return texture;
+            }
+        }
+
+        private static DisplayObject GetLargeTexture(
+            MagickImage image,
+            uint sectionSize,
+            string? fileName = null
+        )
+        {
+            var amount = new Vector2u(
+                (uint)Math.Ceiling((float)image.Width / sectionSize),
+                (uint)Math.Ceiling((float)image.Height / sectionSize)
+            );
+            var currentSize = new Vector2u(image.Width, image.Height);
+            var pos = new Vector2u();
+
+            var largeTexture = new DisplayObject();
+
+            using var pixels = image.GetPixels();
+
+            for (int iy = 0; iy < amount.Y; iy++)
+            {
+                var h = Math.Min(currentSize.Y, sectionSize);
+                currentSize.Y -= h;
+                currentSize.X = image.Width;
+
+                for (int ix = 0; ix < amount.X; ix++)
+                {
+                    var w = Math.Min(currentSize.X, sectionSize);
+                    currentSize.X -= w;
+
+                    var texture = new Texture(w, h);
+                    var bytes = pixels.ToByteArray((int)pos.X, (int)pos.Y, w, h, PixelMapping.RGBA);
+                    texture.Update(bytes);
+                    var sprite = new Sprite(texture) { Position = new Vector2f(pos.X, pos.Y) };
+                    largeTexture.AddChild(sprite);
+
+                    if (fileName is not null)
+                    {
+                        Textures.Add(texture);
+                        TextureFileNames.Add(
+                            fileName + "_" + ix.ToString("00") + "_" + iy.ToString("00") + "^"
+                        );
+                    }
+
+                    pos.X += w;
+                }
+                pos.Y += h;
+                pos.X = 0;
             }
 
-            return texture;
+            largeTexture.Texture.Size = new Vector2u(image.Width, image.Height);
+            if (fileName is not null)
+            {
+                SplitTextures.Add(largeTexture);
+                SplitTextureFileNames.Add(fileName);
+            }
+
+            return largeTexture;
         }
 
         public static MagickImage? GetMagickImage(
@@ -686,7 +406,7 @@ namespace vimage
 
             // Process the rest
             collection.Read(FileName, settings);
-            collection.Coalesce(); // FIXME: Need alternative that doesn't use as some much resources
+            collection.Coalesce(); // FIXME: Need alternative that doesn't use as much resources
             for (int i = 0; i < Data.FrameCount; i++)
             {
                 if (Data.CancelLoading)

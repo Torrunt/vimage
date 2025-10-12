@@ -150,10 +150,6 @@ namespace vimage
             if (ShowTitleBar)
                 DWM.TitleBarSetVisible(Window, true);
 
-            // DevIL Enabled?
-            if (Config.Setting_UseDevIL)
-                Graphics.InitDevIL();
-
             // Get Image
             _ = ChangeImage(file);
 
@@ -1851,7 +1847,7 @@ namespace vimage
             var densityX = targetWidth / (Size.X / 72.0);
             var densityY = targetHeight / (Size.Y / 72.0);
 
-            var texture = Graphics.GetTextureFromMagick(
+            var texture = Graphics.GetTexture(
                 File,
                 new ImageMagick.MagickReadSettings
                 {
@@ -1862,10 +1858,10 @@ namespace vimage
                 },
                 false
             );
-            if (texture == null)
+            if (texture == null || texture is not Texture tex)
                 return;
 
-            Image = new Sprite(new Texture(texture));
+            Image = new Sprite(new Texture(tex));
             Size = Image.Texture.Size;
 
             Window.SetView(
@@ -1893,7 +1889,7 @@ namespace vimage
             if (ImageViewerUtils.IsAnimatedImage(fileName))
                 Image = Graphics.GetAnimatedImage(fileName);
             else
-                Image = Graphics.GetSpriteFromMagick(fileName);
+                Image = Graphics.GetImage(fileName);
 
             if (Image?.Texture == null)
                 return false;
@@ -2186,7 +2182,7 @@ namespace vimage
             }
             else
             {
-                if (Graphics.GetTextureFromMagick(fileName) is null)
+                if (Graphics.GetTexture(fileName) is null)
                     return false;
             }
 
