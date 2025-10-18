@@ -189,9 +189,12 @@ namespace vimage
             if (info is null || !info.SupportsReading)
                 return false;
 
-            if (info.Format == ImageMagick.MagickFormat.Png)
+            if (
+                info.Format == ImageMagick.MagickFormat.Png
+                || info.Format == ImageMagick.MagickFormat.APng
+            )
             {
-                // SupportsMultipleFrames is always false for png so check if it's an apng
+                // SupportsMultipleFrames is always false for png so check if it's an animated png
                 return IsAnimatedPng(path);
             }
             else if (!info.SupportsMultipleFrames)
@@ -203,16 +206,22 @@ namespace vimage
             {
                 ImageMagick.MagickFormat.Gif
                 or ImageMagick.MagickFormat.Gif87
-                or ImageMagick.MagickFormat.WebP
-                or ImageMagick.MagickFormat.APng
-                or ImageMagick.MagickFormat.Mng => true,
+                or ImageMagick.MagickFormat.Mng
+                or ImageMagick.MagickFormat.WebP => true,
                 _ => false,
             };
             if (!validFormat)
                 return false;
 
             using var collection = new ImageMagick.MagickImageCollection();
-            collection.Ping(path);
+            try
+            {
+                collection.Ping(path);
+            }
+            catch (ImageMagick.MagickCorruptImageErrorException)
+            {
+                return false;
+            }
             return collection.Count > 1;
         }
 

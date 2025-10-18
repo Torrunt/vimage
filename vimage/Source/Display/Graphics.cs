@@ -389,7 +389,10 @@ namespace vimage
             var settings = new MagickReadSettings { };
 
             var info = MagickFormatInfo.Create(FileName);
-            if (info is not null && info.Format == MagickFormat.Png)
+            if (
+                info is not null
+                && (info.Format == MagickFormat.APng || info.Format == MagickFormat.Png)
+            )
                 settings.Format = MagickFormat.APng;
 
             using var collection = new MagickImageCollection();
