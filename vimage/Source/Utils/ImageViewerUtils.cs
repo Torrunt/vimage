@@ -178,26 +178,17 @@ namespace vimage
             };
         }
 
+        /// <summary>
+        /// Checks if file is supported by checking the extension.
+        /// This is done instead of getting the actual MagickImageInfo to avoid a performance hit when used in loops.
+        /// </summary>
         public static bool IsSupportedFileType(string path)
         {
-            try
-            {
-                var imageInfo = new ImageMagick.MagickImageInfo(path);
-                if (imageInfo is null)
-                    return false;
-                return IsSupportedFileType(imageInfo.Format);
-            }
-            catch (ImageMagick.MagickDelegateErrorException)
-            {
-                var formatInfo = ImageMagick.MagickFormatInfo.Create(path);
-                if (formatInfo is null)
-                    return false;
-                return IsSupportedFileType(formatInfo.Format);
-            }
-            catch (ImageMagick.MagickCorruptImageErrorException)
-            {
+            // Checks via extension instead of MagickImageInfo to avoid performance hit
+            var formatInfo = ImageMagick.MagickFormatInfo.Create(path);
+            if (formatInfo is null)
                 return false;
-            }
+            return IsSupportedFileType(formatInfo.Format);
         }
 
         public static bool IsAnimatedImage(string path)
