@@ -22,8 +22,8 @@ namespace vimage
                 return;
 
             // Extension supported?
-            var info = ImageMagick.MagickFormatInfo.Create(file);
-            if (info is null || !ImageViewerUtils.IsSupportedFileType(info))
+            var imageInfo = new ImageMagick.MagickImageInfo(file);
+            if (!ImageViewerUtils.IsSupportedFileType(imageInfo.Format))
             {
                 System.Windows.Forms.MessageBox.Show(
                     "vimage does not support this file format.",
@@ -43,11 +43,10 @@ namespace vimage
                 scope.Contexts["File"] = new
                 {
                     Path = file,
-                    Format = Enum.GetName(info.Format),
-                    ModuleFormat = Enum.GetName(info.ModuleFormat),
-                    info.MimeType,
-                    info.Description,
-                    info.SupportsMultipleFrames,
+                    Format = Enum.GetName(imageInfo.Format),
+                    imageInfo.Width,
+                    imageInfo.Height,
+                    imageInfo.Orientation,
                 };
             });
 

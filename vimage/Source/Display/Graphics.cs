@@ -158,7 +158,7 @@ namespace vimage
             MagickReadSettings? settings = null
         )
         {
-            var info = MagickFormatInfo.Create(fileName);
+            var info = new MagickImageInfo(fileName);
             if (info is not null && info.Format == MagickFormat.Ico)
                 return GetMagickImageIco(fileName);
 
@@ -223,7 +223,7 @@ namespace vimage
                         RemoveAnimatedImage();
 
                     // Get Frames
-                    var info = MagickFormatInfo.Create(fileName);
+                    var info = new MagickImageInfo(fileName);
                     if (info is not null && info.Format == MagickFormat.Gif)
                     {
                         // Use System.Drawing and OctreeQuantizer (faster and uses less memory)
@@ -388,7 +388,7 @@ namespace vimage
         {
             var settings = new MagickReadSettings { };
 
-            var info = MagickFormatInfo.Create(FileName);
+            var info = new MagickImageInfo(FileName);
             if (
                 info is not null
                 && (info.Format == MagickFormat.APng || info.Format == MagickFormat.Png)
@@ -409,7 +409,7 @@ namespace vimage
 
             // Process the rest
             collection.Read(FileName, settings);
-            collection.Coalesce(); // FIXME: Need alternative that doesn't use as much resources
+            collection.Coalesce(); // TODO: Find alternative that doesn't use as much resources
             for (int i = 0; i < Data.FrameCount; i++)
             {
                 if (Data.CancelLoading)

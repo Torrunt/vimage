@@ -156,11 +156,11 @@ namespace vimage
             return new System.IO.FileInfo(path).LastWriteTime;
         }
 
-        public static bool IsSupportedFileType(ImageMagick.IMagickFormatInfo? info)
+        public static bool IsSupportedFileType(ImageMagick.MagickFormat? format)
         {
-            if (info is null || !info.SupportsReading)
+            if (format is null)
                 return false;
-            return info.Format switch
+            return format switch
             {
                 ImageMagick.MagickFormat.Avi
                 or ImageMagick.MagickFormat.Flv
@@ -172,21 +172,38 @@ namespace vimage
                 or ImageMagick.MagickFormat.Mpeg
                 or ImageMagick.MagickFormat.Mpg
                 or ImageMagick.MagickFormat.Pdf
-                or ImageMagick.MagickFormat.Wmv => false,
+                or ImageMagick.MagickFormat.Wmv
+                or ImageMagick.MagickFormat.WebM => false,
                 _ => true,
             };
         }
 
         public static bool IsSupportedFileType(string path)
         {
-            var info = ImageMagick.MagickFormatInfo.Create(path);
-            return IsSupportedFileType(info);
+            try
+            {
+                var imageInfo = new ImageMagick.MagickImageInfo(path);
+                if (imageInfo is null)
+                    return false;
+                return IsSupportedFileType(imageInfo.Format);
+            }
+            catch (ImageMagick.MagickDelegateErrorException)
+            {
+                var formatInfo = ImageMagick.MagickFormatInfo.Create(path);
+                if (formatInfo is null)
+                    return false;
+                return IsSupportedFileType(formatInfo.Format);
+            }
+            catch (ImageMagick.MagickCorruptImageErrorException)
+            {
+                return false;
+            }
         }
 
         public static bool IsAnimatedImage(string path)
         {
-            var info = ImageMagick.MagickFormatInfo.Create(path);
-            if (info is null || !info.SupportsReading)
+            var info = new ImageMagick.MagickImageInfo(path);
+            if (info is null)
                 return false;
 
             if (
@@ -194,12 +211,7 @@ namespace vimage
                 || info.Format == ImageMagick.MagickFormat.APng
             )
             {
-                // SupportsMultipleFrames is always false for png so check if it's an animated png
                 return IsAnimatedPng(path);
-            }
-            else if (!info.SupportsMultipleFrames)
-            {
-                return false;
             }
 
             var validFormat = info.Format switch
