@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Text.RegularExpressions;
 
-namespace vimage
+namespace vimage.Common
 {
     public enum Action
     {
@@ -69,21 +69,19 @@ namespace vimage
         SortAscending,
         SortDescending,
 
-        Custom
+        Custom,
     }
 
-    public static class Actions
+    public static partial class Actions
     {
-        public static List<string> Names = new List<string>
-        {
+        public static List<string> Names =
+        [
             "",
-
             "DRAG",
             "CLOSE",
             "OPEN CONTEXT MENU",
             "PREV IMAGE",
             "NEXT IMAGE",
-
             "ROTATE CLOCKWISE",
             "ROTATE ANTICLOCKWISE",
             "FLIP",
@@ -96,18 +94,15 @@ namespace vimage
             "ZOOM FASTER",
             "ZOOM ALT",
             "DRAG LIMIT TO MONITOR BOUNDS",
-
             "TOGGLE SMOOTHING",
             "TOGGLE BACKGROUND",
             "TOGGLE LOCK",
             "ALWAYS ON TOP",
             "CLICK-THROUGH_ABLE",
             "TOGGLE TITLE BAR",
-
             "TOGGLE ANIMATION",
             "PREV FRAME",
             "NEXT FRAME",
-
             "OPEN SETTINGS",
             "RESET IMAGE",
             "OPEN FILE LOCATION",
@@ -117,12 +112,10 @@ namespace vimage
             "OPEN DUPLICATE",
             "OPEN DUPLICATE FULL",
             "RANDOM IMAGE",
-
             "MOVE LEFT",
             "MOVE RIGHT",
             "MOVE UP",
             "MOVE DOWN",
-
             "TOGGLE IMAGE TRANSPARENCY",
             "TRANSPARENCY INC",
             "TRANSPARENCY DEC",
@@ -130,33 +123,73 @@ namespace vimage
             "UNDO CROP",
             "EXIT ALL INSTANCES",
             "RERENDER SVG",
-
             "VISIT WEBSITE",
-
             "SORT NAME",
             "SORT DATE",
             "SORT DATE MODIFIED",
             "SORT DATE CREATED",
             "SORT SIZE",
             "SORT ASCENDING",
-            "SORT DESCENDING"
-        };
+            "SORT DESCENDING",
+        ];
 
-        public static string ToNameString(this Action action) { return Names[(int)action]; }
-        public static Action StringToAction(string action) { return (Action)Names.IndexOf(action); }
+        public static string ToNameString(this Action action)
+        {
+            return Names[(int)action];
+        }
+
+        public static Action StringToAction(string action)
+        {
+            return (Action)Names.IndexOf(action);
+        }
 
         /// <summary>List of actions that can be used in the Context Menu.</summary>
         public static readonly Action[] MenuActions =
-        {
-            Action.Close, Action.NextImage, Action.PrevImage, Action.RotateClockwise, Action.RotateAntiClockwise,
-            Action.Flip, Action.FitToMonitorHeight, Action.FitToMonitorWidth, Action.FitToMonitorAuto, Action.ResetImage,
-            Action.ToggleSmoothing, Action.ToggleBackground, Action.TransparencyToggle, Action.ToggleLock, Action.ToggleAlwaysOnTop, Action.ToggleClickThroughAble, Action.ToggleTitleBar,
-            Action.OpenAtLocation, Action.Delete, Action.Copy, Action.CopyAsImage,
-            Action.OpenDuplicateImage, Action.OpenFullDuplicateImage, Action.RandomImage, Action.UndoCrop, Action.ExitAll,
-            Action.PauseAnimation, Action.NextFrame, Action.PrevFrame,
-            Action.OpenSettings, Action.VisitWebsite,
-            Action.SortName, Action.SortDate, Action.SortDateModified, Action.SortDateCreated, Action.SortSize,
-            Action.SortAscending, Action.SortDescending,
-        };
+        [
+            Action.Close,
+            Action.NextImage,
+            Action.PrevImage,
+            Action.RotateClockwise,
+            Action.RotateAntiClockwise,
+            Action.Flip,
+            Action.FitToMonitorHeight,
+            Action.FitToMonitorWidth,
+            Action.FitToMonitorAuto,
+            Action.ResetImage,
+            Action.ToggleSmoothing,
+            Action.ToggleBackground,
+            Action.TransparencyToggle,
+            Action.ToggleLock,
+            Action.ToggleAlwaysOnTop,
+            Action.ToggleClickThroughAble,
+            Action.ToggleTitleBar,
+            Action.OpenAtLocation,
+            Action.Delete,
+            Action.Copy,
+            Action.CopyAsImage,
+            Action.OpenDuplicateImage,
+            Action.OpenFullDuplicateImage,
+            Action.RandomImage,
+            Action.UndoCrop,
+            Action.ExitAll,
+            Action.PauseAnimation,
+            Action.NextFrame,
+            Action.PrevFrame,
+            Action.OpenSettings,
+            Action.VisitWebsite,
+            Action.SortName,
+            Action.SortDate,
+            Action.SortDateModified,
+            Action.SortDateCreated,
+            Action.SortSize,
+            Action.SortAscending,
+            Action.SortDescending,
+        ];
+
+        /// <summary>
+        /// Split exe and arguments by the first space (regex to exclude the spaces within the quotes of the exe's path)
+        /// </summary>
+        [GeneratedRegex("(?<=^[^\"]*(?:\"[^\"]*\"[^\"]*)*) (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)")]
+        public static partial Regex CustomActionSplitRegex();
     }
 }

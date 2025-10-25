@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using System.Collections.Generic;
+using vimage.Common;
 
 namespace vimage_settings
 {
@@ -12,10 +12,6 @@ namespace vimage_settings
         private readonly StackPanel ParentPanel;
         public int Index;
 
-        public CustomActionItem()
-        {
-            InitializeComponent();
-        }
         public CustomActionItem(int index, StackPanel parentPanel)
         {
             InitializeComponent();
@@ -23,8 +19,8 @@ namespace vimage_settings
             Index = index;
             ParentPanel = parentPanel;
 
-            ItemName.Text = (App.vimageConfig.CustomActions[Index] as dynamic).name;
-            ItemAction.Text = (App.vimageConfig.CustomActions[Index] as dynamic).func;
+            ItemName.Text = App.vimageConfig?.CustomActions[Index].name;
+            ItemAction.Text = App.vimageConfig?.CustomActions[Index].func;
 
             ItemName.TextChanged += ItemName_TextChanged;
             ItemAction.TextChanged += ItemAction_TextChanged;
@@ -32,40 +28,49 @@ namespace vimage_settings
 
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
-            App.vimageConfig.CustomActions.RemoveAt(Index);
-            App.vimageConfig.CustomActionBindings.RemoveAt(Index);
+            if (App.vimageConfig is not null)
+            {
+                App.vimageConfig.CustomActions.RemoveAt(Index);
+                App.vimageConfig.CustomActionBindings.RemoveAt(Index);
+            }
 
             ParentPanel?.Children.Remove(this);
 
-            // update controls tab
-            (Application.Current.MainWindow as MainWindow).ControlBindings.RemoveCustomActionBinding(Index);
+            if (Application.Current.MainWindow is MainWindow mainWindow)
+            {
+                // update controls tab
+                mainWindow.ControlBindings.RemoveCustomActionBinding(Index);
 
-            // update item indices
-            (Application.Current.MainWindow as MainWindow).CustomActions.UpdateItemIndices();
-            // update context menu function list
-            (Application.Current.MainWindow as MainWindow).ContextMenuEditor.UpdateCustomActions();
+                // update item indices
+                mainWindow.CustomActions.UpdateItemIndices();
+                // update context menu function list
+                mainWindow.ContextMenuEditor.UpdateCustomActions();
+            }
         }
 
         private void ItemName_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (App.vimageConfig == null)
                 return;
-            App.vimageConfig.CustomActions[Index] = new { name = ItemName.Text, func = ItemAction.Text };
+            App.vimageConfig.CustomActions[Index] = new CustomAction { name = ItemName.Text, func = ItemAction.Text };
 
             // update control binding
-            List<int> bindings = (App.vimageConfig.CustomActionBindings[Index] as dynamic).bindings;
-            App.vimageConfig.CustomActionBindings[Index] = new { name = ItemName.Text, bindings = bindings };
+            var bindings = App.vimageConfig.CustomActionBindings[Index].bindings;
+            App.vimageConfig.CustomActionBindings[Index] = new CustomActionBinding { name = ItemName.Text, bindings = bindings };
 
-            // update controls tab
-            (Application.Current.MainWindow as MainWindow).ControlBindings.CustomActionBindings[Index].ControlName.Content = ItemName.Text;
-            // update context menu function list
-            (Application.Current.MainWindow as MainWindow).ContextMenuEditor.UpdateCustomActions();
+            if (Application.Current.MainWindow is MainWindow mainWindow)
+            {
+                // update controls tab
+                mainWindow.ControlBindings.CustomActionBindings[Index].ControlName.Content = ItemName.Text;
+                // update context menu function list
+                mainWindow.ContextMenuEditor.UpdateCustomActions();
+            }
         }
         private void ItemAction_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (App.vimageConfig == null)
                 return;
-            App.vimageConfig.CustomActions[Index] = new { name = ItemName.Text, func = ItemAction.Text };
+            App.vimageConfig.CustomActions[Index] = new CustomAction { name = ItemName.Text, func = ItemAction.Text };
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using vimage;
+using vimage.Common;
 
 namespace vimage_settings
 {
@@ -11,14 +11,15 @@ namespace vimage_settings
     /// </summary>
     public partial class ControlItem : UserControl
     {
-        public List<int> Controls;
+        public List<int> Controls = [];
         private bool CanRecordMouseButton = false;
-        private readonly List<int> KeysHeld = new List<int>();
+        private readonly List<int> KeysHeld = [];
 
         public ControlItem()
         {
             InitializeComponent();
         }
+
         public ControlItem(string name, List<int> controls)
         {
             InitializeComponent();
@@ -33,6 +34,7 @@ namespace vimage_settings
             Controls.Clear();
             ControlSetting.Text = "";
         }
+
         public void UpdateBindings()
         {
             ControlSetting.Text = Config.ControlsToString(Controls);
@@ -43,13 +45,14 @@ namespace vimage_settings
             e.Handled = true;
 
             int key = ConvertWindowsKey(e.Key == Key.System ? e.SystemKey : e.Key);
-            if (KeysHeld.Count == 0 || KeysHeld[KeysHeld.Count - 1] != key)
+            if (KeysHeld.Count == 0 || KeysHeld[^1] != key)
             {
                 KeysHeld.Add(key);
                 if (KeysHeld.Count > 2)
                     KeysHeld.RemoveAt(0);
             }
         }
+
         private void OnKeyUp(object sender, KeyEventArgs e)
         {
             e.Handled = true;
@@ -59,6 +62,7 @@ namespace vimage_settings
 
             RecordControl(key);
         }
+
         private void ControlSetting_MouseUp(object sender, MouseButtonEventArgs e)
         {
             if (!ControlSetting.IsFocused)
@@ -71,19 +75,19 @@ namespace vimage_settings
             e.Handled = true;
 
             // Record Mouse Button Press
-            int button = -1;
-            switch (e.ChangedButton)
+            int button = e.ChangedButton switch
             {
-                case MouseButton.Left: button = (int)SFML.Window.Mouse.Button.Left; break;
-                case MouseButton.Right: button = (int)SFML.Window.Mouse.Button.Right; break;
-                case MouseButton.Middle: button = (int)SFML.Window.Mouse.Button.Middle; break;
-                case MouseButton.XButton1: button = (int)SFML.Window.Mouse.Button.XButton1; break;
-                case MouseButton.XButton2: button = (int)SFML.Window.Mouse.Button.XButton2; break;
-            }
-
+                MouseButton.Left => 0,
+                MouseButton.Right => 1,
+                MouseButton.Middle => 2,
+                MouseButton.XButton1 => 3,
+                MouseButton.XButton2 => 4,
+                _ => -1,
+            };
             RecordControl(button + Config.MouseCodeOffset);
             ControlSetting.ReleaseMouseCapture();
         }
+
         private void ControlSetting_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (!ControlSetting.IsFocused)
@@ -99,34 +103,44 @@ namespace vimage_settings
 
             RecordControl(bind);
         }
-        private int ConvertWindowsKey(Key keyCode)
+
+        private static int ConvertWindowsKey(Key keyCode)
         {
-            string key = keyCode.ToString().ToUpper();
+            var key = keyCode.ToString().ToUpper();
+            if (key is null)
+                return -1;
 
             // Record Key Press
-            if (key.Equals("SCROLL") || key.Equals("NUMLOCK") || key.Equals("CAPITAL") ||
-                key.Equals("LWIN") || key.Equals("RWIN"))
+            if (
+                key.Equals("SCROLL")
+                || key.Equals("NUMLOCK")
+                || key.Equals("CAPITAL")
+                || key.Equals("LWIN")
+                || key.Equals("RWIN")
+            )
                 return -1;
 
             // fix up some weird names KeyEventArgs gives
-            switch (key)
+            key = key switch
             {
-                case "OEMOPENBRACKETS": key = "["; break;
-                case "OEM3": key = "`"; break;
-                case "OEM6": key = "]"; break;
-                case "OEM5": key = "\\"; break;
-                case "OEM1": key = ";"; break;
-                case "OEM7": key = "'"; break;
-                case "OEMMINUS": key = "MINUS"; break;
-                case "OEMPLUS": key = "PLUS"; break;
-            }
+                "OEMOPENBRACKETS" => "[",
+                "OEM3" => "`",
+                "OEM6" => "]",
+                "OEM5" => "\\",
+                "OEM1" => ";",
+                "OEM7" => "'",
+                "OEMMINUS" => "MINUS",
+                "OEMPLUS" => "PLUS",
+                _ => key,
+            };
 
             // fix number keys (remove D from D#)
             if (key.Length == 2 && key[0] == 'D')
-                key = key.Remove(0, 1);
+                key = key[1..];
 
             return (int)Config.StringToKey(key);
         }
+
         private void RecordControl(int bind, bool canBeKeyCombo = true)
         {
             if (bind == -1)
@@ -137,10 +151,10 @@ namespace vimage_settings
 
             if (canBeKeyCombo)
             {
-                if (KeysHeld.Count > 0 && KeysHeld[KeysHeld.Count - 1] != bind)
+                if (KeysHeld.Count > 0 && KeysHeld[^1] != bind)
                 {
                     // Key Combo? (eg: CTRL+C)
-                    int c = KeysHeld[KeysHeld.Count - 1];
+                    int c = KeysHeld[^1];
 
                     if (i != -1 && Controls.IndexOf(c) != -1)
                         return;

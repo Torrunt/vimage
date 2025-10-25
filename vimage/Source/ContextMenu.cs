@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using vimage.Common;
+using Action = vimage.Common.Action;
 
 namespace vimage
 {
@@ -8,15 +10,15 @@ namespace vimage
     {
         private readonly ImageViewer ImageViewer;
         public int Setting = -1;
-        private List<string> Items_General;
-        private List<string> Items_Animation;
+        private List<string> Items_General = [];
+        private List<string> Items_Animation = [];
 
-        private Dictionary<string, dynamic> FuncByName;
+        private Dictionary<string, dynamic> FuncByName = [];
 
         public int FileNameItem = -1;
         public string FileNameCurrent = ".";
 
-        private ToolTip ToolTip;
+        private ToolTip? ToolTip;
 
         public ContextMenu(ImageViewer ImageViewer)
             : base()
@@ -26,26 +28,31 @@ namespace vimage
             SetupToolTip();
         }
 
-        public void LoadItems(List<object> General, List<object> Animation, int AnimationInsertAtIndex)
+        public void LoadItems(
+            List<object> General,
+            List<object> Animation,
+            int AnimationInsertAtIndex
+        )
         {
-            FuncByName = new Dictionary<string, dynamic>();
+            FuncByName = [];
 
             // General
-            Items_General = new List<string>();
+            Items_General = [];
             LoadItemsInto(Items_General, General);
 
             // Animation
-            Items_Animation = new List<string>(Items_General);
-            List<string> list = new List<string>();
+            Items_Animation = [.. Items_General];
+            List<string> list = [];
 
             // inserting into submenu?
             int depth = 0;
-            if (Items_Animation[AnimationInsertAtIndex].IndexOf(":") == 0)
+            if (Items_Animation[AnimationInsertAtIndex].StartsWith(':'))
                 depth = Items_Animation[AnimationInsertAtIndex].Split(':').Length - 1;
 
             LoadItemsInto(list, Animation, depth);
             Items_Animation.InsertRange(AnimationInsertAtIndex, list);
         }
+
         private void LoadItemsInto(List<string> list, List<object> items, int depth = 0)
         {
             for (int i = 0; i < items.Count; i++)
@@ -53,10 +60,10 @@ namespace vimage
                 if (ImageViewer.File == "")
                 {
                     // Remove certain items if there is no file (looking at clipboard image)
-                    if (items[i] is string)
+                    if (items[i] is string str)
                     {
                         // remove Sort By submenu
-                        if ((items[i] as string).IndexOf("Sort") == 0)
+                        if (str.StartsWith("Sort"))
                         {
                             i++;
                             if (i < items.Count - 1 && (items[i + 1] as dynamic).name == "-")
@@ -77,29 +84,30 @@ namespace vimage
                     }
                 }
 
-                if (items[i] is string)
+                if (items[i] is string str2)
                 {
                     // Submenu
                     list.Add(VariableAmountOfStrings(depth, ":") + items[i] + ":");
-                    FuncByName.Add(items[i] as string, Action.None);
+                    FuncByName.Add(str2, Action.None);
 
                     i++;
-                    LoadItemsInto(list, items[i] as List<object>, depth + 1);
+                    if (items[i] is List<object> itemList)
+                        LoadItemsInto(list, itemList, depth + 1);
                 }
-                else
+                else if (items[i] is ContextMenuItem contextMenuItem)
                 {
                     // Item
-                    if (!FuncByName.ContainsKey((items[i] as dynamic).name))
+                    if (!FuncByName.ContainsKey(contextMenuItem.name))
                     {
-                        string itemName = (items[i] as dynamic).name;
-                        if (itemName.IndexOf("[filename") == 0)
+                        var itemName = contextMenuItem.name;
+                        if (itemName.StartsWith("[filename"))
                             FileNameItem = list.Count;
                         if (itemName.Contains("[version]"))
                             itemName = itemName.Replace("[version]", ImageViewer.VERSION_NO);
 
                         list.Add(VariableAmountOfStrings(depth, ":") + itemName);
                         if (!itemName.Equals("-"))
-                            FuncByName.Add(itemName, (items[i] as dynamic).func);
+                            FuncByName.Add(itemName, contextMenuItem.func);
                     }
                 }
             }
@@ -107,7 +115,13 @@ namespace vimage
 
         public void Setup(bool force)
         {
-            if (!force && ((Setting == 0 && !(ImageViewer.Image is AnimatedImage)) || (Setting == 1 && ImageViewer.Image is AnimatedImage)))
+            if (
+                !force
+                && (
+                    (Setting == 0 && ImageViewer.Image is not AnimatedImage)
+                    || (Setting == 1 && ImageViewer.Image is AnimatedImage)
+                )
+            )
                 return;
 
             Items.Clear();
@@ -127,31 +141,44 @@ namespace vimage
 
             for (int i = 0; i < items.Count; i++)
             {
-                ToolStripItem item = null;
+                ToolStripItem? item = null;
                 string name = items[i];
                 bool itemClickable = true;
 
-                if (name.Length > 0 && name.LastIndexOf(":") == name.Length - 1)
+                if (name.Length > 0 && name.LastIndexOf(':') == name.Length - 1)
                 {
                     // non-clickable item?
-                    name = name.Substring(0, name.Length - 1);
+                    name = name[..^1];
                     itemClickable = false;
                 }
 
-                if (name.IndexOf(":") == 0)
+                if (name.StartsWith(':'))
                 {
                     // sub item
-                    ToolStripDropDownItem dropDownItem = Items[Items.Count - 1] as ToolStripDropDownItem;
-                    ((ToolStripDropDownMenu)dropDownItem.DropDown).ShowImageMargin = ImageViewer.Config.ContextMenuShowMarginSub;
-                    name = name.Substring(1);
-                    while (name.IndexOf(":") == 0)
+                    if (Items[Items.Count - 1] is ToolStripDropDownItem dropDownItem)
                     {
-                        if (dropDownItem.DropDownItems.Count > 0)
-                            dropDownItem = dropDownItem.DropDownItems[dropDownItem.DropDownItems.Count - 1] as ToolStripDropDownItem;
-                        name = name.Substring(1);
-                    }
+                        if (dropDownItem.DropDown is ToolStripDropDownMenu dropDownMenu)
+                        {
+                            dropDownMenu.ShowImageMargin = ImageViewer
+                                .Config
+                                .ContextMenuShowMarginSub;
+                        }
+                        name = name[1..];
+                        while (name.StartsWith(':'))
+                        {
+                            if (
+                                dropDownItem.DropDownItems.Count > 0
+                                && dropDownItem.DropDownItems[dropDownItem.DropDownItems.Count - 1]
+                                    is ToolStripDropDownItem subDropDownitem
+                            )
+                            {
+                                dropDownItem = subDropDownitem;
+                            }
+                            name = name[1..];
+                        }
 
-                    item = dropDownItem.DropDownItems.Add(name);
+                        item = dropDownItem.DropDownItems.Add(name);
+                    }
                 }
                 else
                 {
@@ -161,13 +188,15 @@ namespace vimage
                 if (name.Equals("-"))
                     continue;
 
-                if (itemClickable)
-                    item.Click += ContexMenuItemClicked;
-
-                item.Name = name;
+                if (item is not null)
+                {
+                    if (itemClickable)
+                        item.Click += ContexMenuItemClicked;
+                    item.Name = name;
+                }
             }
 
-            ToolStripMenuItem websiteItem = GetItemByFunc(Action.VisitWebsite);
+            var websiteItem = GetItemByFunc(Action.VisitWebsite);
             if (websiteItem != null)
                 websiteItem.BackColor = System.Drawing.Color.CornflowerBlue;
 
@@ -182,94 +211,148 @@ namespace vimage
                 if (Items_General[FileNameItem].Contains("[filename]"))
                 {
                     // File Name
-                    Items[Items_General[FileNameItem]].Text = Items_General[FileNameItem].Replace("[filename]", ImageViewer.File == "" ? "Clipboard Image" : ImageViewer.File.Substring(ImageViewer.File.LastIndexOf('\\') + 1));
+                    var fileNameItem = Items[Items_General[FileNameItem]];
+                    if (fileNameItem is not null)
+                    {
+                        fileNameItem.Text = Items_General[FileNameItem]
+                            .Replace(
+                                "[filename]",
+                                ImageViewer.File == ""
+                                    ? "Clipboard Image"
+                                    : ImageViewer.File[(ImageViewer.File.LastIndexOf('\\') + 1)..]
+                            );
+                    }
                 }
                 else if (Items_General[FileNameItem].Contains("[filename"))
                 {
                     // File Name (trimmed)
                     int a = Items_General[FileNameItem].IndexOf("[filename.") + 10;
-                    int b = Items_General[FileNameItem].IndexOf("]");
-                    if (int.TryParse(Items_General[FileNameItem].Substring(a, b - a), out int nameLength))
+                    int b = Items_General[FileNameItem].IndexOf(']');
+                    if (int.TryParse(Items_General[FileNameItem][a..b], out int nameLength))
                     {
-                        string fileName = ImageViewer.File == "" ? "Clipboard Image" : ImageViewer.File.Substring(ImageViewer.File.LastIndexOf('\\') + 1);
-                        string extension = ImageViewer.File == "" ? "" : fileName.Substring(fileName.LastIndexOf("."));
-                        if (nameLength >= fileName.Length - 6 || fileName.LastIndexOf(".") <= nameLength)
+                        string fileName =
+                            ImageViewer.File == ""
+                                ? "Clipboard Image"
+                                : ImageViewer.File[(ImageViewer.File.LastIndexOf('\\') + 1)..];
+                        string extension =
+                            ImageViewer.File == "" ? "" : fileName[fileName.LastIndexOf('.')..];
+                        if (
+                            nameLength >= fileName.Length - 6
+                            || fileName.LastIndexOf('.') <= nameLength
+                        )
                             nameLength = fileName.Length;
-                        Items[Items_General[FileNameItem]].Text = (a > 10 ? Items_General[FileNameItem].Substring(0, a - 10) : "") +
-                            (fileName.Length > nameLength ? fileName.Substring(0, nameLength) + ".." + extension : fileName) +
-                            (b < Items_General[FileNameItem].Length - 1 ? Items_General[FileNameItem].Substring(b + 1) : "");
-                        Items[Items_General[FileNameItem]].ToolTipText = fileName.Length > nameLength ? fileName : "";
-                        Items[Items_General[FileNameItem]].MouseEnter += ItemMouseEnter;
-                        Items[Items_General[FileNameItem]].MouseLeave += ItemMouseLeave;
+
+                        var fileNameItem = Items[Items_General[FileNameItem]];
+                        if (fileNameItem is not null)
+                        {
+                            fileNameItem.Text =
+                                (a > 10 ? Items_General[FileNameItem][..(a - 10)] : "")
+                                + (
+                                    fileName.Length > nameLength
+                                        ? fileName[..nameLength] + ".." + extension
+                                        : fileName
+                                )
+                                + (
+                                    b < Items_General[FileNameItem].Length - 1
+                                        ? Items_General[FileNameItem][(b + 1)..]
+                                        : ""
+                                );
+                            fileNameItem.ToolTipText = fileName.Length > nameLength ? fileName : "";
+                            fileNameItem.MouseEnter += ItemMouseEnter;
+                            fileNameItem.MouseLeave += ItemMouseLeave;
+                        }
                     }
                 }
             }
 
-            if (!ImageViewer.Config.ContextMenuShowMargin && !ImageViewer.Config.ContextMenuShowMarginSub)
+            if (
+                !ImageViewer.Config.ContextMenuShowMargin
+                && !ImageViewer.Config.ContextMenuShowMarginSub
+            )
                 return;
 
-            ToolStripMenuItem item;
+            ToolStripMenuItem? item;
 
             item = GetItemByFunc(Action.Flip);
-            if (item != null) item.Checked = ImageViewer.FlippedX;
+            if (item != null)
+                item.Checked = ImageViewer.FlippedX;
 
             item = GetItemByFunc(Action.FitToMonitorHeight);
-            if (item != null) item.Checked = ImageViewer.FitToMonitorHeight;
+            if (item != null)
+                item.Checked = ImageViewer.FitToMonitorHeight;
 
             item = GetItemByFunc(Action.FitToMonitorWidth);
-            if (item != null) item.Checked = ImageViewer.FitToMonitorWidth;
+            if (item != null)
+                item.Checked = ImageViewer.FitToMonitorWidth;
 
             item = GetItemByFunc(Action.ToggleSmoothing);
-            if (item != null) item.Checked = ImageViewer.Smoothing();
+            if (item != null)
+                item.Checked = ImageViewer.Smoothing();
 
             item = GetItemByFunc(Action.ToggleBackground);
-            if (item != null) item.Checked = ImageViewer.BackgroundsForImagesWithTransparency;
+            if (item != null)
+                item.Checked = ImageViewer.BackgroundsForImagesWithTransparency;
 
             item = GetItemByFunc(Action.ToggleLock);
-            if (item != null) item.Checked = ImageViewer.Locked;
+            if (item != null)
+                item.Checked = ImageViewer.Locked;
 
             item = GetItemByFunc(Action.ToggleAlwaysOnTop);
-            if (item != null) item.Checked = ImageViewer.AlwaysOnTop;
+            if (item != null)
+                item.Checked = ImageViewer.AlwaysOnTop;
 
             item = GetItemByFunc(Action.ToggleTitleBar);
-            if (item != null) item.Checked = ImageViewer.Config.Setting_ShowTitleBar;
+            if (item != null)
+                item.Checked = ImageViewer.Config.Setting_ShowTitleBar;
 
             item = GetItemByFunc(Action.SortName);
-            if (item != null) item.Checked = ImageViewer.SortImagesBy == SortBy.Name;
+            if (item != null)
+                item.Checked = ImageViewer.SortImagesBy == SortBy.Name;
 
             item = GetItemByFunc(Action.SortDate);
-            if (item != null) item.Checked = ImageViewer.SortImagesBy == SortBy.Date;
+            if (item != null)
+                item.Checked = ImageViewer.SortImagesBy == SortBy.Date;
 
             item = GetItemByFunc(Action.SortDateModified);
-            if (item != null) item.Checked = ImageViewer.SortImagesBy == SortBy.DateModified;
+            if (item != null)
+                item.Checked = ImageViewer.SortImagesBy == SortBy.DateModified;
 
             item = GetItemByFunc(Action.SortDateCreated);
-            if (item != null) item.Checked = ImageViewer.SortImagesBy == SortBy.DateCreated;
+            if (item != null)
+                item.Checked = ImageViewer.SortImagesBy == SortBy.DateCreated;
 
             item = GetItemByFunc(Action.SortSize);
-            if (item != null) item.Checked = ImageViewer.SortImagesBy == SortBy.Size;
+            if (item != null)
+                item.Checked = ImageViewer.SortImagesBy == SortBy.Size;
 
             item = GetItemByFunc(Action.SortAscending);
-            if (item != null) item.Checked = ImageViewer.SortImagesByDir == SortDirection.Ascending;
+            if (item != null)
+                item.Checked = ImageViewer.SortImagesByDir == SortDirection.Ascending;
 
             item = GetItemByFunc(Action.SortDescending);
-            if (item != null) item.Checked = ImageViewer.SortImagesByDir == SortDirection.Descending;
+            if (item != null)
+                item.Checked = ImageViewer.SortImagesByDir == SortDirection.Descending;
         }
 
-        private void ContexMenuItemClicked(object sender, EventArgs e)
+        private void ContexMenuItemClicked(object? sender, EventArgs e)
         {
-            ToolStripItem item = sender as ToolStripItem;
+            if (sender is not ToolStripItem item)
+                return;
 
-            if (!(item as ToolStripDropDownItem).HasDropDownItems)
+            if (
+                item is ToolStripDropDownItem toolStripDropDownItem
+                && !toolStripDropDownItem.HasDropDownItems
+            )
                 Close();
 
-            object func = FuncByName[item.Name];
-            if (func is string @funcName)
+            var func = FuncByName[item.Name ?? ""];
+            if (func is string funcName)
             {
                 for (int i = 0; i < ImageViewer.Config.CustomActions.Count; i++)
                 {
-                    if ((ImageViewer.Config.CustomActions[i] as dynamic).name == @funcName)
-                        ImageViewer.DoCustomAction((ImageViewer.Config.CustomActions[i] as dynamic).func);
+                    if (ImageViewer.Config.CustomActions[i].name != funcName)
+                        continue;
+                    ImageViewer.DoCustomAction(ImageViewer.Config.CustomActions[i].func);
                 }
             }
             else
@@ -277,23 +360,31 @@ namespace vimage
         }
 
         /// <summary>returns the ToolStripMenuItem based on the name of the function.</summary>
-        public ToolStripMenuItem GetItemByFunc(Action func)
+        public ToolStripMenuItem? GetItemByFunc(Action func)
         {
             return GetItemByFuncFrom(func, Items);
         }
-        private ToolStripMenuItem GetItemByFuncFrom(Action func, ToolStripItemCollection collection)
+
+        private ToolStripMenuItem? GetItemByFuncFrom(
+            Action func,
+            ToolStripItemCollection collection
+        )
         {
             for (int i = 0; i < collection.Count; i++)
             {
-                if (collection[i].Name == "")
+                var name = collection[i].Name;
+                if (name is null || name == "")
                     continue;
-                object currentFunc = FuncByName[collection[i].Name];
+                object currentFunc = FuncByName[name];
                 if (currentFunc is Action action && action == func)
                     return collection[i] as ToolStripMenuItem;
 
-                if (collection[i] is ToolStripDropDownItem && (collection[i] as ToolStripDropDownItem).DropDownItems.Count > 0)
+                if (
+                    collection[i] is ToolStripDropDownItem toolStripDropDownItem
+                    && toolStripDropDownItem.DropDownItems.Count > 0
+                )
                 {
-                    ToolStripMenuItem item = GetItemByFuncFrom(func, (collection[i] as ToolStripDropDownItem).DropDownItems);
+                    var item = GetItemByFuncFrom(func, toolStripDropDownItem.DropDownItems);
                     if (item != null)
                         return item;
                 }
@@ -315,11 +406,7 @@ namespace vimage
         private void SetupToolTip()
         {
             ShowItemToolTips = false;
-            ToolTip = new ToolTip
-            {
-                UseAnimation = true,
-                UseFading = true
-            };
+            ToolTip = new ToolTip { UseAnimation = true, UseFading = true };
             if (SystemInformation.HighContrast)
             {
                 ToolTip.BackColor = System.Drawing.Color.FromArgb(26, 255, 255);
@@ -330,25 +417,44 @@ namespace vimage
             ToolTip.OwnerDraw = true;
             ToolTip.Draw += new DrawToolTipEventHandler(ToolTipDraw);
         }
-        private void ToolTipDraw(object sender, DrawToolTipEventArgs e)
+
+        private void ToolTipDraw(object? sender, DrawToolTipEventArgs e)
         {
-            System.Drawing.Rectangle bounds = e.Bounds;
+            if (ToolTip is null)
+                return;
+            var bounds = e.Bounds;
             bounds.Height -= 1;
-            DrawToolTipEventArgs newArgs = new DrawToolTipEventArgs(e.Graphics, e.AssociatedWindow, e.AssociatedControl, bounds, e.ToolTipText,
-                ToolTip.BackColor, ToolTip.ForeColor, e.Font);
+            var newArgs = new DrawToolTipEventArgs(
+                e.Graphics,
+                e.AssociatedWindow,
+                e.AssociatedControl,
+                bounds,
+                e.ToolTipText,
+                ToolTip.BackColor,
+                ToolTip.ForeColor,
+                e.Font
+            );
             newArgs.DrawBackground();
             newArgs.DrawText(TextFormatFlags.VerticalCenter);
         }
-        private void ItemMouseEnter(object sender, EventArgs e)
+
+        private void ItemMouseEnter(object? sender, EventArgs e)
         {
-            ToolStripMenuItem item = sender as ToolStripMenuItem;
-            ToolTip.Show(item.ToolTipText, item.Owner, item.Bounds.Location.X + 8, item.Bounds.Location.Y + 1);
-        }
-        private void ItemMouseLeave(object sender, EventArgs e)
-        {
-            ToolStripMenuItem item = sender as ToolStripMenuItem;
-            ToolTip.Hide(item.Owner);
+            if (sender is not ToolStripMenuItem item || item.Owner is null)
+                return;
+            ToolTip?.Show(
+                item.ToolTipText,
+                item.Owner,
+                item.Bounds.Location.X + 8,
+                item.Bounds.Location.Y + 1
+            );
         }
 
+        private void ItemMouseLeave(object? sender, EventArgs e)
+        {
+            if (sender is not ToolStripMenuItem item || item.Owner is null)
+                return;
+            ToolTip?.Hide(item.Owner);
+        }
     }
 }

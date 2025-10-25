@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Navigation;
-using System.Diagnostics;
 
 namespace vimage_settings
 {
@@ -10,7 +10,6 @@ namespace vimage_settings
     /// </summary>
     public partial class MainWindow : Window
     {
-
         public MainWindow()
         {
             InitializeComponent();
@@ -27,7 +26,19 @@ namespace vimage_settings
         {
             ContextMenuEditor.Save();
 
-            App.vimageConfig.Save(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
+            try
+            {
+                App.vimageConfig?.Save(
+                    System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt")
+                );
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show(
+                    "vimage does not have write permissions for the folder it's located in.\nPlease place it somewhere else (or set it to run as admin).",
+                    "vimage - Error"
+                );
+            }
         }
     }
 }

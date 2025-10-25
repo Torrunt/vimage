@@ -1,13 +1,11 @@
-﻿using DevIL.Unmanaged;
-using SFML.Graphics;
-using SFML.System;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
-using Tao.OpenGl;
+using ImageMagick;
+using SFML.Graphics;
+using SFML.System;
 
 namespace vimage
 {
@@ -17,209 +15,126 @@ namespace vimage
     /// </summary>
     internal class Graphics
     {
-        private static readonly List<Texture> Textures = new List<Texture>();
-        private static readonly List<string> TextureFileNames = new List<string>();
+        private static readonly List<Texture> Textures = [];
+        private static readonly List<string> TextureFileNames = [];
 
-        private static readonly List<AnimatedImageData> AnimatedImageDatas = new List<AnimatedImageData>();
-        private static readonly List<string> AnimatedImageDataFileNames = new List<string>();
+        private static readonly List<AnimatedImageData> AnimatedImageDatas = [];
+        private static readonly List<string> AnimatedImageDataFileNames = [];
 
-        private static readonly List<DisplayObject> SplitTextures = new List<DisplayObject>();
-        private static readonly List<string> SplitTextureFileNames = new List<string>();
+        private static readonly List<DisplayObject> SplitTextures = [];
+        private static readonly List<string> SplitTextureFileNames = [];
 
         public static uint MAX_TEXTURES = 80;
         public static uint MAX_ANIMATIONS = 8;
-        public static int TextureMaxSize = (int)Texture.MaximumSize;
+        public static uint TextureMaxSize = Texture.MaximumSize;
 
-        public static bool UseDevil = false;
-
-        public static void InitDevIL()
-        {
-            try
-            {
-                IL.Initialize();
-                UseDevil = true;
-            }
-            catch (DllNotFoundException)
-            {
-                System.Windows.Forms.MessageBox.Show("vimage failed to find DevIL.dll.\nIf problem persists, try disabling DevIL in the settings.", "vimage - DevIL.dll not found");
-            }
-        }
-
-        public static dynamic GetTexture(string fileName)
+        public static object? GetImage(string fileName, MagickReadSettings? settings = null)
         {
             int index = TextureFileNames.IndexOf(fileName);
-            int splitTextureIndex = SplitTextureFileNames.Count == 0 ? -1 : SplitTextureFileNames.IndexOf(fileName);
 
             if (index >= 0)
             {
                 // Texture Already Exists
                 // move it to the end of the array and return it
-                Texture texture = Textures[index];
-                string name = TextureFileNames[index];
+                var texture = Textures[index];
+                var name = TextureFileNames[index];
 
                 Textures.RemoveAt(index);
                 TextureFileNames.RemoveAt(index);
                 Textures.Add(texture);
                 TextureFileNames.Add(name);
 
-                return Textures[Textures.Count - 1];
-            }
-            else if (splitTextureIndex >= 0)
-            {
-                // Texture Already Exists (as split texture)
-                return SplitTextures[splitTextureIndex];
+                return new Sprite(Textures[^1]);
             }
             else
             {
                 // New Texture
-                Texture texture = null;
-                DisplayObject textureLarge = null;
-
-                using (FileStream fileStream = File.OpenRead(fileName))
+                try
                 {
-                    if (UseDevil)
-                    {
-                        // Load image via DevIL
-                        int imageID = IL.GenerateImage();
-                        IL.BindImage(imageID);
+                    var texture = GetTexture(fileName, settings);
+                    if (texture == null)
+                        return null;
+                    if (texture is Texture tex)
+                        return new Sprite(new Texture(tex));
+                    else if (texture is DisplayObject displayObject)
+                        return displayObject;
+                }
+                catch (Exception) { }
+            }
 
-                        _ = IL.Enable(ILEnable.AbsoluteOrigin);
-                        IL.SetOriginLocation(DevIL.OriginLocation.UpperLeft);
+            return null;
+        }
 
-                        bool loaded = IL.LoadImageFromStream(fileStream);
+        public static object? GetTexture(
+            string fileName,
+            MagickReadSettings? settings = null,
+            bool cache = true
+        )
+        {
+            using var image = GetMagickImage(fileName, settings);
+            if (image is null)
+                return null;
 
-                        if (loaded)
-                        {
-                            if (IL.GetImageInfo().Width > TextureMaxSize || IL.GetImageInfo().Height > TextureMaxSize)
-                            {
-                                // Large Image split-up into multiple textures
-                                // (image is larger than GPU's max texture size)
-                                textureLarge = GetLargeTextureFromBoundImage(TextureMaxSize / 2, fileName);
-                            }
-                            else
-                            {
-                                // Single Texture
-                                texture = GetTextureFromBoundImage();
-                                if (texture == null)
-                                    return null;
-
-                                Textures.Add(texture);
-                                TextureFileNames.Add(fileName);
-                            }
-                        }
-                        IL.DeleteImages(new ImageID[] { imageID });
-                    }
-                    else
-                    {
-                        // Load image via SFML
-                        try
-                        {
-                            using (Image image = new Image(fileStream))
-                            {
-                                Vector2u imageSize = image.Size;
-
-                                if (imageSize.X > TextureMaxSize || imageSize.Y > TextureMaxSize)
-                                {
-                                    // Large Image split-up into multiple textures
-                                    textureLarge = GetLargeTextureFromSFMLImage(TextureMaxSize, image, fileName);
-                                }
-                                else
-                                {
-                                    // Single Texture
-                                    texture = GetTextureFromSFMLImage(image);
-                                    Textures.Add(texture);
-                                    TextureFileNames.Add(fileName);
-                                }
-                            }
-                        }
-                        catch (SFML.LoadingFailedException)
-                        {
-                            System.Windows.Forms.MessageBox.Show("Failed to load image:\n" + fileName + ".\n\nTry changing \"Use DevIL\" on in the settings to help with this issue.", "vimage - SFML Image Loading Failed");
-                            return null;
-                        }
-                    }
+            if (image.Width > TextureMaxSize || image.Height > TextureMaxSize)
+            {
+                return GetLargeTexture(image, TextureMaxSize, cache ? fileName : null);
+            }
+            else
+            {
+                using var pixels = image.GetPixels();
+                var bytes = pixels.ToByteArray(PixelMapping.RGBA);
+                var texture = new Texture(image.Width, image.Height);
+                texture.Update(bytes);
+                if (cache)
+                {
+                    Textures.Add(texture);
+                    TextureFileNames.Add(fileName);
                 }
 
-                // Limit amount of Textures in Memory
-                if (Textures.Count > MAX_TEXTURES)
-                    RemoveTexture();
-
-                return texture ?? (dynamic)textureLarge;
+                return texture;
             }
         }
-        private static Texture GetTextureFromBoundImage()
+
+        private static DisplayObject GetLargeTexture(
+            MagickImage image,
+            uint sectionSize,
+            string? fileName = null
+        )
         {
-            bool success = IL.ConvertImage(DevIL.DataFormat.RGBA, DevIL.DataType.UnsignedByte);
+            var amount = new Vector2u(
+                (uint)Math.Ceiling((float)image.Width / sectionSize),
+                (uint)Math.Ceiling((float)image.Height / sectionSize)
+            );
+            var currentSize = new Vector2u(image.Width, image.Height);
+            var pos = new Vector2u();
 
-            if (!success)
-                return null;
+            var largeTexture = new DisplayObject();
 
-            int width = IL.GetImageInfo().Width;
-            int height = IL.GetImageInfo().Height;
-
-            Texture texture = new Texture((uint)width, (uint)height);
-            Texture.Bind(texture);
-            {
-                Gl.glTexImage2D(
-                    Gl.GL_TEXTURE_2D, 0, IL.GetInteger(ILIntegerMode.ImageBytesPerPixel),
-                    width, height, 0,
-                    IL.GetInteger(ILIntegerMode.ImageFormat), ILDefines.IL_UNSIGNED_BYTE,
-                    IL.GetData()
-                    );
-            }
-            Texture.Bind(null);
-
-            return texture;
-        }
-        private static DisplayObject GetLargeTextureFromBoundImage(int sectionSize, string fileName = "")
-        {
-            bool success = IL.ConvertImage(DevIL.DataFormat.RGBA, DevIL.DataType.UnsignedByte);
-
-            if (!success)
-                return null;
-
-            DisplayObject largeTexture = new DisplayObject();
-
-            Vector2i size = new Vector2i(IL.GetImageInfo().Width, IL.GetImageInfo().Height);
-            Vector2u amount = new Vector2u((uint)Math.Ceiling(size.X / (float)sectionSize), (uint)Math.Ceiling(size.Y / (float)sectionSize));
-            Vector2i currentSize = new Vector2i(size.X, size.Y);
-            Vector2i pos = new Vector2i();
+            using var pixels = image.GetPixels();
 
             for (int iy = 0; iy < amount.Y; iy++)
             {
-                int h = Math.Min(currentSize.Y, sectionSize);
+                var h = Math.Min(currentSize.Y, sectionSize);
                 currentSize.Y -= h;
-                currentSize.X = size.X;
+                currentSize.X = image.Width;
 
                 for (int ix = 0; ix < amount.X; ix++)
                 {
-                    int w = Math.Min(currentSize.X, sectionSize);
+                    var w = Math.Min(currentSize.X, sectionSize);
                     currentSize.X -= w;
 
-                    Texture texture = new Texture((uint)w, (uint)h);
-                    IntPtr partPtr = Marshal.AllocHGlobal(w * h * 4);
-                    _ = IL.CopyPixels(pos.X, pos.Y, 0, w, h, 1, DevIL.DataFormat.RGBA, DevIL.DataType.UnsignedByte, partPtr);
-                    Texture.Bind(texture);
-                    {
-                        Gl.glTexImage2D(
-                            Gl.GL_TEXTURE_2D, 0, IL.GetInteger(ILIntegerMode.ImageBytesPerPixel),
-                            w, h, 0,
-                            IL.GetInteger(ILIntegerMode.ImageFormat), ILDefines.IL_UNSIGNED_BYTE,
-                            partPtr);
-                    }
-                    Texture.Bind(null);
-                    Marshal.FreeHGlobal(partPtr);
-
-                    Sprite sprite = new Sprite(texture)
-                    {
-                        Position = new Vector2f(pos.X, pos.Y)
-                    };
+                    var texture = new Texture(w, h);
+                    var bytes = pixels.ToByteArray((int)pos.X, (int)pos.Y, w, h, PixelMapping.RGBA);
+                    texture.Update(bytes);
+                    var sprite = new Sprite(texture) { Position = new Vector2f(pos.X, pos.Y) };
                     largeTexture.AddChild(sprite);
 
-                    if (fileName != "")
+                    if (fileName is not null)
                     {
                         Textures.Add(texture);
-                        TextureFileNames.Add(fileName + "_" + ix.ToString("00") + "_" + iy.ToString("00") + "^");
+                        TextureFileNames.Add(
+                            fileName + "_" + ix.ToString("00") + "_" + iy.ToString("00") + "^"
+                        );
                     }
 
                     pos.X += w;
@@ -228,259 +143,43 @@ namespace vimage
                 pos.X = 0;
             }
 
-            largeTexture.Texture.Size = new Vector2u((uint)size.X, (uint)size.Y);
-            SplitTextures.Add(largeTexture);
-            SplitTextureFileNames.Add(fileName);
+            largeTexture.Texture.Size = new Vector2u(image.Width, image.Height);
+            if (fileName is not null)
+            {
+                SplitTextures.Add(largeTexture);
+                SplitTextureFileNames.Add(fileName);
+            }
 
             return largeTexture;
         }
 
-        private static Texture GetTextureFromSFMLImage(Image image, IntRect area = default)
+        public static MagickImage? GetMagickImage(
+            string fileName,
+            MagickReadSettings? settings = null
+        )
         {
-            Vector2u imageSize = image.Size;
-            byte[] bytes = image.Pixels;
+            var info = new MagickImageInfo(fileName);
+            if (info is not null && info.Format == MagickFormat.Ico)
+                return GetMagickImageIco(fileName);
 
-            if (area == default)
-                area = new IntRect(0, 0, (int)imageSize.X, (int)imageSize.Y);
-
-            Texture texture = new Texture((uint)area.Width, (uint)area.Height);
-
-            byte[] pixels;
-            const int blockSize = 4;
-            if (area.Width < imageSize.X || area.Height < imageSize.Y)
-            {
-                var crop = new byte[area.Width * area.Height * blockSize];
-
-                for (var line = 0; line <= area.Height - 1; line++)
-                {
-                    var sourceIndex = ((area.Top + line) * imageSize.X + area.Left) * blockSize;
-                    var destinationIndex = line * area.Width * blockSize;
-
-                    Array.Copy(bytes, sourceIndex, crop, destinationIndex, area.Width * blockSize);
-                }
-
-                pixels = crop;
-            }
-            else
-                pixels = bytes;
-
-            Texture.Bind(texture);
-            Gl.glTexImage2D(Gl.GL_TEXTURE_2D, 0, Gl.GL_RGBA, area.Width, area.Height, 0, Gl.GL_RGBA, Gl.GL_UNSIGNED_BYTE, pixels);
-            Texture.Bind(null);
-
-            return texture;
-        }
-        private static DisplayObject GetLargeTextureFromSFMLImage(int sectionSize, Image image, string fileName = "")
-        {
-            Vector2u imageSize = image.Size;
-            Vector2u amount = new Vector2u((uint)Math.Ceiling((float)imageSize.X / sectionSize), (uint)Math.Ceiling((float)imageSize.Y / sectionSize));
-            Vector2i currentSize = new Vector2i((int)imageSize.X, (int)imageSize.Y);
-            Vector2i pos = new Vector2i();
-
-
-            DisplayObject largeTexture = new DisplayObject();
-
-            for (int iy = 0; iy < amount.Y; iy++)
-            {
-                int h = Math.Min(currentSize.Y, sectionSize);
-                currentSize.Y -= h;
-                currentSize.X = (int)imageSize.X;
-
-                for (int ix = 0; ix < amount.X; ix++)
-                {
-                    int w = Math.Min(currentSize.X, sectionSize);
-                    currentSize.X -= w;
-
-                    Texture texture = GetTextureFromSFMLImage(image, new IntRect(pos.X, pos.Y, w, h));
-                    Sprite sprite = new Sprite(texture)
-                    {
-                        Position = new Vector2f(pos.X, pos.Y)
-                    };
-                    largeTexture.AddChild(sprite);
-
-                    if (fileName != "")
-                    {
-                        Textures.Add(texture);
-                        TextureFileNames.Add(fileName + "_" + ix.ToString("00") + "_" + iy.ToString("00") + "^");
-                    }
-
-                    pos.X += w;
-                }
-                pos.Y += h;
-                pos.X = 0;
-            }
-
-
-            largeTexture.Texture.Size = new Vector2u(imageSize.X, imageSize.Y);
-            SplitTextures.Add(largeTexture);
-            SplitTextureFileNames.Add(fileName);
-
-            return largeTexture;
+            var image = settings is null
+                ? new MagickImage(
+                    fileName,
+                    new MagickReadSettings { BackgroundColor = MagickColors.None }
+                )
+                : new MagickImage(fileName, settings);
+            if (image is null)
+                return null;
+            image.Format = MagickFormat.Rgba;
+            return image;
         }
 
-        public static Sprite GetSpriteFromIcon(string fileName)
+        /// <summary>Gets the highest resolution image in the .ico</summary>
+        private static MagickImage? GetMagickImageIco(string fileName)
         {
-            int index = TextureFileNames.IndexOf(fileName);
-
-            if (index >= 0)
-            {
-                // Texture Already Exists
-                // move it to the end of the array and return it
-                Texture texture = Textures[index];
-                string name = TextureFileNames[index];
-
-                Textures.RemoveAt(index);
-                TextureFileNames.RemoveAt(index);
-                Textures.Add(texture);
-                TextureFileNames.Add(name);
-
-                return new Sprite(Textures[Textures.Count - 1]);
-            }
-            else
-            {
-                // New Texture (from .ico)
-                try
-                {
-                    System.Drawing.Icon icon = new System.Drawing.Icon(fileName, 256, 256);
-                    System.Drawing.Bitmap iconImage = ExtractVistaIcon(icon);
-                    if (iconImage == null)
-                        iconImage = icon.ToBitmap();
-
-                    Sprite iconSprite;
-
-                    using (MemoryStream iconStream = new MemoryStream())
-                    {
-                        iconImage.Save(iconStream, System.Drawing.Imaging.ImageFormat.Png);
-                        Texture iconTexture = new Texture(iconStream);
-                        Textures.Add(iconTexture);
-                        TextureFileNames.Add(fileName);
-
-                        iconSprite = new Sprite(new Texture(iconTexture));
-                    }
-
-                    return iconSprite;
-                }
-                catch (Exception) { }
-            }
-
-            return null;
-        }
-        // http://stackoverflow.com/questions/220465/using-256-x-256-vista-icon-in-application/1945764#1945764
-        // Based on: http://www.codeproject.com/KB/cs/IconExtractor.aspx
-        // And a hint from: http://www.codeproject.com/KB/cs/IconLib.aspx
-        public static System.Drawing.Bitmap ExtractVistaIcon(System.Drawing.Icon icoIcon)
-        {
-            System.Drawing.Bitmap bmpPngExtracted = null;
-            try
-            {
-                byte[] srcBuf = null;
-                using (MemoryStream stream = new MemoryStream())
-                { icoIcon.Save(stream); srcBuf = stream.ToArray(); }
-                const int SizeICONDIR = 6;
-                const int SizeICONDIRENTRY = 16;
-                int iCount = BitConverter.ToInt16(srcBuf, 4);
-                for (int iIndex = 0; iIndex < iCount; iIndex++)
-                {
-                    int iWidth = srcBuf[SizeICONDIR + SizeICONDIRENTRY * iIndex];
-                    int iHeight = srcBuf[SizeICONDIR + SizeICONDIRENTRY * iIndex + 1];
-                    int iBitCount = BitConverter.ToInt16(srcBuf, SizeICONDIR + SizeICONDIRENTRY * iIndex + 6);
-                    if (iWidth == 0 && iHeight == 0 && iBitCount == 32)
-                    {
-                        int iImageSize = BitConverter.ToInt32(srcBuf, SizeICONDIR + SizeICONDIRENTRY * iIndex + 8);
-                        int iImageOffset = BitConverter.ToInt32(srcBuf, SizeICONDIR + SizeICONDIRENTRY * iIndex + 12);
-                        MemoryStream destStream = new MemoryStream();
-                        BinaryWriter writer = new BinaryWriter(destStream);
-                        writer.Write(srcBuf, iImageOffset, iImageSize);
-                        _ = destStream.Seek(0, SeekOrigin.Begin);
-                        bmpPngExtracted = new System.Drawing.Bitmap(destStream); // This is PNG! :)
-                        break;
-                    }
-                }
-            }
-            catch { return null; }
-            return bmpPngExtracted;
-        }
-
-        public static Sprite GetSpriteFromSVG(string fileName)
-        {
-            int index = TextureFileNames.IndexOf(fileName);
-
-            if (index >= 0)
-            {
-                // Texture Already Exists
-                // move it to the end of the array and return it
-                Texture texture = Textures[index];
-                string name = TextureFileNames[index];
-
-                Textures.RemoveAt(index);
-                TextureFileNames.RemoveAt(index);
-                Textures.Add(texture);
-                TextureFileNames.Add(name);
-
-                return new Sprite(Textures[Textures.Count - 1]);
-            }
-            else
-            {
-                // New Texture (from .svg)
-                try
-                {
-                    Svg.SvgDocument svg = Svg.SvgDocument.Open(fileName);
-                    System.Drawing.Bitmap bitmap = svg.Draw();
-                    using (MemoryStream stream = new MemoryStream())
-                    {
-                        bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                        Texture texture = new Texture(stream);
-                        Textures.Add(texture);
-                        TextureFileNames.Add(fileName);
-
-                        return new Sprite(new Texture(texture));
-                    }
-                }
-                catch (Exception) { }
-            }
-
-            return null;
-        }
-
-        public static Sprite GetSpriteFromWebP(string fileName)
-        {
-            int index = TextureFileNames.IndexOf(fileName);
-
-            if (index >= 0)
-            {
-                // Texture Already Exists
-                // move it to the end of the array and return it
-                Texture texture = Textures[index];
-                string name = TextureFileNames[index];
-
-                Textures.RemoveAt(index);
-                TextureFileNames.RemoveAt(index);
-                Textures.Add(texture);
-                TextureFileNames.Add(name);
-
-                return new Sprite(Textures[Textures.Count - 1]);
-            }
-            else
-            {
-                // New Texture (from .webp)
-                try
-                {
-                    byte[] fileBytes = File.ReadAllBytes(fileName);
-                    System.Drawing.Bitmap bitmap = new Imazen.WebP.SimpleDecoder().DecodeFromBytes(fileBytes, fileBytes.Length);
-                    using (MemoryStream stream = new MemoryStream())
-                    {
-                        bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                        Texture texture = new Texture(stream);
-                        Textures.Add(texture);
-                        TextureFileNames.Add(fileName);
-
-                        return new Sprite(new Texture(texture));
-                    }
-                }
-                catch (Exception) { }
-            }
-
-            return null;
+            using var images = new MagickImageCollection(fileName);
+            var best = images.OrderByDescending(i => i.Width * i.Height).First();
+            return new MagickImage(best);
         }
 
         /// <param name="filename">Animated Image (ie: animated gif).</param>
@@ -488,6 +187,7 @@ namespace vimage
         {
             return new AnimatedImage(GetAnimatedImageData(fileName));
         }
+
         /// <param name="filename">Animated Image (ie: animated gif).</param>
         public static AnimatedImageData GetAnimatedImageData(string fileName)
         {
@@ -499,7 +199,7 @@ namespace vimage
                 {
                     // AnimatedImageData Already Exists
                     // move it to the end of the array and return it
-                    AnimatedImageData data = AnimatedImageDatas[index];
+                    var data = AnimatedImageDatas[index];
                     string name = AnimatedImageDataFileNames[index];
 
                     AnimatedImageDatas.RemoveAt(index);
@@ -507,13 +207,12 @@ namespace vimage
                     AnimatedImageDatas.Add(data);
                     AnimatedImageDataFileNames.Add(name);
 
-                    return AnimatedImageDatas[AnimatedImageDatas.Count - 1];
+                    return AnimatedImageDatas[^1];
                 }
                 else
                 {
                     // New AnimatedImageData
-                    System.Drawing.Image image = System.Drawing.Image.FromFile(fileName);
-                    AnimatedImageData data = new AnimatedImageData();
+                    var data = new AnimatedImageData();
 
                     // Store AnimatedImageData
                     AnimatedImageDatas.Add(data);
@@ -524,13 +223,36 @@ namespace vimage
                         RemoveAnimatedImage();
 
                     // Get Frames
-                    LoadingAnimatedImage loadingAnimatedImage = new LoadingAnimatedImage(image, data);
-                    Thread loadFramesThread = new Thread(new ThreadStart(loadingAnimatedImage.LoadFrames))
+                    var info = new MagickImageInfo(fileName);
+                    if (info is not null && info.Format == MagickFormat.Gif)
                     {
-                        Name = "AnimationLoadThread - " + fileName,
-                        IsBackground = true
-                    };
-                    loadFramesThread.Start();
+                        // Use System.Drawing and OctreeQuantizer (faster and uses less memory)
+                        var loadingAnimatedImage = new LoadingAnimatedImage(fileName, data);
+                        var loadFramesThread = new Thread(
+                            new ThreadStart(loadingAnimatedImage.LoadFrames)
+                        )
+                        {
+                            Name = "AnimationLoadThread - " + fileName,
+                            IsBackground = true,
+                        };
+                        loadFramesThread.Start();
+                    }
+                    else
+                    {
+                        // Use ImageMagick
+                        var loadingAnimatedImage = new LoadingAnimatedImageFromMagick(
+                            fileName,
+                            data
+                        );
+                        var loadFramesThread = new Thread(
+                            new ThreadStart(loadingAnimatedImage.LoadFrames)
+                        )
+                        {
+                            Name = "AnimationLoadThread - " + fileName,
+                            IsBackground = true,
+                        };
+                        loadFramesThread.Start();
+                    }
 
                     // Wait for at least one frame to be loaded
                     while (data.Frames == null || data.Frames.Length <= 0 || data.Frames[0] == null)
@@ -556,7 +278,11 @@ namespace vimage
             int a = 0;
             while (AnimatedImageDatas.Count > s)
             {
-                if (s == 1 && (image as AnimatedImage).Data == AnimatedImageDatas[a])
+                if (
+                    s == 1
+                    && image is AnimatedImage animatedImage
+                    && animatedImage.Data == AnimatedImageDatas[a]
+                )
                     a++;
                 RemoveAnimatedImage(a);
             }
@@ -579,14 +305,14 @@ namespace vimage
                 {
                     for (int i = 0; i < TextureFileNames.Count; i++)
                     {
-                        if (TextureFileNames[i].IndexOf(file) == 0)
+                        if (TextureFileNames[i].StartsWith(file))
                             s++;
                         else if (s > 0)
                             break;
                     }
                     while (TextureFileNames.Count > s)
                     {
-                        if (TextureFileNames[a].IndexOf(file) == 0)
+                        if (TextureFileNames[a].StartsWith(file))
                             a += s;
                         RemoveTexture(a);
                     }
@@ -600,24 +326,24 @@ namespace vimage
                         RemoveTexture(a);
                     }
                 }
-
             }
 
             // Force garbage collection
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
             GC.WaitForPendingFinalizers();
         }
+
         public static void RemoveTexture(int t = 0)
         {
             if (TextureFileNames[t].IndexOf('^') == TextureFileNames[t].Length - 1)
             {
                 // if part of split texture - remove all parts
-                string name = TextureFileNames[t].Substring(0, TextureFileNames[t].Length - 7);
+                string name = TextureFileNames[t][..^7];
 
                 int i;
                 for (i = t + 1; i < TextureFileNames.Count; i++)
                 {
-                    if (TextureFileNames[i].IndexOf(name) != 0)
+                    if (!TextureFileNames[i].StartsWith(name))
                         break;
                 }
                 for (int d = t; d < i; d++)
@@ -627,7 +353,8 @@ namespace vimage
                     TextureFileNames.RemoveAt(t);
                 }
 
-                int splitIndex = SplitTextureFileNames.Count == 0 ? -1 : SplitTextureFileNames.IndexOf(name);
+                int splitIndex =
+                    SplitTextureFileNames.Count == 0 ? -1 : SplitTextureFileNames.IndexOf(name);
                 if (splitIndex != -1)
                 {
                     SplitTextures.RemoveAt(splitIndex);
@@ -641,6 +368,7 @@ namespace vimage
                 TextureFileNames.RemoveAt(t);
             }
         }
+
         public static void RemoveAnimatedImage(int a = 0)
         {
             AnimatedImageDatas[a].CancelLoading = true;
@@ -649,67 +377,145 @@ namespace vimage
             AnimatedImageDatas.RemoveAt(a);
             AnimatedImageDataFileNames.RemoveAt(a);
         }
-
     }
 
-    internal class LoadingAnimatedImage
+    internal class LoadingAnimatedImageFromMagick(string fileName, AnimatedImageData data)
     {
-        private readonly System.Drawing.Image Image;
-        private ImageManipulation.OctreeQuantizer Quantizer;
-        private readonly AnimatedImageData Data;
-
-        public LoadingAnimatedImage(System.Drawing.Image image, AnimatedImageData data)
-        {
-            Image = image;
-            Data = data;
-        }
+        private readonly string FileName = fileName;
+        private readonly AnimatedImageData Data = data;
 
         public void LoadFrames()
         {
+            var settings = new MagickReadSettings { };
+
+            var info = new MagickImageInfo(FileName);
+            if (
+                info is not null
+                && (info.Format == MagickFormat.APng || info.Format == MagickFormat.Png)
+            )
+                settings.Format = MagickFormat.APng;
+
+            using var collection = new MagickImageCollection();
+            collection.Ping(FileName, settings);
+
+            Data.FrameCount = collection.Count;
+            Data.Frames = new Texture[Data.FrameCount];
+            Data.FrameDelays = new int[Data.FrameCount];
+
+            int defaultFrameDelay = AnimatedImage.DEFAULT_FRAME_DELAY;
+
+            // Load first frame (so it can be shown as soon as possible)
+            ReadAndLoadFrame(0);
+
+            // Process the rest
+            collection.Read(FileName, settings);
+            collection.Coalesce(); // TODO: Find alternative that doesn't use as much resources
+            for (int i = 0; i < Data.FrameCount; i++)
+            {
+                if (Data.CancelLoading)
+                    return;
+                using var frame = collection[i];
+                LoadFrame(frame, i);
+            }
+
+            Data.FullyLoaded = true;
+        }
+
+        public void LoadFrame(IMagickImage<byte> frame, int index)
+        {
+            var delay = frame.AnimationDelay * 10;
+            Data.FrameDelays[index] = delay > 0 ? (int)delay : AnimatedImage.DEFAULT_FRAME_DELAY;
+
+            using var pixels = frame.GetPixelsUnsafe();
+            var bytes = pixels.ToByteArray(PixelMapping.RGBA);
+            var texture = new Texture(frame.Width, frame.Height);
+            texture.Update(bytes);
+
+            Data.Frames[index] = texture;
+            texture.Smooth = Data.Smooth;
+            if (Data.Mipmap)
+                texture.GenerateMipmap();
+        }
+
+        public void ReadAndLoadFrame(int index)
+        {
+            using var frame = new MagickImage(
+                FileName,
+                new MagickReadSettings
+                {
+                    FrameIndex = (uint)index,
+                    FrameCount = 1,
+                    BackgroundColor = MagickColors.None,
+                }
+            );
+            LoadFrame(frame, index);
+        }
+    }
+
+    internal class LoadingAnimatedImage(string fileName, AnimatedImageData data)
+    {
+        private readonly string FileName = fileName;
+        private ImageManipulation.OctreeQuantizer? Quantizer;
+        private readonly AnimatedImageData Data = data;
+
+        public void LoadFrames()
+        {
+            using var image = System.Drawing.Image.FromFile(FileName);
+
             // Get Frame Count
-            System.Drawing.Imaging.FrameDimension frameDimension = new System.Drawing.Imaging.FrameDimension(Image.FrameDimensionsList[0]);
-            Data.FrameCount = Image.GetFrameCount(frameDimension);
+            var frameDimension = new System.Drawing.Imaging.FrameDimension(
+                image.FrameDimensionsList[0]
+            );
+            Data.FrameCount = image.GetFrameCount(frameDimension);
             Data.Frames = new Texture[Data.FrameCount];
             Data.FrameDelays = new int[Data.FrameCount];
 
             // Get Frame Delays
-            byte[] frameDelays = null;
+            byte[]? frameDelays = null;
             try
             {
-                System.Drawing.Imaging.PropertyItem frameDelaysItem = Image.GetPropertyItem(0x5100);
-                frameDelays = frameDelaysItem.Value;
-                if (frameDelays.Length == 0 || (frameDelays[0] == 0 && frameDelays.All(d => d == 0))) frameDelays = null;
+                var frameDelaysItem = image.GetPropertyItem(0x5100);
+                if (frameDelaysItem is not null)
+                {
+                    frameDelays = frameDelaysItem.Value;
+                    if (
+                        frameDelays is null
+                        || frameDelays.Length == 0
+                        || (frameDelays[0] == 0 && frameDelays.All(d => d == 0))
+                    )
+                        frameDelays = null;
+                }
             }
             catch { }
             int defaultFrameDelay = AnimatedImage.DEFAULT_FRAME_DELAY;
-            if (frameDelays != null && frameDelays.Length > 1) defaultFrameDelay = (frameDelays[0] + frameDelays[1] * 256) * 10;
+            if (frameDelays != null && frameDelays.Length > 1)
+                defaultFrameDelay = (frameDelays[0] + frameDelays[1] * 256) * 10;
 
             for (int i = 0; i < Data.FrameCount; i++)
             {
                 if (Data.CancelLoading)
                     return;
 
-                _ = Image.SelectActiveFrame(frameDimension, i);
+                int fd = i * 4;
+                Data.FrameDelays[i] =
+                    frameDelays != null && frameDelays.Length > fd
+                        ? (frameDelays[fd] + frameDelays[fd + 1] * 256) * 10
+                        : defaultFrameDelay;
+
+                _ = image.SelectActiveFrame(frameDimension, i);
                 Quantizer = new ImageManipulation.OctreeQuantizer(255, 8);
 
-                System.Drawing.Bitmap quantized = Quantizer.Quantize(Image);
-                MemoryStream stream = new MemoryStream();
+                using var quantized = Quantizer.Quantize(image);
+                using var stream = new MemoryStream();
                 quantized.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                Data.Frames[i] = new Texture(stream);
+                var texture = new Texture(stream);
 
-                stream.Dispose();
-
-                if (Data.CancelLoading)
-                    return;
-
-                Data.Frames[i].Smooth = Data.Smooth;
-                if (Data.Mipmap) Data.Frames[i].GenerateMipmap();
-
-                int fd = i * 4;
-                Data.FrameDelays[i] = frameDelays != null && frameDelays.Length > fd ? (frameDelays[fd] + frameDelays[fd + 1] * 256) * 10 : defaultFrameDelay;
+                Data.Frames[i] = texture;
+                texture.Smooth = Data.Smooth;
+                if (Data.Mipmap)
+                    texture.GenerateMipmap();
             }
             Data.FullyLoaded = true;
         }
     }
-
 }
