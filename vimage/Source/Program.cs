@@ -18,37 +18,43 @@ namespace vimage
                 if (!System.IO.File.Exists(file))
                     return;
             }
-            if (file == "")
-                return;
 
             // Extension supported?
-            var imageInfo = new ImageMagick.MagickImageInfo(file);
-            if (!ImageViewerUtils.IsSupportedFileType(imageInfo.Format))
+            ImageMagick.MagickImageInfo? imageInfo = null;
+            if (file != "")
             {
-                System.Windows.Forms.MessageBox.Show(
-                    "vimage does not support this file format.",
-                    "vimage - Unknown File Format"
-                );
-                return;
+                imageInfo = new ImageMagick.MagickImageInfo(file);
+                if (!ImageViewerUtils.IsSupportedFileType(imageInfo.Format))
+                {
+                    System.Windows.Forms.MessageBox.Show(
+                        "vimage does not support this file format.",
+                        "vimage - Unknown File Format"
+                    );
+                    return;
+                }
             }
 
+            // Setup Sentry
             Sentry.SentrySdk.Init(options =>
             {
                 options.Dsn = SENTRY_DSN;
                 options.IsGlobalModeEnabled = true;
                 options.AutoSessionTracking = true;
             });
-            Sentry.SentrySdk.ConfigureScope(scope =>
+            if (imageInfo != null)
             {
-                scope.Contexts["File"] = new
+                Sentry.SentrySdk.ConfigureScope(scope =>
                 {
-                    Path = file,
-                    Format = Enum.GetName(imageInfo.Format),
-                    imageInfo.Width,
-                    imageInfo.Height,
-                    imageInfo.Orientation,
-                };
-            });
+                    scope.Contexts["File"] = new
+                    {
+                        Path = file,
+                        Format = Enum.GetName(imageInfo.Format),
+                        imageInfo.Width,
+                        imageInfo.Height,
+                        imageInfo.Orientation,
+                    };
+                });
+            }
 
             _ = new ImageViewer(file, args);
         }
