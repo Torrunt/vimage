@@ -14,7 +14,7 @@ using System.Collections;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace ImageManipulation
+namespace vimage.ImageManipulation
 {
     /// <summary>
     /// Quantize using an Octree

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using SFML.Graphics;
 using SFML.System;
 
-namespace vimage
+namespace vimage.Display
 {
     /// <summary>
     /// Desktop Window Manager

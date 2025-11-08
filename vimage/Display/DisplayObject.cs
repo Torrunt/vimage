@@ -2,7 +2,7 @@
 using SFML.Graphics;
 using SFML.System;
 
-namespace vimage
+namespace vimage.Display
 {
     internal class DisplayObject : Transformable, Drawable
     {

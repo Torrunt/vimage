@@ -8,6 +8,8 @@ using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
 using vimage.Common;
+using vimage.Display;
+using vimage.Utils;
 using Action = vimage.Common.Action;
 
 namespace vimage

@@ -24,7 +24,7 @@ namespace vimage
             if (file != "")
             {
                 imageInfo = new ImageMagick.MagickImageInfo(file);
-                if (!ImageViewerUtils.IsSupportedFileType(imageInfo.Format))
+                if (!Utils.ImageViewerUtils.IsSupportedFileType(imageInfo.Format))
                 {
                     System.Windows.Forms.MessageBox.Show(
                         "vimage does not support this file format.",

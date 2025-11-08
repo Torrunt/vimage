@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace vimage
+namespace vimage.Utils
 {
     internal partial class WindowsFileSorting
     {

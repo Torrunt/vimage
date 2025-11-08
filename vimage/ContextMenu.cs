@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using vimage.Common;
+using vimage.Display;
 using Action = vimage.Common.Action;
 
 namespace vimage

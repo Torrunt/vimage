@@ -3,7 +3,7 @@ using System.Linq;
 using SFML.Graphics;
 using SFML.System;
 
-namespace vimage
+namespace vimage.Utils
 {
     internal class ImageViewerUtils
     {

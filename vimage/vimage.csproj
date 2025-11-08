@@ -34,7 +34,7 @@
     <ProjectReference Include="..\vimage.Common\vimage.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Source\ContextMenu.cs">
+    <Compile Update="ContextMenu.cs">
       <SubType>Component</SubType>
     </Compile>
   </ItemGroup>

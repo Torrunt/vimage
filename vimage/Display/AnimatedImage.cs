@@ -1,7 +1,7 @@
 ﻿using System;
 using SFML.Graphics;
 
-namespace vimage
+namespace vimage.Display
 {
     internal class AnimatedImageData
     {

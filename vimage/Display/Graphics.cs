@@ -7,7 +7,7 @@ using ImageMagick;
 using SFML.Graphics;
 using SFML.System;
 
-namespace vimage
+namespace vimage.Display
 {
     /// <summary>
     /// Graphics Manager.
