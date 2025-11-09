@@ -110,7 +110,7 @@ namespace vimage.Utils
         public static int GetDefaultRotationFromEXIF(string path)
         {
             using var image = new ImageMagick.MagickImage();
-            image.Ping(path);
+            image.Ping(path, GetDefaultMagickReadSettings());
 
             var exif = image.GetExifProfile();
             if (exif is null)
@@ -173,7 +173,12 @@ namespace vimage.Utils
                 or ImageMagick.MagickFormat.Mpg
                 or ImageMagick.MagickFormat.Pdf
                 or ImageMagick.MagickFormat.Wmv
-                or ImageMagick.MagickFormat.WebM => false,
+                or ImageMagick.MagickFormat.WebM
+                or ImageMagick.MagickFormat.Text
+                or ImageMagick.MagickFormat.Txt
+                or ImageMagick.MagickFormat.Json
+                or ImageMagick.MagickFormat.Htm
+                or ImageMagick.MagickFormat.Html => false,
                 _ => true,
             };
         }
@@ -193,7 +198,7 @@ namespace vimage.Utils
 
         public static bool IsAnimatedImage(string path)
         {
-            var info = new ImageMagick.MagickImageInfo(path);
+            var info = GetMagickImageInfo(path);
             if (info is null)
                 return false;
 
@@ -265,6 +270,32 @@ namespace vimage.Utils
             }
 
             return false;
+        }
+
+        public static ImageMagick.MagickImageInfo? GetMagickImageInfo(string fileName)
+        {
+            ImageMagick.MagickImageInfo? info = null;
+            try
+            {
+                info = new ImageMagick.MagickImageInfo(fileName, GetDefaultMagickReadSettings());
+            }
+            catch
+            {
+                // Ignore errors
+            }
+            return info;
+        }
+
+        public static ImageMagick.MagickReadSettings GetDefaultMagickReadSettings(
+            Action<ImageMagick.MagickReadSettings>? configure = null
+        )
+        {
+            var settings = new ImageMagick.MagickReadSettings(
+                // Fixed loading issues with bmp files invalid file size info
+                new ImageMagick.Formats.BmpReadDefines { IgnoreFileSize = true }
+            );
+            configure?.Invoke(settings);
+            return settings;
         }
     }
 }

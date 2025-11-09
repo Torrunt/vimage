@@ -23,7 +23,29 @@ namespace vimage
             ImageMagick.MagickImageInfo? imageInfo = null;
             if (file != "")
             {
-                imageInfo = new ImageMagick.MagickImageInfo(file);
+                try
+                {
+                    imageInfo = new ImageMagick.MagickImageInfo(
+                        file,
+                        Utils.ImageViewerUtils.GetDefaultMagickReadSettings()
+                    );
+                }
+                catch (ImageMagick.MagickMissingDelegateErrorException)
+                {
+                    System.Windows.Forms.MessageBox.Show(
+                        "vimage does not support this file format.",
+                        "vimage - Unknown File Format"
+                    );
+                    return;
+                }
+                catch (ImageMagick.MagickCorruptImageErrorException)
+                {
+                    System.Windows.Forms.MessageBox.Show(
+                        "The file appears to be corrupted and cannot be opened.",
+                        "vimage - Corrupted File"
+                    );
+                    return;
+                }
                 if (!Utils.ImageViewerUtils.IsSupportedFileType(imageInfo.Format))
                 {
                     System.Windows.Forms.MessageBox.Show(

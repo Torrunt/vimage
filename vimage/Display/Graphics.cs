@@ -158,14 +158,16 @@ namespace vimage.Display
             MagickReadSettings? settings = null
         )
         {
-            var info = new MagickImageInfo(fileName);
+            var info = Utils.ImageViewerUtils.GetMagickImageInfo(fileName);
             if (info is not null && info.Format == MagickFormat.Ico)
                 return GetMagickImageIco(fileName);
 
             var image = settings is null
                 ? new MagickImage(
                     fileName,
-                    new MagickReadSettings { BackgroundColor = MagickColors.None }
+                    Utils.ImageViewerUtils.GetDefaultMagickReadSettings(s =>
+                        s.BackgroundColor = MagickColors.None
+                    )
                 )
                 : new MagickImage(fileName, settings);
             if (image is null)
@@ -223,7 +225,7 @@ namespace vimage.Display
                         RemoveAnimatedImage();
 
                     // Get Frames
-                    var info = new MagickImageInfo(fileName);
+                    var info = Utils.ImageViewerUtils.GetMagickImageInfo(fileName);
                     if (info is not null && info.Format == MagickFormat.Gif)
                     {
                         // Use System.Drawing and OctreeQuantizer (faster and uses less memory)
@@ -388,7 +390,7 @@ namespace vimage.Display
         {
             var settings = new MagickReadSettings { };
 
-            var info = new MagickImageInfo(FileName);
+            var info = Utils.ImageViewerUtils.GetMagickImageInfo(FileName);
             if (
                 info is not null
                 && (info.Format == MagickFormat.APng || info.Format == MagickFormat.Png)
