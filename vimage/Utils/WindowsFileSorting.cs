@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using vimage.Common;
 
 namespace vimage.Utils
 {
@@ -89,6 +90,50 @@ namespace vimage.Utils
             {
                 return false;
             }
+        }
+
+        public static (SortBy, SortDirection) GetSorting(
+            SortBy sortBy,
+            SortDirection sortDir,
+            string file
+        )
+        {
+            if (
+                file == ""
+                || (sortBy != SortBy.FolderDefault && sortDir != SortDirection.FolderDefault)
+            )
+                return (SortBy.Name, SortDirection.Ascending);
+
+            // Get sort column info from window with corresponding name
+            var sort = GetWindowsSortOrder(file);
+            if (sort is null)
+                return (SortBy.Name, SortDirection.Ascending);
+
+            // Direction
+            if (sort[0] == '-')
+            {
+                sort = sort[1..];
+
+                if (sortDir == SortDirection.FolderDefault)
+                    sortDir = SortDirection.Descending;
+            }
+            else if (sortDir == SortDirection.FolderDefault)
+                sortDir = SortDirection.Ascending;
+
+            // By
+            if (sortBy == SortBy.FolderDefault)
+            {
+                sortBy = sort switch
+                {
+                    "System.ItemDate" => SortBy.Date,
+                    "System.DateModified" => SortBy.DateModified,
+                    "System.DateCreated" => SortBy.DateCreated,
+                    "System.Size" => SortBy.Size,
+                    _ => SortBy.Name,
+                };
+            }
+
+            return (sortBy, sortDir);
         }
     }
 }

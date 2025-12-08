@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
@@ -216,51 +217,17 @@ namespace vimage
             ViewStateHistory = [];
 
             // Get/Set Folder Sorting
-            SortImagesBy = Config.Setting_DefaultSortBy;
-            SortImagesByDir = Config.Setting_DefaultSortDir;
-
-            if (
-                file != ""
-                && (
-                    SortImagesBy == SortBy.FolderDefault
-                    || SortImagesByDir == SortDirection.FolderDefault
-                )
-            )
+            // (threaded to avoid potential hang when having to check Windows for current folder sorting)
+            Task.Run(() =>
             {
-                // Get sort column info from window with corresponding name
-                var sort = WindowsFileSorting.GetWindowsSortOrder(file);
-                if (sort is not null)
-                {
-                    // Direction
-                    if (sort[0] == '-')
-                    {
-                        sort = sort[1..];
-
-                        if (SortImagesByDir == SortDirection.FolderDefault)
-                            SortImagesByDir = SortDirection.Descending;
-                    }
-                    else if (SortImagesByDir == SortDirection.FolderDefault)
-                        SortImagesByDir = SortDirection.Ascending;
-
-                    // By
-                    if (SortImagesBy == SortBy.FolderDefault)
-                    {
-                        SortImagesBy = sort switch
-                        {
-                            "System.ItemDate" => SortBy.Date,
-                            "System.DateModified" => SortBy.DateModified,
-                            "System.DateCreated" => SortBy.DateCreated,
-                            "System.Size" => SortBy.Size,
-                            _ => SortBy.Name,
-                        };
-                    }
-                }
-            }
-            // Default sorting if folder was closed
-            if (SortImagesBy == SortBy.FolderDefault)
-                SortImagesBy = SortBy.Name;
-            if (SortImagesByDir == SortDirection.FolderDefault)
-                SortImagesByDir = SortDirection.Ascending;
+                var (sortBy, sortDir) = WindowsFileSorting.GetSorting(
+                    Config.Setting_DefaultSortBy,
+                    Config.Setting_DefaultSortDir,
+                    file
+                );
+                SortImagesBy = sortBy;
+                SortImagesByDir = sortDir;
+            });
 
             // Create Context Menu
             ContextMenu = new ContextMenu(this);
