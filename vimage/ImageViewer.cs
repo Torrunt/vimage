@@ -1351,10 +1351,7 @@ namespace vimage
         public void ResetImage()
         {
             // Reset size / crops
-            if (Image is DisplayObject obj)
-                Size = obj.Texture.Size;
-            else if (Image is Sprite sprite)
-                Size = sprite.Texture.Size;
+            ResetSize();
 
             Window.SetView(
                 new View(Window.DefaultView)
@@ -1372,13 +1369,7 @@ namespace vimage
 
             // Color
             if (ImageColor != Color.White)
-            {
-                ImageColor = Color.White;
-                if (Image is DisplayObject obj2)
-                    obj2.Color = ImageColor;
-                else if (Image is Sprite sprite)
-                    sprite.Color = ImageColor;
-            }
+                SetImageColor(Color.White);
 
             // Click-Through-Able?
             if (ClickThroughAble)
@@ -1528,7 +1519,7 @@ namespace vimage
         {
             if (ImageTransparencyHold)
                 ImageTransparencyTweaked = true;
-            ImageColor = new Color(
+            var color = new Color(
                 ImageColor.R,
                 ImageColor.G,
                 ImageColor.B,
@@ -1550,28 +1541,30 @@ namespace vimage
                         255
                     )
             );
-            SetImageColor(ImageColor);
+            SetImageColor(color);
             Updated = true;
         }
 
         public void SetImageTransparency(byte alpha = 255)
         {
-            ImageColor = new Color(ImageColor.R, ImageColor.G, ImageColor.B, alpha);
-            SetImageColor(ImageColor);
+            SetImageColor(new Color(ImageColor.R, ImageColor.G, ImageColor.B, alpha));
             Updated = true;
         }
 
         public void SetImageColor(Color color)
         {
+            ImageColor = color;
             if (Image is DisplayObject obj)
                 obj.Color = color;
             else if (Image is Sprite sprite)
                 sprite.Color = color;
         }
 
-        public void UpdateSizeToImageTextureSize()
+        public void ResetSize()
         {
-            if (Image is DisplayObject displayObject)
+            if (Image is AnimatedImage animatedImage)
+                Size = animatedImage.Texture.Size;
+            else if (Image is DisplayObject displayObject)
                 Size = displayObject.Texture.Size;
             else if (Image is Sprite sprite)
                 Size = sprite.Texture.Size;
@@ -1850,7 +1843,7 @@ namespace vimage
                 return;
 
             Image = new Sprite(new Texture(tex));
-            UpdateSizeToImageTextureSize();
+            ResetSize();
 
             Window.SetView(
                 new View(Window.DefaultView)
@@ -1882,7 +1875,7 @@ namespace vimage
             if (Image is null)
                 return false;
 
-            UpdateSizeToImageTextureSize();
+            ResetSize();
             DefaultRotation = ImageViewerUtils.GetDefaultRotationFromEXIF(fileName);
 
             return true;
@@ -1930,7 +1923,7 @@ namespace vimage
                     return;
                 }
 
-                UpdateSizeToImageTextureSize();
+                ResetSize();
                 DefaultRotation = 0;
 
                 LoadedClipboardImage = true;
@@ -2704,8 +2697,7 @@ namespace vimage
                     case "-color":
                     case "-colour":
                         var colour = System.Drawing.ColorTranslator.FromHtml(args[i + 1]);
-                        ImageColor = new Color(colour.R, colour.G, colour.B, colour.A);
-                        SetImageColor(ImageColor);
+                        SetImageColor(new Color(colour.R, colour.G, colour.B, colour.A));
                         Updated = true;
                         i++;
                         break;
