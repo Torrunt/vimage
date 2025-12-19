@@ -72,26 +72,6 @@ namespace vimage.Utils
             return null;
         }
 
-        private static bool HasProperty(dynamic obj, string name)
-        {
-            try
-            {
-                var val = obj.GetType()
-                    .InvokeMember(
-                        name,
-                        System.Reflection.BindingFlags.GetProperty,
-                        null,
-                        obj,
-                        null
-                    );
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
         public static (SortBy, SortDirection) GetSorting(
             SortBy sortBy,
             SortDirection sortDir,
