@@ -23,7 +23,7 @@ namespace vimage
         public readonly float ZOOM_MAX = 75f;
 
         public RenderWindow Window;
-        public dynamic? Image;
+        public object? Image;
         public string File = "";
         public List<string> FolderContents = [];
         public int FolderPosition = 0;
@@ -402,7 +402,8 @@ namespace vimage
                 );
             }
             // Draw Image
-            Window.Draw(Image);
+            if (Image is Drawable drawable)
+                Window.Draw(drawable);
             // Draw Other
             if (Cropping && CropRect != null)
                 Window.Draw(CropRect);
@@ -1350,8 +1351,11 @@ namespace vimage
         public void ResetImage()
         {
             // Reset size / crops
-            if (Image is not null)
-                Size = Image.Texture.Size;
+            if (Image is DisplayObject obj)
+                Size = obj.Texture.Size;
+            else if (Image is Sprite sprite)
+                Size = sprite.Texture.Size;
+
             Window.SetView(
                 new View(Window.DefaultView)
                 {
@@ -1370,8 +1374,10 @@ namespace vimage
             if (ImageColor != Color.White)
             {
                 ImageColor = Color.White;
-                if (Image is not null)
-                    Image.Color = ImageColor;
+                if (Image is DisplayObject obj2)
+                    obj2.Color = ImageColor;
+                else if (Image is Sprite sprite)
+                    sprite.Color = ImageColor;
             }
 
             // Click-Through-Able?
@@ -1512,8 +1518,7 @@ namespace vimage
             }
             else
                 ImageColor = Color.White;
-            if (Image is not null)
-                Image.Color = ImageColor;
+            SetImageColor(ImageColor);
             Updated = true;
 
             return true;
@@ -1545,17 +1550,31 @@ namespace vimage
                         255
                     )
             );
-            if (Image is not null)
-                Image.Color = ImageColor;
+            SetImageColor(ImageColor);
             Updated = true;
         }
 
         public void SetImageTransparency(byte alpha = 255)
         {
             ImageColor = new Color(ImageColor.R, ImageColor.G, ImageColor.B, alpha);
-            if (Image is not null)
-                Image.Color = ImageColor;
+            SetImageColor(ImageColor);
             Updated = true;
+        }
+
+        public void SetImageColor(Color color)
+        {
+            if (Image is DisplayObject obj)
+                obj.Color = color;
+            else if (Image is Sprite sprite)
+                sprite.Color = color;
+        }
+
+        public void UpdateSizeToImageTextureSize()
+        {
+            if (Image is DisplayObject displayObject)
+                Size = displayObject.Texture.Size;
+            else if (Image is Sprite sprite)
+                Size = sprite.Texture.Size;
         }
 
         public bool ToggleLock(int val = -1)
@@ -1831,7 +1850,7 @@ namespace vimage
                 return;
 
             Image = new Sprite(new Texture(tex));
-            Size = Image.Texture.Size;
+            UpdateSizeToImageTextureSize();
 
             Window.SetView(
                 new View(Window.DefaultView)
@@ -1860,10 +1879,10 @@ namespace vimage
             else
                 Image = Graphics.GetImage(fileName);
 
-            if (Image?.Texture == null)
+            if (Image is null)
                 return false;
 
-            Size = Image.Texture.Size;
+            UpdateSizeToImageTextureSize();
             DefaultRotation = ImageViewerUtils.GetDefaultRotationFromEXIF(fileName);
 
             return true;
@@ -1905,13 +1924,13 @@ namespace vimage
                 ClipboardBitmap = new System.Drawing.Bitmap(image);
                 Image = new Sprite(new Texture(stream));
 
-                if (Image?.Texture == null)
+                if (Image == null)
                 {
                     LoadedClipboardImage = false;
                     return;
                 }
 
-                Size = Image.Texture.Size;
+                UpdateSizeToImageTextureSize();
                 DefaultRotation = 0;
 
                 LoadedClipboardImage = true;
@@ -1945,7 +1964,10 @@ namespace vimage
             // Dispose of previous image
             if (Image != null)
             {
-                Image.Dispose();
+                if (Image is DisplayObject obj)
+                    obj.Dispose();
+                else if (Image is Sprite sprite)
+                    sprite.Dispose();
                 Image = null;
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
             }
@@ -1986,7 +2008,7 @@ namespace vimage
 
             // Color
             if (Image is not null && ImageColor != Color.White)
-                Image.Color = ImageColor;
+                SetImageColor(ImageColor);
 
             // Don't keep current zoom value if it wasn't set by user
             if (
@@ -2359,7 +2381,10 @@ namespace vimage
             GetFolderContents();
             if (FolderContents.Count == 1)
             {
-                Image?.Dispose();
+                if (Image is DisplayObject obj)
+                    obj.Dispose();
+                else if (Image is Sprite sprite)
+                    sprite.Dispose();
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
                 Window.Close();
             }
@@ -2680,8 +2705,7 @@ namespace vimage
                     case "-colour":
                         var colour = System.Drawing.ColorTranslator.FromHtml(args[i + 1]);
                         ImageColor = new Color(colour.R, colour.G, colour.B, colour.A);
-                        if (Image is not null)
-                            Image.Color = ImageColor;
+                        SetImageColor(ImageColor);
                         Updated = true;
                         i++;
                         break;

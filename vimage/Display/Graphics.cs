@@ -273,7 +273,7 @@ namespace vimage.Display
         /// </summary>
         /// <param name="image">The currently viewed image.</param>
         /// <param name="file">The currently viewed image filepath.</param>
-        public static void ClearMemory(dynamic image, string file = "")
+        public static void ClearMemory(object? image, string file = "")
         {
             // Remove all AnimatedImages (except the one that's currently being viewed)
             int s = image is AnimatedImage ? 1 : 0;

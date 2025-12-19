@@ -14,7 +14,7 @@ namespace vimage
         private List<string> Items_General = [];
         private List<string> Items_Animation = [];
 
-        private Dictionary<string, dynamic> FuncByName = [];
+        private Dictionary<string, object> FuncByName = [];
 
         public int FileNameItem = -1;
         public string FileNameCurrent = ".";
@@ -67,15 +67,19 @@ namespace vimage
                         if (str.StartsWith("Sort"))
                         {
                             i++;
-                            if (i < items.Count - 1 && (items[i + 1] as dynamic).name == "-")
+                            if (
+                                i < items.Count - 1
+                                && items[i + 1] is ContextMenuItem nextItem
+                                && nextItem.name == "-"
+                            )
                                 i++;
                             continue;
                         }
                     }
-                    else
+                    else if (items[i] is ContextMenuItem contextMenuItem)
                     {
                         // remove navigation and delete
-                        switch ((items[i] as dynamic).func)
+                        switch (contextMenuItem.func)
                         {
                             case Action.NextImage:
                             case Action.PrevImage:
