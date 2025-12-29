@@ -354,13 +354,10 @@ namespace vimage
                     else if (MousePos.Y > Window.Size.Y)
                         MousePos.Y = (int)Window.Size.Y;
                     var m = Window.MapPixelToCoords(MousePos);
-                    if (CropRect != null)
-                    {
-                        CropRect.Size = new Vector2f(
-                            m.X - CropRect.Position.X,
-                            m.Y - CropRect.Position.Y
-                        );
-                    }
+                    CropRect?.Size = new Vector2f(
+                        m.X - CropRect.Position.X,
+                        m.Y - CropRect.Position.Y
+                    );
 
                     doRedraw = true;
                 }
