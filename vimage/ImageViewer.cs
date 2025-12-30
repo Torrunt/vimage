@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
@@ -22,7 +23,7 @@ namespace vimage
         public readonly float ZOOM_MAX = 75f;
 
         public RenderWindow Window;
-        public dynamic? Image;
+        public object? Image;
         public string File = "";
         public List<string> FolderContents = [];
         public int FolderPosition = 0;
@@ -216,51 +217,17 @@ namespace vimage
             ViewStateHistory = [];
 
             // Get/Set Folder Sorting
-            SortImagesBy = Config.Setting_DefaultSortBy;
-            SortImagesByDir = Config.Setting_DefaultSortDir;
-
-            if (
-                file != ""
-                && (
-                    SortImagesBy == SortBy.FolderDefault
-                    || SortImagesByDir == SortDirection.FolderDefault
-                )
-            )
+            // (threaded to avoid potential hang when having to check Windows for current folder sorting)
+            Task.Run(() =>
             {
-                // Get sort column info from window with corresponding name
-                var sort = WindowsFileSorting.GetWindowsSortOrder(file);
-                if (sort is not null)
-                {
-                    // Direction
-                    if (sort[0] == '-')
-                    {
-                        sort = sort[1..];
-
-                        if (SortImagesByDir == SortDirection.FolderDefault)
-                            SortImagesByDir = SortDirection.Descending;
-                    }
-                    else if (SortImagesByDir == SortDirection.FolderDefault)
-                        SortImagesByDir = SortDirection.Ascending;
-
-                    // By
-                    if (SortImagesBy == SortBy.FolderDefault)
-                    {
-                        SortImagesBy = sort switch
-                        {
-                            "System.ItemDate" => SortBy.Date,
-                            "System.DateModified" => SortBy.DateModified,
-                            "System.DateCreated" => SortBy.DateCreated,
-                            "System.Size" => SortBy.Size,
-                            _ => SortBy.Name,
-                        };
-                    }
-                }
-            }
-            // Default sorting if folder was closed
-            if (SortImagesBy == SortBy.FolderDefault)
-                SortImagesBy = SortBy.Name;
-            if (SortImagesByDir == SortDirection.FolderDefault)
-                SortImagesByDir = SortDirection.Ascending;
+                var (sortBy, sortDir) = WindowsFileSorting.GetSorting(
+                    Config.Setting_DefaultSortBy,
+                    Config.Setting_DefaultSortDir,
+                    file
+                );
+                SortImagesBy = sortBy;
+                SortImagesByDir = sortDir;
+            });
 
             // Create Context Menu
             ContextMenu = new ContextMenu(this);
@@ -387,13 +354,10 @@ namespace vimage
                     else if (MousePos.Y > Window.Size.Y)
                         MousePos.Y = (int)Window.Size.Y;
                     var m = Window.MapPixelToCoords(MousePos);
-                    if (CropRect != null)
-                    {
-                        CropRect.Size = new Vector2f(
-                            m.X - CropRect.Position.X,
-                            m.Y - CropRect.Position.Y
-                        );
-                    }
+                    CropRect?.Size = new Vector2f(
+                        m.X - CropRect.Position.X,
+                        m.Y - CropRect.Position.Y
+                    );
 
                     doRedraw = true;
                 }
@@ -435,7 +399,8 @@ namespace vimage
                 );
             }
             // Draw Image
-            Window.Draw(Image);
+            if (Image is Drawable drawable)
+                Window.Draw(drawable);
             // Draw Other
             if (Cropping && CropRect != null)
                 Window.Draw(CropRect);
@@ -1383,8 +1348,8 @@ namespace vimage
         public void ResetImage()
         {
             // Reset size / crops
-            if (Image is not null)
-                Size = Image.Texture.Size;
+            ResetSize();
+
             Window.SetView(
                 new View(Window.DefaultView)
                 {
@@ -1401,11 +1366,7 @@ namespace vimage
 
             // Color
             if (ImageColor != Color.White)
-            {
-                ImageColor = Color.White;
-                if (Image is not null)
-                    Image.Color = ImageColor;
-            }
+                SetImageColor(Color.White);
 
             // Click-Through-Able?
             if (ClickThroughAble)
@@ -1545,8 +1506,7 @@ namespace vimage
             }
             else
                 ImageColor = Color.White;
-            if (Image is not null)
-                Image.Color = ImageColor;
+            SetImageColor(ImageColor);
             Updated = true;
 
             return true;
@@ -1556,7 +1516,7 @@ namespace vimage
         {
             if (ImageTransparencyHold)
                 ImageTransparencyTweaked = true;
-            ImageColor = new Color(
+            var color = new Color(
                 ImageColor.R,
                 ImageColor.G,
                 ImageColor.B,
@@ -1578,17 +1538,33 @@ namespace vimage
                         255
                     )
             );
-            if (Image is not null)
-                Image.Color = ImageColor;
+            SetImageColor(color);
             Updated = true;
         }
 
         public void SetImageTransparency(byte alpha = 255)
         {
-            ImageColor = new Color(ImageColor.R, ImageColor.G, ImageColor.B, alpha);
-            if (Image is not null)
-                Image.Color = ImageColor;
+            SetImageColor(new Color(ImageColor.R, ImageColor.G, ImageColor.B, alpha));
             Updated = true;
+        }
+
+        public void SetImageColor(Color color)
+        {
+            ImageColor = color;
+            if (Image is DisplayObject obj)
+                obj.Color = color;
+            else if (Image is Sprite sprite)
+                sprite.Color = color;
+        }
+
+        public void ResetSize()
+        {
+            if (Image is AnimatedImage animatedImage)
+                Size = animatedImage.Texture.Size;
+            else if (Image is DisplayObject displayObject)
+                Size = displayObject.Texture.Size;
+            else if (Image is Sprite sprite)
+                Size = sprite.Texture.Size;
         }
 
         public bool ToggleLock(int val = -1)
@@ -1864,7 +1840,7 @@ namespace vimage
                 return;
 
             Image = new Sprite(new Texture(tex));
-            Size = Image.Texture.Size;
+            ResetSize();
 
             Window.SetView(
                 new View(Window.DefaultView)
@@ -1893,10 +1869,10 @@ namespace vimage
             else
                 Image = Graphics.GetImage(fileName);
 
-            if (Image?.Texture == null)
+            if (Image is null)
                 return false;
 
-            Size = Image.Texture.Size;
+            ResetSize();
             DefaultRotation = ImageViewerUtils.GetDefaultRotationFromEXIF(fileName);
 
             return true;
@@ -1938,13 +1914,13 @@ namespace vimage
                 ClipboardBitmap = new System.Drawing.Bitmap(image);
                 Image = new Sprite(new Texture(stream));
 
-                if (Image?.Texture == null)
+                if (Image == null)
                 {
                     LoadedClipboardImage = false;
                     return;
                 }
 
-                Size = Image.Texture.Size;
+                ResetSize();
                 DefaultRotation = 0;
 
                 LoadedClipboardImage = true;
@@ -1978,7 +1954,10 @@ namespace vimage
             // Dispose of previous image
             if (Image != null)
             {
-                Image.Dispose();
+                if (Image is DisplayObject obj)
+                    obj.Dispose();
+                else if (Image is Sprite sprite)
+                    sprite.Dispose();
                 Image = null;
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
             }
@@ -2019,7 +1998,7 @@ namespace vimage
 
             // Color
             if (Image is not null && ImageColor != Color.White)
-                Image.Color = ImageColor;
+                SetImageColor(ImageColor);
 
             // Don't keep current zoom value if it wasn't set by user
             if (
@@ -2392,7 +2371,10 @@ namespace vimage
             GetFolderContents();
             if (FolderContents.Count == 1)
             {
-                Image?.Dispose();
+                if (Image is DisplayObject obj)
+                    obj.Dispose();
+                else if (Image is Sprite sprite)
+                    sprite.Dispose();
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
                 Window.Close();
             }
@@ -2712,9 +2694,7 @@ namespace vimage
                     case "-color":
                     case "-colour":
                         var colour = System.Drawing.ColorTranslator.FromHtml(args[i + 1]);
-                        ImageColor = new Color(colour.R, colour.G, colour.B, colour.A);
-                        if (Image is not null)
-                            Image.Color = ImageColor;
+                        SetImageColor(new Color(colour.R, colour.G, colour.B, colour.A));
                         Updated = true;
                         i++;
                         break;

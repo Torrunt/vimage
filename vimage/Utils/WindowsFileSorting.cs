@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using vimage.Common;
 
 namespace vimage.Utils
 {
@@ -71,24 +72,48 @@ namespace vimage.Utils
             return null;
         }
 
-        private static bool HasProperty(dynamic obj, string name)
+        public static (SortBy, SortDirection) GetSorting(
+            SortBy sortBy,
+            SortDirection sortDir,
+            string file
+        )
         {
-            try
+            if (
+                file == ""
+                || (sortBy != SortBy.FolderDefault && sortDir != SortDirection.FolderDefault)
+            )
+                return (SortBy.Name, SortDirection.Ascending);
+
+            // Get sort column info from window with corresponding name
+            var sort = GetWindowsSortOrder(file);
+            if (sort is null)
+                return (SortBy.Name, SortDirection.Ascending);
+
+            // Direction
+            if (sort[0] == '-')
             {
-                var val = obj.GetType()
-                    .InvokeMember(
-                        name,
-                        System.Reflection.BindingFlags.GetProperty,
-                        null,
-                        obj,
-                        null
-                    );
-                return true;
+                sort = sort[1..];
+
+                if (sortDir == SortDirection.FolderDefault)
+                    sortDir = SortDirection.Descending;
             }
-            catch
+            else if (sortDir == SortDirection.FolderDefault)
+                sortDir = SortDirection.Ascending;
+
+            // By
+            if (sortBy == SortBy.FolderDefault)
             {
-                return false;
+                sortBy = sort switch
+                {
+                    "System.ItemDate" => SortBy.Date,
+                    "System.DateModified" => SortBy.DateModified,
+                    "System.DateCreated" => SortBy.DateCreated,
+                    "System.Size" => SortBy.Size,
+                    _ => SortBy.Name,
+                };
             }
+
+            return (sortBy, sortDir);
         }
     }
 }

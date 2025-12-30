@@ -225,12 +225,12 @@ namespace vimage.Display
                 GWL_EX_STYLE,
                 canClickThrough
                     ? new nint(
-                        (GetWindowLongPtr(hWnd, GWL_EX_STYLE).ToInt64())
+                        GetWindowLongPtr(hWnd, GWL_EX_STYLE).ToInt64()
                             | WS_EX_LAYERED
                             | WS_EX_TRANSPARENT
                     )
                     : new nint(
-                        (GetWindowLongPtr(hWnd, GWL_EX_STYLE).ToInt64())
+                        GetWindowLongPtr(hWnd, GWL_EX_STYLE).ToInt64()
                             & ~WS_EX_LAYERED
                             & ~WS_EX_TRANSPARENT
                     )

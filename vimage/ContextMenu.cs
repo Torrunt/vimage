@@ -14,7 +14,7 @@ namespace vimage
         private List<string> Items_General = [];
         private List<string> Items_Animation = [];
 
-        private Dictionary<string, dynamic> FuncByName = [];
+        private Dictionary<string, object> FuncByName = [];
 
         public int FileNameItem = -1;
         public string FileNameCurrent = ".";
@@ -67,15 +67,19 @@ namespace vimage
                         if (str.StartsWith("Sort"))
                         {
                             i++;
-                            if (i < items.Count - 1 && (items[i + 1] as dynamic).name == "-")
+                            if (
+                                i < items.Count - 1
+                                && items[i + 1] is ContextMenuItem nextItem
+                                && nextItem.name == "-"
+                            )
                                 i++;
                             continue;
                         }
                     }
-                    else
+                    else if (items[i] is ContextMenuItem contextMenuItem)
                     {
                         // remove navigation and delete
-                        switch ((items[i] as dynamic).func)
+                        switch (contextMenuItem.func)
                         {
                             case Action.NextImage:
                             case Action.PrevImage:
@@ -197,9 +201,7 @@ namespace vimage
                 }
             }
 
-            var websiteItem = GetItemByFunc(Action.VisitWebsite);
-            if (websiteItem != null)
-                websiteItem.BackColor = System.Drawing.Color.CornflowerBlue;
+            GetItemByFunc(Action.VisitWebsite)?.BackColor = System.Drawing.Color.CornflowerBlue;
 
             RefreshItems();
         }
@@ -209,33 +211,30 @@ namespace vimage
             if (FileNameItem != -1 && FileNameCurrent != ImageViewer.File)
             {
                 FileNameCurrent = ImageViewer.File;
-                if (Items_General[FileNameItem].Contains("[filename]"))
+                var item = Items_General[FileNameItem];
+                if (item.Contains("[filename]"))
                 {
                     // File Name
-                    var fileNameItem = Items[Items_General[FileNameItem]];
-                    if (fileNameItem is not null)
-                    {
-                        fileNameItem.Text = Items_General[FileNameItem]
-                            .Replace(
-                                "[filename]",
-                                ImageViewer.File == ""
-                                    ? "Clipboard Image"
-                                    : ImageViewer.File[(ImageViewer.File.LastIndexOf('\\') + 1)..]
-                            );
-                    }
+                    var fileNameItem = Items[item];
+                    fileNameItem?.Text = item.Replace(
+                        "[filename]",
+                        ImageViewer.File == ""
+                            ? "Clipboard Image"
+                            : ImageViewer.File[(ImageViewer.File.LastIndexOf('\\') + 1)..]
+                    );
                 }
-                else if (Items_General[FileNameItem].Contains("[filename"))
+                else if (item.Contains("[filename"))
                 {
                     // File Name (trimmed)
-                    int a = Items_General[FileNameItem].IndexOf("[filename.") + 10;
-                    int b = Items_General[FileNameItem].IndexOf(']');
-                    if (int.TryParse(Items_General[FileNameItem][a..b], out int nameLength))
+                    int a = item.IndexOf("[filename.") + 10;
+                    int b = item.IndexOf(']');
+                    if (int.TryParse(item[a..b], out int nameLength))
                     {
-                        string fileName =
+                        var fileName =
                             ImageViewer.File == ""
                                 ? "Clipboard Image"
                                 : ImageViewer.File[(ImageViewer.File.LastIndexOf('\\') + 1)..];
-                        string extension =
+                        var extension =
                             ImageViewer.File == "" ? "" : fileName[fileName.LastIndexOf('.')..];
                         if (
                             nameLength >= fileName.Length - 6
@@ -243,21 +242,17 @@ namespace vimage
                         )
                             nameLength = fileName.Length;
 
-                        var fileNameItem = Items[Items_General[FileNameItem]];
+                        var fileNameItem = Items[item];
                         if (fileNameItem is not null)
                         {
                             fileNameItem.Text =
-                                (a > 10 ? Items_General[FileNameItem][..(a - 10)] : "")
+                                (a > 10 ? item[..(a - 10)] : "")
                                 + (
                                     fileName.Length > nameLength
                                         ? fileName[..nameLength] + ".." + extension
                                         : fileName
                                 )
-                                + (
-                                    b < Items_General[FileNameItem].Length - 1
-                                        ? Items_General[FileNameItem][(b + 1)..]
-                                        : ""
-                                );
+                                + (b < item.Length - 1 ? item[(b + 1)..] : "");
                             fileNameItem.ToolTipText = fileName.Length > nameLength ? fileName : "";
                             fileNameItem.MouseEnter += ItemMouseEnter;
                             fileNameItem.MouseLeave += ItemMouseLeave;
@@ -272,67 +267,26 @@ namespace vimage
             )
                 return;
 
-            ToolStripMenuItem? item;
-
-            item = GetItemByFunc(Action.Flip);
-            if (item != null)
-                item.Checked = ImageViewer.FlippedX;
-
-            item = GetItemByFunc(Action.FitToMonitorHeight);
-            if (item != null)
-                item.Checked = ImageViewer.FitToMonitorHeight;
-
-            item = GetItemByFunc(Action.FitToMonitorWidth);
-            if (item != null)
-                item.Checked = ImageViewer.FitToMonitorWidth;
-
-            item = GetItemByFunc(Action.ToggleSmoothing);
-            if (item != null)
-                item.Checked = ImageViewer.Smoothing();
-
-            item = GetItemByFunc(Action.ToggleBackground);
-            if (item != null)
-                item.Checked = ImageViewer.BackgroundsForImagesWithTransparency;
-
-            item = GetItemByFunc(Action.ToggleLock);
-            if (item != null)
-                item.Checked = ImageViewer.Locked;
-
-            item = GetItemByFunc(Action.ToggleAlwaysOnTop);
-            if (item != null)
-                item.Checked = ImageViewer.AlwaysOnTop;
-
-            item = GetItemByFunc(Action.ToggleTitleBar);
-            if (item != null)
-                item.Checked = ImageViewer.Config.Setting_ShowTitleBar;
-
-            item = GetItemByFunc(Action.SortName);
-            if (item != null)
-                item.Checked = ImageViewer.SortImagesBy == SortBy.Name;
-
-            item = GetItemByFunc(Action.SortDate);
-            if (item != null)
-                item.Checked = ImageViewer.SortImagesBy == SortBy.Date;
-
-            item = GetItemByFunc(Action.SortDateModified);
-            if (item != null)
-                item.Checked = ImageViewer.SortImagesBy == SortBy.DateModified;
-
-            item = GetItemByFunc(Action.SortDateCreated);
-            if (item != null)
-                item.Checked = ImageViewer.SortImagesBy == SortBy.DateCreated;
-
-            item = GetItemByFunc(Action.SortSize);
-            if (item != null)
-                item.Checked = ImageViewer.SortImagesBy == SortBy.Size;
-
-            item = GetItemByFunc(Action.SortAscending);
-            if (item != null)
-                item.Checked = ImageViewer.SortImagesByDir == SortDirection.Ascending;
-
-            item = GetItemByFunc(Action.SortDescending);
-            if (item != null)
-                item.Checked = ImageViewer.SortImagesByDir == SortDirection.Descending;
+            GetItemByFunc(Action.Flip)?.Checked = ImageViewer.FlippedX;
+            GetItemByFunc(Action.FitToMonitorHeight)?.Checked = ImageViewer.FitToMonitorHeight;
+            GetItemByFunc(Action.FitToMonitorWidth)?.Checked = ImageViewer.FitToMonitorWidth;
+            GetItemByFunc(Action.ToggleSmoothing)?.Checked = ImageViewer.Smoothing();
+            GetItemByFunc(Action.ToggleBackground)?.Checked =
+                ImageViewer.BackgroundsForImagesWithTransparency;
+            GetItemByFunc(Action.ToggleLock)?.Checked = ImageViewer.Locked;
+            GetItemByFunc(Action.ToggleAlwaysOnTop)?.Checked = ImageViewer.AlwaysOnTop;
+            GetItemByFunc(Action.ToggleTitleBar)?.Checked = ImageViewer.Config.Setting_ShowTitleBar;
+            GetItemByFunc(Action.SortName)?.Checked = ImageViewer.SortImagesBy == SortBy.Name;
+            GetItemByFunc(Action.SortDate)?.Checked = ImageViewer.SortImagesBy == SortBy.Date;
+            GetItemByFunc(Action.SortDateModified)?.Checked =
+                ImageViewer.SortImagesBy == SortBy.DateModified;
+            GetItemByFunc(Action.SortDateCreated)?.Checked =
+                ImageViewer.SortImagesBy == SortBy.DateCreated;
+            GetItemByFunc(Action.SortSize)?.Checked = ImageViewer.SortImagesBy == SortBy.Size;
+            GetItemByFunc(Action.SortAscending)?.Checked =
+                ImageViewer.SortImagesByDir == SortDirection.Ascending;
+            GetItemByFunc(Action.SortDescending)?.Checked =
+                ImageViewer.SortImagesByDir == SortDirection.Descending;
         }
 
         private void ContexMenuItemClicked(object? sender, EventArgs e)
