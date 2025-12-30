@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 
@@ -12,6 +13,12 @@ namespace vimage_settings
         public About()
         {
             InitializeComponent();
+            var version =
+                Assembly
+                    .GetExecutingAssembly()
+                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                    ?.InformationalVersion.Split('+')[0] ?? "#";
+            VersionLabel.Content = $"version {version}";
         }
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)

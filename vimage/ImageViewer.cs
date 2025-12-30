@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using SFML.Graphics;
@@ -17,7 +18,11 @@ namespace vimage
 {
     internal class ImageViewer
     {
-        public const string VERSION_NO = "#";
+        public static string VERSION_NO =
+            Assembly
+                .GetExecutingAssembly()
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion?.Split('+')[0] ?? "#";
 
         public readonly float ZOOM_MIN = 0.05f;
         public readonly float ZOOM_MAX = 75f;

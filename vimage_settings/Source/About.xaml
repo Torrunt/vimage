@@ -10,7 +10,7 @@
     <StackPanel>
         <DockPanel>
             <Label Content="vimage" FontWeight="SemiBold" FontSize="26" />
-            <Label Content="version #" FontSize="18" HorizontalAlignment="Right" VerticalAlignment="Center" />
+            <Label x:Name="VersionLabel" FontSize="18" HorizontalAlignment="Right" VerticalAlignment="Center" />
         </DockPanel>
         <TextBlock VerticalAlignment="Center" Margin="5,0,0,0" LineHeight="20">
             A simplistic image viewer for Windows.
