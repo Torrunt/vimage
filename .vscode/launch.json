@@ -4,6 +4,7 @@
                "name": "C#: vimage",
                "type": "dotnet",
                "request": "launch",
+               "preLaunchTask": "build",
                "projectPath": "${workspaceFolder}\\vimage\\vimage.csproj",
                "launchConfigurationId": "TargetFramework=;vimage"
           }
