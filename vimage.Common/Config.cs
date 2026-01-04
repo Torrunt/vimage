@@ -74,6 +74,9 @@ namespace vimage.Common
         public List<int> Control_PauseAnimation = [];
         public List<int> Control_PrevFrame = [];
         public List<int> Control_NextFrame = [];
+        public List<int> Control_PlaybackSpeedIncrease = [];
+        public List<int> Control_PlaybackSpeedDecrease = [];
+        public List<int> Control_PlaybackSpeedReset = [];
         public List<int> Control_OpenSettings = [];
         public List<int> Control_ResetImage = [];
         public List<int> Control_OpenAtLocation = [];
@@ -123,6 +126,9 @@ namespace vimage.Common
             "Pause Animation",
             "Prev Frame",
             "Next Frame",
+            "Speed Increase",
+            "Speed Decrease",
+            "Speed Reset",
             "Open Settings",
             "Reset Image",
             "Open At Location",
@@ -365,6 +371,9 @@ namespace vimage.Common
                 Control_PauseAnimation,
                 Control_PrevFrame,
                 Control_NextFrame,
+                Control_PlaybackSpeedIncrease,
+                Control_PlaybackSpeedDecrease,
+                Control_PlaybackSpeedReset,
                 Control_OpenSettings,
                 Control_ResetImage,
                 Control_OpenAtLocation,
@@ -455,6 +464,9 @@ namespace vimage.Common
                 { "PAUSEANIMATION", Control_PauseAnimation },
                 { "PREVFRAME", Control_PrevFrame },
                 { "NEXTFRAME", Control_NextFrame },
+                { "PLAYBACKSPEEDINCREASE", Control_PlaybackSpeedIncrease },
+                { "PLAYBACKSPEEDDECREASE", Control_PlaybackSpeedDecrease },
+                { "PLAYBACKSPEEDRESET", Control_PlaybackSpeedReset },
                 { "OPENSETTINGS", Control_OpenSettings },
                 { "RESETIMAGE", Control_ResetImage },
                 { "OPENATLOCATION", Control_OpenAtLocation },
@@ -512,6 +524,9 @@ namespace vimage.Common
             Control_PauseAnimation.Clear();
             Control_PrevFrame.Clear();
             Control_NextFrame.Clear();
+            Control_PlaybackSpeedIncrease.Clear();
+            Control_PlaybackSpeedDecrease.Clear();
+            Control_PlaybackSpeedReset.Clear();
             Control_OpenSettings.Clear();
             Control_ResetImage.Clear();
             Control_OpenAtLocation.Clear();
@@ -558,6 +573,9 @@ namespace vimage.Common
             SetControls(Control_PauseAnimation, "SPACE");
             SetControls(Control_PrevFrame, "<");
             SetControls(Control_NextFrame, ">");
+            SetControls(Control_PlaybackSpeedIncrease, "PLUS");
+            SetControls(Control_PlaybackSpeedDecrease, "MINUS");
+            SetControls(Control_PlaybackSpeedReset, "0");
             SetControls(Control_OpenSettings, "");
             SetControls(Control_ResetImage, "R");
             SetControls(Control_OpenAtLocation, "O");
@@ -1026,6 +1044,9 @@ namespace vimage.Common
             WriteControl(writer, "PauseAnimation", Control_PauseAnimation);
             WriteControl(writer, "PrevFrame", Control_PrevFrame);
             WriteControl(writer, "NextFrame", Control_NextFrame);
+            WriteControl(writer, "PlaybackSpeedIncrease", Control_PlaybackSpeedIncrease);
+            WriteControl(writer, "PlaybackSpeedDecrease", Control_PlaybackSpeedDecrease);
+            WriteControl(writer, "PlaybackSpeedReset", Control_PlaybackSpeedReset);
             WriteControl(writer, "OpenSettings", Control_OpenSettings);
             WriteControl(writer, "ResetImage", Control_ResetImage);
             WriteControl(writer, "OpenAtLocation", Control_OpenAtLocation);

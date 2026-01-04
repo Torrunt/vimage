@@ -76,7 +76,18 @@ namespace vimage.Display
 
         /// <summary> Keeps track of when to change frame. Resets on frame change. </summary>
         public float CurrentTime;
-        private float CurrentFrameDelay;
+
+        public float SpeedMultiplier
+        {
+            get;
+            set
+            {
+                if (field == value)
+                    return;
+                field = value;
+                CurrentTime = 0;
+            }
+        } = 1.0f;
 
         /// <summary>Default Frame Delay for animated images that don't define it.</summary>
         public static readonly int DEFAULT_FRAME_DELAY = 100;
@@ -89,7 +100,6 @@ namespace vimage.Display
             AddChild(Sprite);
 
             CurrentTime = 0;
-            CurrentFrameDelay = data.FrameDelays[0];
         }
 
         public bool Update(float dt)
@@ -97,29 +107,31 @@ namespace vimage.Display
             if (!Playing)
                 return false;
 
-            CurrentTime += dt;
+            CurrentTime += dt * SpeedMultiplier;
+            var frame = CurrentFrame;
 
-            while (CurrentTime > CurrentFrameDelay)
+            while (CurrentTime >= Data.FrameDelays[frame])
             {
-                if (Looping || CurrentFrame < TotalFrames - 1)
+                CurrentTime -= Data.FrameDelays[frame];
+
+                if (frame == TotalFrames - 1)
                 {
-                    if (CurrentFrame == TotalFrames - 1)
-                        _ = SetFrame(0);
-                    else
-                        NextFrame();
+                    if (!Looping)
+                    {
+                        Finished = true;
+                        Playing = false;
+                        break;
+                    }
+                    frame = 0;
                 }
                 else
-                    Finished = true;
-
-                if (CurrentFrameDelay == 0)
-                    CurrentTime = 0;
-                else
-                    CurrentTime -= CurrentFrameDelay;
-
-                return true;
+                    frame++;
             }
 
-            return false;
+            if (frame == CurrentFrame)
+                return false;
+
+            return SetFrame(frame);
         }
 
         public bool SetFrame(int number)
@@ -134,7 +146,6 @@ namespace vimage.Display
             Finished = CurrentFrame == TotalFrames - 1;
 
             Sprite.Texture = Data.Frames[CurrentFrame];
-            CurrentFrameDelay = Data.FrameDelays[CurrentFrame];
 
             return true;
         }

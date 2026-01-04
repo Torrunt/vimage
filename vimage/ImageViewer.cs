@@ -513,6 +513,15 @@ namespace vimage
                 case Action.PauseAnimation:
                     _ = ToggleAnimation();
                     return;
+                case Action.PlaybackSpeedIncrease:
+                    AdjustPlaybackSpeed(0.1f);
+                    return;
+                case Action.PlaybackSpeedDecrease:
+                    AdjustPlaybackSpeed(-0.1f);
+                    return;
+                case Action.PlaybackSpeedReset:
+                    ResetPlaybackSpeed();
+                    return;
 
                 case Action.OpenSettings:
                     OpenConfig();
@@ -760,6 +769,15 @@ namespace vimage
             if (Config.IsControl(code, Config.Control_PauseAnimation, CurrentAction != Action.None))
                 CurrentAction = Action.PauseAnimation;
 
+            if (
+                Config.IsControl(
+                    code,
+                    Config.Control_PlaybackSpeedReset,
+                    CurrentAction != Action.None
+                )
+            )
+                CurrentAction = Action.PlaybackSpeedReset;
+
             // Next/Prev Image in Folder
             if (Config.IsControl(code, Config.Control_PrevImage, CurrentAction != Action.None))
                 CurrentAction = Action.PrevImage;
@@ -873,11 +891,9 @@ namespace vimage
                 {
                     DoCustomAction(
                         (
-                            Config
-                                .CustomActions.Where(a =>
-                                    a.name == Config.CustomActionBindings[i].name
-                                )
-                                .First()
+                            Config.CustomActions.First(a =>
+                                a.name == Config.CustomActionBindings[i].name
+                            )
                         ).func
                     );
                     CurrentAction = Action.Custom;
@@ -937,6 +953,23 @@ namespace vimage
                 CurrentAction = Action.NextFrame;
             if (Config.IsControl(code, Config.Control_PrevFrame, CurrentAction != Action.None))
                 CurrentAction = Action.PrevFrame;
+
+            if (
+                Config.IsControl(
+                    code,
+                    Config.Control_PlaybackSpeedIncrease,
+                    CurrentAction != Action.None
+                )
+            )
+                CurrentAction = Action.PlaybackSpeedIncrease;
+            if (
+                Config.IsControl(
+                    code,
+                    Config.Control_PlaybackSpeedDecrease,
+                    CurrentAction != Action.None
+                )
+            )
+                CurrentAction = Action.PlaybackSpeedDecrease;
 
             // Change Image Transparency
             if (
@@ -1022,6 +1055,23 @@ namespace vimage
                 animatedImage.Play();
 
             return animatedImage.Playing;
+        }
+
+        public void AdjustPlaybackSpeed(float increment = 1)
+        {
+            if (Image is not AnimatedImage animatedImage)
+                return;
+            animatedImage.SpeedMultiplier = Math.Max(
+                0.1f,
+                (float)Math.Round(animatedImage.SpeedMultiplier + increment, 2)
+            );
+        }
+
+        public void ResetPlaybackSpeed()
+        {
+            if (Image is not AnimatedImage animatedImage)
+                return;
+            animatedImage.SpeedMultiplier = 1;
         }
 
         private void Zoom(float value, bool center = false, bool manualZoom = false)
