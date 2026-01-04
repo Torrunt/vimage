@@ -130,7 +130,7 @@ namespace vimage.Utils
         public static DateTime GetDateValueFromEXIF(string path)
         {
             using var image = new ImageMagick.MagickImage();
-            image.Ping(path);
+            image.Ping(path, GetDefaultMagickReadSettings());
 
             var exif = image.GetExifProfile();
             if (exif is null)
