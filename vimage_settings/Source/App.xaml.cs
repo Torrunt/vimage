@@ -14,7 +14,7 @@ namespace vimage_settings
 
             try
             {
-                vimageConfig.Load(
+                Config.Load(
                     System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt")
                 );
             }

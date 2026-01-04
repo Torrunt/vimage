@@ -120,10 +120,11 @@ namespace vimage
             DWM.DwmEnableBlurBehindWindow(Window.SystemHandle, ref bb);
 
             // Load Config File
-            Config = new Config();
             try
             {
-                Config.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
+                Config = Config.Load(
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json")
+                );
             }
             catch (UnauthorizedAccessException)
             {
@@ -131,13 +132,14 @@ namespace vimage
                     "vimage does not have write permissions for the folder it's located in.\nPlease place it somewhere else (or set it to run as admin).",
                     "vimage - Error"
                 );
+                Config = new Config();
             }
 
-            if (Config.Setting_ListenForConfigChanges)
+            if (Config.ListenForConfigChanges)
             {
                 ConfigFileWatcher = new FileSystemWatcher(
                     AppDomain.CurrentDomain.BaseDirectory,
-                    "config.txt"
+                    "config.json"
                 )
                 {
                     NotifyFilter = NotifyFilters.LastWrite,
@@ -146,15 +148,13 @@ namespace vimage
                 ConfigFileWatcher.EnableRaisingEvents = true;
             }
             BackgroundsForImagesWithTransparency =
-                Config.Setting_BackgroundForImagesWithTransparencyDefault;
-            var backColour = System.Drawing.ColorTranslator.FromHtml(
-                Config.Setting_BackgroundColour
-            );
+                Config.BackgroundForImagesWithTransparencyDefault;
+            var backColour = System.Drawing.ColorTranslator.FromHtml(Config.BackgroundColour);
             BackgroundColour = new Color(backColour.R, backColour.G, backColour.B, backColour.A);
-            Graphics.MAX_TEXTURES = (uint)Config.Setting_MaxTextures;
-            Graphics.MAX_ANIMATIONS = (uint)Config.Setting_MaxAnimations;
+            Graphics.MAX_TEXTURES = (uint)Config.MaxTextures;
+            Graphics.MAX_ANIMATIONS = (uint)Config.MaxAnimations;
             Graphics.TextureMaxSize = Math.Min(Graphics.TextureMaxSize, 8192);
-            ShowTitleBar = Config.Setting_ShowTitleBar;
+            ShowTitleBar = Config.ShowTitleBar;
             if (ShowTitleBar)
                 DWM.TitleBarSetVisible(Window, true);
 
@@ -171,14 +171,14 @@ namespace vimage
             var winPos = mousePos;
             var bounds = ImageViewerUtils.GetCurrentBounds(winPos);
             if (
-                Config.Setting_PositionLargeWideImagesInCorner
+                Config.PositionLargeWideImagesInCorner
                 && CurrentImageSize().X > CurrentImageSize().Y
                 && CurrentImageSize().X * CurrentZoom >= bounds.Width
             )
             {
                 winPos = new Vector2i(bounds.Left, bounds.Top);
             }
-            else if (Config.Setting_OpenAtMousePosition)
+            else if (Config.OpenAtMousePosition)
             {
                 // At Mouse Position
                 winPos = new Vector2i(
@@ -226,8 +226,8 @@ namespace vimage
             Task.Run(() =>
             {
                 var (sortBy, sortDir) = WindowsFileSorting.GetSorting(
-                    Config.Setting_DefaultSortBy,
-                    Config.Setting_DefaultSortDir,
+                    Config.DefaultSortBy,
+                    Config.DefaultSortDir,
                     file
                 );
                 SortImagesBy = sortBy;
@@ -446,13 +446,13 @@ namespace vimage
                     _ = FlipImage();
                     return;
                 case Action.FitToMonitorHeight:
-                    ToggleFitToMonitor(Config.HEIGHT);
+                    ToggleFitToMonitor(LimitImagesToMonitorOption.Height);
                     return;
                 case Action.FitToMonitorWidth:
-                    ToggleFitToMonitor(Config.WIDTH);
+                    ToggleFitToMonitor(LimitImagesToMonitorOption.Width);
                     return;
                 case Action.FitToMonitorAuto:
-                    ToggleFitToMonitor(Config.AUTO);
+                    ToggleFitToMonitor(LimitImagesToMonitorOption.Auto);
                     return;
                 case Action.ZoomIn:
                     Zoom(
@@ -460,8 +460,8 @@ namespace vimage
                             CurrentZoom
                                 + (
                                     ZoomFaster
-                                        ? (Config.Setting_ZoomSpeedFast / 100f)
-                                        : (Config.Setting_ZoomSpeed / 100f)
+                                        ? (Config.ZoomSpeedFast / 100f)
+                                        : (Config.ZoomSpeed / 100f)
                                 ),
                             ZOOM_MAX
                         ),
@@ -475,8 +475,8 @@ namespace vimage
                             CurrentZoom
                                 - (
                                     ZoomFaster
-                                        ? (Config.Setting_ZoomSpeedFast / 100f)
-                                        : (Config.Setting_ZoomSpeed / 100f)
+                                        ? (Config.ZoomSpeedFast / 100f)
+                                        : (Config.ZoomSpeed / 100f)
                                 ),
                             ZOOM_MIN
                         ),
@@ -552,27 +552,19 @@ namespace vimage
                     return;
 
                 case Action.MoveLeft:
-                    NextWindowPos.X -= ZoomFaster
-                        ? Config.Setting_MoveSpeedFast
-                        : Config.Setting_MoveSpeed;
+                    NextWindowPos.X -= ZoomFaster ? Config.MoveSpeedFast : Config.MoveSpeed;
                     Window.Position = NextWindowPos;
                     return;
                 case Action.MoveRight:
-                    NextWindowPos.X += ZoomFaster
-                        ? Config.Setting_MoveSpeedFast
-                        : Config.Setting_MoveSpeed;
+                    NextWindowPos.X += ZoomFaster ? Config.MoveSpeedFast : Config.MoveSpeed;
                     Window.Position = NextWindowPos;
                     return;
                 case Action.MoveUp:
-                    NextWindowPos.Y -= ZoomFaster
-                        ? Config.Setting_MoveSpeedFast
-                        : Config.Setting_MoveSpeed;
+                    NextWindowPos.Y -= ZoomFaster ? Config.MoveSpeedFast : Config.MoveSpeed;
                     Window.Position = NextWindowPos;
                     return;
                 case Action.MoveDown:
-                    NextWindowPos.Y += ZoomFaster
-                        ? Config.Setting_MoveSpeedFast
-                        : Config.Setting_MoveSpeed;
+                    NextWindowPos.Y += ZoomFaster ? Config.MoveSpeedFast : Config.MoveSpeed;
                     Window.Position = NextWindowPos;
                     return;
 
@@ -644,24 +636,24 @@ namespace vimage
             if (Locked)
                 return;
 
-            int dir = e.Delta > 0 ? Config.MOUSE_SCROLL_UP : Config.MOUSE_SCROLL_DOWN;
+            var dir = e.Delta > 0 ? Controls.MOUSE_SCROLL_UP : Controls.MOUSE_SCROLL_DOWN;
 
             // Next/Prev Image in Folder
-            if (Config.IsControl(dir, Config.Control_PrevImage, CurrentAction != Action.None))
+            if (Controls.Equals(dir, Config.Controls.PrevImage, CurrentAction != Action.None))
                 CurrentAction = Action.PrevImage;
-            if (Config.IsControl(dir, Config.Control_NextImage, CurrentAction != Action.None))
+            if (Controls.Equals(dir, Config.Controls.NextImage, CurrentAction != Action.None))
                 CurrentAction = Action.NextImage;
             // Change Image Transparency
-            if (Config.IsControl(dir, Config.Control_TransparencyInc, CurrentAction != Action.None))
+            if (Controls.Equals(dir, Config.Controls.TransparencyInc, CurrentAction != Action.None))
                 CurrentAction = Action.TransparencyInc;
-            if (Config.IsControl(dir, Config.Control_TransparencyDec, CurrentAction != Action.None))
+            if (Controls.Equals(dir, Config.Controls.TransparencyDec, CurrentAction != Action.None))
                 CurrentAction = Action.TransparencyDec;
             // Zooming
             if (!Cropping)
             {
-                if (Config.IsControl(dir, Config.Control_ZoomIn, CurrentAction != Action.None))
+                if (Controls.Equals(dir, Config.Controls.ZoomIn, CurrentAction != Action.None))
                     CurrentAction = Action.ZoomIn;
-                if (Config.IsControl(dir, Config.Control_ZoomOut, CurrentAction != Action.None))
+                if (Controls.Equals(dir, Config.Controls.ZoomOut, CurrentAction != Action.None))
                     CurrentAction = Action.ZoomOut;
             }
 
@@ -694,12 +686,12 @@ namespace vimage
         private void ControlUp(object code)
         {
             // Close
-            if (Config.IsControl(code, Config.Control_ExitAll))
+            if (Controls.Equals(code, Config.Controls.ExitAll))
             {
                 ExitAllInstances();
                 return;
             }
-            if (Config.IsControl(code, Config.Control_Close))
+            if (Controls.Equals(code, Config.Controls.Close))
             {
                 CloseNextTick = true;
                 return;
@@ -708,157 +700,157 @@ namespace vimage
             var DownAction = CurrentAction; // Remember ControlDown Action so it won't be repeated on release
 
             // Dragging
-            if (Config.IsControl(code, Config.Control_Drag))
+            if (Controls.Equals(code, Config.Controls.Drag))
                 Dragging = false;
 
             // Open Context Menu
             if (
-                Config.IsControl(code, Config.Control_OpenContextMenu, CurrentAction != Action.None)
+                Controls.Equals(code, Config.Controls.OpenContextMenu, CurrentAction != Action.None)
             )
                 CurrentAction = Action.OpenContextMenu;
 
             // Rotate Image
             if (
-                Config.IsControl(code, Config.Control_RotateClockwise, CurrentAction != Action.None)
+                Controls.Equals(code, Config.Controls.RotateClockwise, CurrentAction != Action.None)
             )
                 CurrentAction = Action.RotateClockwise;
             if (
-                Config.IsControl(
+                Controls.Equals(
                     code,
-                    Config.Control_RotateAntiClockwise,
+                    Config.Controls.RotateAntiClockwise,
                     CurrentAction != Action.None
                 )
             )
                 CurrentAction = Action.RotateAntiClockwise;
 
             // Flip Image
-            if (Config.IsControl(code, Config.Control_Flip, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.Flip, CurrentAction != Action.None))
                 CurrentAction = Action.Flip;
 
             // Reset Image
-            if (Config.IsControl(code, Config.Control_ResetImage, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.ResetImage, CurrentAction != Action.None))
                 CurrentAction = Action.ResetImage;
 
             // Fit To Monitor Height/Width
             if (
-                Config.IsControl(
+                Controls.Equals(
                     code,
-                    Config.Control_FitToMonitorHeight,
+                    Config.Controls.FitToMonitorHeight,
                     CurrentAction != Action.None
                 )
             )
                 CurrentAction = Action.FitToMonitorHeight;
             if (
-                Config.IsControl(
+                Controls.Equals(
                     code,
-                    Config.Control_FitToMonitorWidth,
+                    Config.Controls.FitToMonitorWidth,
                     CurrentAction != Action.None
                 )
             )
                 CurrentAction = Action.FitToMonitorWidth;
             if (
-                Config.IsControl(
+                Controls.Equals(
                     code,
-                    Config.Control_FitToMonitorAuto,
+                    Config.Controls.FitToMonitorAuto,
                     CurrentAction != Action.None
                 )
             )
                 CurrentAction = Action.FitToMonitorAuto;
 
             // Animated Image - Pause/Play
-            if (Config.IsControl(code, Config.Control_PauseAnimation, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.PauseAnimation, CurrentAction != Action.None))
                 CurrentAction = Action.PauseAnimation;
 
             if (
-                Config.IsControl(
+                Controls.Equals(
                     code,
-                    Config.Control_PlaybackSpeedReset,
+                    Config.Controls.PlaybackSpeedReset,
                     CurrentAction != Action.None
                 )
             )
                 CurrentAction = Action.PlaybackSpeedReset;
 
             // Next/Prev Image in Folder
-            if (Config.IsControl(code, Config.Control_PrevImage, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.PrevImage, CurrentAction != Action.None))
                 CurrentAction = Action.PrevImage;
-            if (Config.IsControl(code, Config.Control_NextImage, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.NextImage, CurrentAction != Action.None))
                 CurrentAction = Action.NextImage;
 
             // Open Config
-            if (Config.IsControl(code, Config.Control_OpenSettings, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.OpenSettings, CurrentAction != Action.None))
                 CurrentAction = Action.OpenSettings;
 
             // Toggle Settings
             if (
-                Config.IsControl(code, Config.Control_ToggleSmoothing, CurrentAction != Action.None)
+                Controls.Equals(code, Config.Controls.ToggleSmoothing, CurrentAction != Action.None)
             )
                 CurrentAction = Action.ToggleSmoothing;
 
             if (
-                Config.IsControl(
+                Controls.Equals(
                     code,
-                    Config.Control_ToggleBackground,
+                    Config.Controls.ToggleBackground,
                     CurrentAction != Action.None
                 )
             )
                 CurrentAction = Action.ToggleBackground;
 
-            if (Config.IsControl(code, Config.Control_ToggleLock, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.ToggleLock, CurrentAction != Action.None))
                 CurrentAction = Action.ToggleLock;
 
             if (
-                Config.IsControl(
+                Controls.Equals(
                     code,
-                    Config.Control_ToggleAlwaysOnTop,
+                    Config.Controls.ToggleAlwaysOnTop,
                     CurrentAction != Action.None
                 )
             )
                 CurrentAction = Action.ToggleAlwaysOnTop;
 
-            if (Config.IsControl(code, Config.Control_ToggleTitleBar, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.ToggleTitleBar, CurrentAction != Action.None))
                 CurrentAction = Action.ToggleTitleBar;
 
             // Open File At Location
-            if (Config.IsControl(code, Config.Control_OpenAtLocation, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.OpenAtLocation, CurrentAction != Action.None))
                 CurrentAction = Action.OpenAtLocation;
 
             // Delete File
-            if (Config.IsControl(code, Config.Control_Delete, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.Delete, CurrentAction != Action.None))
                 CurrentAction = Action.Delete;
 
             // Copy File
-            if (Config.IsControl(code, Config.Control_Copy, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.Copy, CurrentAction != Action.None))
                 CurrentAction = Action.Copy;
-            if (Config.IsControl(code, Config.Control_CopyAsImage, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.CopyAsImage, CurrentAction != Action.None))
                 CurrentAction = Action.CopyAsImage;
 
             // Open Duplicate Window
             if (
-                Config.IsControl(
+                Controls.Equals(
                     code,
-                    Config.Control_OpenDuplicateImage,
+                    Config.Controls.OpenDuplicateImage,
                     CurrentAction != Action.None
                 )
             )
                 CurrentAction = Action.OpenDuplicateImage;
             if (
-                Config.IsControl(
+                Controls.Equals(
                     code,
-                    Config.Control_OpenFullDuplicateImage,
+                    Config.Controls.OpenFullDuplicateImage,
                     CurrentAction != Action.None
                 )
             )
                 CurrentAction = Action.OpenFullDuplicateImage;
 
             // Random Image
-            if (Config.IsControl(code, Config.Control_RandomImage, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.RandomImage, CurrentAction != Action.None))
                 CurrentAction = Action.RandomImage;
 
             // Toggle Image Transparency
             if (
-                Config.IsControl(
+                Controls.Equals(
                     code,
-                    Config.Control_TransparencyToggle,
+                    Config.Controls.TransparencyToggle,
                     CurrentAction != Action.None
                 )
             )
@@ -867,22 +859,22 @@ namespace vimage
             // Cropping - release
             if (
                 Cropping
-                && Config.IsControl(code, Config.Control_Crop, CurrentAction != Action.None)
+                && Controls.Equals(code, Config.Controls.Crop, CurrentAction != Action.None)
             )
                 CropEnd();
 
-            if (Config.IsControl(code, Config.Control_UndoCrop, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.UndoCrop, CurrentAction != Action.None))
                 CurrentAction = Action.UndoCrop;
 
             // Re-render SVG
-            if (Config.IsControl(code, Config.Control_RerenderSVG, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.RerenderSVG, CurrentAction != Action.None))
                 CurrentAction = Action.RerenderSVG;
 
             // Custom Actions
             for (int i = 0; i < Config.CustomActionBindings.Count; i++)
             {
                 if (
-                    Config.IsControl(
+                    Controls.Equals(
                         code,
                         Config.CustomActionBindings[i].bindings,
                         CurrentAction != Action.None
@@ -913,13 +905,13 @@ namespace vimage
                 DoAction(CurrentAction);
 
             // Hold Keys - up
-            if (Config.IsControl(code, Config.Control_ZoomFaster))
+            if (Controls.Equals(code, Config.Controls.ZoomFaster))
                 ZoomFaster = false;
-            if (Config.IsControl(code, Config.Control_ZoomAlt))
+            if (Controls.Equals(code, Config.Controls.ZoomAlt))
                 ZoomAlt = false;
-            if (Config.IsControl(code, Config.Control_DragLimitToMonitorBounds))
+            if (Controls.Equals(code, Config.Controls.DragLimitToMonitorBounds))
                 DragLimitToBoundsMod = false;
-            if (Config.IsControl(code, Config.Control_FitToMonitorAlt))
+            if (Controls.Equals(code, Config.Controls.FitToMonitorAlt))
                 FitToMonitorAlt = false;
 
             CurrentAction = Action.None;
@@ -931,17 +923,17 @@ namespace vimage
                 return;
 
             // Hold Keys - down
-            if (Config.IsControl(code, Config.Control_ZoomFaster))
+            if (Controls.Equals(code, Config.Controls.ZoomFaster))
                 ZoomFaster = true;
-            if (Config.IsControl(code, Config.Control_ZoomAlt))
+            if (Controls.Equals(code, Config.Controls.ZoomAlt))
                 ZoomAlt = true;
-            if (Config.IsControl(code, Config.Control_DragLimitToMonitorBounds))
+            if (Controls.Equals(code, Config.Controls.DragLimitToMonitorBounds))
                 DragLimitToBoundsMod = true;
-            if (Config.IsControl(code, Config.Control_FitToMonitorAlt))
+            if (Controls.Equals(code, Config.Controls.FitToMonitorAlt))
                 FitToMonitorAlt = true;
 
             // Dragging
-            if (Config.IsControl(code, Config.Control_Drag))
+            if (Controls.Equals(code, Config.Controls.Drag))
             {
                 if (!Dragging)
                     DragPos = MousePos;
@@ -949,23 +941,23 @@ namespace vimage
             }
 
             // Animated Image Controls
-            if (Config.IsControl(code, Config.Control_NextFrame, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.NextFrame, CurrentAction != Action.None))
                 CurrentAction = Action.NextFrame;
-            if (Config.IsControl(code, Config.Control_PrevFrame, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.PrevFrame, CurrentAction != Action.None))
                 CurrentAction = Action.PrevFrame;
 
             if (
-                Config.IsControl(
+                Controls.Equals(
                     code,
-                    Config.Control_PlaybackSpeedIncrease,
+                    Config.Controls.PlaybackSpeedIncrease,
                     CurrentAction != Action.None
                 )
             )
                 CurrentAction = Action.PlaybackSpeedIncrease;
             if (
-                Config.IsControl(
+                Controls.Equals(
                     code,
-                    Config.Control_PlaybackSpeedDecrease,
+                    Config.Controls.PlaybackSpeedDecrease,
                     CurrentAction != Action.None
                 )
             )
@@ -973,45 +965,45 @@ namespace vimage
 
             // Change Image Transparency
             if (
-                Config.IsControl(code, Config.Control_TransparencyInc, CurrentAction != Action.None)
+                Controls.Equals(code, Config.Controls.TransparencyInc, CurrentAction != Action.None)
             )
                 CurrentAction = Action.TransparencyInc;
             if (
-                Config.IsControl(code, Config.Control_TransparencyDec, CurrentAction != Action.None)
+                Controls.Equals(code, Config.Controls.TransparencyDec, CurrentAction != Action.None)
             )
                 CurrentAction = Action.TransparencyDec;
 
             if (
                 !ImageTransparencyHold
-                && Config.IsControl(
+                && Controls.Equals(
                     code,
-                    Config.Control_TransparencyToggle,
+                    Config.Controls.TransparencyToggle,
                     CurrentAction != Action.None
                 )
             )
                 ImageTransparencyHold = true;
 
             // Zooming
-            if (Config.IsControl(code, Config.Control_ZoomIn, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.ZoomIn, CurrentAction != Action.None))
                 CurrentAction = Action.ZoomIn;
-            if (Config.IsControl(code, Config.Control_ZoomOut, CurrentAction != Action.None))
+            if (Controls.Equals(code, Config.Controls.ZoomOut, CurrentAction != Action.None))
                 CurrentAction = Action.ZoomOut;
 
             // Moving
             if (!Dragging)
             {
-                if (Config.IsControl(code, Config.Control_MoveLeft, CurrentAction != Action.None))
+                if (Controls.Equals(code, Config.Controls.MoveLeft, CurrentAction != Action.None))
                     CurrentAction = Action.MoveLeft;
-                if (Config.IsControl(code, Config.Control_MoveRight, CurrentAction != Action.None))
+                if (Controls.Equals(code, Config.Controls.MoveRight, CurrentAction != Action.None))
                     CurrentAction = Action.MoveRight;
-                if (Config.IsControl(code, Config.Control_MoveUp, CurrentAction != Action.None))
+                if (Controls.Equals(code, Config.Controls.MoveUp, CurrentAction != Action.None))
                     CurrentAction = Action.MoveUp;
-                if (Config.IsControl(code, Config.Control_MoveDown, CurrentAction != Action.None))
+                if (Controls.Equals(code, Config.Controls.MoveDown, CurrentAction != Action.None))
                     CurrentAction = Action.MoveDown;
             }
 
             // Cropping - release
-            if (!Cropping && Config.IsControl(code, Config.Control_Crop))
+            if (!Cropping && Controls.Equals(code, Config.Controls.Crop))
                 CropStart();
 
             if (CurrentAction != Action.None)
@@ -1287,7 +1279,7 @@ namespace vimage
             return FlippedX;
         }
 
-        public void ToggleFitToMonitor(int dimension)
+        public void ToggleFitToMonitor(LimitImagesToMonitorOption dimension)
         {
             if (Cropping)
                 return;
@@ -1300,20 +1292,23 @@ namespace vimage
                 ? workingArea
                 : ImageViewerUtils.GetCurrentBounds(Mouse.GetPosition());
 
-            if (dimension == Config.AUTO)
+            if (dimension == LimitImagesToMonitorOption.Auto)
             {
-                dimension = bounds.Height < bounds.Width ? Config.HEIGHT : Config.WIDTH;
+                dimension =
+                    bounds.Height < bounds.Width
+                        ? LimitImagesToMonitorOption.Height
+                        : LimitImagesToMonitorOption.Width;
             }
 
             bool center = false;
             if (
                 CurrentZoom == 1
-                || (FitToMonitorHeight && dimension != Config.HEIGHT)
-                || (FitToMonitorWidth && dimension != Config.WIDTH)
+                || (FitToMonitorHeight && dimension != LimitImagesToMonitorOption.Height)
+                || (FitToMonitorWidth && dimension != LimitImagesToMonitorOption.Width)
             )
             {
                 // Fit to Monitor Height/Width
-                if (dimension == Config.HEIGHT)
+                if (dimension == LimitImagesToMonitorOption.Height)
                 {
                     FitToMonitorWidth = false;
                     FitToMonitorHeight = true;
@@ -1326,7 +1321,7 @@ namespace vimage
                             ? ImageViewerUtils.LimitToBounds(NextWindowPos, NextWindowSize, bounds)
                             : new Vector2i(NextWindowPos.X, bounds.Top);
                 }
-                else if (dimension == Config.WIDTH)
+                else if (dimension == LimitImagesToMonitorOption.Width)
                 {
                     FitToMonitorWidth = true;
                     FitToMonitorHeight = false;
@@ -1359,7 +1354,7 @@ namespace vimage
 
             // Position window
             if (
-                Config.Setting_PositionLargeWideImagesInCorner
+                Config.PositionLargeWideImagesInCorner
                 && NextWindowSize.X >= bounds.Width
                 && bounds.Width > bounds.Height
             )
@@ -1418,32 +1413,35 @@ namespace vimage
             // Forcre Fit To Monitor Height?
             var mousePos = Mouse.GetPosition();
             var bounds = ImageViewerUtils.GetCurrentBounds(mousePos);
-            if (Config.Setting_LimitImagesToMonitor != Config.NONE)
+            if (Config.LimitImagesToMonitor != LimitImagesToMonitorOption.None)
             {
                 // Fit to monitor height/width
-                int limit = Config.Setting_LimitImagesToMonitor;
+                var limit = Config.LimitImagesToMonitor;
 
-                if (limit == Config.AUTO)
+                if (limit == LimitImagesToMonitorOption.Auto)
                 {
-                    limit = bounds.Height < bounds.Width ? Config.HEIGHT : Config.WIDTH;
+                    limit =
+                        bounds.Height < bounds.Width
+                            ? LimitImagesToMonitorOption.Height
+                            : LimitImagesToMonitorOption.Width;
                 }
 
-                if (limit == Config.HEIGHT && Size.Y > bounds.Height)
+                if (limit == LimitImagesToMonitorOption.Height && Size.Y > bounds.Height)
                 {
                     Zoom((float)bounds.Height / Size.Y, true);
                     FitToMonitorHeightForced = true;
                 }
-                else if (limit == Config.WIDTH && Size.X > bounds.Width)
+                else if (limit == LimitImagesToMonitorOption.Width && Size.X > bounds.Width)
                 {
                     Zoom((float)bounds.Width / Size.X, true);
                     AutomaticallyZoomed = true;
                 }
             }
-            if (Math.Min(Size.X, Size.Y) < Config.Setting_MinImageSize)
+            if (Math.Min(Size.X, Size.Y) < Config.MinImageSize)
             {
                 // Reisze images smaller than min size to min size
                 AutomaticallyZoomed = true;
-                Zoom(Config.Setting_MinImageSize / Math.Min(Size.X, Size.Y), true);
+                Zoom(Config.MinImageSize / Math.Min(Size.X, Size.Y), true);
             }
 
             // Center image or place in top-left corner if it's a large/wide image.
@@ -1452,7 +1450,7 @@ namespace vimage
             currentWorkingArea = !FitToMonitorHeightForced ? workingArea : bounds;
 
             if (
-                Config.Setting_PositionLargeWideImagesInCorner
+                Config.PositionLargeWideImagesInCorner
                 && Size.X > Size.Y
                 && Size.X * CurrentZoom >= bounds.Width
             )
@@ -1482,7 +1480,7 @@ namespace vimage
 
             ViewStateHistory = [];
 
-            if (Config.Setting_ClearMemoryOnResetImage)
+            if (Config.ClearMemoryOnResetImage)
                 Graphics.ClearMemory(Image, File);
         }
 
@@ -1543,7 +1541,7 @@ namespace vimage
             if ((val == -1 && ImageColor == Color.White) || val == 1)
             {
                 var colour = System.Drawing.ColorTranslator.FromHtml(
-                    Config.Setting_TransparencyToggleValue
+                    Config.TransparencyToggleValue
                 );
                 ImageColor = new Color(colour.R, colour.G, colour.B, colour.A);
             }
@@ -1572,8 +1570,8 @@ namespace vimage
                                     255
                                     * (
                                         ZoomFaster
-                                            ? (Config.Setting_ZoomSpeedFast / 100f)
-                                            : (Config.Setting_ZoomSpeed / 100f)
+                                            ? (Config.ZoomSpeedFast / 100f)
+                                            : (Config.ZoomSpeed / 100f)
                                     )
                                 )
                             ),
@@ -1734,20 +1732,16 @@ namespace vimage
             {
                 CropRect = new RectangleShape();
 
-                var colour = System.Drawing.ColorTranslator.FromHtml(
-                    Config.Setting_CropToolFillColour
-                );
+                var colour = System.Drawing.ColorTranslator.FromHtml(Config.CropToolFillColour);
                 CropRect.FillColor = new Color(colour.R, colour.G, colour.B, colour.A);
 
-                if (Config.Setting_CropToolOutlineThickness > 0)
+                if (Config.CropToolOutlineThickness > 0)
                 {
-                    colour = System.Drawing.ColorTranslator.FromHtml(
-                        Config.Setting_CropToolOutlineColour
-                    );
+                    colour = System.Drawing.ColorTranslator.FromHtml(Config.CropToolOutlineColour);
                     CropRect.OutlineColor = new Color(colour.R, colour.G, colour.B, colour.A);
                 }
             }
-            CropRect.OutlineThickness = Config.Setting_CropToolOutlineThickness * (1 / CurrentZoom);
+            CropRect.OutlineThickness = Config.CropToolOutlineThickness * (1 / CurrentZoom);
 
             CropStartPos = ImageViewerUtils.LimitToWindow(Mouse.GetPosition(), Window);
             CropRect.Position = Window.MapPixelToCoords(
@@ -2026,16 +2020,16 @@ namespace vimage
             if (Image is AnimatedImage animatedImage)
             {
                 animatedImage.Data.Smooth =
-                    Math.Min(Size.X, Size.Y) >= Config.Setting_SmoothingMinImageSize
-                    && Config.Setting_SmoothingDefault;
-                animatedImage.Data.Mipmap = Config.Setting_Mipmapping;
+                    Math.Min(Size.X, Size.Y) >= Config.SmoothingMinImageSize
+                    && Config.SmoothingDefault;
+                animatedImage.Data.Mipmap = Config.Mipmapping;
             }
             else if (Image is Sprite sprite)
             {
                 sprite.Texture.Smooth =
-                    Math.Min(Size.X, Size.Y) >= Config.Setting_SmoothingMinImageSize
-                    && Config.Setting_SmoothingDefault;
-                if (Config.Setting_Mipmapping)
+                    Math.Min(Size.X, Size.Y) >= Config.SmoothingMinImageSize
+                    && Config.SmoothingDefault;
+                if (Config.Mipmapping)
                     sprite.Texture.GenerateMipmap();
             }
 
@@ -2047,14 +2041,14 @@ namespace vimage
             if (
                 AutomaticallyZoomed
                 || FitToMonitorHeightForced
-                || Config.Setting_ImageSizing == SizingOption.FullSize
+                || Config.ImageSizing == SizingOption.FullSize
             )
             {
                 AutomaticallyZoomed = false;
                 FitToMonitorHeightForced = false;
                 CurrentZoom = 1;
             }
-            else if (CurrentZoom != 1 && Config.Setting_ImageSizing != SizingOption.KeepZoom)
+            else if (CurrentZoom != 1 && Config.ImageSizing != SizingOption.KeepZoom)
             {
                 // Resize Image to be similar size to previous image
                 var actualPrevSize =
@@ -2062,9 +2056,9 @@ namespace vimage
                         ? prevSize
                         : new Vector2u(prevSize.Y, prevSize.X);
                 CurrentZoom =
-                    Config.Setting_ImageSizing == SizingOption.FitHeight
+                    Config.ImageSizing == SizingOption.FitHeight
                     || (
-                        Config.Setting_ImageSizing == SizingOption.FitAuto
+                        Config.ImageSizing == SizingOption.FitAuto
                         && actualPrevSize.Y < actualPrevSize.X
                     )
                         ? actualPrevSize.Y * CurrentZoom / CurrentImageSize().Y
@@ -2072,18 +2066,21 @@ namespace vimage
             }
 
             bool wasFitToMonitorDimension = FitToMonitorHeightForced;
-            if (Config.Setting_LimitImagesToMonitor != Config.NONE)
+            if (Config.LimitImagesToMonitor != LimitImagesToMonitorOption.None)
             {
                 // Fit to monitor height/width
-                int limit = Config.Setting_LimitImagesToMonitor;
+                var limit = Config.LimitImagesToMonitor;
 
-                if (limit == Config.AUTO)
+                if (limit == LimitImagesToMonitorOption.Auto)
                 {
-                    limit = bounds.Height < bounds.Width ? Config.HEIGHT : Config.WIDTH;
+                    limit =
+                        bounds.Height < bounds.Width
+                            ? LimitImagesToMonitorOption.Height
+                            : LimitImagesToMonitorOption.Width;
                 }
 
                 if (
-                    limit == Config.HEIGHT
+                    limit == LimitImagesToMonitorOption.Height
                     && (FitToMonitorHeight || CurrentImageSize().Y * CurrentZoom > bounds.Height)
                 )
                 {
@@ -2103,7 +2100,10 @@ namespace vimage
 
                     wasFitToMonitorDimension = true;
                 }
-                else if (limit == Config.WIDTH && CurrentImageSize().X * CurrentZoom > bounds.Width)
+                else if (
+                    limit == LimitImagesToMonitorOption.Width
+                    && CurrentImageSize().X * CurrentZoom > bounds.Width
+                )
                 {
                     Zoom((float)bounds.Width / CurrentImageSize().X, true);
 
@@ -2127,13 +2127,13 @@ namespace vimage
                     Zoom(1, true);
                     FitToMonitorHeightForced = false;
                 }
-                else if (Math.Min(Size.X, Size.Y) * CurrentZoom < Config.Setting_MinImageSize)
+                else if (Math.Min(Size.X, Size.Y) * CurrentZoom < Config.MinImageSize)
                 {
                     // Reisze images smaller than min size to min size
-                    if (Math.Min(Size.X, Size.Y) < Config.Setting_MinImageSize)
+                    if (Math.Min(Size.X, Size.Y) < Config.MinImageSize)
                     {
                         AutomaticallyZoomed = true;
-                        Zoom(Config.Setting_MinImageSize / Math.Min(Size.X, Size.Y), true);
+                        Zoom(Config.MinImageSize / Math.Min(Size.X, Size.Y), true);
                     }
                     else
                         Zoom(1, true);
@@ -2158,7 +2158,7 @@ namespace vimage
             // Position Window at top-left if the image is wide (ie: a Desktop Wallpaper / Screenshot)
             // Otherwise, if image is hanging off monitor just center it.
             if (
-                Config.Setting_PositionLargeWideImagesInCorner
+                Config.PositionLargeWideImagesInCorner
                 && CurrentImageSize().X > CurrentImageSize().Y
                 && CurrentImageSize().X * CurrentZoom >= bounds.Width
             )
@@ -2245,7 +2245,7 @@ namespace vimage
             if (FolderContents.Count <= 1)
                 return;
 
-            if (!Config.Setting_LoopImageNavigation && FolderPosition == FolderContents.Count - 1)
+            if (!Config.LoopImageNavigation && FolderPosition == FolderContents.Count - 1)
                 return;
 
             bool success;
@@ -2259,7 +2259,7 @@ namespace vimage
             Update();
 
             // Preload next image?
-            if (Config.Setting_PreloadNextImage)
+            if (Config.PreloadNextImage)
             {
                 PreloadingNextImage = 1;
                 PreloadNextImageStart = true;
@@ -2272,7 +2272,7 @@ namespace vimage
             if (FolderContents.Count <= 1)
                 return;
 
-            if (!Config.Setting_LoopImageNavigation && FolderPosition == 0)
+            if (!Config.LoopImageNavigation && FolderPosition == 0)
                 return;
 
             bool success;
@@ -2286,7 +2286,7 @@ namespace vimage
             Update();
 
             // Preload next image?
-            if (Config.Setting_PreloadNextImage)
+            if (Config.PreloadNextImage)
             {
                 PreloadingNextImage = -1;
                 PreloadNextImageStart = true;
@@ -2546,7 +2546,7 @@ namespace vimage
 
         public void OpenConfig()
         {
-            if (Config.Setting_OpenSettingsEXE)
+            if (Config.OpenSettingsEXE)
             {
                 string vimage_settings = Path.Combine(
                     AppContext.BaseDirectory,
@@ -2562,7 +2562,7 @@ namespace vimage
             _ = Process.Start(
                 new ProcessStartInfo
                 {
-                    FileName = Path.Combine(AppContext.BaseDirectory, "config.txt"),
+                    FileName = Path.Combine(AppContext.BaseDirectory, "config.json"),
                     UseShellExecute = true,
                 }
             );
@@ -2570,8 +2570,9 @@ namespace vimage
 
         public void ReloadConfig()
         {
-            Config.Init();
-            Config.Load(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt"));
+            Config = Config.Load(
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json")
+            );
 
             // Update ContextMenu
             if (ContextMenu is not null)
@@ -2586,9 +2587,7 @@ namespace vimage
             }
 
             // Update Background Colour?
-            var backColour = System.Drawing.ColorTranslator.FromHtml(
-                Config.Setting_BackgroundColour
-            );
+            var backColour = System.Drawing.ColorTranslator.FromHtml(Config.BackgroundColour);
             var newBackColour = new Color(backColour.R, backColour.G, backColour.B, backColour.A);
             if (BackgroundColour != newBackColour)
             {
@@ -2597,7 +2596,7 @@ namespace vimage
                     Update();
             }
 
-            if (ShowTitleBar != Config.Setting_ShowTitleBar)
+            if (ShowTitleBar != Config.ShowTitleBar)
                 _ = ToggleTitleBar();
         }
 
@@ -2781,13 +2780,13 @@ namespace vimage
                         break;
 
                     case "-fitToMonitorHeight":
-                        ToggleFitToMonitor(Config.HEIGHT);
+                        ToggleFitToMonitor(LimitImagesToMonitorOption.Height);
                         break;
                     case "-fitToMonitorWidth":
-                        ToggleFitToMonitor(Config.WIDTH);
+                        ToggleFitToMonitor(LimitImagesToMonitorOption.Width);
                         break;
                     case "-fitToMonitorAuto":
-                        ToggleFitToMonitor(Config.AUTO);
+                        ToggleFitToMonitor(LimitImagesToMonitorOption.Auto);
                         break;
 
                     case "-toggleSync":

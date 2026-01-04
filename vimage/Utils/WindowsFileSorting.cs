@@ -78,10 +78,7 @@ namespace vimage.Utils
             string file
         )
         {
-            if (
-                file == ""
-                || (sortBy != SortBy.FolderDefault && sortDir != SortDirection.FolderDefault)
-            )
+            if (file == "" || (sortBy != SortBy.Folder && sortDir != SortDirection.Folder))
                 return (SortBy.Name, SortDirection.Ascending);
 
             // Get sort column info from window with corresponding name
@@ -94,14 +91,14 @@ namespace vimage.Utils
             {
                 sort = sort[1..];
 
-                if (sortDir == SortDirection.FolderDefault)
+                if (sortDir == SortDirection.Folder)
                     sortDir = SortDirection.Descending;
             }
-            else if (sortDir == SortDirection.FolderDefault)
+            else if (sortDir == SortDirection.Folder)
                 sortDir = SortDirection.Ascending;
 
             // By
-            if (sortBy == SortBy.FolderDefault)
+            if (sortBy == SortBy.Folder)
             {
                 sortBy = sort switch
                 {

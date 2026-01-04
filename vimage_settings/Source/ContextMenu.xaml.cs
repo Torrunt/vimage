@@ -42,11 +42,14 @@ namespace vimage_settings
             SaveContextMenu(App.vimageConfig.ContextMenu_Animation, ContextMenuItems_Animation);
         }
 
-        private static void SaveContextMenu(List<object> contextMenu, Panel panel)
+        private static void SaveContextMenu(
+            List<vimage.Common.ContextMenuItem> contextMenu,
+            Panel panel
+        )
         {
             int currentSubLevel = 0;
-            List<object> currentMenu = contextMenu;
-            List<object>? prevMenu = null;
+            List<vimage.Common.ContextMenuItem> currentMenu = contextMenu;
+            List<vimage.Common.ContextMenuItem>? prevMenu = null;
             for (int i = 0; i < panel.Children.Count; i++)
             {
                 if (panel.Children[i] is not ContextMenuItem item)
@@ -107,7 +110,7 @@ namespace vimage_settings
         }
 
         private void LoadItems(
-            List<object> items,
+            List<vimage.Common.ContextMenuItem> items,
             Panel panel,
             ContextMenuEditorCanvas canvas,
             ScrollViewer scroll,
@@ -195,7 +198,9 @@ namespace vimage_settings
             ContextMenuItems_Animation.Children.Clear();
             Items.Clear();
 
-            App.vimageConfig.SetDefaultContextMenu();
+            var defaultConfig = new vimage.Common.Config();
+            App.vimageConfig.ContextMenu = defaultConfig.ContextMenu;
+            App.vimageConfig.ContextMenu_Animation = defaultConfig.ContextMenu_Animation;
 
             LoadItems(
                 App.vimageConfig.ContextMenu,
