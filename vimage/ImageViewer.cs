@@ -300,46 +300,34 @@ namespace vimage
                     {
                         // limit to monitor bounds
                         var currentBounds = ImageViewerUtils.GetCurrentBounds(Mouse.GetPosition());
+                        var left = currentBounds.Left;
+                        var top = currentBounds.Top;
+                        var right = left + currentBounds.Width - (int)Window.Size.X;
+                        var bottom = currentBounds.Top + currentBounds.Height - (int)Window.Size.Y;
 
                         if (Window.Size.X > currentBounds.Width)
                         {
-                            if (NextWindowPos.X > currentBounds.Left)
-                                NextWindowPos.X = currentBounds.Left;
-                            else if (
-                                NextWindowPos.X
-                                < currentBounds.Left + currentBounds.Width - Window.Size.X
-                            )
-                                NextWindowPos.X =
-                                    currentBounds.Left + currentBounds.Width - (int)Window.Size.X;
+                            if (NextWindowPos.X > left)
+                                NextWindowPos.X = left;
+                            else if (NextWindowPos.X < right)
+                                NextWindowPos.X = right;
                         }
-                        else if (NextWindowPos.X < currentBounds.Left)
-                            NextWindowPos.X = currentBounds.Left;
-                        else if (
-                            NextWindowPos.X
-                            > currentBounds.Left + currentBounds.Width - Window.Size.X
-                        )
-                            NextWindowPos.X =
-                                currentBounds.Left + currentBounds.Width - (int)Window.Size.X;
+                        else if (NextWindowPos.X < left)
+                            NextWindowPos.X = left;
+                        else if (NextWindowPos.X > right)
+                            NextWindowPos.X = right;
 
                         if (Window.Size.Y > currentBounds.Height)
                         {
-                            if (NextWindowPos.Y > currentBounds.Top)
-                                NextWindowPos.Y = currentBounds.Top;
-                            else if (
-                                NextWindowPos.Y
-                                < currentBounds.Top + currentBounds.Height - Window.Size.Y
-                            )
-                                NextWindowPos.Y =
-                                    currentBounds.Top + currentBounds.Height - (int)Window.Size.Y;
+                            if (NextWindowPos.Y > top)
+                                NextWindowPos.Y = top;
+                            else if (NextWindowPos.Y < bottom)
+                                NextWindowPos.Y = bottom;
                         }
-                        else if (NextWindowPos.Y < currentBounds.Top)
-                            NextWindowPos.Y = currentBounds.Top;
-                        else if (
-                            NextWindowPos.Y
-                            > currentBounds.Top + currentBounds.Height - Window.Size.Y
-                        )
-                            NextWindowPos.Y =
-                                currentBounds.Top + currentBounds.Height - (int)Window.Size.Y;
+                        else if (NextWindowPos.Y < top)
+                            NextWindowPos.Y = top;
+                        else if (NextWindowPos.Y > bottom)
+                            NextWindowPos.Y = bottom;
                     }
                     Window.Position = ShowTitleBar
                         ? NextWindowPos - DWM.GetTitleBarDifference(Window.SystemHandle)
@@ -2585,35 +2573,34 @@ namespace vimage
             {
                 // Apply arguments to current instance of vimage
                 ApplyArguments(action.Split(' '));
+                return;
             }
-            else
+
+            // Open new process with arguments
+            if (File == "" && (action.Contains("%f") || action.Contains("%d")))
+                return; // don't do the action if it requires the Filename but there isn't one
+
+            action = action.Replace("%f", "\"" + File + "\"");
+            action = action.Replace("%d", Path.GetDirectoryName(File) + "\\");
+
+            // Split exe and arguments by the first space (regex to exclude the spaces within the quotes of the exe's path)
+            var s = Actions.CustomActionSplitRegex().Split(action, 2);
+
+            if (s[0].Contains('%'))
+                s[0] = Environment.ExpandEnvironmentVariables(s[0]);
+
+            try
             {
-                // Open new process with arguments
-                if (File == "" && (action.Contains("%f") || action.Contains("%d")))
-                    return; // don't do the action if it requires the Filename but there isn't one
-
-                action = action.Replace("%f", "\"" + File + "\"");
-                action = action.Replace("%d", Path.GetDirectoryName(File) + "\\");
-
-                // Split exe and arguments by the first space (regex to exclude the spaces within the quotes of the exe's path)
-                var s = Actions.CustomActionSplitRegex().Split(action, 2);
-
-                if (s[0].Contains('%'))
-                    s[0] = Environment.ExpandEnvironmentVariables(s[0]);
-
-                try
-                {
-                    _ = Process.Start(
-                        new ProcessStartInfo
-                        {
-                            FileName = s[0],
-                            Arguments = s[1],
-                            UseShellExecute = true,
-                        }
-                    );
-                }
-                catch (Exception) { }
+                _ = Process.Start(
+                    new ProcessStartInfo
+                    {
+                        FileName = s[0],
+                        Arguments = s[1],
+                        UseShellExecute = true,
+                    }
+                );
             }
+            catch (Exception) { }
         }
 
         public void ApplyArguments(string[] args, bool ignoreFirst = false)
