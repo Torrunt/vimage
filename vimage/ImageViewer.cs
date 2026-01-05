@@ -640,69 +640,56 @@ namespace vimage
 
             var dir = e.Delta > 0 ? MouseWheel.ScrollUp : MouseWheel.ScrollDown;
 
-            var actions = Controls.GetActionsFromBinding(new MouseWheelBinding(dir));
-            foreach (var a in actions)
+            var a = Controls.GetActionFromInput(new MouseWheelInput(dir));
+            if (a == null)
+                return;
+            if (a is ActionEnum action)
             {
-                if (a is ActionEnum action)
-                {
-                    // Prevent zooming while cropping or using transparency modifier
-                    if (
-                        (Cropping || ImageTransparencyHold)
-                        && (action.Value == Action.ZoomIn || action.Value == Action.ZoomOut)
-                    )
-                    {
-                        continue;
-                    }
-                    DoAction(action.Value);
-                }
-                else if (a is CustomAction customAction)
-                {
-                    DoCustomAction(customAction.Value);
-                }
+                // Prevent zooming while cropping or using transparency modifier
+                if (
+                    (Cropping || ImageTransparencyHold)
+                    && (action.Value == Action.ZoomIn || action.Value == Action.ZoomOut)
+                )
+                    return;
+
+                DoAction(action.Value);
+            }
+            else if (a is CustomAction customAction)
+            {
+                DoCustomAction(customAction.Value);
             }
         }
 
         private void OnMouseDown(object? sender, MouseButtonEventArgs e)
         {
-            ControlDown(new MouseBinding(e.Button));
+            ControlDown(new MouseInput(e.Button));
         }
 
         private void OnMouseUp(object? sender, MouseButtonEventArgs e)
         {
-            ControlUp(new MouseBinding(e.Button));
+            ControlUp(new MouseInput(e.Button));
+            LastAction = Action.None;
         }
 
         private void OnKeyDown(object? sender, KeyEventArgs e)
         {
-            ControlDown(new KeyBinding(e.Code));
+            ControlDown(new KeyInput(e.Code));
         }
 
         private void OnKeyUp(object? sender, KeyEventArgs e)
         {
-            ControlUp(new KeyBinding(e.Code));
+            ControlUp(new KeyInput(e.Code));
+            LastAction = Action.None;
         }
 
-        private void ControlUp(Binding value)
+        private void ControlUp(ControlInput value)
         {
-            var actions = Controls.GetActionsFromBinding(value);
-            // TODO: Don't always do multiple actions at once.
-            // ie: if one action is a keycombo and the other is not then only do the key-combo action.
-            foreach (var a in actions)
+            var modifiers = Controls.GetModifierActionsFromInput(value);
+            if (modifiers.Count > 0)
             {
-                if (a is CustomAction customAction)
+                foreach (var m in modifiers)
                 {
-                    if (LastAction != Action.None)
-                        continue;
-                    DoCustomAction(customAction.Value);
-                    continue;
-                }
-
-                if (a is not ActionEnum action)
-                    continue;
-
-                if (Actions.ModiferActions.Contains(action.Value))
-                {
-                    switch (action.Value)
+                    switch (m)
                     {
                         case Action.Drag:
                             Dragging = false;
@@ -728,46 +715,54 @@ namespace vimage
                                 CropEnd();
                             break;
                     }
-                    continue;
                 }
-
-                // Prevent action from triggering on control up if an action just happened on control down
-                if (LastAction != Action.None)
-                    continue;
-
-                // Prevent action if locked (unless unlocking or opening context menu)
-                if (
-                    Locked
-                    && !(
-                        action.Value == Action.ToggleLock || action.Value == Action.OpenContextMenu
-                    )
-                )
-                    continue;
-
-                // Prevent zoom in/out while cropping
-                if (Cropping && (action.Value == Action.ZoomIn || action.Value == Action.ZoomOut))
-                    continue;
-
-                DoAction(action.Value);
             }
 
-            LastAction = Action.None;
+            var a = Controls.GetActionFromInput(value);
+            if (a == null)
+                return;
+
+            if (a is CustomAction customAction)
+            {
+                if (LastAction != Action.None)
+                    return;
+                DoCustomAction(customAction.Value);
+                return;
+            }
+
+            if (a is not ActionEnum action)
+                return;
+
+            // Prevent action from triggering on control up if an action just happened on control down
+            if (LastAction != Action.None)
+                return;
+
+            // Prevent action if locked (unless unlocking or opening context menu)
+            if (
+                Locked
+                && !(action.Value == Action.ToggleLock || action.Value == Action.OpenContextMenu)
+            )
+                return;
+
+            // Prevent zoom in/out while cropping
+            if (Cropping && (action.Value == Action.ZoomIn || action.Value == Action.ZoomOut))
+                return;
+
+            DoAction(action.Value);
         }
 
-        private void ControlDown(Binding value)
+        private void ControlDown(ControlInput value)
         {
             if (Locked)
                 return;
 
-            var actions = Controls.GetActionsFromBinding(value, true);
-            foreach (var a in actions)
+            var modifiers = Controls.GetModifierActionsFromInput(value);
+            if (modifiers.Count > 0)
             {
-                if (a is not ActionEnum action)
-                    continue;
-
-                if (Actions.ModiferActions.Contains(action.Value))
+                LastAction = Action.None;
+                foreach (var m in modifiers)
                 {
-                    switch (action.Value)
+                    switch (m)
                     {
                         case Action.Drag:
                             if (!Dragging)
@@ -788,38 +783,44 @@ namespace vimage
                             break;
                         case Action.TransparencyToggle:
                             ImageTransparencyHold = true;
+                            LastAction = Action.TransparencyToggle;
                             break;
                         case Action.Crop:
-                            if (!Cropping)
-                                CropStart();
+                            if (Cropping)
+                                break;
+                            CropStart();
+                            LastAction = Action.Crop;
                             break;
                     }
-                    continue;
                 }
-
-                // Prevent move actions while dragging
-                if (
-                    Dragging
-                    && (
-                        action.Value == Action.MoveLeft
-                        || action.Value == Action.MoveRight
-                        || action.Value == Action.MoveUp
-                        || action.Value == Action.MoveDown
-                    )
-                )
-                {
-                    continue;
-                }
-
-                // Prevent zoom in/out while cropping
-                if (Cropping && (action.Value == Action.ZoomIn || action.Value == Action.ZoomOut))
-                {
-                    continue;
-                }
-
-                DoAction(action.Value);
-                LastAction = action.Value;
+                return;
             }
+
+            var a = Controls.GetActionFromInput(value, true);
+            if (a == null)
+                return;
+
+            if (a is not ActionEnum action)
+                return;
+
+            // Prevent move actions while dragging
+            if (
+                Dragging
+                && (
+                    action.Value == Action.MoveLeft
+                    || action.Value == Action.MoveRight
+                    || action.Value == Action.MoveUp
+                    || action.Value == Action.MoveDown
+                )
+            )
+                return;
+
+            // Prevent zoom in/out while cropping
+            if (Cropping && (action.Value == Action.ZoomIn || action.Value == Action.ZoomOut))
+                return;
+
+            DoAction(action.Value);
+            LastAction = action.Value;
         }
 
         ///////////////////////////
@@ -2429,8 +2430,13 @@ namespace vimage
             ContextMenu.Capture = true;
         }
 
-        public void DoCustomAction(string action)
+        public void DoCustomAction(string actionKey)
         {
+            var a = Config.CustomActions.FirstOrDefault((a) => a.name == actionKey);
+            var action = a.func;
+            if (action == "")
+                return;
+
             if (action.StartsWith('-'))
             {
                 // Apply arguments to current instance of vimage
