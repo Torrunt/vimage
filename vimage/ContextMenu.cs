@@ -14,7 +14,7 @@ namespace vimage
         private List<string> Items_General = [];
         private List<string> Items_Animation = [];
 
-        private Dictionary<string, ContextMenuFunc> FuncByName = [];
+        private Dictionary<string, ActionFunc> FuncByName = [];
 
         public int FileNameItem = -1;
         public string FileNameCurrent = ".";
@@ -66,10 +66,10 @@ namespace vimage
                         // remove Sort By submenu
                         continue;
                     }
-                    if (item.func is FuncAction funcAction)
+                    if (item.func is ActionEnum action)
                     {
                         // remove navigation and delete
-                        switch (funcAction.Value)
+                        switch (action.Value)
                         {
                             case Action.NextImage:
                             case Action.PrevImage:
@@ -83,7 +83,7 @@ namespace vimage
                 {
                     // Submenu
                     list.Add(VariableAmountOfStrings(depth, ":") + item.name + ":");
-                    FuncByName.Add(item.name, new FuncAction(Action.None));
+                    FuncByName.Add(item.name, new ActionEnum(Action.None));
                     LoadItemsInto(list, item.children, depth + 1);
                 }
                 else
@@ -101,7 +101,7 @@ namespace vimage
                     list.Add(VariableAmountOfStrings(depth, ":") + itemName);
                     if (
                         item.func != null
-                        && !(item.func is FuncAction action && action.Value == Action.None)
+                        && !(item.func is ActionEnum action && action.Value == Action.None)
                     )
                         FuncByName.Add(itemName, item.func);
                 }
@@ -291,10 +291,10 @@ namespace vimage
                 Close();
 
             var func = FuncByName[item.Name ?? ""];
-            if (func is FuncString funcString)
-                ImageViewer.DoCustomAction(funcString.Value);
-            else if (func is FuncAction funcAction)
-                ImageViewer.DoAction(funcAction.Value);
+            if (func is CustomAction customAction)
+                ImageViewer.DoCustomAction(customAction.Value);
+            else if (func is ActionEnum action)
+                ImageViewer.DoAction(action.Value);
         }
 
         /// <summary>returns the ToolStripMenuItem based on the name of the function.</summary>
@@ -314,7 +314,7 @@ namespace vimage
                 if (name is null || name == "")
                     continue;
                 FuncByName.TryGetValue(name, out var currentFunc);
-                if (currentFunc is FuncAction action && action.Value == func)
+                if (currentFunc is ActionEnum action && action.Value == func)
                     return collection[i] as ToolStripMenuItem;
 
                 if (

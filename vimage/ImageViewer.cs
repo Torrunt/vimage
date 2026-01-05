@@ -37,9 +37,10 @@ namespace vimage
         public Vector2u Size = new();
         public int Rotation = 0;
         public List<ViewState> ViewStateHistory = [];
-        private Action CurrentAction = Action.None;
+        private Action LastAction = Action.None;
 
         public Config Config;
+        public Controls Controls;
         private readonly FileSystemWatcher? ConfigFileWatcher;
         private bool ReloadConfigNextTick = false;
 
@@ -134,6 +135,7 @@ namespace vimage
                 );
                 Config = new Config();
             }
+            Controls = new Controls(Config);
 
             if (Config.ListenForConfigChanges)
             {
@@ -636,378 +638,188 @@ namespace vimage
             if (Locked)
                 return;
 
-            var dir = e.Delta > 0 ? Controls.MOUSE_SCROLL_UP : Controls.MOUSE_SCROLL_DOWN;
+            var dir = e.Delta > 0 ? MouseWheel.ScrollUp : MouseWheel.ScrollDown;
 
-            // Next/Prev Image in Folder
-            if (Controls.Equals(dir, Config.Controls.PrevImage, CurrentAction != Action.None))
-                CurrentAction = Action.PrevImage;
-            if (Controls.Equals(dir, Config.Controls.NextImage, CurrentAction != Action.None))
-                CurrentAction = Action.NextImage;
-            // Change Image Transparency
-            if (Controls.Equals(dir, Config.Controls.TransparencyInc, CurrentAction != Action.None))
-                CurrentAction = Action.TransparencyInc;
-            if (Controls.Equals(dir, Config.Controls.TransparencyDec, CurrentAction != Action.None))
-                CurrentAction = Action.TransparencyDec;
-            // Zooming
-            if (!Cropping)
+            var actions = Controls.GetActionsFromBinding(new MouseWheelBinding(dir));
+            foreach (var a in actions)
             {
-                if (Controls.Equals(dir, Config.Controls.ZoomIn, CurrentAction != Action.None))
-                    CurrentAction = Action.ZoomIn;
-                if (Controls.Equals(dir, Config.Controls.ZoomOut, CurrentAction != Action.None))
-                    CurrentAction = Action.ZoomOut;
+                if (a is ActionEnum action)
+                {
+                    // Prevent zooming while cropping or using transparency modifier
+                    if (
+                        (Cropping || ImageTransparencyHold)
+                        && (action.Value == Action.ZoomIn || action.Value == Action.ZoomOut)
+                    )
+                    {
+                        continue;
+                    }
+                    DoAction(action.Value);
+                }
+                else if (a is CustomAction customAction)
+                {
+                    DoCustomAction(customAction.Value);
+                }
             }
-
-            if (CurrentAction != Action.None)
-                DoAction(CurrentAction);
-
-            CurrentAction = Action.None;
         }
 
         private void OnMouseDown(object? sender, MouseButtonEventArgs e)
         {
-            ControlDown(e.Button);
+            ControlDown(new MouseBinding(e.Button));
         }
 
         private void OnMouseUp(object? sender, MouseButtonEventArgs e)
         {
-            ControlUp(e.Button);
+            ControlUp(new MouseBinding(e.Button));
         }
 
         private void OnKeyDown(object? sender, KeyEventArgs e)
         {
-            ControlDown(e.Code);
+            ControlDown(new KeyBinding(e.Code));
         }
 
         private void OnKeyUp(object? sender, KeyEventArgs e)
         {
-            ControlUp(e.Code);
+            ControlUp(new KeyBinding(e.Code));
         }
 
-        private void ControlUp(object code)
+        private void ControlUp(Binding value)
         {
-            // Close
-            if (Controls.Equals(code, Config.Controls.ExitAll))
+            var actions = Controls.GetActionsFromBinding(value);
+            // TODO: Don't always do multiple actions at once.
+            // ie: if one action is a keycombo and the other is not then only do the key-combo action.
+            foreach (var a in actions)
             {
-                ExitAllInstances();
-                return;
-            }
-            if (Controls.Equals(code, Config.Controls.Close))
-            {
-                CloseNextTick = true;
-                return;
-            }
+                if (a is CustomAction customAction)
+                {
+                    if (LastAction != Action.None)
+                        continue;
+                    DoCustomAction(customAction.Value);
+                    continue;
+                }
 
-            var DownAction = CurrentAction; // Remember ControlDown Action so it won't be repeated on release
+                if (a is not ActionEnum action)
+                    continue;
 
-            // Dragging
-            if (Controls.Equals(code, Config.Controls.Drag))
-                Dragging = false;
+                if (Actions.ModiferActions.Contains(action.Value))
+                {
+                    switch (action.Value)
+                    {
+                        case Action.Drag:
+                            Dragging = false;
+                            break;
+                        case Action.ZoomFaster:
+                            ZoomFaster = false;
+                            break;
+                        case Action.ZoomAlt:
+                            ZoomAlt = false;
+                            break;
+                        case Action.DragLimitToMonitorBounds:
+                            DragLimitToBoundsMod = false;
+                            break;
+                        case Action.FitToMonitorAlt:
+                            FitToMonitorAlt = false;
+                            break;
+                        case Action.TransparencyToggle:
+                            // Note: this toggle button is also used as a modifier
+                            DoAction(Action.TransparencyToggle);
+                            break;
+                        case Action.Crop:
+                            if (Cropping)
+                                CropEnd();
+                            break;
+                    }
+                    continue;
+                }
 
-            // Open Context Menu
-            if (
-                Controls.Equals(code, Config.Controls.OpenContextMenu, CurrentAction != Action.None)
-            )
-                CurrentAction = Action.OpenContextMenu;
+                // Prevent action from triggering on control up if an action just happened on control down
+                if (LastAction != Action.None)
+                    continue;
 
-            // Rotate Image
-            if (
-                Controls.Equals(code, Config.Controls.RotateClockwise, CurrentAction != Action.None)
-            )
-                CurrentAction = Action.RotateClockwise;
-            if (
-                Controls.Equals(
-                    code,
-                    Config.Controls.RotateAntiClockwise,
-                    CurrentAction != Action.None
-                )
-            )
-                CurrentAction = Action.RotateAntiClockwise;
-
-            // Flip Image
-            if (Controls.Equals(code, Config.Controls.Flip, CurrentAction != Action.None))
-                CurrentAction = Action.Flip;
-
-            // Reset Image
-            if (Controls.Equals(code, Config.Controls.ResetImage, CurrentAction != Action.None))
-                CurrentAction = Action.ResetImage;
-
-            // Fit To Monitor Height/Width
-            if (
-                Controls.Equals(
-                    code,
-                    Config.Controls.FitToMonitorHeight,
-                    CurrentAction != Action.None
-                )
-            )
-                CurrentAction = Action.FitToMonitorHeight;
-            if (
-                Controls.Equals(
-                    code,
-                    Config.Controls.FitToMonitorWidth,
-                    CurrentAction != Action.None
-                )
-            )
-                CurrentAction = Action.FitToMonitorWidth;
-            if (
-                Controls.Equals(
-                    code,
-                    Config.Controls.FitToMonitorAuto,
-                    CurrentAction != Action.None
-                )
-            )
-                CurrentAction = Action.FitToMonitorAuto;
-
-            // Animated Image - Pause/Play
-            if (Controls.Equals(code, Config.Controls.PauseAnimation, CurrentAction != Action.None))
-                CurrentAction = Action.PauseAnimation;
-
-            if (
-                Controls.Equals(
-                    code,
-                    Config.Controls.PlaybackSpeedReset,
-                    CurrentAction != Action.None
-                )
-            )
-                CurrentAction = Action.PlaybackSpeedReset;
-
-            // Next/Prev Image in Folder
-            if (Controls.Equals(code, Config.Controls.PrevImage, CurrentAction != Action.None))
-                CurrentAction = Action.PrevImage;
-            if (Controls.Equals(code, Config.Controls.NextImage, CurrentAction != Action.None))
-                CurrentAction = Action.NextImage;
-
-            // Open Config
-            if (Controls.Equals(code, Config.Controls.OpenSettings, CurrentAction != Action.None))
-                CurrentAction = Action.OpenSettings;
-
-            // Toggle Settings
-            if (
-                Controls.Equals(code, Config.Controls.ToggleSmoothing, CurrentAction != Action.None)
-            )
-                CurrentAction = Action.ToggleSmoothing;
-
-            if (
-                Controls.Equals(
-                    code,
-                    Config.Controls.ToggleBackground,
-                    CurrentAction != Action.None
-                )
-            )
-                CurrentAction = Action.ToggleBackground;
-
-            if (Controls.Equals(code, Config.Controls.ToggleLock, CurrentAction != Action.None))
-                CurrentAction = Action.ToggleLock;
-
-            if (
-                Controls.Equals(
-                    code,
-                    Config.Controls.ToggleAlwaysOnTop,
-                    CurrentAction != Action.None
-                )
-            )
-                CurrentAction = Action.ToggleAlwaysOnTop;
-
-            if (Controls.Equals(code, Config.Controls.ToggleTitleBar, CurrentAction != Action.None))
-                CurrentAction = Action.ToggleTitleBar;
-
-            // Open File At Location
-            if (Controls.Equals(code, Config.Controls.OpenAtLocation, CurrentAction != Action.None))
-                CurrentAction = Action.OpenAtLocation;
-
-            // Delete File
-            if (Controls.Equals(code, Config.Controls.Delete, CurrentAction != Action.None))
-                CurrentAction = Action.Delete;
-
-            // Copy File
-            if (Controls.Equals(code, Config.Controls.Copy, CurrentAction != Action.None))
-                CurrentAction = Action.Copy;
-            if (Controls.Equals(code, Config.Controls.CopyAsImage, CurrentAction != Action.None))
-                CurrentAction = Action.CopyAsImage;
-
-            // Open Duplicate Window
-            if (
-                Controls.Equals(
-                    code,
-                    Config.Controls.OpenDuplicateImage,
-                    CurrentAction != Action.None
-                )
-            )
-                CurrentAction = Action.OpenDuplicateImage;
-            if (
-                Controls.Equals(
-                    code,
-                    Config.Controls.OpenFullDuplicateImage,
-                    CurrentAction != Action.None
-                )
-            )
-                CurrentAction = Action.OpenFullDuplicateImage;
-
-            // Random Image
-            if (Controls.Equals(code, Config.Controls.RandomImage, CurrentAction != Action.None))
-                CurrentAction = Action.RandomImage;
-
-            // Toggle Image Transparency
-            if (
-                Controls.Equals(
-                    code,
-                    Config.Controls.TransparencyToggle,
-                    CurrentAction != Action.None
-                )
-            )
-                CurrentAction = Action.TransparencyToggle;
-
-            // Cropping - release
-            if (
-                Cropping
-                && Controls.Equals(code, Config.Controls.Crop, CurrentAction != Action.None)
-            )
-                CropEnd();
-
-            if (Controls.Equals(code, Config.Controls.UndoCrop, CurrentAction != Action.None))
-                CurrentAction = Action.UndoCrop;
-
-            // Re-render SVG
-            if (Controls.Equals(code, Config.Controls.RerenderSVG, CurrentAction != Action.None))
-                CurrentAction = Action.RerenderSVG;
-
-            // Custom Actions
-            for (int i = 0; i < Config.CustomActionBindings.Count; i++)
-            {
+                // Prevent action if locked (unless unlocking or opening context menu)
                 if (
-                    Controls.Equals(
-                        code,
-                        Config.CustomActionBindings[i].bindings,
-                        CurrentAction != Action.None
+                    Locked
+                    && !(
+                        action.Value == Action.ToggleLock || action.Value == Action.OpenContextMenu
                     )
                 )
-                {
-                    DoCustomAction(
-                        (
-                            Config.CustomActions.First(a =>
-                                a.name == Config.CustomActionBindings[i].name
-                            )
-                        ).func
-                    );
-                    CurrentAction = Action.Custom;
-                }
+                    continue;
+
+                // Prevent zoom in/out while cropping
+                if (Cropping && (action.Value == Action.ZoomIn || action.Value == Action.ZoomOut))
+                    continue;
+
+                DoAction(action.Value);
             }
 
-            if (
-                CurrentAction != Action.None
-                && CurrentAction != Action.Custom
-                && CurrentAction != DownAction
-                && (
-                    !Locked
-                    || CurrentAction == Action.ToggleLock
-                    || CurrentAction == Action.OpenContextMenu
-                )
-            )
-                DoAction(CurrentAction);
-
-            // Hold Keys - up
-            if (Controls.Equals(code, Config.Controls.ZoomFaster))
-                ZoomFaster = false;
-            if (Controls.Equals(code, Config.Controls.ZoomAlt))
-                ZoomAlt = false;
-            if (Controls.Equals(code, Config.Controls.DragLimitToMonitorBounds))
-                DragLimitToBoundsMod = false;
-            if (Controls.Equals(code, Config.Controls.FitToMonitorAlt))
-                FitToMonitorAlt = false;
-
-            CurrentAction = Action.None;
+            LastAction = Action.None;
         }
 
-        private void ControlDown(object code)
+        private void ControlDown(Binding value)
         {
             if (Locked)
                 return;
 
-            // Hold Keys - down
-            if (Controls.Equals(code, Config.Controls.ZoomFaster))
-                ZoomFaster = true;
-            if (Controls.Equals(code, Config.Controls.ZoomAlt))
-                ZoomAlt = true;
-            if (Controls.Equals(code, Config.Controls.DragLimitToMonitorBounds))
-                DragLimitToBoundsMod = true;
-            if (Controls.Equals(code, Config.Controls.FitToMonitorAlt))
-                FitToMonitorAlt = true;
-
-            // Dragging
-            if (Controls.Equals(code, Config.Controls.Drag))
+            var actions = Controls.GetActionsFromBinding(value, true);
+            foreach (var a in actions)
             {
-                if (!Dragging)
-                    DragPos = MousePos;
-                Dragging = true;
+                if (a is not ActionEnum action)
+                    continue;
+
+                if (Actions.ModiferActions.Contains(action.Value))
+                {
+                    switch (action.Value)
+                    {
+                        case Action.Drag:
+                            if (!Dragging)
+                                DragPos = MousePos;
+                            Dragging = true;
+                            break;
+                        case Action.ZoomFaster:
+                            ZoomFaster = true;
+                            break;
+                        case Action.ZoomAlt:
+                            ZoomAlt = true;
+                            break;
+                        case Action.DragLimitToMonitorBounds:
+                            DragLimitToBoundsMod = true;
+                            break;
+                        case Action.FitToMonitorAlt:
+                            FitToMonitorAlt = true;
+                            break;
+                        case Action.TransparencyToggle:
+                            ImageTransparencyHold = true;
+                            break;
+                        case Action.Crop:
+                            if (!Cropping)
+                                CropStart();
+                            break;
+                    }
+                    continue;
+                }
+
+                // Prevent move actions while dragging
+                if (
+                    Dragging
+                    && (
+                        action.Value == Action.MoveLeft
+                        || action.Value == Action.MoveRight
+                        || action.Value == Action.MoveUp
+                        || action.Value == Action.MoveDown
+                    )
+                )
+                {
+                    continue;
+                }
+
+                // Prevent zoom in/out while cropping
+                if (Cropping && (action.Value == Action.ZoomIn || action.Value == Action.ZoomOut))
+                {
+                    continue;
+                }
+
+                DoAction(action.Value);
+                LastAction = action.Value;
             }
-
-            // Animated Image Controls
-            if (Controls.Equals(code, Config.Controls.NextFrame, CurrentAction != Action.None))
-                CurrentAction = Action.NextFrame;
-            if (Controls.Equals(code, Config.Controls.PrevFrame, CurrentAction != Action.None))
-                CurrentAction = Action.PrevFrame;
-
-            if (
-                Controls.Equals(
-                    code,
-                    Config.Controls.PlaybackSpeedIncrease,
-                    CurrentAction != Action.None
-                )
-            )
-                CurrentAction = Action.PlaybackSpeedIncrease;
-            if (
-                Controls.Equals(
-                    code,
-                    Config.Controls.PlaybackSpeedDecrease,
-                    CurrentAction != Action.None
-                )
-            )
-                CurrentAction = Action.PlaybackSpeedDecrease;
-
-            // Change Image Transparency
-            if (
-                Controls.Equals(code, Config.Controls.TransparencyInc, CurrentAction != Action.None)
-            )
-                CurrentAction = Action.TransparencyInc;
-            if (
-                Controls.Equals(code, Config.Controls.TransparencyDec, CurrentAction != Action.None)
-            )
-                CurrentAction = Action.TransparencyDec;
-
-            if (
-                !ImageTransparencyHold
-                && Controls.Equals(
-                    code,
-                    Config.Controls.TransparencyToggle,
-                    CurrentAction != Action.None
-                )
-            )
-                ImageTransparencyHold = true;
-
-            // Zooming
-            if (Controls.Equals(code, Config.Controls.ZoomIn, CurrentAction != Action.None))
-                CurrentAction = Action.ZoomIn;
-            if (Controls.Equals(code, Config.Controls.ZoomOut, CurrentAction != Action.None))
-                CurrentAction = Action.ZoomOut;
-
-            // Moving
-            if (!Dragging)
-            {
-                if (Controls.Equals(code, Config.Controls.MoveLeft, CurrentAction != Action.None))
-                    CurrentAction = Action.MoveLeft;
-                if (Controls.Equals(code, Config.Controls.MoveRight, CurrentAction != Action.None))
-                    CurrentAction = Action.MoveRight;
-                if (Controls.Equals(code, Config.Controls.MoveUp, CurrentAction != Action.None))
-                    CurrentAction = Action.MoveUp;
-                if (Controls.Equals(code, Config.Controls.MoveDown, CurrentAction != Action.None))
-                    CurrentAction = Action.MoveDown;
-            }
-
-            // Cropping - release
-            if (!Cropping && Controls.Equals(code, Config.Controls.Crop))
-                CropStart();
-
-            if (CurrentAction != Action.None)
-                DoAction(CurrentAction);
         }
 
         ///////////////////////////
@@ -2573,6 +2385,7 @@ namespace vimage
             Config = Config.Load(
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json")
             );
+            Controls.Update(Config);
 
             // Update ContextMenu
             if (ContextMenu is not null)

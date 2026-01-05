@@ -41,70 +41,18 @@ namespace vimage.Common
     }
 
     [Serializable]
-    public struct CustomAction
+    public struct ContextMenuItem
+    {
+        public string name;
+        public ActionFunc? func;
+        public List<ContextMenuItem>? children;
+    }
+
+    [Serializable]
+    public struct CustomActionItem
     {
         public string name;
         public string func;
-    }
-
-    [Serializable]
-    public struct CustomActionBinding
-    {
-        public string name;
-        public List<string> bindings;
-    }
-
-    [Serializable]
-    public class Controls
-    {
-        public List<string> Drag = ["MOUSELEFT"];
-        public List<string> Close = ["ESC", "BACKSPACE"];
-        public List<string> OpenContextMenu = ["MOUSERIGHT"];
-        public List<string> PrevImage = ["LEFT", "PAGE UP", "MOUSE4"];
-        public List<string> NextImage = ["RIGHT", "PAGE DOWN", "MOUSE5"];
-        public List<string> RotateClockwise = ["UP"];
-        public List<string> RotateAntiClockwise = ["DOWN"];
-        public List<string> Flip = ["F"];
-        public List<string> FitToMonitorHeight = ["CTRL+MOUSEMIDDLE"];
-        public List<string> FitToMonitorWidth = ["SHIFT+MOUSEMIDDLE"];
-        public List<string> FitToMonitorAuto = ["MOUSEMIDDLE"];
-        public List<string> FitToMonitorAlt = ["RSHIFT", "LSHIFT"];
-        public List<string> ZoomIn = ["SCROLLUP"];
-        public List<string> ZoomOut = ["SCROLLDOWN"];
-        public List<string> ZoomFaster = ["RSHIFT", "LSHIFT"];
-        public List<string> ZoomAlt = ["RCTRL", "CTRL"];
-        public List<string> DragLimitToMonitorBounds = ["ALT"];
-        public List<string> ToggleSmoothing = ["S"];
-        public List<string> ToggleBackground = ["B"];
-        public List<string> ToggleLock = [""];
-        public List<string> ToggleAlwaysOnTop = ["L"];
-        public List<string> ToggleTitleBar = [""];
-        public List<string> PauseAnimation = ["SPACE"];
-        public List<string> PrevFrame = ["<"];
-        public List<string> NextFrame = [">"];
-        public List<string> PlaybackSpeedIncrease = ["PLUS"];
-        public List<string> PlaybackSpeedDecrease = ["MINUS"];
-        public List<string> PlaybackSpeedReset = ["0"];
-        public List<string> OpenSettings = [""];
-        public List<string> ResetImage = ["R"];
-        public List<string> OpenAtLocation = ["O"];
-        public List<string> Delete = ["DELETE"];
-        public List<string> Copy = ["CTRL+C"];
-        public List<string> CopyAsImage = ["ALT+C"];
-        public List<string> OpenDuplicateImage = ["C"];
-        public List<string> OpenFullDuplicateImage = ["SHIFT+C"];
-        public List<string> RandomImage = ["M"];
-        public List<string> MoveLeft = ["CTRL+LEFT", "RCTRL+LEFT"];
-        public List<string> MoveRight = ["CTRL+RIGHT", "RCTRL+RIGHT"];
-        public List<string> MoveUp = ["CTRL+UP", "RCTRL+UP"];
-        public List<string> MoveDown = ["CTRL+DOWN", "RCTRL+DOWN"];
-        public List<string> TransparencyToggle = ["T"];
-        public List<string> TransparencyInc = ["T+SCROLLDOWN"];
-        public List<string> TransparencyDec = ["T+SCROLLUP"];
-        public List<string> Crop = ["X"];
-        public List<string> UndoCrop = ["CTRL+Z"];
-        public List<string> ExitAll = ["SHIFT+ESC"];
-        public List<string> RerenderSVG = ["SHIFT+R"];
     }
 
     [Serializable]
@@ -146,94 +94,160 @@ namespace vimage.Common
         public string CropToolOutlineColour = "#FF000000";
         public int CropToolOutlineThickness = 2;
 
-        public Controls Controls = new();
+        public Dictionary<Action, List<string>> Controls = new()
+        {
+            [Action.Drag] = ["MOUSELEFT"],
+            [Action.Close] = ["ESC", "BACKSPACE"],
+            [Action.OpenContextMenu] = ["MOUSERIGHT"],
+            [Action.PrevImage] = ["LEFT", "PAGE UP", "MOUSE4"],
+            [Action.NextImage] = ["RIGHT", "PAGE DOWN", "MOUSE5"],
+
+            [Action.RotateClockwise] = ["UP"],
+            [Action.RotateAntiClockwise] = ["DOWN"],
+            [Action.Flip] = ["F"],
+            [Action.FitToMonitorHeight] = ["CTRL+MOUSEMIDDLE"],
+            [Action.FitToMonitorWidth] = ["SHIFT+MOUSEMIDDLE"],
+            [Action.FitToMonitorAuto] = ["MOUSEMIDDLE"],
+            [Action.FitToMonitorAlt] = ["RSHIFT", "LSHIFT"],
+            [Action.ZoomIn] = ["SCROLLUP"],
+            [Action.ZoomOut] = ["SCROLLDOWN"],
+            [Action.ZoomFaster] = ["RSHIFT", "LSHIFT"],
+            [Action.ZoomAlt] = ["RCTRL", "CTRL"],
+            [Action.DragLimitToMonitorBounds] = ["ALT"],
+
+            [Action.ToggleSmoothing] = ["S"],
+            [Action.ToggleBackground] = ["B"],
+            [Action.ToggleLock] = [],
+            [Action.ToggleAlwaysOnTop] = ["L"],
+            [Action.ToggleTitleBar] = [],
+
+            [Action.PauseAnimation] = ["SPACE"],
+            [Action.PrevFrame] = ["<"],
+            [Action.NextFrame] = [">"],
+            [Action.PlaybackSpeedIncrease] = ["PLUS"],
+            [Action.PlaybackSpeedDecrease] = ["MINUS"],
+            [Action.PlaybackSpeedReset] = ["0"],
+
+            [Action.OpenSettings] = [""],
+            [Action.ResetImage] = ["R"],
+            [Action.OpenAtLocation] = ["O"],
+            [Action.Delete] = ["DELETE"],
+            [Action.Copy] = ["CTRL+C"],
+            [Action.CopyAsImage] = ["ALT+C"],
+            [Action.OpenDuplicateImage] = ["C"],
+            [Action.OpenFullDuplicateImage] = ["SHIFT+C"],
+            [Action.RandomImage] = ["M"],
+
+            [Action.MoveLeft] = ["CTRL+LEFT", "RCTRL+LEFT"],
+            [Action.MoveRight] = ["CTRL+RIGHT", "RCTRL+RIGHT"],
+            [Action.MoveUp] = ["CTRL+UP", "RCTRL+UP"],
+            [Action.MoveDown] = ["CTRL+DOWN", "RCTRL+DOWN"],
+
+            [Action.TransparencyToggle] = ["T"],
+            [Action.TransparencyInc] = ["T+SCROLLDOWN"],
+            [Action.TransparencyDec] = ["T+SCROLLUP"],
+            [Action.Crop] = ["X"],
+            [Action.UndoCrop] = ["CTRL+Z"],
+            [Action.ExitAll] = ["SHIFT+ESC"],
+            [Action.RerenderSVG] = ["SHIFT+R"],
+
+            [Action.VisitWebsite] = [],
+
+            [Action.SortName] = [],
+            [Action.SortDate] = [],
+            [Action.SortDateModified] = [],
+            [Action.SortDateCreated] = [],
+            [Action.SortSize] = [],
+            [Action.SortAscending] = [],
+            [Action.SortDescending] = [],
+        };
 
         public List<ContextMenuItem> ContextMenu =
         [
-            new ContextMenuItem { name = "Close", func = new FuncAction(Action.Close) },
-            new ContextMenuItem { name = "-", func = new FuncAction(Action.None) },
-            new ContextMenuItem { name = "Next", func = new FuncAction(Action.NextImage) },
-            new ContextMenuItem { name = "Previous", func = new FuncAction(Action.PrevImage) },
+            new ContextMenuItem { name = "Close", func = new ActionEnum(Action.Close) },
+            new ContextMenuItem { name = "-", func = new ActionEnum(Action.None) },
+            new ContextMenuItem { name = "Next", func = new ActionEnum(Action.NextImage) },
+            new ContextMenuItem { name = "Previous", func = new ActionEnum(Action.PrevImage) },
             new ContextMenuItem
             {
                 name = "Sort by",
                 children =
                 [
-                    new ContextMenuItem { name = "Name", func = new FuncAction(Action.SortName) },
-                    new ContextMenuItem { name = "Date", func = new FuncAction(Action.SortDate) },
+                    new ContextMenuItem { name = "Name", func = new ActionEnum(Action.SortName) },
+                    new ContextMenuItem { name = "Date", func = new ActionEnum(Action.SortDate) },
                     new ContextMenuItem
                     {
                         name = "Date modified",
-                        func = new FuncAction(Action.SortDateModified),
+                        func = new ActionEnum(Action.SortDateModified),
                     },
                     new ContextMenuItem
                     {
                         name = "Date created",
-                        func = new FuncAction(Action.SortDateCreated),
+                        func = new ActionEnum(Action.SortDateCreated),
                     },
-                    new ContextMenuItem { name = "Size", func = new FuncAction(Action.SortSize) },
-                    new ContextMenuItem { name = "-", func = new FuncAction(Action.None) },
+                    new ContextMenuItem { name = "Size", func = new ActionEnum(Action.SortSize) },
+                    new ContextMenuItem { name = "-", func = new ActionEnum(Action.None) },
                     new ContextMenuItem
                     {
                         name = "Ascending",
-                        func = new FuncAction(Action.SortAscending),
+                        func = new ActionEnum(Action.SortAscending),
                     },
                     new ContextMenuItem
                     {
                         name = "Descending",
-                        func = new FuncAction(Action.SortDescending),
+                        func = new ActionEnum(Action.SortDescending),
                     },
                 ],
             },
-            new ContextMenuItem { name = "-", func = new FuncAction(Action.None) },
+            new ContextMenuItem { name = "-", func = new ActionEnum(Action.None) },
             new ContextMenuItem
             {
                 name = "Rotate right",
-                func = new FuncAction(Action.RotateClockwise),
+                func = new ActionEnum(Action.RotateClockwise),
             },
             new ContextMenuItem
             {
                 name = "Rotate left",
-                func = new FuncAction(Action.RotateAntiClockwise),
+                func = new ActionEnum(Action.RotateAntiClockwise),
             },
-            new ContextMenuItem { name = "Flip", func = new FuncAction(Action.Flip) },
+            new ContextMenuItem { name = "Flip", func = new ActionEnum(Action.Flip) },
             new ContextMenuItem
             {
                 name = "Fit to height",
-                func = new FuncAction(Action.FitToMonitorHeight),
+                func = new ActionEnum(Action.FitToMonitorHeight),
             },
             new ContextMenuItem
             {
                 name = "Fit to width",
-                func = new FuncAction(Action.FitToMonitorWidth),
+                func = new ActionEnum(Action.FitToMonitorWidth),
             },
             new ContextMenuItem
             {
                 name = "Smoothing",
-                func = new FuncAction(Action.ToggleSmoothing),
+                func = new ActionEnum(Action.ToggleSmoothing),
             },
             new ContextMenuItem
             {
                 name = "Always on top",
-                func = new FuncAction(Action.ToggleAlwaysOnTop),
+                func = new ActionEnum(Action.ToggleAlwaysOnTop),
             },
-            new ContextMenuItem { name = "Reset", func = new FuncAction(Action.ResetImage) },
-            new ContextMenuItem { name = "-", func = new FuncAction(Action.None) },
-            new ContextMenuItem { name = "Edit", func = new FuncString("EDIT PAINT") },
-            new ContextMenuItem { name = "Copy", func = new FuncAction(Action.Copy) },
-            new ContextMenuItem { name = "Delete", func = new FuncAction(Action.Delete) },
-            new ContextMenuItem { name = "-", func = new FuncAction(Action.None) },
+            new ContextMenuItem { name = "Reset", func = new ActionEnum(Action.ResetImage) },
+            new ContextMenuItem { name = "-", func = new ActionEnum(Action.None) },
+            new ContextMenuItem { name = "Edit", func = new CustomAction("EDIT PAINT") },
+            new ContextMenuItem { name = "Copy", func = new ActionEnum(Action.Copy) },
+            new ContextMenuItem { name = "Delete", func = new ActionEnum(Action.Delete) },
+            new ContextMenuItem { name = "-", func = new ActionEnum(Action.None) },
             new ContextMenuItem
             {
                 name = "[filename.14]",
-                func = new FuncAction(Action.OpenAtLocation),
+                func = new ActionEnum(Action.OpenAtLocation),
             },
-            new ContextMenuItem { name = "-", func = new FuncAction(Action.None) },
-            new ContextMenuItem { name = "Settings", func = new FuncAction(Action.OpenSettings) },
+            new ContextMenuItem { name = "-", func = new ActionEnum(Action.None) },
+            new ContextMenuItem { name = "Settings", func = new ActionEnum(Action.OpenSettings) },
             new ContextMenuItem
             {
                 name = "vimage [version]",
-                func = new FuncAction(Action.VisitWebsite),
+                func = new ActionEnum(Action.VisitWebsite),
             },
         ];
         public List<ContextMenuItem> ContextMenu_Animation =
@@ -241,38 +255,38 @@ namespace vimage.Common
             new ContextMenuItem
             {
                 name = "Pause/Play",
-                func = new FuncAction(Action.PauseAnimation),
+                func = new ActionEnum(Action.PauseAnimation),
             },
-            new ContextMenuItem { name = "-", func = new FuncAction(Action.None) },
+            new ContextMenuItem { name = "-", func = new ActionEnum(Action.None) },
         ];
 
         public int ContextMenu_Animation_InsertAtIndex = 2;
         public bool ContextMenuShowMargin = false;
         public bool ContextMenuShowMarginSub = true;
 
-        public List<CustomAction> CustomActions =
+        public List<CustomActionItem> CustomActions =
         [
-            new CustomAction
+            new CustomActionItem
             {
                 name = "TOGGLE OVERLAY MODE",
                 func = "-toggleSync -clickThrough -alwaysOnTop -defaultTransparency",
             },
-            new CustomAction { name = "EDIT PAINT", func = @"mspaint.exe %f" },
-            new CustomAction
+            new CustomActionItem { name = "EDIT PAINT", func = @"mspaint.exe %f" },
+            new CustomActionItem
             {
                 name = "EDIT PAINTDOTNET",
                 func = "\"C:\\Program Files\\Paint.NET\\PaintDotNet.exe\" %f",
             },
-            new CustomAction { name = "TOGGLE TASKBAR", func = "-taskbarIcon" },
+            new CustomActionItem { name = "TOGGLE TASKBAR", func = "-taskbarIcon" },
         ];
 
-        public List<CustomActionBinding> CustomActionBindings =
-        [
-            new CustomActionBinding { name = "TOGGLE OVERLAY MODE", bindings = ["SHIFT+L"] },
-            new CustomActionBinding { name = "EDIT PAINT", bindings = [] },
-            new CustomActionBinding { name = "EDIT PAINTDOTNET", bindings = [] },
-            new CustomActionBinding { name = "TOGGLE TASKBAR", bindings = [] },
-        ];
+        public Dictionary<string, List<string>> CustomActionBindings = new()
+        {
+            ["TOGGLE OVERLAY MODE"] = ["SHIFT+L"],
+            ["EDIT PAINT"] = [],
+            ["EDIT PAINTDOTNET"] = [],
+            ["TOGGLE TASKBAR"] = [],
+        };
 
         private static readonly System.Text.Json.JsonSerializerOptions JsonOptions = new()
         {

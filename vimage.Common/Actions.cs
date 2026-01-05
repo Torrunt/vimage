@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace vimage.Common
@@ -77,6 +78,12 @@ namespace vimage.Common
         Custom,
     }
 
+    public enum MouseWheel
+    {
+        ScrollUp,
+        ScrollDown,
+    }
+
     public static partial class Actions
     {
         public static List<string> Names =
@@ -151,6 +158,35 @@ namespace vimage.Common
             return (Action)Names.IndexOf(action);
         }
 
+        /// <summary>List of modifier actions that can be activated simultaneously.</summary>
+        public static readonly Action[] ModiferActions =
+        [
+            Action.Crop,
+            Action.Drag,
+            Action.DragLimitToMonitorBounds,
+            Action.FitToMonitorAlt,
+            Action.ZoomAlt,
+            Action.ZoomFaster,
+            Action.TransparencyToggle,
+        ];
+
+        /// <summary>List of actions that occur while a key/button is down.</summary>
+        public static readonly Action[] HoldDownActions =
+        [
+            Action.NextFrame,
+            Action.PrevFrame,
+            Action.PlaybackSpeedIncrease,
+            Action.PlaybackSpeedDecrease,
+            Action.TransparencyInc,
+            Action.TransparencyDec,
+            Action.ZoomIn,
+            Action.ZoomOut,
+            Action.MoveLeft,
+            Action.MoveRight,
+            Action.MoveUp,
+            Action.MoveDown,
+        ];
+
         /// <summary>List of actions that can be used in the Context Menu.</summary>
         public static readonly Action[] MenuActions =
         [
@@ -202,5 +238,55 @@ namespace vimage.Common
         /// </summary>
         [GeneratedRegex("(?<=^[^\"]*(?:\"[^\"]*\"[^\"]*)*) (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)")]
         public static partial Regex CustomActionSplitRegex();
+    }
+
+    /// <summary>
+    /// Either a Action enum or the name of a custom action.
+    /// </summary>
+    [JsonConverter(typeof(ActionFuncConverter))]
+    public abstract record ActionFunc;
+
+    public record CustomAction(string Value) : ActionFunc;
+
+    public record ActionEnum(Action Value) : ActionFunc;
+
+    public sealed class ActionFuncConverter : JsonConverter<ActionFunc>
+    {
+        public override ActionFunc Read(
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options
+        )
+        {
+            if (reader.TokenType != JsonTokenType.String)
+                throw new JsonException();
+
+            var value = reader.GetString()!;
+
+            // Check if Action enum
+            if (Enum.TryParse<Action>(value, out var action))
+                return new ActionEnum(action);
+
+            return new CustomAction(value);
+        }
+
+        public override void Write(
+            Utf8JsonWriter writer,
+            ActionFunc value,
+            JsonSerializerOptions options
+        )
+        {
+            switch (value)
+            {
+                case ActionEnum a:
+                    writer.WriteStringValue(a.Value.ToString());
+                    break;
+                case CustomAction s:
+                    writer.WriteStringValue(s.Value);
+                    break;
+                default:
+                    throw new JsonException();
+            }
+        }
     }
 }
