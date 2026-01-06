@@ -61,12 +61,12 @@ namespace vimage
                 if (ImageViewer.File == "")
                 {
                     // Remove certain items if there is no file (looking at clipboard image)
-                    if (item.func == null && item.name.StartsWith("Sort"))
+                    if (item.Func == null && item.Name.StartsWith("Sort"))
                     {
                         // remove Sort By submenu
                         continue;
                     }
-                    if (item.func is ActionEnum action)
+                    if (item.Func is ActionEnum action)
                     {
                         // remove navigation and delete
                         switch (action.Value)
@@ -79,20 +79,20 @@ namespace vimage
                     }
                 }
 
-                if (item.children != null && item.children.Count > 0)
+                if (item.Children != null && item.Children.Count > 0)
                 {
                     // Submenu
-                    list.Add(VariableAmountOfStrings(depth, ":") + item.name + ":");
-                    FuncByName.Add(item.name, new ActionEnum(Action.None));
-                    LoadItemsInto(list, item.children, depth + 1);
+                    list.Add(VariableAmountOfStrings(depth, ":") + item.Name + ":");
+                    FuncByName.Add(item.Name, new ActionEnum(Action.None));
+                    LoadItemsInto(list, item.Children, depth + 1);
                 }
                 else
                 {
                     // Item
-                    if (FuncByName.ContainsKey(item.name))
+                    if (FuncByName.ContainsKey(item.Name))
                         continue;
 
-                    var itemName = item.name;
+                    var itemName = item.Name;
                     if (itemName.StartsWith("[filename"))
                         FileNameItem = list.Count;
                     if (itemName.Contains("[version]"))
@@ -100,10 +100,10 @@ namespace vimage
 
                     list.Add(VariableAmountOfStrings(depth, ":") + itemName);
                     if (
-                        item.func != null
-                        && !(item.func is ActionEnum action && action.Value == Action.None)
+                        item.Func != null
+                        && !(item.Func is ActionEnum action && action.Value == Action.None)
                     )
-                        FuncByName.Add(itemName, item.func);
+                        FuncByName.Add(itemName, item.Func);
                 }
             }
         }

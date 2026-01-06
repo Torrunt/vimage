@@ -16,28 +16,23 @@ namespace vimage_settings
         {
             InitializeComponent();
 
-            if (App.vimageConfig == null)
+            if (App.Config == null)
                 return;
-            for (int i = 0; i < App.vimageConfig.Controls.Count; i++)
-            {
-                var item = new ControlItem(App.vimageConfig.ControlNames[i], App.vimageConfig.Controls[i]);
-                _ = ControlsPanel.Children.Add(item);
-            }
+            foreach (var c in App.Config.Controls)
+                ControlsPanel.Children.Add(new ControlItem(c.Key.ToString(), c.Value));
+
             CustomActionBindings = [];
-            for (int i = 0; i < App.vimageConfig.CustomActionBindings.Count; i++)
-            {
-                AddCustomActionBinding(i);
-            }
+            foreach (var c in App.Config.CustomActionBindings)
+                AddCustomActionBinding(c.Key, c.Value);
         }
-        public void AddCustomActionBinding(int index)
+
+        public void AddCustomActionBinding(string actionName, List<string> bindings)
         {
-            if (App.vimageConfig.CustomActionBindings[index] is CustomActionBinding cab)
-            {
-                var item = new ControlItem(cab.name, cab.bindings);
-                _ = ControlsPanel.Children.Add(item);
-                CustomActionBindings.Add(item);
-            }
+            var item = new ControlItem(actionName, bindings);
+            _ = ControlsPanel.Children.Add(item);
+            CustomActionBindings.Add(item);
         }
+
         public void RemoveCustomActionBinding(int index)
         {
             ControlsPanel.Children.Remove(CustomActionBindings[index]);
@@ -46,8 +41,12 @@ namespace vimage_settings
 
         private void Default_Click(object sender, RoutedEventArgs e)
         {
+            if (App.Config == null)
+                return;
+
             // Reset Controls to Default
-            App.vimageConfig.SetDefaultControls();
+            var defaultConfig = new Config();
+            App.Config.Controls = new Dictionary<Action, List<string>>(defaultConfig.Controls);
 
             foreach (ControlItem item in ControlsPanel.Children)
                 item.UpdateBindings();

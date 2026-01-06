@@ -4,13 +4,14 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using vimage.Common;
+using Action = vimage.Common.Action;
 
 namespace vimage_settings
 {
     /// <summary>
-    /// Interaction logic for ContextMenuItem.xaml
+    /// Interaction logic for ContextMenuRow.xaml
     /// </summary>
-    public partial class ContextMenuItem : UserControl
+    public partial class ContextMenuRow : UserControl
     {
         private readonly ContextMenu? ContextMenuEditor;
         private readonly Panel? ParentPanel;
@@ -23,15 +24,15 @@ namespace vimage_settings
         private readonly SolidColorBrush BrushSelected = new(Colors.DodgerBlue);
         private readonly SolidColorBrush BrushOver = new(Colors.LightSkyBlue);
 
-        public ContextMenuItem()
+        public ContextMenuRow()
         {
             InitializeComponent();
             SetFunctions();
         }
 
-        public ContextMenuItem(
+        public ContextMenuRow(
             string name,
-            object func,
+            ActionFunc? func,
             ContextMenu contextMenu,
             Panel parentPanel,
             ContextMenuEditorCanvas canvas,
@@ -50,11 +51,30 @@ namespace vimage_settings
 
             ItemName.Text = name;
 
-            int funcIndex = ItemFunction.Items.IndexOf(
-                (string)(func is vimage.Common.Action action ? action.ToNameString() : func)
-            );
+            var actionName = "";
+            if (func is ActionEnum actionEnum)
+                actionName = actionEnum.Value.ToString();
+            else if (func is CustomAction customAction)
+                actionName = customAction.Value;
+
+            int funcIndex = ItemFunction.Items.IndexOf(actionName);
             if (funcIndex != -1)
                 ItemFunction.SelectedIndex = funcIndex;
+        }
+
+        public ContextMenuItem GetAsContextMenuItem()
+        {
+            var actionName = ItemFunction.Text.Trim();
+            ActionFunc? func;
+
+            if (actionName == null || actionName.Length <= 0)
+                func = null;
+            else  if (Enum.TryParse<Action>(actionName, true, out var action))
+                func = new ActionEnum(action);
+            else
+                func = new CustomAction(ItemFunction.Text.Trim());
+
+            return new ContextMenuItem(ItemName.Text, func);
         }
 
         public void SetFunctions()
@@ -67,12 +87,12 @@ namespace vimage_settings
 
             _ = ItemFunction.Items.Add("-");
             for (int i = 0; i < Actions.MenuActions.Length; i++)
-                _ = ItemFunction.Items.Add(Actions.MenuActions[i].ToNameString());
-            if (App.vimageConfig != null)
+                _ = ItemFunction.Items.Add(Actions.MenuActions[i].ToString());
+            if (App.Config != null)
             {
                 CustomActionsStartIndex = ItemFunction.Items.Count;
-                for (int i = 0; i < App.vimageConfig.CustomActions.Count; i++)
-                    ItemFunction.Items.Add(App.vimageConfig.CustomActions[i].name);
+                for (int i = 0; i < App.Config.CustomActions.Count; i++)
+                    ItemFunction.Items.Add(App.Config.CustomActions[i].Name);
             }
             ItemFunction.SelectedIndex = 0;
 
@@ -89,7 +109,7 @@ namespace vimage_settings
 
             for (
                 int i = CustomActionsStartIndex;
-                i < CustomActionsStartIndex + App.vimageConfig.CustomActions.Count;
+                i < CustomActionsStartIndex + App.Config.CustomActions.Count;
                 i++
             )
             {
@@ -97,20 +117,19 @@ namespace vimage_settings
                 {
                     // add
                     ItemFunction.Items.Add(
-                        App.vimageConfig.CustomActions[i - CustomActionsStartIndex].name
+                        App.Config.CustomActions[i - CustomActionsStartIndex].Name
                     );
                 }
                 else
                 {
                     // update name
-                    ItemFunction.Items[i] = App.vimageConfig
+                    ItemFunction.Items[i] = App.Config
                         .CustomActions[i - CustomActionsStartIndex]
-                        .name;
+                        .Name;
                 }
             }
             while (
-                ItemFunction.Items.Count
-                > CustomActionsStartIndex + App.vimageConfig.CustomActions.Count
+                ItemFunction.Items.Count > CustomActionsStartIndex + App.Config.CustomActions.Count
             )
                 ItemFunction.Items.RemoveAt(ItemFunction.Items.Count - 1); // delete
 
@@ -182,8 +201,7 @@ namespace vimage_settings
                 return;
 
             Selected = true;
-            if (ContextMenuEditor is not null)
-                ContextMenuEditor.CurrentItemSelection = this;
+            ContextMenuEditor?.CurrentItemSelection = this;
             UserControl.Background = BrushSelected;
 
             if (selectTextBox)
@@ -235,7 +253,7 @@ namespace vimage_settings
                     if (i != 0)
                     {
                         var itemAbove = ParentPanel?.Children[i - 1];
-                        if (itemAbove is ContextMenuItem itemAboveItem)
+                        if (itemAbove is ContextMenuRow itemAboveItem)
                         {
                             if (posX >= (itemAboveItem.Indent + 1) * 30)
                                 indent = itemAboveItem.Indent + 1;
@@ -286,29 +304,27 @@ namespace vimage_settings
                 Dragging = false;
         }
 
-        private int _Indent = 0;
         public int Indent
         {
-            get { return _Indent; }
+            get;
             set
             {
-                _Indent = value;
-                IndentColumn.Width = new GridLength(_Indent * 30);
+                field = value;
+                IndentColumn.Width = new GridLength(field * 30);
             }
         }
 
-        private bool _Dragging = false;
         public bool Dragging
         {
-            get { return _Dragging; }
+            get;
             set
             {
-                if (_Dragging == value)
+                if (field == value)
                     return;
 
                 if (ParentPanel is null || ParentCanvas is null)
                 {
-                    _Dragging = value;
+                    field = value;
                     return;
                 }
 
@@ -370,7 +386,7 @@ namespace vimage_settings
                     ButtonDelete.IsEnabled = true;
                 }
 
-                _Dragging = value;
+                field = value;
             }
         }
     }

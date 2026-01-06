@@ -2432,9 +2432,9 @@ namespace vimage
 
         public void DoCustomAction(string actionKey)
         {
-            var a = Config.CustomActions.FirstOrDefault((a) => a.name == actionKey);
-            var action = a.func;
-            if (action == "")
+            var a = Config.CustomActions.FirstOrDefault((a) => a.Name == actionKey);
+            var action = a?.Func;
+            if (action == null || action == "")
                 return;
 
             if (action.StartsWith('-'))

@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using vimage.Common;
 
 namespace vimage_settings
 {
@@ -13,19 +11,20 @@ namespace vimage_settings
         public CustomActions()
         {
             InitializeComponent();
-            DataContext = App.vimageConfig;
+            DataContext = App.Config;
 
-            if (App.vimageConfig == null)
+            if (App.Config == null)
                 return;
             LoadItems();
         }
 
         private void LoadItems()
         {
-            if (App.vimageConfig is null) return;
-            for (int i = 0; i < App.vimageConfig.CustomActions.Count; i++)
+            if (App.Config is null)
+                return;
+            for (int i = 0; i < App.Config.CustomActions.Count; i++)
             {
-                var item = new CustomActionItem(i, CustomActionItems);
+                var item = new CustomActionRow(i, CustomActionItems);
                 _ = CustomActionItems.Children.Add(item);
             }
         }
@@ -34,32 +33,30 @@ namespace vimage_settings
         {
             for (int i = 0; i < CustomActionItems.Children.Count; i++)
             {
-                if (CustomActionItems.Children[i] is CustomActionItem customActionItem)
+                if (CustomActionItems.Children[i] is CustomActionRow customActionItem)
                     customActionItem.Index = i;
             }
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)
         {
+            if (App.Config == null)
+                return;
+
             int index = CustomActionItems.Children.Count;
 
-            if (App.vimageConfig != null)
-            {
-                App.vimageConfig.CustomActions.Add(new CustomAction { name = "ACTION", func = "" });
-                App.vimageConfig.CustomActionBindings.Add(
-                    new CustomActionBinding { name = "ACTION", bindings = [] }
-                );
-            }
+            var actionName = "ACTION";
 
-            var item = new CustomActionItem(index, CustomActionItems);
+            App.Config.CustomActions.Add(new vimage.Common.CustomActionItem(actionName, ""));
+            App.Config.CustomActionBindings.Add(actionName, []);
+
+            var item = new CustomActionRow(index, CustomActionItems);
             _ = CustomActionItems.Children.Add(item);
 
             if (Application.Current.MainWindow is MainWindow mainWindow)
             {
                 // update controls tab
-                mainWindow.ControlBindings.AddCustomActionBinding(
-                    index
-                );
+                mainWindow.ControlBindings.AddCustomActionBinding(actionName, []);
                 // update context menu function list
                 mainWindow.ContextMenuEditor.UpdateCustomActions();
             }

@@ -10,7 +10,7 @@ namespace vimage_settings
         public General()
         {
             InitializeComponent();
-            DataContext = App.vimageConfig;
+            DataContext = App.Config;
         }
     }
 }

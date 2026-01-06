@@ -269,7 +269,7 @@ namespace vimage.Display
 
         /// <summary>
         /// Clears all images/textures from memory (except the currently viewed image).
-        /// Called from `-clearMemory` command or by using reset image with `Setting_ClearMemoryOnResetImage` enabled.
+        /// Called from `-clearMemory` command or by using reset image with `ClearMemoryOnResetImage` enabled.
         /// </summary>
         /// <param name="image">The currently viewed image.</param>
         /// <param name="file">The currently viewed image filepath.</param>

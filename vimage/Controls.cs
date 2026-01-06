@@ -92,7 +92,7 @@ namespace vimage
                 )
                     continue;
                 // Skip if action is a modifier action
-                else if (b.Action is ActionEnum m && Actions.ModiferActions.Contains(m.Value))
+                else if (b.Action is ActionEnum m && Actions.ModifierActions.Contains(m.Value))
                     continue;
 
                 // Skip if we already have an action unless this one is a longer combo
@@ -135,7 +135,7 @@ namespace vimage
             List<Action> actions = [];
             foreach (var b in binding.Actions)
             {
-                if (b.Action is not ActionEnum a || !Actions.ModiferActions.Contains(a.Value))
+                if (b.Action is not ActionEnum a || !Actions.ModifierActions.Contains(a.Value))
                     continue;
                 actions.Add(a.Value);
             }

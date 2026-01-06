@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using vimage.Common;
 
 namespace vimage_settings
 {
@@ -11,16 +11,17 @@ namespace vimage_settings
     /// </summary>
     public partial class ControlItem : UserControl
     {
-        public List<int> Controls = [];
+        public List<string> Controls = [];
         private bool CanRecordMouseButton = false;
-        private readonly List<int> KeysHeld = [];
+        private bool JustRecordedCombo = false;
+        private readonly List<string> KeysHeld = [];
 
         public ControlItem()
         {
             InitializeComponent();
         }
 
-        public ControlItem(string name, List<int> controls)
+        public ControlItem(string name, List<string> controls)
         {
             InitializeComponent();
 
@@ -37,14 +38,17 @@ namespace vimage_settings
 
         public void UpdateBindings()
         {
-            ControlSetting.Text = Config.ControlsToString(Controls);
+            ControlSetting.Text = string.Join(", ", Controls);
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
             e.Handled = true;
 
-            int key = ConvertWindowsKey(e.Key == Key.System ? e.SystemKey : e.Key);
+            var key = ConvertWindowsKey(e.Key == Key.System ? e.SystemKey : e.Key);
+            if (key == null)
+                return;
+
             if (KeysHeld.Count == 0 || KeysHeld[^1] != key)
             {
                 KeysHeld.Add(key);
@@ -57,9 +61,11 @@ namespace vimage_settings
         {
             e.Handled = true;
 
-            int key = ConvertWindowsKey(e.Key == Key.System ? e.SystemKey : e.Key);
-            _ = KeysHeld.Remove(key);
+            var key = ConvertWindowsKey(e.Key == Key.System ? e.SystemKey : e.Key);
+            if (key == null)
+                return;
 
+            _ = KeysHeld.Remove(key);
             RecordControl(key);
         }
 
@@ -75,16 +81,17 @@ namespace vimage_settings
             e.Handled = true;
 
             // Record Mouse Button Press
-            int button = e.ChangedButton switch
+            var button = e.ChangedButton switch
             {
-                MouseButton.Left => 0,
-                MouseButton.Right => 1,
-                MouseButton.Middle => 2,
-                MouseButton.XButton1 => 3,
-                MouseButton.XButton2 => 4,
-                _ => -1,
+                MouseButton.Left => "MOUSELEFT",
+                MouseButton.Right => "MOUSERIGHT",
+                MouseButton.Middle => "MOUSEMIDDLE",
+                MouseButton.XButton1 => "MOUSE4",
+                MouseButton.XButton2 => "MOUSE5",
+                _ => null,
             };
-            RecordControl(button + Config.MouseCodeOffset);
+            if (button != null)
+                RecordControl(button);
             ControlSetting.ReleaseMouseCapture();
         }
 
@@ -95,20 +102,14 @@ namespace vimage_settings
             e.Handled = true;
 
             // Record Mouse Wheel Direction
-            int bind = -1;
-            if (e.Delta > 0)
-                bind = Config.MOUSE_SCROLL_UP;
-            else if (e.Delta < 0)
-                bind = Config.MOUSE_SCROLL_DOWN;
-
-            RecordControl(bind);
+            RecordControl(e.Delta > 0 ? "SCROLLUP" : "SCROLLDOWN");
         }
 
-        private static int ConvertWindowsKey(Key keyCode)
+        private static string? ConvertWindowsKey(Key keyCode)
         {
             var key = keyCode.ToString().ToUpper();
             if (key is null)
-                return -1;
+                return null;
 
             // Record Key Press
             if (
@@ -118,7 +119,7 @@ namespace vimage_settings
                 || key.Equals("LWIN")
                 || key.Equals("RWIN")
             )
-                return -1;
+                return null;
 
             // fix up some weird names KeyEventArgs gives
             key = key switch
@@ -138,39 +139,43 @@ namespace vimage_settings
             if (key.Length == 2 && key[0] == 'D')
                 key = key[1..];
 
-            return (int)Config.StringToKey(key);
+            return key;
         }
 
-        private void RecordControl(int bind, bool canBeKeyCombo = true)
+        private void RecordControl(string input)
         {
-            if (bind == -1)
-                return;
-            int i = Controls.IndexOf(bind);
-            if (!(i == -1 || (i > 1 && Controls[i - 2] == -2)))
-                return;
-
-            if (canBeKeyCombo)
+            if (JustRecordedCombo)
             {
-                if (KeysHeld.Count > 0 && KeysHeld[^1] != bind)
-                {
-                    // Key Combo? (eg: CTRL+C)
-                    int c = KeysHeld[^1];
-
-                    if (i != -1 && Controls.IndexOf(c) != -1)
-                        return;
-                    Controls.Add(-2);
-                    Controls.Add(c);
-                }
-                else if (i != -1)
+                // Don't record any more controls until all buttons are released
+                if (KeysHeld.Count > 0)
                     return;
+                JustRecordedCombo = false;
+                return;
             }
-            Controls.Add(bind);
+
+            int i = Controls.IndexOf(input);
+
+            // Key Combo? (eg: CTRL+C)
+            if (KeysHeld.Count > 0 && KeysHeld[^1] != input)
+            {
+                var combo = string.Join("+", KeysHeld) + "+" + input;
+                if (Controls.IndexOf(combo) != -1)
+                    return;
+                Controls.Add(combo);
+                UpdateBindings();
+                JustRecordedCombo = true;
+                return;
+            }
+
+            if (i != -1)
+                return;
+            Controls.Add(input);
             UpdateBindings();
         }
 
         private void ControlSetting_GotFocus(object sender, RoutedEventArgs e)
         {
-            Window window = Window.GetWindow(this);
+            var window = Window.GetWindow(this);
             if (window == null)
                 return;
             window.PreviewKeyDown += OnKeyDown;
@@ -182,7 +187,7 @@ namespace vimage_settings
 
         private void ControlSetting_LostFocus(object sender, RoutedEventArgs e)
         {
-            Window window = Window.GetWindow(this);
+            var window = Window.GetWindow(this);
             if (window == null)
                 return;
             window.PreviewKeyDown -= OnKeyDown;

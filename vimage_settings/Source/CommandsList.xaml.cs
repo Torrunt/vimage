@@ -10,7 +10,10 @@ namespace vimage_settings
         public CommandsList()
         {
             InitializeComponent();
-            SourceInitialized += (s, e) => { MaxHeight = ActualHeight; };
+            SourceInitialized += (s, e) =>
+            {
+                MaxHeight = ActualHeight;
+            };
         }
     }
 }

@@ -6,24 +6,27 @@ namespace vimage_settings
 {
     public class ContextMenuEditorCanvas : Canvas
     {
-        public ContextMenuItem? MovingItem;
-        public ContextMenuItem GhostItem = new();
-        public Rectangle SelectionRect = new() { Height = 4, Fill = System.Windows.Media.Brushes.Black, Opacity = 0.5f };
+        public ContextMenuRow? MovingItem;
+        public ContextMenuRow GhostItem = new();
+        public Rectangle SelectionRect = new()
+        {
+            Height = 4,
+            Fill = System.Windows.Media.Brushes.Black,
+            Opacity = 0.5f,
+        };
         public int InsertAtIndex = -1;
 
-        public ContextMenuEditorCanvas() : base()
-        {
-        }
+        public ContextMenuEditorCanvas()
+            : base() { }
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
             base.OnMouseUp(e);
 
-            if (MovingItem != null)
-                MovingItem.Dragging = false;
+            MovingItem?.Dragging = false;
         }
 
-        public void SetupGhost(ContextMenuItem item)
+        public void SetupGhost(ContextMenuRow item)
         {
             if (GhostItem.Parent != null)
                 return;
@@ -34,6 +37,5 @@ namespace vimage_settings
             GhostItem.Indent = item.Indent;
             GhostItem.IsEnabled = false;
         }
-
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using vimage.Common;
 
 namespace vimage_settings
 {
@@ -9,24 +11,24 @@ namespace vimage_settings
     /// </summary>
     public partial class ContextMenu : UserControl
     {
-        public List<ContextMenuItem> Items = [];
-        public ContextMenuItem? CurrentItemSelection = null;
+        public List<ContextMenuRow> Items = [];
+        public ContextMenuRow? CurrentItemSelection = null;
 
         public ContextMenu()
         {
             InitializeComponent();
-            DataContext = App.vimageConfig;
+            DataContext = App.Config;
 
-            if (App.vimageConfig == null)
+            if (App.Config == null)
                 return;
             LoadItems(
-                App.vimageConfig.ContextMenu,
+                App.Config.ContextMenu,
                 ContextMenuItems_General,
                 ContextMenuItems_GeneralCanvas,
                 ContextMenuItems_GeneralScroll
             );
             LoadItems(
-                App.vimageConfig.ContextMenu_Animation,
+                App.Config.ContextMenu_Animation,
                 ContextMenuItems_Animation,
                 ContextMenuItems_AnimationCanvas,
                 ContextMenuItems_AnimationScroll
@@ -35,112 +37,70 @@ namespace vimage_settings
 
         public void Save()
         {
-            App.vimageConfig.ContextMenu.Clear();
-            App.vimageConfig.ContextMenu_Animation.Clear();
+            App.Config.ContextMenu.Clear();
+            App.Config.ContextMenu_Animation.Clear();
 
-            SaveContextMenu(App.vimageConfig.ContextMenu, ContextMenuItems_General);
-            SaveContextMenu(App.vimageConfig.ContextMenu_Animation, ContextMenuItems_Animation);
+            App.Config.ContextMenu = GetSavedContextMenu(ContextMenuItems_General);
+            App.Config.ContextMenu_Animation = GetSavedContextMenu(ContextMenuItems_Animation);
         }
 
-        private static void SaveContextMenu(
-            List<vimage.Common.ContextMenuItem> contextMenu,
-            Panel panel
-        )
+        private static List<ContextMenuItem> GetSavedContextMenu(Panel panel)
         {
-            int currentSubLevel = 0;
-            List<vimage.Common.ContextMenuItem> currentMenu = contextMenu;
-            List<vimage.Common.ContextMenuItem>? prevMenu = null;
-            for (int i = 0; i < panel.Children.Count; i++)
+            List<ContextMenuItem> contextMenu = [];
+            var stack = new Stack<(int indent, ContextMenuItem item)>();
+            foreach (var child in panel.Children)
             {
-                if (panel.Children[i] is not ContextMenuItem item)
+                if (child is not ContextMenuRow row)
                     continue;
-                if (
-                    i < panel.Children.Count - 1
-                    && ((ContextMenuItem)panel.Children[i + 1]).Indent > item.Indent
-                )
-                {
-                    // Submenu
-                    currentMenu.Add(item.ItemName.Text);
-                }
-                else if (item.Indent != 0)
-                {
-                    // Subitem
-                    if (item.Indent > currentSubLevel)
-                    {
-                        // First subitem
-                        currentSubLevel = item.Indent;
-                        currentMenu.Add(new List<object>());
-                        prevMenu = currentMenu;
-                        var subMenu = currentMenu[^1];
-                        if (subMenu is List<object> subMenuList)
-                            currentMenu = subMenuList;
-                    }
-                    else if (item.Indent < currentSubLevel && prevMenu is not null)
-                    {
-                        currentSubLevel = item.Indent;
-                        currentMenu = prevMenu;
-                    }
 
-                    currentMenu.Add(
-                        new vimage.Common.ContextMenuItem
-                        {
-                            name = item.ItemName.Text,
-                            func = item.ItemFunction.Text.Trim(),
-                        }
-                    );
+                var item = row.GetAsContextMenuItem();
+                int indent = row.Indent;
+
+                while (stack.Count > 0 && stack.Peek().indent >= indent)
+                    stack.Pop(); // pop until we find the correct parent level
+
+                if (stack.Count > 0)
+                {
+                    // Sub item
+                    var previousItem = stack.Peek().item;
+                    previousItem.Children ??= [];
+                    previousItem.Children.Add(item);
                 }
                 else
-                {
-                    // Item
-                    if (currentSubLevel != 0)
-                    {
-                        currentSubLevel = 0;
-                        currentMenu = contextMenu;
-                    }
+                    contextMenu.Add(item);
 
-                    currentMenu.Add(
-                        new vimage.Common.ContextMenuItem
-                        {
-                            name = item.ItemName.Text,
-                            func = item.ItemFunction.Text.Trim(),
-                        }
-                    );
-                }
+                stack.Push((indent, item));
             }
+
+            return contextMenu;
         }
 
         private void LoadItems(
-            List<vimage.Common.ContextMenuItem> items,
+            List<ContextMenuItem> items,
             Panel panel,
             ContextMenuEditorCanvas canvas,
             ScrollViewer scroll,
             int indent = 0
         )
         {
-            for (int i = 0; i < items.Count; i++)
+            foreach (var item in items)
             {
-                if (items[i] is List<object> list)
-                {
-                    LoadItems(list, panel, canvas, scroll, indent + 1);
-                    continue;
-                }
-                var name = "";
-                object func = "";
-                if (items[i] is vimage.Common.ContextMenuItem cmi)
-                {
-                    name = cmi.name;
-                    func = cmi.func;
-                }
-                else if (items[i] is string str)
-                {
-                    name = str;
-                }
+                var row = new ContextMenuRow(
+                    item.Name,
+                    item.Func,
+                    this,
+                    panel,
+                    canvas,
+                    scroll,
+                    indent
+                );
+                _ = panel.Children.Add(row);
+                Items.Add(row);
 
-                var item = new ContextMenuItem(name, func, this, panel, canvas, scroll, indent);
-                _ = panel.Children.Add(item);
-                Items.Add(item);
+                Canvas.SetTop(row, row.MinHeight * (panel.Children.Count - 1));
 
-                Canvas.SetTop(item, item.MinHeight * (panel.Children.Count - 1));
+                if (item.Children != null && item.Children.Count > 0)
+                    LoadItems(item.Children, panel, canvas, scroll, indent + 1);
             }
         }
 
@@ -163,9 +123,9 @@ namespace vimage_settings
                     ? ContextMenuItems_GeneralScroll
                     : ContextMenuItems_AnimationScroll;
 
-            var item = new ContextMenuItem(
+            var item = new ContextMenuRow(
                 "",
-                "",
+                new ActionEnum(Action.None),
                 this,
                 panel,
                 canvas,
@@ -191,25 +151,25 @@ namespace vimage_settings
 
         private void Default_Click(object sender, RoutedEventArgs e)
         {
-            if (App.vimageConfig == null)
+            if (App.Config == null)
                 return;
 
             ContextMenuItems_General.Children.Clear();
             ContextMenuItems_Animation.Children.Clear();
             Items.Clear();
 
-            var defaultConfig = new vimage.Common.Config();
-            App.vimageConfig.ContextMenu = defaultConfig.ContextMenu;
-            App.vimageConfig.ContextMenu_Animation = defaultConfig.ContextMenu_Animation;
+            var defaultConfig = new Config();
+            App.Config.ContextMenu = [.. defaultConfig.ContextMenu];
+            App.Config.ContextMenu_Animation = [.. defaultConfig.ContextMenu_Animation];
 
             LoadItems(
-                App.vimageConfig.ContextMenu,
+                App.Config.ContextMenu,
                 ContextMenuItems_General,
                 ContextMenuItems_GeneralCanvas,
                 ContextMenuItems_GeneralScroll
             );
             LoadItems(
-                App.vimageConfig.ContextMenu_Animation,
+                App.Config.ContextMenu_Animation,
                 ContextMenuItems_Animation,
                 ContextMenuItems_AnimationCanvas,
                 ContextMenuItems_AnimationScroll

@@ -86,80 +86,8 @@ namespace vimage.Common
 
     public static partial class Actions
     {
-        public static List<string> Names =
-        [
-            "",
-            "DRAG",
-            "CLOSE",
-            "OPEN CONTEXT MENU",
-            "PREV IMAGE",
-            "NEXT IMAGE",
-            "ROTATE CLOCKWISE",
-            "ROTATE ANTICLOCKWISE",
-            "FLIP",
-            "FIT TO HEIGHT",
-            "FIT TO WIDTH",
-            "FIT TO AUTO",
-            "FIT TO ALT",
-            "ZOOM IN",
-            "ZOOM OUT",
-            "ZOOM FASTER",
-            "ZOOM ALT",
-            "DRAG LIMIT TO MONITOR BOUNDS",
-            "TOGGLE SMOOTHING",
-            "TOGGLE BACKGROUND",
-            "TOGGLE LOCK",
-            "ALWAYS ON TOP",
-            "CLICK-THROUGH_ABLE",
-            "TOGGLE TITLE BAR",
-            "TOGGLE ANIMATION",
-            "PREV FRAME",
-            "NEXT FRAME",
-            "SPEED INCREASE",
-            "SPEED DECREASE",
-            "SPEED RESET",
-            "OPEN SETTINGS",
-            "RESET IMAGE",
-            "OPEN FILE LOCATION",
-            "DELETE",
-            "COPY",
-            "COPY AS IMAGE",
-            "OPEN DUPLICATE",
-            "OPEN DUPLICATE FULL",
-            "RANDOM IMAGE",
-            "MOVE LEFT",
-            "MOVE RIGHT",
-            "MOVE UP",
-            "MOVE DOWN",
-            "TOGGLE IMAGE TRANSPARENCY",
-            "TRANSPARENCY INC",
-            "TRANSPARENCY DEC",
-            "CROP",
-            "UNDO CROP",
-            "EXIT ALL INSTANCES",
-            "RERENDER SVG",
-            "VISIT WEBSITE",
-            "SORT NAME",
-            "SORT DATE",
-            "SORT DATE MODIFIED",
-            "SORT DATE CREATED",
-            "SORT SIZE",
-            "SORT ASCENDING",
-            "SORT DESCENDING",
-        ];
-
-        public static string ToNameString(this Action action)
-        {
-            return Names[(int)action];
-        }
-
-        public static Action StringToAction(string action)
-        {
-            return (Action)Names.IndexOf(action);
-        }
-
         /// <summary>List of modifier actions that can be activated simultaneously.</summary>
-        public static readonly Action[] ModiferActions =
+        public static readonly Action[] ModifierActions =
         [
             Action.Crop,
             Action.Drag,

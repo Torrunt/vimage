@@ -5,22 +5,24 @@ using vimage.Common;
 namespace vimage_settings
 {
     /// <summary>
-    /// Interaction logic for CustomActionItem.xaml
+    /// Interaction logic for CustomActionRow.xaml
     /// </summary>
-    public partial class CustomActionItem : UserControl
+    public partial class CustomActionRow : UserControl
     {
         private readonly StackPanel ParentPanel;
         public int Index;
+        private string ActionName;
 
-        public CustomActionItem(int index, StackPanel parentPanel)
+        public CustomActionRow(int index, StackPanel parentPanel)
         {
             InitializeComponent();
 
             Index = index;
             ParentPanel = parentPanel;
 
-            ItemName.Text = App.vimageConfig?.CustomActions[Index].name;
-            ItemAction.Text = App.vimageConfig?.CustomActions[Index].func;
+            ActionName = App.Config?.CustomActions[Index].Name ?? "";
+            ItemName.Text = ActionName;
+            ItemAction.Text = App.Config?.CustomActions[Index].Func;
 
             ItemName.TextChanged += ItemName_TextChanged;
             ItemAction.TextChanged += ItemAction_TextChanged;
@@ -28,10 +30,10 @@ namespace vimage_settings
 
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
-            if (App.vimageConfig is not null)
+            if (App.Config is not null)
             {
-                App.vimageConfig.CustomActions.RemoveAt(Index);
-                App.vimageConfig.CustomActionBindings.RemoveAt(Index);
+                App.Config.CustomActions.RemoveAt(Index);
+                App.Config.CustomActionBindings.Remove(ActionName);
             }
 
             ParentPanel?.Children.Remove(this);
@@ -50,27 +52,34 @@ namespace vimage_settings
 
         private void ItemName_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (App.vimageConfig == null)
+            if (App.Config == null)
                 return;
-            App.vimageConfig.CustomActions[Index] = new CustomAction { name = ItemName.Text, func = ItemAction.Text };
+
+            var previousName = ActionName;
+            var binding = App.Config.CustomActionBindings[previousName];
+
+            App.Config.CustomActions[Index] = new CustomActionItem(ItemName.Text, ItemAction.Text);
+            ActionName = ItemName.Text;
 
             // update control binding
-            var bindings = App.vimageConfig.CustomActionBindings[Index].bindings;
-            App.vimageConfig.CustomActionBindings[Index] = new CustomActionBinding { name = ItemName.Text, bindings = bindings };
+            App.Config.CustomActionBindings.Remove(previousName);
+            App.Config.CustomActionBindings.Add(ActionName, binding);
 
             if (Application.Current.MainWindow is MainWindow mainWindow)
             {
                 // update controls tab
-                mainWindow.ControlBindings.CustomActionBindings[Index].ControlName.Content = ItemName.Text;
+                mainWindow.ControlBindings.CustomActionBindings[Index].ControlName.Content =
+                    ItemName.Text;
                 // update context menu function list
                 mainWindow.ContextMenuEditor.UpdateCustomActions();
             }
         }
+
         private void ItemAction_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (App.vimageConfig == null)
+            if (App.Config == null)
                 return;
-            App.vimageConfig.CustomActions[Index] = new CustomAction { name = ItemName.Text, func = ItemAction.Text };
+            App.Config.CustomActions[Index] = new CustomActionItem(ItemName.Text, ItemAction.Text);
         }
     }
 }

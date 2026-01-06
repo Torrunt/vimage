@@ -11,8 +11,7 @@ namespace vimage
 
         private static void Main(string[] args)
         {
-            string file =
-                @"C:\Users\torru\OneDrive\Pictures\Misc\vimage demostration images\AnimatedGif.gif";
+            string file = "";
             if (args.Length > 0)
             {
                 file = args[0];

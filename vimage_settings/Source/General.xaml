@@ -23,20 +23,20 @@
     </UserControl.Resources>
 
     <StackPanel>
-        <CheckBox IsChecked="{Binding Setting_OpenAtMousePosition}" Content="Open images at mouse position" ToolTip="When an image is opened it will be centered at the current mouse position (commonly where the image file is).&#x0a;Otherwise it will be centered on the current monitor."/>
-        <CheckBox IsChecked="{Binding Setting_SmoothingDefault}" Content="Smoothing"/>
-        <CheckBox IsChecked="{Binding Setting_Mipmapping}" Content="Mipmapping (smoother images when zoomed out)"/>
-        <CheckBox IsChecked="{Binding Setting_PositionLargeWideImagesInCorner}" Content="Position large/wide images in corner (ie: wallpapers/screenshots)" ToolTip="Images that are wider than or the same width as the current monitor will be placed in the top left corner."/>
-        <CheckBox IsChecked="{Binding Setting_LoopImageNavigation}" Content="Loop image navigation" ToolTip="Whether or not looping will occur when reaching the last/first image in the directory when using the next/prev image buttons."/>
-        <CheckBox IsChecked="{Binding Setting_PreloadNextImage}" Content="Image preloading" ToolTip="When using the next/prev image buttons, the image after the one just loaded will be loaded as well."/>
-        <CheckBox IsChecked="{Binding Setting_ClearMemoryOnResetImage}" Content="Clear Memory on reset image" ToolTip="When the Reset Image action is used, all textures/animations will be cleared from memory (except ones used for current image)."/>
-        <CheckBox IsChecked="{Binding Setting_ShowTitleBar}" Content="Show Title Bar" ToolTip="Shows the Windows Title Bar on images by default."/>
+        <CheckBox IsChecked="{Binding OpenAtMousePosition}" Content="Open images at mouse position" ToolTip="When an image is opened it will be centered at the current mouse position (commonly where the image file is).&#x0a;Otherwise it will be centered on the current monitor."/>
+        <CheckBox IsChecked="{Binding SmoothingDefault}" Content="Smoothing"/>
+        <CheckBox IsChecked="{Binding Mipmapping}" Content="Mipmapping (smoother images when zoomed out)"/>
+        <CheckBox IsChecked="{Binding PositionLargeWideImagesInCorner}" Content="Position large/wide images in corner (ie: wallpapers/screenshots)" ToolTip="Images that are wider than or the same width as the current monitor will be placed in the top left corner."/>
+        <CheckBox IsChecked="{Binding LoopImageNavigation}" Content="Loop image navigation" ToolTip="Whether or not looping will occur when reaching the last/first image in the directory when using the next/prev image buttons."/>
+        <CheckBox IsChecked="{Binding PreloadNextImage}" Content="Image preloading" ToolTip="When using the next/prev image buttons, the image after the one just loaded will be loaded as well."/>
+        <CheckBox IsChecked="{Binding ClearMemoryOnResetImage}" Content="Clear Memory on reset image" ToolTip="When the Reset Image action is used, all textures/animations will be cleared from memory (except ones used for current image)."/>
+        <CheckBox IsChecked="{Binding ShowTitleBar}" Content="Show Title Bar" ToolTip="Shows the Windows Title Bar on images by default."/>
         
-        <CheckBox IsChecked="{Binding Setting_BackgroundForImagesWithTransparencyDefault}" Content="Show background behind images with transparency" ToolTip="Images with partial transparency will have a background behind them." Margin="0,10"/>
+        <CheckBox IsChecked="{Binding BackgroundForImagesWithTransparencyDefault}" Content="Show background behind images with transparency" ToolTip="Images with partial transparency will have a background behind them." Margin="0,10"/>
         <DockPanel ToolTip="For transparent images (when transparency is turned off)." Height="15" Margin="0,0,0,10">
             <Border Style="{StaticResource ColourPickerBorder}" OverridesDefaultStyle="true" Width="14" Height="13" Margin="1,0,5,0" BorderThickness="1">
                 <DockPanel Width="13" Height="12" ClipToBounds="true" >
-                    <xctk:ColorPicker Width="17" Height="15" ShowTabHeaders="false" ColorMode="ColorCanvas" SelectedColor="{Binding Setting_BackgroundColour}" ShowDropDownButton="False" Padding="0" BorderThickness="0" Margin="-2,-4,0,0" />
+                    <xctk:ColorPicker Width="17" Height="15" ShowTabHeaders="false" ColorMode="ColorCanvas" SelectedColor="{Binding BackgroundColour}" ShowDropDownButton="False" Padding="0" BorderThickness="0" Margin="-2,-4,0,0" />
                 </DockPanel>
             </Border>
             <Label Content="Background colour" Padding="-4,0,0,0" Margin="0,-1,0,0"/>
@@ -44,7 +44,7 @@
         <DockPanel ToolTip="The transparency of the image when you press the 'Transparency Toggle' button." Height="15" Margin="0,0,0,10">
             <Border Style="{StaticResource ColourPickerBorder}" OverridesDefaultStyle="true" Width="14" Height="13" Margin="1,0,5,0" BorderThickness="1">
                 <DockPanel Width="13" Height="12" ClipToBounds="true" >
-                    <xctk:ColorPicker Width="17" Height="15" ShowTabHeaders="false" ColorMode="ColorCanvas" SelectedColor="{Binding Setting_TransparencyToggleValue}" ShowDropDownButton="False" Padding="0" BorderThickness="0" Margin="-2,-4,0,0" />
+                    <xctk:ColorPicker Width="17" Height="15" ShowTabHeaders="false" ColorMode="ColorCanvas" SelectedColor="{Binding TransparencyToggleValue}" ShowDropDownButton="False" Padding="0" BorderThickness="0" Margin="-2,-4,0,0" />
                 </DockPanel>
             </Border>
             <Label Content="Transparency toggle value" Padding="-4,0,0,0" Margin="0,-1,0,0"/>
@@ -52,7 +52,7 @@
         <DockPanel Height="15" Margin="0,0,0,10">
             <Border Style="{StaticResource ColourPickerBorder}" OverridesDefaultStyle="true" Width="14" Height="13" Margin="1,0,5,0" BorderThickness="1">
                 <DockPanel Width="13" Height="12" ClipToBounds="true" >
-                    <xctk:ColorPicker Width="17" Height="15" ShowTabHeaders="false" ColorMode="ColorCanvas" SelectedColor="{Binding Setting_CropToolFillColour}" ShowDropDownButton="False" Padding="0" BorderThickness="0" Margin="-2,-4,0,0" />
+                    <xctk:ColorPicker Width="17" Height="15" ShowTabHeaders="false" ColorMode="ColorCanvas" SelectedColor="{Binding CropToolFillColour}" ShowDropDownButton="False" Padding="0" BorderThickness="0" Margin="-2,-4,0,0" />
                 </DockPanel>
             </Border>
             <Label Content="Crop tool fill colour" Padding="-4,0,0,0" Margin="0,-1,0,0"/>
@@ -60,19 +60,19 @@
         <DockPanel Height="15" >
             <Border Style="{StaticResource ColourPickerBorder}" OverridesDefaultStyle="true" Width="14" Height="13" Margin="1,0,5,0" BorderThickness="1">
                 <DockPanel Width="13" Height="12" ClipToBounds="true" >
-                    <xctk:ColorPicker Width="17" Height="15" ShowTabHeaders="false" ColorMode="ColorCanvas" SelectedColor="{Binding Setting_CropToolOutlineColour}" ShowDropDownButton="False" Padding="0" BorderThickness="0" Margin="-2,-4,0,0" />
+                    <xctk:ColorPicker Width="17" Height="15" ShowTabHeaders="false" ColorMode="ColorCanvas" SelectedColor="{Binding CropToolOutlineColour}" ShowDropDownButton="False" Padding="0" BorderThickness="0" Margin="-2,-4,0,0" />
                 </DockPanel>
             </Border>
             <Label Content="Crop tool outline colour" Padding="-4,0,0,0" Margin="0,-1,0,0"/>
         </DockPanel>
         <DockPanel>
             <Label Content="Crop tool outline thickness" Margin="15,0,0,0"/>
-            <xctk:IntegerUpDown Value="{Binding Setting_CropToolOutlineThickness}" Minimum="0" Margin="10,0" Width="50" HorizontalAlignment="Right" />
+            <xctk:IntegerUpDown Value="{Binding CropToolOutlineThickness}" Minimum="0" Margin="10,0" Width="50" HorizontalAlignment="Right" />
         </DockPanel>
 
         <DockPanel Margin="0,10,0,0" ToolTip="How the image will be sized when using the next/prev image buttons.">
             <Label Content="Next/Prev Image Sizing"/>
-            <ComboBox SelectedIndex="{Binding Setting_ImageSizing, Converter={StaticResource EnumConverter}}" Margin="10,0" Width="100" HorizontalAlignment="Right" >
+            <ComboBox SelectedIndex="{Binding ImageSizing, Converter={StaticResource EnumConverter}}" Margin="10,0" Width="100" HorizontalAlignment="Right" >
                 <System:String>Fit Width</System:String>
                 <System:String>Fit Height</System:String>
                 <System:String>Fit Auto</System:String>
@@ -82,7 +82,7 @@
         </DockPanel>
         <DockPanel ToolTip="Applied when opening or resetting an image.">
             <Label Content="Limit images to monitor"/>
-            <ComboBox SelectedIndex="{Binding Setting_LimitImagesToMonitor}" Margin="10,0" Width="100" HorizontalAlignment="Right" >
+            <ComboBox SelectedIndex="{Binding LimitImagesToMonitor}" Margin="10,0" Width="100" HorizontalAlignment="Right" >
                 <System:String>NONE</System:String>
                 <System:String>HEIGHT</System:String>
                 <System:String>WIDTH</System:String>
@@ -91,40 +91,40 @@
         </DockPanel>
         <DockPanel ToolTip="Images smaller than this (in width or height) will automatically be scaled up to this size.">
             <Label Content="Min image size"/>
-            <xctk:IntegerUpDown Value="{Binding Setting_MinImageSize}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+            <xctk:IntegerUpDown Value="{Binding MinImageSize}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
         <DockPanel ToolTip="Smoothing will be turned off by default for images smaller than this.">
             <Label Content="Don't smooth images smaller than"/>
-            <xctk:IntegerUpDown Value="{Binding Setting_SmoothingMinImageSize}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+            <xctk:IntegerUpDown Value="{Binding SmoothingMinImageSize}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
         <DockPanel ToolTip="Speed at which the image resizes when zooming with Mouse Wheel.&#x0a;Also affects 'Transparency Hold'.">
             <Label Content="Zoom Speed"/>
-            <xctk:IntegerUpDown Value="{Binding Setting_ZoomSpeed}" FormatString="0\%" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+            <xctk:IntegerUpDown Value="{Binding ZoomSpeed}" FormatString="0\%" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
         <DockPanel ToolTip="Zoom speed when holding down 'Zoom Faster' (SHIFT by default).">
             <Label Content="Zoom Speed (Fast)"/>
-            <xctk:IntegerUpDown Value="{Binding Setting_ZoomSpeedFast}" FormatString="0\%" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+            <xctk:IntegerUpDown Value="{Binding ZoomSpeedFast}" FormatString="0\%" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
         <DockPanel ToolTip="Speed at which the image moves when using the movement key binds.">
             <Label Content="Move Speed"/>
-            <xctk:IntegerUpDown Value="{Binding Setting_MoveSpeed}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+            <xctk:IntegerUpDown Value="{Binding MoveSpeed}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
         <DockPanel ToolTip="Move speed when holding down 'Zoom Faster' (SHIFT by default).">
             <Label Content="Move Speed (Fast)"/>
-            <xctk:IntegerUpDown Value="{Binding Setting_MoveSpeedFast}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+            <xctk:IntegerUpDown Value="{Binding MoveSpeedFast}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
         <DockPanel ToolTip="The max amount of textures that vimage will keep in it's memory.">
             <Label Content="Max Textures in Memory"/>
-            <xctk:IntegerUpDown Value="{Binding Setting_MaxTextures}" Minimum="3" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+            <xctk:IntegerUpDown Value="{Binding MaxTextures}" Minimum="3" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
         <DockPanel ToolTip="The max amount of animated gifs that vimage will keep in it's memory.">
             <Label Content="Max Animations in Memory"/>
-            <xctk:IntegerUpDown Value="{Binding Setting_MaxAnimations}" Minimum="2" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+            <xctk:IntegerUpDown Value="{Binding MaxAnimations}" Minimum="2" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
         <DockPanel ToolTip="Default sorting when stepping through images in a folder.&#x0a;(FOLDER = Sort the same way Windows is sorting the folder)">
             <Label Content="Default Sorting" />
             <DockPanel HorizontalAlignment="Right">
-                <ComboBox SelectedIndex="{Binding Setting_DefaultSortBy, Converter={StaticResource EnumConverter}}" Width="100">
+                <ComboBox SelectedIndex="{Binding DefaultSortBy, Converter={StaticResource EnumConverter}}" Width="100">
                     <System:String>FOLDER</System:String>
                     <System:String>Name</System:String>
                     <System:String>Date</System:String>
@@ -132,7 +132,7 @@
                     <System:String>Date Created</System:String>
                     <System:String>Size</System:String>
                 </ComboBox>
-                <ComboBox SelectedIndex="{Binding Setting_DefaultSortDir, Converter={StaticResource EnumConverter}}" Margin="0,0,10,0" Width="100">
+                <ComboBox SelectedIndex="{Binding DefaultSortDir, Converter={StaticResource EnumConverter}}" Margin="0,0,10,0" Width="100">
                     <System:String>FOLDER</System:String>
                     <System:String>Ascending</System:String>
                     <System:String>Descending</System:String>
