@@ -56,14 +56,17 @@ namespace vimage
 
         private void LoadItemsInto(List<string> list, List<ContextMenuItem> items, int depth = 0)
         {
-            foreach (var item in items)
+            for (int i = 0; i < items.Count; i++)
             {
+                var item = items[i];
                 if (ImageViewer.File == "")
                 {
                     // Remove certain items if there is no file (looking at clipboard image)
                     if (item.Func == null && item.Name.StartsWith("Sort"))
                     {
-                        // remove Sort By submenu
+                        // remove Sort By submenu (and separator if there is one after it)
+                        if (i + 1 < items.Count && items[i + 1].Name == "-")
+                            i++;
                         continue;
                     }
                     if (item.Func is ActionEnum action)
@@ -137,7 +140,7 @@ namespace vimage
             for (int i = 0; i < items.Count; i++)
             {
                 ToolStripItem? item = null;
-                string name = items[i];
+                var name = items[i];
                 bool itemClickable = true;
 
                 if (name.Length > 0 && name.LastIndexOf(':') == name.Length - 1)
