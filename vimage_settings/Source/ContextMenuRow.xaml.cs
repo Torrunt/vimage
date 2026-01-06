@@ -69,7 +69,7 @@ namespace vimage_settings
 
             if (actionName == null || actionName.Length <= 0)
                 func = null;
-            else  if (Enum.TryParse<Action>(actionName, true, out var action))
+            else if (Enum.TryParse<Action>(actionName, true, out var action))
                 func = new ActionEnum(action);
             else
                 func = new CustomAction(ItemFunction.Text.Trim());
