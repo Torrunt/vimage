@@ -5,6 +5,12 @@ using vimage.Common;
 
 namespace vimage
 {
+    public enum MouseWheel
+    {
+        ScrollUp,
+        ScrollDown,
+    }
+
     public abstract record ControlInput;
 
     public record KeyInput(Keyboard.Key Key) : ControlInput;
@@ -19,6 +25,9 @@ namespace vimage
     {
         private Dictionary<ControlInput, ControlBinding> Bindings = ParseBindings(config);
 
+        /// <summary>
+        /// Updates the controls by parsing the control bindings from the config.
+        /// </summary>
         public void Update(Config config) => Bindings = ParseBindings(config);
 
         /// <summary>

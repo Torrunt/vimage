@@ -78,12 +78,6 @@ namespace vimage.Common
         Custom,
     }
 
-    public enum MouseWheel
-    {
-        ScrollUp,
-        ScrollDown,
-    }
-
     public static partial class Actions
     {
         /// <summary>List of modifier actions that can be activated simultaneously.</summary>
