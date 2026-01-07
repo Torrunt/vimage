@@ -58,8 +58,8 @@ namespace vimage.Common
         MoveDown,
 
         TransparencyToggle,
-        TransparencyInc,
-        TransparencyDec,
+        TransparencyIncrease,
+        TransparencyDecrease,
         Crop,
         UndoCrop,
         ExitAll,
@@ -95,7 +95,6 @@ namespace vimage.Common
             Action.FitToMonitorAlt,
             Action.ZoomAlt,
             Action.ZoomFaster,
-            Action.TransparencyToggle,
         ];
 
         /// <summary>List of actions that occur while a key/button is down.</summary>
@@ -105,8 +104,8 @@ namespace vimage.Common
             Action.PrevFrame,
             Action.PlaybackSpeedIncrease,
             Action.PlaybackSpeedDecrease,
-            Action.TransparencyInc,
-            Action.TransparencyDec,
+            Action.TransparencyIncrease,
+            Action.TransparencyDecrease,
             Action.ZoomIn,
             Action.ZoomOut,
             Action.MoveLeft,

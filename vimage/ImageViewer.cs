@@ -92,8 +92,6 @@ namespace vimage
         private bool PreloadingImage = false;
         public SortBy SortImagesBy = SortBy.Name;
         public SortDirection SortImagesByDir = SortDirection.Ascending;
-        private bool ImageTransparencyHold = false;
-        private bool ImageTransparencyTweaked = false;
 
         /// <summary>Bitmap of image loaded in via Clipboard (used to copy it back into clipboard).</summary>
         private System.Drawing.Bitmap? ClipboardBitmap;
@@ -554,26 +552,34 @@ namespace vimage
                     return;
 
                 case Action.MoveLeft:
+                    if (Dragging)
+                        return;
                     NextWindowPos.X -= ZoomFaster ? Config.MoveSpeedFast : Config.MoveSpeed;
                     Window.Position = NextWindowPos;
                     return;
                 case Action.MoveRight:
+                    if (Dragging)
+                        return;
                     NextWindowPos.X += ZoomFaster ? Config.MoveSpeedFast : Config.MoveSpeed;
                     Window.Position = NextWindowPos;
                     return;
                 case Action.MoveUp:
+                    if (Dragging)
+                        return;
                     NextWindowPos.Y -= ZoomFaster ? Config.MoveSpeedFast : Config.MoveSpeed;
                     Window.Position = NextWindowPos;
                     return;
                 case Action.MoveDown:
+                    if (Dragging)
+                        return;
                     NextWindowPos.Y += ZoomFaster ? Config.MoveSpeedFast : Config.MoveSpeed;
                     Window.Position = NextWindowPos;
                     return;
 
-                case Action.TransparencyInc:
+                case Action.TransparencyIncrease:
                     AdjustImageTransparency(-1);
                     return;
-                case Action.TransparencyDec:
+                case Action.TransparencyDecrease:
                     AdjustImageTransparency(1);
                     return;
 
@@ -640,24 +646,20 @@ namespace vimage
 
             var dir = e.Delta > 0 ? MouseWheel.ScrollUp : MouseWheel.ScrollDown;
 
-            var a = Controls.GetActionFromInput(new MouseWheelInput(dir));
+            var (a, isKeyCombo) = Controls.GetActionFromInput(new MouseWheelInput(dir));
             if (a == null)
                 return;
-            if (a is ActionEnum action)
-            {
-                // Prevent zooming while cropping or using transparency modifier
-                if (
-                    (Cropping || ImageTransparencyHold)
-                    && (action.Value == Action.ZoomIn || action.Value == Action.ZoomOut)
-                )
-                    return;
 
-                DoAction(action.Value);
-            }
-            else if (a is CustomAction customAction)
+            if (a is CustomAction customAction)
             {
                 DoCustomAction(customAction.Value);
+                return;
             }
+            if (a is not ActionEnum action)
+                return;
+
+            DoAction(action.Value);
+            LastAction = isKeyCombo ? action.Value : Action.None;
         }
 
         private void OnMouseDown(object? sender, MouseButtonEventArgs e)
@@ -706,10 +708,6 @@ namespace vimage
                         case Action.FitToMonitorAlt:
                             FitToMonitorAlt = false;
                             break;
-                        case Action.TransparencyToggle:
-                            // Note: this toggle button is also used as a modifier
-                            DoAction(Action.TransparencyToggle);
-                            break;
                         case Action.Crop:
                             if (Cropping)
                                 CropEnd();
@@ -718,23 +716,20 @@ namespace vimage
                 }
             }
 
-            var a = Controls.GetActionFromInput(value);
+            var (a, _) = Controls.GetActionFromInput(value);
             if (a == null)
-                return;
-
-            if (a is CustomAction customAction)
-            {
-                if (LastAction != Action.None)
-                    return;
-                DoCustomAction(customAction.Value);
-                return;
-            }
-
-            if (a is not ActionEnum action)
                 return;
 
             // Prevent action from triggering on control up if an action just happened on control down
             if (LastAction != Action.None)
+                return;
+
+            if (a is CustomAction customAction)
+            {
+                DoCustomAction(customAction.Value);
+                return;
+            }
+            if (a is not ActionEnum action)
                 return;
 
             // Prevent action if locked (unless unlocking or opening context menu)
@@ -742,10 +737,6 @@ namespace vimage
                 Locked
                 && !(action.Value == Action.ToggleLock || action.Value == Action.OpenContextMenu)
             )
-                return;
-
-            // Prevent zoom in/out while cropping
-            if (Cropping && (action.Value == Action.ZoomIn || action.Value == Action.ZoomOut))
                 return;
 
             DoAction(action.Value);
@@ -759,7 +750,6 @@ namespace vimage
             var modifiers = Controls.GetModifierActionsFromInput(value);
             if (modifiers.Count > 0)
             {
-                LastAction = Action.None;
                 foreach (var m in modifiers)
                 {
                     switch (m)
@@ -781,10 +771,6 @@ namespace vimage
                         case Action.FitToMonitorAlt:
                             FitToMonitorAlt = true;
                             break;
-                        case Action.TransparencyToggle:
-                            ImageTransparencyHold = true;
-                            LastAction = Action.TransparencyToggle;
-                            break;
                         case Action.Crop:
                             if (Cropping)
                                 break;
@@ -796,27 +782,11 @@ namespace vimage
                 return;
             }
 
-            var a = Controls.GetActionFromInput(value, true);
+            var (a, _) = Controls.GetActionFromInput(value, true);
             if (a == null)
                 return;
 
             if (a is not ActionEnum action)
-                return;
-
-            // Prevent move actions while dragging
-            if (
-                Dragging
-                && (
-                    action.Value == Action.MoveLeft
-                    || action.Value == Action.MoveRight
-                    || action.Value == Action.MoveUp
-                    || action.Value == Action.MoveDown
-                )
-            )
-                return;
-
-            // Prevent zoom in/out while cropping
-            if (Cropping && (action.Value == Action.ZoomIn || action.Value == Action.ZoomOut))
                 return;
 
             DoAction(action.Value);
@@ -881,6 +851,10 @@ namespace vimage
 
         private void Zoom(float value, bool center = false, bool manualZoom = false)
         {
+            // Prevent zooming while cropping
+            if (Cropping)
+                return;
+
             // Limit zooming to prevent the going past the GPU's max texture size
             if (value > CurrentZoom && (uint)Math.Ceiling(Size.X * value) >= Texture.MaximumSize)
                 value = CurrentZoom;
@@ -1345,12 +1319,6 @@ namespace vimage
 
         public bool ToggleImageTransparency(int val = -1)
         {
-            if (ImageTransparencyHold && ImageTransparencyTweaked)
-            {
-                ImageTransparencyHold = false;
-                ImageTransparencyTweaked = false;
-                return false;
-            }
             if ((val == -1 && ImageColor == Color.White) || val == 1)
             {
                 var colour = System.Drawing.ColorTranslator.FromHtml(
@@ -1368,31 +1336,17 @@ namespace vimage
 
         public void AdjustImageTransparency(int amount = 1)
         {
-            if (ImageTransparencyHold)
-                ImageTransparencyTweaked = true;
-            var color = new Color(
-                ImageColor.R,
-                ImageColor.G,
-                ImageColor.B,
-                (byte)
-                    Math.Clamp(
-                        ImageColor.A
-                            + (
-                                amount
-                                * (
-                                    255
-                                    * (
-                                        ZoomFaster
-                                            ? (Config.ZoomSpeedFast / 100f)
-                                            : (Config.ZoomSpeed / 100f)
-                                    )
-                                )
-                            ),
-                        2,
-                        255
-                    )
+            var adjustment =
+                amount
+                * (255 * (ZoomFaster ? (Config.ZoomSpeedFast / 100f) : (Config.ZoomSpeed / 100f)));
+            SetImageColor(
+                new Color(
+                    ImageColor.R,
+                    ImageColor.G,
+                    ImageColor.B,
+                    (byte)Math.Clamp(ImageColor.A + adjustment, 2, 255)
+                )
             );
-            SetImageColor(color);
             Updated = true;
         }
 

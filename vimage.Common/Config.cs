@@ -149,8 +149,8 @@ namespace vimage.Common
             [Action.MoveDown] = ["CTRL+DOWN", "RCTRL+DOWN"],
 
             [Action.TransparencyToggle] = ["T"],
-            [Action.TransparencyInc] = ["T+SCROLLDOWN"],
-            [Action.TransparencyDec] = ["T+SCROLLUP"],
+            [Action.TransparencyIncrease] = ["T+SCROLLDOWN"],
+            [Action.TransparencyDecrease] = ["T+SCROLLUP"],
             [Action.Crop] = ["X"],
             [Action.UndoCrop] = ["CTRL+Z"],
             [Action.ExitAll] = ["SHIFT+ESC"],

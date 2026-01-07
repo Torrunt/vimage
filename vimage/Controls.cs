@@ -13,16 +13,86 @@ namespace vimage
 
     public record MouseWheelInput(MouseWheel Wheel) : ControlInput;
 
-    public struct ControlBinding
-    {
-        public List<(ActionFunc Action, List<ControlInput> ComboKeys)> Actions;
-    }
+    public class ControlBinding : List<(ActionFunc Action, List<ControlInput> ComboKeys)>;
 
     internal class Controls(Config config)
     {
         private Dictionary<ControlInput, ControlBinding> Bindings = ParseBindings(config);
 
         public void Update(Config config) => Bindings = ParseBindings(config);
+
+        /// <summary>
+        /// Returns the action that should happen based on control input
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="controlDown">If true; will only return bindings that can occur while a key/button is down.</param>
+        public (ActionFunc?, bool isKeyCombo) GetActionFromInput(
+            ControlInput input,
+            bool controlDown = false
+        )
+        {
+            if (!Bindings.TryGetValue(input, out var binding))
+                return (null, false);
+            ActionFunc? action = null;
+            int comboLength = 0;
+            foreach (var b in binding)
+            {
+                // Skip if action is not a hold-down action (if controlDown is true)
+                if (
+                    controlDown
+                    && (b.Action is not ActionEnum a || !Actions.HoldDownActions.Contains(a.Value))
+                )
+                    continue;
+                // Skip if action is a modifier action
+                else if (b.Action is ActionEnum m && Actions.ModifierActions.Contains(m.Value))
+                    continue;
+
+                // Skip if we already have an action unless this one is a longer combo
+                if (action != null && comboLength >= b.ComboKeys?.Count)
+                    continue;
+
+                if (b.ComboKeys == null || b.ComboKeys.Count <= 0)
+                {
+                    action = b.Action;
+                    continue;
+                }
+
+                var comboKeysActive = true;
+                foreach (var comboKey in b.ComboKeys)
+                {
+                    if (comboKey is not KeyInput keyInput)
+                        continue;
+                    if (Keyboard.IsKeyPressed(keyInput.Key))
+                        continue;
+                    comboKeysActive = false;
+                    break;
+                }
+                if (!comboKeysActive)
+                    continue;
+
+                action = b.Action;
+                comboLength = b.ComboKeys.Count;
+            }
+            return (action, comboLength > 0);
+        }
+
+        /// <summary>
+        /// Returns the modifier actions that should happen based on control input
+        /// </summary>
+        /// <param name="value"></param>
+        public List<Action> GetModifierActionsFromInput(ControlInput input)
+        {
+            if (!Bindings.TryGetValue(input, out var binding))
+                return [];
+            List<Action> actions = [];
+            foreach (var b in binding)
+            {
+                if (b.Action is not ActionEnum a || !Actions.ModifierActions.Contains(a.Value))
+                    continue;
+                actions.Add(a.Value);
+            }
+            return actions;
+        }
 
         private static Dictionary<ControlInput, ControlBinding> ParseBindings(Config config)
         {
@@ -67,82 +137,12 @@ namespace vimage
                 if (key == null)
                     continue;
 
-                if (!bindings.TryAdd(key, new ControlBinding() { Actions = [(action, keys)] }))
-                    bindings[key].Actions.Add((action, keys));
+                if (!bindings.TryAdd(key, [(action, keys)]))
+                    bindings[key].Add((action, keys));
             }
         }
 
-        /// <summary>
-        /// Returns the action that should happen based on control input
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="controlDown">If true; will only return bindings that can occur while a key/button is down.</param>
-        public ActionFunc? GetActionFromInput(ControlInput input, bool controlDown = false)
-        {
-            if (!Bindings.TryGetValue(input, out var binding))
-                return null;
-            ActionFunc? action = null;
-            int comboLength = 0;
-            foreach (var b in binding.Actions)
-            {
-                // Skip if action is not a hold-down action (if controlDown is true)
-                if (
-                    controlDown
-                    && (b.Action is not ActionEnum a || !Actions.HoldDownActions.Contains(a.Value))
-                )
-                    continue;
-                // Skip if action is a modifier action
-                else if (b.Action is ActionEnum m && Actions.ModifierActions.Contains(m.Value))
-                    continue;
-
-                // Skip if we already have an action unless this one is a longer combo
-                if (action != null && comboLength >= b.ComboKeys?.Count)
-                    continue;
-
-                if (b.ComboKeys == null || b.ComboKeys.Count <= 0)
-                {
-                    action = b.Action;
-                    continue;
-                }
-
-                var comboKeysActive = true;
-                foreach (var comboKey in b.ComboKeys)
-                {
-                    if (comboKey is not KeyInput keyInput)
-                        continue;
-                    if (Keyboard.IsKeyPressed(keyInput.Key))
-                        continue;
-                    comboKeysActive = false;
-                    break;
-                }
-                if (!comboKeysActive)
-                    continue;
-
-                action = b.Action;
-                comboLength = b.ComboKeys.Count;
-            }
-            return action;
-        }
-
-        /// <summary>
-        /// Returns the modifier actions that should happen based on control input
-        /// </summary>
-        /// <param name="value"></param>
-        public List<Action> GetModifierActionsFromInput(ControlInput input)
-        {
-            if (!Bindings.TryGetValue(input, out var binding))
-                return [];
-            List<Action> actions = [];
-            foreach (var b in binding.Actions)
-            {
-                if (b.Action is not ActionEnum a || !Actions.ModifierActions.Contains(a.Value))
-                    continue;
-                actions.Add(a.Value);
-            }
-            return actions;
-        }
-
-        public static ControlInput? ParseControlInput(string value)
+        private static ControlInput? ParseControlInput(string value)
         {
             ControlInput? parsed = value switch
             {
