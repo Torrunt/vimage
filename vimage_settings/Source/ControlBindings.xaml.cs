@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using vimage.Common;
+using Action = vimage.Common.Action;
 
 namespace vimage_settings
 {
@@ -18,12 +20,23 @@ namespace vimage_settings
 
             if (App.Config == null)
                 return;
-            foreach (var c in App.Config.Controls)
-                ControlsPanel.Children.Add(new ControlItem(c.Key.ToString(), c.Value));
+            foreach (var action in Enum.GetValues<Action>())
+            {
+                if (action == Action.None || action == Action.Custom)
+                    continue;
+                _ = App.Config.Controls.TryGetValue(action, out var controls);
+                ControlsPanel.Children.Add(new ControlItem(action.ToString(), controls ?? []));
+            }
 
             CustomActionBindings = [];
-            foreach (var c in App.Config.CustomActionBindings)
-                AddCustomActionBinding(c.Key, c.Value);
+            foreach (var customAction in App.Config.CustomActions)
+            {
+                _ = App.Config.CustomActionBindings.TryGetValue(
+                    customAction.Name,
+                    out var controls
+                );
+                AddCustomActionBinding(customAction.Name, controls ?? []);
+            }
         }
 
         public void AddCustomActionBinding(string actionName, List<string> bindings)
