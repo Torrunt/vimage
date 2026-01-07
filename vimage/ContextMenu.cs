@@ -62,7 +62,11 @@ namespace vimage
                 if (ImageViewer.File == "")
                 {
                     // Remove certain items if there is no file (looking at clipboard image)
-                    if (item.Func == null && item.Name.StartsWith("Sort"))
+                    if (
+                        item.Name.StartsWith("sort", StringComparison.InvariantCultureIgnoreCase)
+                        && item.Children != null
+                        && item.Children.Count > 0
+                    )
                     {
                         // remove Sort By submenu (and separator if there is one after it)
                         if (i + 1 < items.Count && items[i + 1].Name == "-")
@@ -91,6 +95,13 @@ namespace vimage
                 }
                 else
                 {
+                    // Separator
+                    if (item.Name == "-")
+                    {
+                        list.Add(VariableAmountOfStrings(depth, ":") + "-");
+                        continue;
+                    }
+
                     // Item
                     if (FuncByName.ContainsKey(item.Name))
                         continue;

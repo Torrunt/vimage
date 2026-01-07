@@ -6,8 +6,12 @@ namespace vimage_settings
 {
     public partial class App : Application
     {
-        private static Config config = new();
-        public static Config Config { get => config; set => config = value; }
+        private static Config? config;
+        public static Config? Config
+        {
+            get => config;
+            set => config = value;
+        }
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -15,7 +19,7 @@ namespace vimage_settings
 
             try
             {
-                Config.Load(
+                config = Config.Load(
                     System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json")
                 );
             }
@@ -27,6 +31,5 @@ namespace vimage_settings
                 );
             }
         }
-
     }
 }

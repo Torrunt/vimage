@@ -37,6 +37,8 @@ namespace vimage_settings
 
         public void Save()
         {
+            if (App.Config == null)
+                return;
             App.Config.ContextMenu.Clear();
             App.Config.ContextMenu_Animation.Clear();
 

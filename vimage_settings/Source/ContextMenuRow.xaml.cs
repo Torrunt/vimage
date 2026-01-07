@@ -102,7 +102,7 @@ namespace vimage_settings
 
         public void UpdateCustomActions()
         {
-            if (CustomActionsStartIndex == -1)
+            if (CustomActionsStartIndex == -1 || App.Config == null)
                 return;
 
             int prevSelected = ItemFunction.SelectedIndex;
