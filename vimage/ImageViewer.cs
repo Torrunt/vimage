@@ -28,7 +28,7 @@ namespace vimage
         public readonly float ZOOM_MAX = 75f;
 
         public RenderWindow Window;
-        public object? Image;
+        public SFML.ObjectBase? Image;
         public string File = "";
         public List<string> FolderContents = [];
         public int FolderPosition = 0;
@@ -151,8 +151,8 @@ namespace vimage
                 Config.BackgroundForImagesWithTransparencyDefault;
             var backColour = System.Drawing.ColorTranslator.FromHtml(Config.BackgroundColour);
             BackgroundColour = new Color(backColour.R, backColour.G, backColour.B, backColour.A);
-            Graphics.MAX_TEXTURES = (uint)Config.MaxTextures;
-            Graphics.MAX_ANIMATIONS = (uint)Config.MaxAnimations;
+            Graphics.MaxTextures = (uint)Config.MaxTextures;
+            Graphics.MaxAnimations = (uint)Config.MaxAnimations;
             Graphics.TextureMaxSize = Math.Min(Graphics.TextureMaxSize, 8192);
             ShowTitleBar = Config.ShowTitleBar;
             if (ShowTitleBar)
@@ -219,7 +219,7 @@ namespace vimage
             Redraw();
             Updated = false;
             _ = Window.SetActive();
-            ViewStateHistory = [];
+            ViewStateHistory.Clear();
 
             // Get/Set Folder Sorting
             // (threaded to avoid potential hang when having to check Windows for current folder sorting)
@@ -241,7 +241,7 @@ namespace vimage
                 Config.ContextMenu_Animation,
                 Config.ContextMenu_Animation_InsertAtIndex
             );
-            ContextMenu.Setup(false);
+            ContextMenu.Setup(true);
 
             // Interaction
             Window.Closed += OnWindowClosed;
@@ -1265,7 +1265,7 @@ namespace vimage
             // Temporarily set always on top to bring it infront of the taskbar?
             ForceAlwaysOnTopCheck(bounds, workingArea);
 
-            ViewStateHistory = [];
+            ViewStateHistory.Clear();
 
             if (Config.ClearMemoryOnResetImage)
                 Graphics.ClearMemory(Image, File);
@@ -1640,10 +1640,10 @@ namespace vimage
                 },
                 false
             );
-            if (texture == null || texture is not Texture tex)
+            if (texture == null || texture is not SingleTexture tex)
                 return;
 
-            Image = new Sprite(new Texture(tex));
+            Image = new Sprite(tex.Texture);
             ResetSize();
 
             Window.SetView(
@@ -1756,15 +1756,8 @@ namespace vimage
             );
 
             // Dispose of previous image
-            if (Image != null)
-            {
-                if (Image is DisplayObject obj)
-                    obj.Dispose();
-                else if (Image is Sprite sprite)
-                    sprite.Dispose();
-                Image = null;
-                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-            }
+            Image?.Dispose();
+            Image = null;
 
             // Load new image
             if (fileName != "" && !LoadImage(fileName))
@@ -1953,29 +1946,12 @@ namespace vimage
             ForceAlwaysOnTopCheck(bounds, ImageViewerUtils.GetCurrentWorkingArea(boundsPos));
 
             Window.SetTitle(fileName == "" ? "vimage" : Path.GetFileName(fileName) + " - vimage");
-            ContextMenu?.Setup(false);
+            ContextMenu?.Setup();
 
             if (NextWindowSize.X == bounds.Width && NextWindowSize.Y == bounds.Height)
                 DWM.PreventExlusiveFullscreen(Window); // prevent exlusive fullscreen when image is the same size as current screen
 
-            ViewStateHistory = [];
-
-            return true;
-        }
-
-        /// <summary>Loads an image into memory but doesn't set it as the displayed image.</summary>
-        private static bool PreloadImage(string fileName)
-        {
-            if (ImageViewerUtils.IsAnimatedImage(fileName))
-            {
-                if (Graphics.GetAnimatedImageData(fileName) is null)
-                    return false;
-            }
-            else
-            {
-                if (Graphics.GetTexture(fileName) is null)
-                    return false;
-            }
+            ViewStateHistory.Clear();
 
             return true;
         }
@@ -1999,7 +1975,7 @@ namespace vimage
                 else
                     return;
 
-                success = PreloadImage(FolderContents[pos]);
+                success = Graphics.PreloadImage(FolderContents[pos]);
             } while (!success);
 
             PreloadingNextImage = 0;
@@ -2176,16 +2152,13 @@ namespace vimage
             if (File == "")
                 return;
 
-            string fileName = File;
+            var fileName = File;
 
             GetFolderContents();
             if (FolderContents.Count == 1)
             {
-                if (Image is DisplayObject obj)
-                    obj.Dispose();
-                else if (Image is Sprite sprite)
-                    sprite.Dispose();
-                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+                Image?.Dispose();
+                Image = null;
                 Window.Close();
             }
             else

@@ -50,28 +50,27 @@ namespace vimage.Display
         public Sprite Sprite;
         public new Texture Texture
         {
-            get { return Sprite.Texture; }
+            get => Sprite.Texture;
             private set { }
         }
 
         public int CurrentFrame;
         public int TotalFrames
         {
-            get { return Data.Frames.Length; }
+            get => Data.Frames.Length;
             private set { }
         }
 
         public bool Playing = true;
-        private bool _Looping = true;
         public bool Looping
         {
-            get { return _Looping; }
+            get;
             set
             {
-                _Looping = value;
+                field = value;
                 Finished = false;
             }
-        }
+        } = true;
         public bool Finished = false;
 
         /// <summary> Keeps track of when to change frame. Resets on frame change. </summary>

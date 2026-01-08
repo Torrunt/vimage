@@ -9,63 +9,65 @@ using SFML.System;
 
 namespace vimage.Display
 {
+    public abstract record TextureType;
+
+    public record SingleTexture(Texture Texture) : TextureType;
+
+    public record SplitTexture(DisplayObject DisplayObject) : TextureType;
+
     /// <summary>
     /// Graphics Manager.
     /// Loads and stores Textures and AnimatedImageDatas.
-    /// </summary>
+    /// /// </summary>
     internal class Graphics
     {
-        private static readonly List<Texture> Textures = [];
-        private static readonly List<string> TextureFileNames = [];
+        private static readonly OrderedDictionary<string, TextureType> Textures = [];
+        private static readonly OrderedDictionary<string, AnimatedImageData> AnimatedImageDatas =
+        [];
 
-        private static readonly List<AnimatedImageData> AnimatedImageDatas = [];
-        private static readonly List<string> AnimatedImageDataFileNames = [];
-
-        private static readonly List<DisplayObject> SplitTextures = [];
-        private static readonly List<string> SplitTextureFileNames = [];
-
-        public static uint MAX_TEXTURES = 80;
-        public static uint MAX_ANIMATIONS = 8;
+        public static uint MaxTextures = 80;
+        public static uint MaxAnimations = 8;
         public static uint TextureMaxSize = Texture.MaximumSize;
 
-        public static object? GetImage(string fileName, MagickReadSettings? settings = null)
+        public static SFML.ObjectBase? GetImage(
+            string fileName,
+            MagickReadSettings? settings = null
+        )
         {
-            int index = TextureFileNames.IndexOf(fileName);
+            TextureType? texture = null;
 
-            if (index >= 0)
+            lock (Textures)
             {
-                // Texture Already Exists
-                // move it to the end of the array and return it
-                var texture = Textures[index];
-                var name = TextureFileNames[index];
-
-                Textures.RemoveAt(index);
-                TextureFileNames.RemoveAt(index);
-                Textures.Add(texture);
-                TextureFileNames.Add(name);
-
-                return new Sprite(Textures[^1]);
+                int index = Textures.IndexOf(fileName);
+                if (index >= 0)
+                {
+                    // Texture Already Exists
+                    // move it to the end of the array and return it
+                    var (name, existingTexture) = Textures.GetAt(index);
+                    Textures.RemoveAt(index);
+                    Textures.Add(name, existingTexture);
+                    texture = existingTexture;
+                }
             }
-            else
+
+            if (texture == null)
             {
                 // New Texture
                 try
                 {
-                    var texture = GetTexture(fileName, settings);
-                    if (texture == null)
-                        return null;
-                    if (texture is Texture tex)
-                        return new Sprite(new Texture(tex));
-                    else if (texture is DisplayObject displayObject)
-                        return displayObject;
+                    texture = GetTexture(fileName, settings);
                 }
                 catch (Exception) { }
             }
 
+            if (texture is SingleTexture tex)
+                return new Sprite(tex.Texture);
+            else if (texture is SplitTexture splitTexture)
+                return splitTexture.DisplayObject;
             return null;
         }
 
-        public static object? GetTexture(
+        public static TextureType? GetTexture(
             string fileName,
             MagickReadSettings? settings = null,
             bool cache = true
@@ -75,9 +77,12 @@ namespace vimage.Display
             if (image is null)
                 return null;
 
+            TextureType output;
+
             if (image.Width > TextureMaxSize || image.Height > TextureMaxSize)
             {
-                return GetLargeTexture(image, TextureMaxSize, cache ? fileName : null);
+                // Image is too large -> split it up into multiple textures
+                output = new SplitTexture(GetLargeTexture(image, TextureMaxSize));
             }
             else
             {
@@ -85,21 +90,23 @@ namespace vimage.Display
                 var bytes = pixels.ToByteArray(PixelMapping.RGBA);
                 var texture = new Texture(image.Width, image.Height);
                 texture.Update(bytes);
-                if (cache)
-                {
-                    Textures.Add(texture);
-                    TextureFileNames.Add(fileName);
-                }
-
-                return texture;
+                output = new SingleTexture(texture);
             }
+
+            if (!cache)
+                return output;
+
+            lock (Textures)
+            {
+                Textures.Add(fileName, output);
+                // Limit amount of textures in memory
+                if (Textures.Count > MaxTextures)
+                    RemoveTexture();
+            }
+            return output;
         }
 
-        private static DisplayObject GetLargeTexture(
-            MagickImage image,
-            uint sectionSize,
-            string? fileName = null
-        )
+        private static DisplayObject GetLargeTexture(MagickImage image, uint sectionSize)
         {
             var amount = new Vector2u(
                 (uint)Math.Ceiling((float)image.Width / sectionSize),
@@ -128,15 +135,6 @@ namespace vimage.Display
                     texture.Update(bytes);
                     var sprite = new Sprite(texture) { Position = new Vector2f(pos.X, pos.Y) };
                     largeTexture.AddChild(sprite);
-
-                    if (fileName is not null)
-                    {
-                        Textures.Add(texture);
-                        TextureFileNames.Add(
-                            fileName + "_" + ix.ToString("00") + "_" + iy.ToString("00") + "^"
-                        );
-                    }
-
                     pos.X += w;
                 }
                 pos.Y += h;
@@ -144,13 +142,28 @@ namespace vimage.Display
             }
 
             largeTexture.Texture.Size = new Vector2u(image.Width, image.Height);
-            if (fileName is not null)
+            return largeTexture;
+        }
+
+        /// <summary>Loads an image into memory but doesn't set it as the displayed image.</summary>
+        public static bool PreloadImage(string fileName)
+        {
+            if (Utils.ImageViewerUtils.IsAnimatedImage(fileName))
             {
-                SplitTextures.Add(largeTexture);
-                SplitTextureFileNames.Add(fileName);
+                lock (AnimatedImageDatas)
+                {
+                    if (AnimatedImageDatas.ContainsKey(fileName))
+                        return true;
+                }
+                return GetAnimatedImageData(fileName) is not null;
             }
 
-            return largeTexture;
+            lock (Textures)
+            {
+                if (Textures.ContainsKey(fileName))
+                    return true;
+            }
+            return GetTexture(fileName) is not null;
         }
 
         public static MagickImage? GetMagickImage(
@@ -195,21 +208,16 @@ namespace vimage.Display
         {
             lock (AnimatedImageDatas)
             {
-                int index = AnimatedImageDataFileNames.IndexOf(fileName);
+                var index = AnimatedImageDatas.IndexOf(fileName);
 
                 if (index >= 0)
                 {
                     // AnimatedImageData Already Exists
                     // move it to the end of the array and return it
-                    var data = AnimatedImageDatas[index];
-                    string name = AnimatedImageDataFileNames[index];
-
+                    var (name, data) = AnimatedImageDatas.GetAt(index);
                     AnimatedImageDatas.RemoveAt(index);
-                    AnimatedImageDataFileNames.RemoveAt(index);
-                    AnimatedImageDatas.Add(data);
-                    AnimatedImageDataFileNames.Add(name);
-
-                    return AnimatedImageDatas[^1];
+                    AnimatedImageDatas.Add(name, data);
+                    return data;
                 }
                 else
                 {
@@ -217,11 +225,10 @@ namespace vimage.Display
                     var data = new AnimatedImageData();
 
                     // Store AnimatedImageData
-                    AnimatedImageDatas.Add(data);
-                    AnimatedImageDataFileNames.Add(fileName);
+                    AnimatedImageDatas.Add(fileName, data);
 
-                    // Limit amount of Animations in Memory
-                    if (AnimatedImageDatas.Count > MAX_ANIMATIONS)
+                    // Limit amount of animations in memory
+                    if (AnimatedImageDatas.Count > MaxAnimations)
                         RemoveAnimatedImage();
 
                     // Get Frames
@@ -276,54 +283,28 @@ namespace vimage.Display
         public static void ClearMemory(object? image, string file = "")
         {
             // Remove all AnimatedImages (except the one that's currently being viewed)
-            int s = image is AnimatedImage ? 1 : 0;
-            int a = 0;
-            while (AnimatedImageDatas.Count > s)
+            lock (AnimatedImageDatas)
             {
-                if (
-                    s == 1
-                    && image is AnimatedImage animatedImage
-                    && animatedImage.Data == AnimatedImageDatas[a]
-                )
-                    a++;
-                RemoveAnimatedImage(a);
+                int s = image is AnimatedImage ? 1 : 0;
+                while (AnimatedImageDatas.Count > s)
+                    RemoveAnimatedImage();
             }
 
-            if (image is AnimatedImage)
+            lock (Textures)
             {
-                // Remove all Textures
-                while (TextureFileNames.Count > 0)
-                    RemoveTexture();
-            }
-            else
-            {
-                // Remove all Textures (except ones being used by current image)
-                if (file == "")
-                    return;
-
-                s = 0;
-                a = 0;
-                if (SplitTextureFileNames.Contains(file))
+                if (image is AnimatedImage)
                 {
-                    for (int i = 0; i < TextureFileNames.Count; i++)
-                    {
-                        if (TextureFileNames[i].StartsWith(file))
-                            s++;
-                        else if (s > 0)
-                            break;
-                    }
-                    while (TextureFileNames.Count > s)
-                    {
-                        if (TextureFileNames[a].StartsWith(file))
-                            a += s;
-                        RemoveTexture(a);
-                    }
+                    // Remove all Textures
+                    while (Textures.Count > 0)
+                        RemoveTexture();
                 }
                 else
                 {
-                    while (TextureFileNames.Count > 1)
+                    // Remove all Textures (except ones being used by current image)
+                    int a = 0;
+                    while (Textures.Count > 1)
                     {
-                        if (TextureFileNames[a] == file)
+                        if (Textures.GetAt(0).Key == file)
                             a++;
                         RemoveTexture(a);
                     }
@@ -335,49 +316,45 @@ namespace vimage.Display
             GC.WaitForPendingFinalizers();
         }
 
-        public static void RemoveTexture(int t = 0)
+        public static void RemoveTexture(int index = 0)
         {
-            if (TextureFileNames[t].IndexOf('^') == TextureFileNames[t].Length - 1)
+            var (_, texture) = Textures.GetAt(index);
+
+            if (texture is SplitTexture splitTexture)
             {
-                // if part of split texture - remove all parts
-                string name = TextureFileNames[t][..^7];
-
-                int i;
-                for (i = t + 1; i < TextureFileNames.Count; i++)
+                List<Sprite> sprites = [];
+                for (int i = splitTexture.DisplayObject.NumChildren - 1; i >= 0; i--)
                 {
-                    if (!TextureFileNames[i].StartsWith(name))
-                        break;
+                    var child = splitTexture.DisplayObject.GetChildAt(i);
+                    if (child is not Sprite sprite)
+                        continue;
+                    sprites.Add(sprite);
                 }
-                for (int d = t; d < i; d++)
+                splitTexture.DisplayObject.Clear();
+                splitTexture.DisplayObject.Dispose();
+                foreach (var sprite in sprites)
                 {
-                    Textures[t]?.Dispose();
-                    Textures.RemoveAt(t);
-                    TextureFileNames.RemoveAt(t);
-                }
-
-                int splitIndex =
-                    SplitTextureFileNames.Count == 0 ? -1 : SplitTextureFileNames.IndexOf(name);
-                if (splitIndex != -1)
-                {
-                    SplitTextures.RemoveAt(splitIndex);
-                    SplitTextureFileNames.RemoveAt(splitIndex);
+                    sprite.Texture.Dispose();
+                    sprite.Dispose();
                 }
             }
-            else
+            else if (texture is SingleTexture singleTexture)
             {
-                Textures[t]?.Dispose();
-                Textures.RemoveAt(t);
-                TextureFileNames.RemoveAt(t);
+                singleTexture.Texture.Dispose();
             }
+            Textures.RemoveAt(index);
         }
 
-        public static void RemoveAnimatedImage(int a = 0)
+        public static void RemoveAnimatedImage(int index = 0)
         {
-            AnimatedImageDatas[a].CancelLoading = true;
-            for (int i = 0; i < AnimatedImageDatas[a].Frames.Length; i++)
-                AnimatedImageDatas[a]?.Frames[i]?.Dispose();
-            AnimatedImageDatas.RemoveAt(a);
-            AnimatedImageDataFileNames.RemoveAt(a);
+            var (_, data) = AnimatedImageDatas.GetAt(index);
+            if (data != null)
+            {
+                data.CancelLoading = true;
+                for (int i = 0; i < data.Frames.Length; i++)
+                    data.Frames[i]?.Dispose();
+            }
+            AnimatedImageDatas.RemoveAt(index);
         }
     }
 

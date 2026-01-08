@@ -7,14 +7,19 @@ using Action = vimage.Common.Action;
 
 namespace vimage
 {
+    public enum ContextMenuType
+    {
+        Default,
+        AnimatedImage,
+    }
+
     internal class ContextMenu : ContextMenuStrip
     {
         private readonly ImageViewer ImageViewer;
-        public int Setting = -1;
-        private List<string> Items_General = [];
-        private List<string> Items_Animation = [];
-
-        private Dictionary<string, ActionFunc> FuncByName = [];
+        private ContextMenuType Type = ContextMenuType.Default;
+        private readonly List<string> Items_General = [];
+        private readonly List<string> Items_Animation = [];
+        private readonly Dictionary<string, ActionFunc> FuncByName = [];
 
         public int FileNameItem = -1;
         public string FileNameCurrent = ".";
@@ -35,14 +40,15 @@ namespace vimage
             int AnimationInsertAtIndex
         )
         {
-            FuncByName = [];
+            FuncByName.Clear();
+            Items_General.Clear();
+            Items_Animation.Clear();
 
             // General
-            Items_General = [];
             LoadItemsInto(Items_General, General);
 
             // Animation
-            Items_Animation = [.. Items_General];
+            Items_Animation.InsertRange(0, Items_General);
             List<string> list = [];
 
             // inserting into submenu?
@@ -122,31 +128,29 @@ namespace vimage
             }
         }
 
-        public void Setup(bool force)
+        public void Setup(bool force = false)
         {
-            if (
-                !force
-                && (
-                    (Setting == 0 && ImageViewer.Image is not AnimatedImage)
-                    || (Setting == 1 && ImageViewer.Image is AnimatedImage)
-                )
-            )
+            var targetType =
+                ImageViewer.Image is AnimatedImage
+                    ? ContextMenuType.AnimatedImage
+                    : ContextMenuType.Default;
+
+            if (!force && Type == targetType)
                 return;
 
+            foreach (var i in Items)
+            {
+                if (i is not ToolStripItem item)
+                    continue;
+                item.Click -= ContexMenuItemClicked;
+                item.MouseEnter -= ItemMouseEnter;
+                item.MouseLeave -= ItemMouseLeave;
+            }
             Items.Clear();
             ShowImageMargin = ImageViewer.Config.ContextMenuShowMargin;
 
-            List<string> items;
-            if (ImageViewer.Image is AnimatedImage)
-            {
-                Setting = 1;
-                items = Items_Animation;
-            }
-            else
-            {
-                Setting = 0;
-                items = Items_General;
-            }
+            Type = targetType;
+            var items = Type == ContextMenuType.AnimatedImage ? Items_Animation : Items_General;
 
             for (int i = 0; i < items.Count; i++)
             {
@@ -180,9 +184,7 @@ namespace vimage
                                 && dropDownItem.DropDownItems[dropDownItem.DropDownItems.Count - 1]
                                     is ToolStripDropDownItem subDropDownitem
                             )
-                            {
                                 dropDownItem = subDropDownitem;
-                            }
                             name = name[1..];
                         }
 
@@ -201,6 +203,11 @@ namespace vimage
                 {
                     if (itemClickable)
                         item.Click += ContexMenuItemClicked;
+                    if (name.Contains("[filename"))
+                    {
+                        item.MouseEnter += ItemMouseEnter;
+                        item.MouseLeave += ItemMouseLeave;
+                    }
                     item.Name = name;
                 }
             }
@@ -258,8 +265,6 @@ namespace vimage
                                 )
                                 + (b < item.Length - 1 ? item[(b + 1)..] : "");
                             fileNameItem.ToolTipText = fileName.Length > nameLength ? fileName : "";
-                            fileNameItem.MouseEnter += ItemMouseEnter;
-                            fileNameItem.MouseLeave += ItemMouseLeave;
                         }
                     }
                 }

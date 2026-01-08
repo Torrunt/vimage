@@ -40,7 +40,6 @@ namespace vimage.Common
         Auto,
     }
 
-    [Serializable]
     public class ContextMenuItem(
         string name,
         ActionFunc? func = null,
@@ -52,14 +51,12 @@ namespace vimage.Common
         public List<ContextMenuItem>? Children = children;
     }
 
-    [Serializable]
     public class CustomActionItem(string name, string func)
     {
         public string Name = name;
         public string Func = func;
     }
 
-    [Serializable]
     public class Config
     {
         public bool OpenAtMousePosition { get; set; } = true;
