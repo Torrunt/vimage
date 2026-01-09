@@ -1668,6 +1668,14 @@ namespace vimage
         {
             File = fileName;
 
+            // Check if file still exists
+            if (!System.IO.File.Exists(fileName))
+            {
+                Graphics.RemoveFileFromMemory(fileName);
+                FolderContents.Remove(fileName);
+                return false;
+            }
+
             if (ImageViewerUtils.IsAnimatedImage(fileName))
                 Image = Graphics.GetAnimatedImage(fileName);
             else
@@ -1958,7 +1966,7 @@ namespace vimage
 
         private void PreloadNextImage()
         {
-            if (PreloadingImage || PreloadingNextImage == 0 || FolderContents.Count == 0)
+            if (PreloadingImage || PreloadingNextImage == 0 || FolderContents.Count <= 1)
                 return;
 
             PreloadingImage = true;
@@ -2164,7 +2172,8 @@ namespace vimage
             else
             {
                 NextImage();
-                FolderContents.Clear();
+                Graphics.RemoveFileFromMemory(fileName);
+                FolderContents.Remove(fileName);
             }
 
             Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(

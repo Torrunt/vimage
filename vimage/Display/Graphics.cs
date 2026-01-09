@@ -25,7 +25,7 @@ namespace vimage.Display
         private static readonly OrderedDictionary<string, AnimatedImageData> AnimatedImageDatas =
         [];
 
-        public static uint MaxTextures = 80;
+        public static uint MaxTextures = 40;
         public static uint MaxAnimations = 8;
         public static uint TextureMaxSize = Texture.MaximumSize;
 
@@ -148,6 +148,9 @@ namespace vimage.Display
         /// <summary>Loads an image into memory but doesn't set it as the displayed image.</summary>
         public static bool PreloadImage(string fileName)
         {
+            if (!File.Exists(fileName))
+                return false;
+
             if (Utils.ImageViewerUtils.IsAnimatedImage(fileName))
             {
                 lock (AnimatedImageDatas)
@@ -355,6 +358,19 @@ namespace vimage.Display
                     data.Frames[i]?.Dispose();
             }
             AnimatedImageDatas.RemoveAt(index);
+        }
+
+        public static void RemoveFileFromMemory(string fileName)
+        {
+            var index = Textures.IndexOf(fileName);
+            if (index != -1)
+            {
+                RemoveTexture(index);
+                return;
+            }
+            index = AnimatedImageDatas.IndexOf(fileName);
+            if (index != -1)
+                RemoveAnimatedImage(index);
         }
     }
 
