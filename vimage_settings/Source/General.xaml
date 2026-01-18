@@ -82,11 +82,11 @@
         </DockPanel>
         <DockPanel ToolTip="Applied when opening or resetting an image.">
             <Label Content="Limit images to monitor"/>
-            <ComboBox SelectedIndex="{Binding LimitImagesToMonitor}" Margin="10,0" Width="100" HorizontalAlignment="Right" >
-                <System:String>NONE</System:String>
-                <System:String>HEIGHT</System:String>
-                <System:String>WIDTH</System:String>
-                <System:String>AUTO</System:String>
+            <ComboBox SelectedIndex="{Binding LimitImagesToMonitor, Converter={StaticResource EnumConverter}}" Margin="10,0" Width="100" HorizontalAlignment="Right" >
+                <System:String>None</System:String>
+                <System:String>Height</System:String>
+                <System:String>Width</System:String>
+                <System:String>Auto</System:String>
             </ComboBox>
         </DockPanel>
         <DockPanel ToolTip="Images smaller than this (in width or height) will automatically be scaled up to this size.">
