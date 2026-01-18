@@ -30,6 +30,7 @@
                     -centerY 0.0<LineBreak />
                     -colour #FFFFFFFF<LineBreak />
                     -alpha 0<LineBreak />
+                    -speed 0.0<LineBreak />
                     <LineBreak />
                     -frame 0<LineBreak />
                     -next<LineBreak />
@@ -69,7 +70,8 @@
                     position of the view center (use with sizeX/sizeY to crop view)<LineBreak />
                     <LineBreak />
                     image tint (white = no tint)<LineBreak />
-                    the transparency of the image (0-255)<LineBreak />
+                    transparency of the image (0-255)<LineBreak />
+                    playback speed of animated images (1 = 100%)<LineBreak />
                     <LineBreak />
                     set the current frame of the animated gif<LineBreak />
                     go to the next image<LineBreak />

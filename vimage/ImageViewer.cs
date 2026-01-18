@@ -842,6 +842,21 @@ namespace vimage
             );
         }
 
+        public void SetPlaybackSpeed(float speed = 1)
+        {
+            if (Image is not AnimatedImage animatedImage)
+                return;
+
+            if (speed == 0)
+            {
+                animatedImage.Stop();
+                return;
+            }
+            animatedImage.SpeedMultiplier = speed;
+            if (!animatedImage.Playing)
+                animatedImage.Play();
+        }
+
         public void ResetPlaybackSpeed()
         {
             if (Image is not AnimatedImage animatedImage)
@@ -2501,6 +2516,12 @@ namespace vimage
                                 SetImageTransparency((byte)val);
                             i++;
                         }
+                        break;
+                    case "-speed":
+                        if (!float.TryParse(args[i + 1], out valf))
+                            valf = 0;
+                        SetPlaybackSpeed(valf);
+                        i++;
                         break;
 
                     case "-frame":
