@@ -23,7 +23,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SFML.Window" Version="2.6.1" />
     <Reference Include="Xceed.Wpf.Toolkit">
       <HintPath>.\Xceed.Wpf.Toolkit.dll</HintPath>
     </Reference>

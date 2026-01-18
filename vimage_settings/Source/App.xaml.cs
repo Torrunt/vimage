@@ -6,7 +6,12 @@ namespace vimage_settings
 {
     public partial class App : Application
     {
-        public static Config vimageConfig = new();
+        private static Config? config;
+        public static Config? Config
+        {
+            get => config;
+            set => config = value;
+        }
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -14,8 +19,8 @@ namespace vimage_settings
 
             try
             {
-                vimageConfig.Load(
-                    System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt")
+                config = Config.Load(
+                    System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json")
                 );
             }
             catch (UnauthorizedAccessException)

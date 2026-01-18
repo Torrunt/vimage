@@ -1,7 +1,10 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace vimage.Common
 {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum Action
     {
         None,
@@ -35,6 +38,9 @@ namespace vimage.Common
         PauseAnimation,
         PrevFrame,
         NextFrame,
+        PlaybackSpeedIncrease,
+        PlaybackSpeedDecrease,
+        PlaybackSpeedReset,
 
         OpenSettings,
         ResetImage,
@@ -52,8 +58,8 @@ namespace vimage.Common
         MoveDown,
 
         TransparencyToggle,
-        TransparencyInc,
-        TransparencyDec,
+        TransparencyIncrease,
+        TransparencyDecrease,
         Crop,
         UndoCrop,
         ExitAll,
@@ -74,74 +80,33 @@ namespace vimage.Common
 
     public static partial class Actions
     {
-        public static List<string> Names =
+        /// <summary>List of modifier actions that can be activated simultaneously.</summary>
+        public static readonly Action[] ModifierActions =
         [
-            "",
-            "DRAG",
-            "CLOSE",
-            "OPEN CONTEXT MENU",
-            "PREV IMAGE",
-            "NEXT IMAGE",
-            "ROTATE CLOCKWISE",
-            "ROTATE ANTICLOCKWISE",
-            "FLIP",
-            "FIT TO HEIGHT",
-            "FIT TO WIDTH",
-            "FIT TO AUTO",
-            "FIT TO ALT",
-            "ZOOM IN",
-            "ZOOM OUT",
-            "ZOOM FASTER",
-            "ZOOM ALT",
-            "DRAG LIMIT TO MONITOR BOUNDS",
-            "TOGGLE SMOOTHING",
-            "TOGGLE BACKGROUND",
-            "TOGGLE LOCK",
-            "ALWAYS ON TOP",
-            "CLICK-THROUGH_ABLE",
-            "TOGGLE TITLE BAR",
-            "TOGGLE ANIMATION",
-            "PREV FRAME",
-            "NEXT FRAME",
-            "OPEN SETTINGS",
-            "RESET IMAGE",
-            "OPEN FILE LOCATION",
-            "DELETE",
-            "COPY",
-            "COPY AS IMAGE",
-            "OPEN DUPLICATE",
-            "OPEN DUPLICATE FULL",
-            "RANDOM IMAGE",
-            "MOVE LEFT",
-            "MOVE RIGHT",
-            "MOVE UP",
-            "MOVE DOWN",
-            "TOGGLE IMAGE TRANSPARENCY",
-            "TRANSPARENCY INC",
-            "TRANSPARENCY DEC",
-            "CROP",
-            "UNDO CROP",
-            "EXIT ALL INSTANCES",
-            "RERENDER SVG",
-            "VISIT WEBSITE",
-            "SORT NAME",
-            "SORT DATE",
-            "SORT DATE MODIFIED",
-            "SORT DATE CREATED",
-            "SORT SIZE",
-            "SORT ASCENDING",
-            "SORT DESCENDING",
+            Action.Crop,
+            Action.Drag,
+            Action.DragLimitToMonitorBounds,
+            Action.FitToMonitorAlt,
+            Action.ZoomAlt,
+            Action.ZoomFaster,
         ];
 
-        public static string ToNameString(this Action action)
-        {
-            return Names[(int)action];
-        }
-
-        public static Action StringToAction(string action)
-        {
-            return (Action)Names.IndexOf(action);
-        }
+        /// <summary>List of actions that occur while a key/button is down.</summary>
+        public static readonly Action[] HoldDownActions =
+        [
+            Action.NextFrame,
+            Action.PrevFrame,
+            Action.PlaybackSpeedIncrease,
+            Action.PlaybackSpeedDecrease,
+            Action.TransparencyIncrease,
+            Action.TransparencyDecrease,
+            Action.ZoomIn,
+            Action.ZoomOut,
+            Action.MoveLeft,
+            Action.MoveRight,
+            Action.MoveUp,
+            Action.MoveDown,
+        ];
 
         /// <summary>List of actions that can be used in the Context Menu.</summary>
         public static readonly Action[] MenuActions =
@@ -175,6 +140,9 @@ namespace vimage.Common
             Action.PauseAnimation,
             Action.NextFrame,
             Action.PrevFrame,
+            Action.PlaybackSpeedIncrease,
+            Action.PlaybackSpeedDecrease,
+            Action.PlaybackSpeedReset,
             Action.OpenSettings,
             Action.VisitWebsite,
             Action.SortName,
@@ -191,5 +159,55 @@ namespace vimage.Common
         /// </summary>
         [GeneratedRegex("(?<=^[^\"]*(?:\"[^\"]*\"[^\"]*)*) (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)")]
         public static partial Regex CustomActionSplitRegex();
+    }
+
+    /// <summary>
+    /// Either a Action enum or the name of a custom action.
+    /// </summary>
+    [JsonConverter(typeof(ActionFuncConverter))]
+    public abstract record ActionFunc;
+
+    public record CustomAction(string Value) : ActionFunc;
+
+    public record ActionEnum(Action Value) : ActionFunc;
+
+    public sealed class ActionFuncConverter : JsonConverter<ActionFunc>
+    {
+        public override ActionFunc Read(
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options
+        )
+        {
+            if (reader.TokenType != JsonTokenType.String)
+                throw new JsonException();
+
+            var value = reader.GetString()!;
+
+            // Check if Action enum
+            if (Enum.TryParse<Action>(value, out var action))
+                return new ActionEnum(action);
+
+            return new CustomAction(value);
+        }
+
+        public override void Write(
+            Utf8JsonWriter writer,
+            ActionFunc value,
+            JsonSerializerOptions options
+        )
+        {
+            switch (value)
+            {
+                case ActionEnum a:
+                    writer.WriteStringValue(a.Value.ToString());
+                    break;
+                case CustomAction s:
+                    writer.WriteStringValue(s.Value);
+                    break;
+                default:
+                    throw new JsonException();
+            }
+        }
     }
 }

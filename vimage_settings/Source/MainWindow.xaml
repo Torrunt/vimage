@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:vimage_settings"
         mc:Ignorable="d"
         Title="vimage settings"
-        Height="{Binding Setting_SettingsAppHeight, Mode=TwoWay}" Width="{Binding Setting_SettingsAppWidth, Mode=TwoWay}"
+        Height="{Binding SettingsAppHeight, Mode=TwoWay}" Width="{Binding SettingsAppWidth, Mode=TwoWay}"
         WindowStartupLocation="CenterScreen"
         Icon="../Resources/icon.ico" MinWidth="450" MinHeight="300">
     <DockPanel>

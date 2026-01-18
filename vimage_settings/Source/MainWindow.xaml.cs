@@ -13,7 +13,7 @@ namespace vimage_settings
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = App.vimageConfig;
+            DataContext = App.Config;
         }
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
@@ -28,8 +28,8 @@ namespace vimage_settings
 
             try
             {
-                App.vimageConfig?.Save(
-                    System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.txt")
+                App.Config?.Save(
+                    System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json")
                 );
             }
             catch (UnauthorizedAccessException)

@@ -4,7 +4,7 @@ using SFML.System;
 
 namespace vimage.Display
 {
-    internal class DisplayObject : Transformable, Drawable
+    public class DisplayObject : Transformable, Drawable
     {
         private readonly List<Transformable> Children = [];
         private int DrawListIndex = 0;
@@ -21,7 +21,7 @@ namespace vimage.Display
 
         public int NumChildren
         {
-            get { return Children.Count; }
+            get => Children.Count;
         }
 
         public void AddChild(Transformable child)
@@ -169,55 +169,52 @@ namespace vimage.Display
                 Rotation += amount;
         }
 
-        public Color _Color = Color.White;
         public Color Color
         {
-            get { return _Color; }
+            get;
             set
             {
-                _Color = value;
+                field = value;
                 for (int i = 0; i < Children.Count; i++)
                 {
                     if (Children[i] is Sprite spite)
-                        spite.Color = _Color;
+                        spite.Color = field;
                     else if (Children[i] is DisplayObject displayObject)
-                        displayObject.Color = _Color;
+                        displayObject.Color = field;
                 }
             }
-        }
+        } = Color.White;
     }
 
-    internal class TextureInfo(DisplayObject obj)
+    public class TextureInfo(DisplayObject obj)
     {
         private readonly DisplayObject Obj = obj;
         public Vector2u Size = new();
 
-        private bool _Smooth = true;
         public bool Smooth
         {
-            get { return _Smooth; }
+            get;
             set
             {
-                _Smooth = value;
+                field = value;
                 for (int i = 0; i < Obj.NumChildren; i++)
                 {
                     var child = Obj.GetChildAt(i);
                     if (child is Sprite sprite)
-                        sprite.Texture.Smooth = _Smooth;
+                        sprite.Texture.Smooth = field;
                     else if (child is DisplayObject displayObject)
-                        displayObject.Texture.Smooth = _Smooth;
+                        displayObject.Texture.Smooth = field;
                 }
             }
-        }
+        } = true;
 
-        private bool _Mipmap = true;
         public bool Mipmap
         {
-            get { return _Mipmap; }
+            get;
             set
             {
-                _Mipmap = value;
-                if (!_Mipmap)
+                field = value;
+                if (!field)
                     return;
 
                 for (int i = 0; i < Obj.NumChildren; i++)
@@ -229,6 +226,6 @@ namespace vimage.Display
                         displayObject.Texture.Mipmap = true;
                 }
             }
-        }
+        } = true;
     }
 }

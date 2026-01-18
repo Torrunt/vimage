@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using vimage.Common;
+using Action = vimage.Common.Action;
 
 namespace vimage_settings
 {
@@ -16,28 +18,34 @@ namespace vimage_settings
         {
             InitializeComponent();
 
-            if (App.vimageConfig == null)
+            if (App.Config == null)
                 return;
-            for (int i = 0; i < App.vimageConfig.Controls.Count; i++)
+            foreach (var action in Enum.GetValues<Action>())
             {
-                var item = new ControlItem(App.vimageConfig.ControlNames[i], App.vimageConfig.Controls[i]);
-                _ = ControlsPanel.Children.Add(item);
+                if (action == Action.None || action == Action.Custom)
+                    continue;
+                _ = App.Config.Controls.TryGetValue(action, out var controls);
+                ControlsPanel.Children.Add(new ControlItem(action.ToString(), controls ?? []));
             }
+
             CustomActionBindings = [];
-            for (int i = 0; i < App.vimageConfig.CustomActionBindings.Count; i++)
+            foreach (var customAction in App.Config.CustomActions)
             {
-                AddCustomActionBinding(i);
+                _ = App.Config.CustomActionBindings.TryGetValue(
+                    customAction.Name,
+                    out var controls
+                );
+                AddCustomActionBinding(customAction.Name, controls ?? []);
             }
         }
-        public void AddCustomActionBinding(int index)
+
+        public void AddCustomActionBinding(string actionName, List<string> bindings)
         {
-            if (App.vimageConfig.CustomActionBindings[index] is CustomActionBinding cab)
-            {
-                var item = new ControlItem(cab.name, cab.bindings);
-                _ = ControlsPanel.Children.Add(item);
-                CustomActionBindings.Add(item);
-            }
+            var item = new ControlItem(actionName, bindings);
+            _ = ControlsPanel.Children.Add(item);
+            CustomActionBindings.Add(item);
         }
+
         public void RemoveCustomActionBinding(int index)
         {
             ControlsPanel.Children.Remove(CustomActionBindings[index]);
@@ -46,8 +54,12 @@ namespace vimage_settings
 
         private void Default_Click(object sender, RoutedEventArgs e)
         {
+            if (App.Config == null)
+                return;
+
             // Reset Controls to Default
-            App.vimageConfig.SetDefaultControls();
+            var defaultConfig = new Config();
+            App.Config.Controls = new Dictionary<Action, List<string>>(defaultConfig.Controls);
 
             foreach (ControlItem item in ControlsPanel.Children)
                 item.UpdateBindings();
