@@ -82,6 +82,7 @@ namespace vimage.Common
         public int ZoomSpeedFast { get; set; } = 10;
         public int MoveSpeed { get; set; } = 2;
         public int MoveSpeedFast { get; set; } = 10;
+        public int AdjustPlaybackSpeedAmount { get; set; } = 10;
         public int MaxTextures { get; set; } = 80;
         public int MaxAnimations { get; set; } = 8;
         public int MaxTextureSize { get; set; } = 10000;

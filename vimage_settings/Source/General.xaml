@@ -113,6 +113,10 @@
             <Label Content="Move Speed (Fast)"/>
             <xctk:IntegerUpDown Value="{Binding MoveSpeedFast}" FormatString="0px" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
         </DockPanel>
+        <DockPanel ToolTip="Percentage amount to adjust animation playback speed (-/+ by default).">
+            <Label Content="Adjust Animation Playback Speed Amount"/>
+            <xctk:IntegerUpDown Value="{Binding AdjustPlaybackSpeedAmount}" FormatString="0\%" Minimum="0" Margin="10,0" Width="100" HorizontalAlignment="Right" />
+        </DockPanel>
         <DockPanel ToolTip="The max amount of textures that vimage will keep in it's memory.">
             <Label Content="Max Textures in Memory"/>
             <xctk:IntegerUpDown Value="{Binding MaxTextures}" Minimum="3" Margin="10,0" Width="100" HorizontalAlignment="Right" />

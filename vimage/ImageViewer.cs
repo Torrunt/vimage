@@ -514,10 +514,10 @@ namespace vimage
                     _ = ToggleAnimation();
                     return;
                 case Action.PlaybackSpeedIncrease:
-                    AdjustPlaybackSpeed(0.1f);
+                    AdjustPlaybackSpeed(Config.AdjustPlaybackSpeedAmount / 100f);
                     return;
                 case Action.PlaybackSpeedDecrease:
-                    AdjustPlaybackSpeed(-0.1f);
+                    AdjustPlaybackSpeed(-(Config.AdjustPlaybackSpeedAmount / 100f));
                     return;
                 case Action.PlaybackSpeedReset:
                     ResetPlaybackSpeed();
@@ -837,7 +837,7 @@ namespace vimage
             if (Image is not AnimatedImage animatedImage)
                 return;
             animatedImage.SpeedMultiplier = Math.Max(
-                0.1f,
+                Config.AdjustPlaybackSpeedAmount / 100f,
                 (float)Math.Round(animatedImage.SpeedMultiplier + increment, 2)
             );
         }
