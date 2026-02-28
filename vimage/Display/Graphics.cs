@@ -88,7 +88,7 @@ namespace vimage.Display
             {
                 using var pixels = image.GetPixels();
                 var bytes = pixels.ToByteArray(PixelMapping.RGBA);
-                var texture = new Texture(image.Width, image.Height);
+                var texture = new Texture((image.Width, image.Height));
                 texture.Update(bytes);
                 output = new SingleTexture(texture);
             }
@@ -130,7 +130,7 @@ namespace vimage.Display
                     var w = Math.Min(currentSize.X, sectionSize);
                     currentSize.X -= w;
 
-                    var texture = new Texture(w, h);
+                    var texture = new Texture((w, h));
                     var bytes = pixels.ToByteArray((int)pos.X, (int)pos.Y, w, h, PixelMapping.RGBA);
                     texture.Update(bytes);
                     var sprite = new Sprite(texture) { Position = new Vector2f(pos.X, pos.Y) };
@@ -423,7 +423,7 @@ namespace vimage.Display
 
             using var pixels = frame.GetPixelsUnsafe();
             var bytes = pixels.ToByteArray(PixelMapping.RGBA);
-            var texture = new Texture(frame.Width, frame.Height);
+            var texture = new Texture((frame.Width, frame.Height));
             texture.Update(bytes);
 
             Data.Frames[index] = texture;

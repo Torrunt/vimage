@@ -21,19 +21,15 @@ namespace vimage.Utils
                     continue;
 
                 return new IntRect(
-                    screen.WorkingArea.X,
-                    screen.WorkingArea.Y,
-                    screen.WorkingArea.Width,
-                    screen.WorkingArea.Height
+                    (screen.WorkingArea.X, screen.WorkingArea.Y),
+                    (screen.WorkingArea.Width, screen.WorkingArea.Height)
                 );
             }
             var firstScreen = System.Windows.Forms.Screen.AllScreens.ElementAt(0);
 
             return new IntRect(
-                firstScreen.WorkingArea.X,
-                firstScreen.WorkingArea.Y,
-                firstScreen.WorkingArea.Width,
-                firstScreen.WorkingArea.Height
+                (firstScreen.WorkingArea.X, firstScreen.WorkingArea.Y),
+                (firstScreen.WorkingArea.Width, firstScreen.WorkingArea.Height)
             );
         }
 
@@ -62,19 +58,15 @@ namespace vimage.Utils
                 }
 
                 return new IntRect(
-                    screen.Bounds.X,
-                    screen.Bounds.Y,
-                    screen.Bounds.Width,
-                    screen.Bounds.Height
+                    (screen.Bounds.X, screen.Bounds.Y),
+                    (screen.Bounds.Width, screen.Bounds.Height)
                 );
             }
 
             return returnBackupScreen
                 ? new IntRect(
-                    backupScreen.Bounds.X,
-                    backupScreen.Bounds.Y,
-                    backupScreen.Bounds.Width,
-                    backupScreen.Bounds.Height
+                    (backupScreen.Bounds.X, backupScreen.Bounds.Y),
+                    (backupScreen.Bounds.Width, backupScreen.Bounds.Height)
                 )
                 : new IntRect();
         }

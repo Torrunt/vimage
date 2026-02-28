@@ -4,7 +4,7 @@ using SFML.System;
 
 namespace vimage.Display
 {
-    public class DisplayObject : Transformable, Drawable
+    public class DisplayObject : Transformable, IDrawable
     {
         private readonly List<Transformable> Children = [];
         private int DrawListIndex = 0;
@@ -87,7 +87,7 @@ namespace vimage.Display
 
         public virtual void OnRemoved() { }
 
-        public void Draw(RenderTarget Target, RenderStates states)
+        public void Draw(IRenderTarget Target, RenderStates states)
         {
             states.Transform *= Transform;
             for (DrawListIndex = 0; DrawListIndex < Children.Count; DrawListIndex++)
@@ -97,7 +97,7 @@ namespace vimage.Display
                     if (displayObject.Visible)
                         displayObject.Draw(Target, states);
                 }
-                else if (Children[DrawListIndex] is Drawable drawable)
+                else if (Children[DrawListIndex] is IDrawable drawable)
                     drawable.Draw(Target, states);
             }
         }

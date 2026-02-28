@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using SFML.System;
 using vimage.Common;
 using vimage.Display;
 using Action = vimage.Common.Action;
@@ -32,6 +33,13 @@ namespace vimage
             this.ImageViewer = ImageViewer;
 
             SetupToolTip();
+        }
+
+        public void Open(Vector2i position)
+        {
+            RefreshItems();
+            Show(position.X, position.Y);
+            Capture = true;
         }
 
         public void LoadItems(

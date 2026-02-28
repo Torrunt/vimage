@@ -104,7 +104,12 @@ namespace vimage
             var mousePos = Mouse.GetPosition();
 
             // Create Window
-            Window = new RenderWindow(new VideoMode(0, 0), File + " - vimage", Styles.None)
+            Window = new RenderWindow(
+                new VideoMode((0, 0)),
+                File + " - vimage",
+                Styles.None,
+                State.Windowed
+            )
             {
                 Position = mousePos,
             };
@@ -116,7 +121,7 @@ namespace vimage
                 fEnable = true,
                 hRgnBlur = DWM.CreateRectRgn(0, 0, -1, -1),
             };
-            DWM.DwmEnableBlurBehindWindow(Window.SystemHandle, ref bb);
+            DWM.DwmEnableBlurBehindWindow(Window.NativeHandle, ref bb);
 
             // Load Config File
             try
@@ -330,7 +335,7 @@ namespace vimage
                             NextWindowPos.Y = bottom;
                     }
                     Window.Position = ShowTitleBar
-                        ? NextWindowPos - DWM.GetTitleBarDifference(Window.SystemHandle)
+                        ? NextWindowPos - DWM.GetTitleBarDifference(Window.NativeHandle)
                         : NextWindowPos;
 
                     doRedraw = true;
@@ -392,7 +397,7 @@ namespace vimage
                 );
             }
             // Draw Image
-            if (Image is Drawable drawable)
+            if (Image is IDrawable drawable)
                 Window.Draw(drawable);
             // Draw Other
             if (Cropping && CropRect != null)
@@ -427,7 +432,7 @@ namespace vimage
                     CloseNextTick = true;
                     return;
                 case Action.OpenContextMenu:
-                    OpenContextMenu();
+                    ContextMenu?.Open(Mouse.GetPosition());
                     return;
                 case Action.PrevImage:
                     PrevImage();
@@ -633,7 +638,7 @@ namespace vimage
 
         private void OnMouseMoved(object? sender, MouseMoveEventArgs e)
         {
-            MousePos = new Vector2i(e.X, e.Y);
+            MousePos = new Vector2i(e.Position.X, e.Position.Y);
 
             if (Dragging)
                 UnforceAlwaysOnTop();
@@ -1024,7 +1029,7 @@ namespace vimage
             UnforceAlwaysOnTop();
 
             var view = Window.GetView();
-            view.Rotation = -Rotation;
+            view.Rotation = Angle.FromDegrees(-Rotation);
             if (Rotation == 90 || Rotation == 270)
             {
                 WindowSize = new Vector2u(
@@ -1176,7 +1181,7 @@ namespace vimage
                 );
 
             if (ShowTitleBar)
-                NextWindowPos -= DWM.GetTitleBarDifference(Window.SystemHandle);
+                NextWindowPos -= DWM.GetTitleBarDifference(Window.NativeHandle);
 
             // Temporarily set always on top to bring it infront of the taskbar?
             if (!FitToMonitorAlt)
@@ -1405,7 +1410,7 @@ namespace vimage
 
             AlwaysOnTop = val == -1 ? !AlwaysOnTop : val == 1;
             AlwaysOnTopForced = false;
-            DWM.SetAlwaysOnTop(Window.SystemHandle, AlwaysOnTop);
+            DWM.SetAlwaysOnTop(Window.NativeHandle, AlwaysOnTop);
 
             return AlwaysOnTop;
         }
@@ -1415,7 +1420,7 @@ namespace vimage
             ForceAlwaysOnTopNextTick = false;
             AlwaysOnTop = true;
             AlwaysOnTopForced = true;
-            DWM.SetAlwaysOnTop(Window.SystemHandle);
+            DWM.SetAlwaysOnTop(Window.NativeHandle);
         }
 
         /// <summary>Turns Always On Top off if it was forced.</summary>
@@ -1428,7 +1433,7 @@ namespace vimage
 
             AlwaysOnTop = false;
             AlwaysOnTopForced = false;
-            DWM.SetAlwaysOnTop(Window.SystemHandle, false);
+            DWM.SetAlwaysOnTop(Window.NativeHandle, false);
         }
 
         public void ForceAlwaysOnTopCheck(IntRect bounds, IntRect workingArea)
@@ -1464,7 +1469,7 @@ namespace vimage
                 return ClickThroughAble;
 
             ClickThroughAble = val == -1 ? !ClickThroughAble : val == 1;
-            DWM.SetClickThroughAble(Window.SystemHandle, ClickThroughAble);
+            DWM.SetClickThroughAble(Window.NativeHandle, ClickThroughAble);
 
             return ClickThroughAble;
         }
@@ -1475,7 +1480,7 @@ namespace vimage
                 return ShowTitleBar;
 
             var diff = ShowTitleBar
-                ? DWM.GetTitleBarDifference(Window.SystemHandle)
+                ? DWM.GetTitleBarDifference(Window.NativeHandle)
                 : new Vector2i();
 
             ShowTitleBar = val == -1 ? !ShowTitleBar : val == -1;
@@ -1483,7 +1488,7 @@ namespace vimage
             DWM.TitleBarSetVisible(Window, ShowTitleBar);
             if (ShowTitleBar)
             {
-                Window.Position -= DWM.GetTitleBarDifference(Window.SystemHandle);
+                Window.Position -= DWM.GetTitleBarDifference(Window.NativeHandle);
                 Zoom(CurrentZoom, true);
             }
             else
@@ -1500,7 +1505,7 @@ namespace vimage
             bool visible = val == -1 ? !DWM.TaskbarIconVisible : (val == 1);
             if (val != -1 && DWM.TaskbarIconVisible == visible)
                 return visible;
-            DWM.TaskBarIconSetVisible(Window.SystemHandle, visible);
+            DWM.TaskBarIconSetVisible(Window.NativeHandle, visible);
             return visible;
         }
 
@@ -1528,7 +1533,7 @@ namespace vimage
             CropStartPos = ImageViewerUtils.LimitToWindow(Mouse.GetPosition(), Window);
             CropRect.Position = Window.MapPixelToCoords(
                 CropStartPos
-                    - (ShowTitleBar ? DWM.GetWindowClientPos(Window.SystemHandle) : Window.Position)
+                    - (ShowTitleBar ? DWM.GetWindowClientPos(Window.NativeHandle) : Window.Position)
             );
         }
 
@@ -1587,7 +1592,7 @@ namespace vimage
                 pos.Y < CropStartPos.Y ? pos.Y : CropStartPos.Y
             );
             if (ShowTitleBar)
-                NextWindowPos -= DWM.GetTitleBarDifference(Window.SystemHandle);
+                NextWindowPos -= DWM.GetTitleBarDifference(Window.NativeHandle);
 
             CropRect.Size = new Vector2f();
 
@@ -2370,15 +2375,6 @@ namespace vimage
             // Wait a bit for the config file to be unlocked
             Thread.Sleep(500);
             ReloadConfigNextTick = true;
-        }
-
-        public void OpenContextMenu()
-        {
-            if (ContextMenu is null)
-                return;
-            ContextMenu.RefreshItems();
-            ContextMenu.Show(Mouse.GetPosition().X, Mouse.GetPosition().Y);
-            ContextMenu.Capture = true;
         }
 
         public void DoCustomAction(string actionKey)

@@ -158,8 +158,8 @@ namespace vimage
                 "MOUSELEFT" or "MOUSE1" => new MouseInput(Mouse.Button.Left),
                 "MOUSERIGHT" or "MOUSE2" => new MouseInput(Mouse.Button.Right),
                 "MOUSEMIDDLE" or "MOUSE3" => new MouseInput(Mouse.Button.Middle),
-                "MOUSEX1" or "MOUSEXBUTTON1" or "MOUSE4" => new MouseInput(Mouse.Button.XButton1),
-                "MOUSEX2" or "MOUSEXBUTTON2" or "MOUSE5" => new MouseInput(Mouse.Button.XButton2),
+                "MOUSEX1" or "MOUSEXBUTTON1" or "MOUSE4" => new MouseInput(Mouse.Button.Extra1),
+                "MOUSEX2" or "MOUSEXBUTTON2" or "MOUSE5" => new MouseInput(Mouse.Button.Extra2),
                 "SCROLLUP" => new MouseWheelInput(MouseWheel.ScrollUp),
                 "SCROLLDOWN" => new MouseWheelInput(MouseWheel.ScrollDown),
 

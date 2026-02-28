@@ -88,24 +88,24 @@ namespace vimage.Display
         {
             _ = visible
                 ? SetWindowLongPtr(
-                    window.SystemHandle,
+                    window.NativeHandle,
                     GWL_STYLE,
                     new nint(
-                        GetWindowLongPtr(window.SystemHandle, GWL_STYLE).ToInt64()
+                        GetWindowLongPtr(window.NativeHandle, GWL_STYLE).ToInt64()
                             | WS_CAPTION
                             | WS_SYSMENU
                     )
                 )
                 : SetWindowLongPtr(
-                    window.SystemHandle,
+                    window.NativeHandle,
                     GWL_STYLE,
                     new nint(
-                        GetWindowLongPtr(window.SystemHandle, GWL_STYLE).ToInt64() & ~WS_CAPTION
+                        GetWindowLongPtr(window.NativeHandle, GWL_STYLE).ToInt64() & ~WS_CAPTION
                     )
                 );
 
             _ = SetWindowPos(
-                window.SystemHandle,
+                window.NativeHandle,
                 new IntPtr(0),
                 window.Position.X,
                 window.Position.Y,
@@ -118,9 +118,9 @@ namespace vimage.Display
         public static void PreventExlusiveFullscreen(RenderWindow window)
         {
             _ = SetWindowLongPtr(
-                window.SystemHandle,
+                window.NativeHandle,
                 GWL_STYLE,
-                new nint(GetWindowLongPtr(window.SystemHandle, GWL_STYLE).ToInt64() & ~WS_POPUP)
+                new nint(GetWindowLongPtr(window.NativeHandle, GWL_STYLE).ToInt64() & ~WS_POPUP)
             );
         }
 
